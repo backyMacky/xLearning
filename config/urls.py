@@ -17,83 +17,31 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
 from web_project.views import SystemView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
-    # FrontPages urls
+    
+    # Front pages (public pages)
     path("", include("apps.front_pages.urls")),
-
-    # Dashboard urls
-    path("", include("apps.dashboards.urls")),
- 
-    # FrontPages urls
-    path("", include("apps.mail.urls")),
-
-    # Chat urls
-    path("", include("apps.chat.urls")),
-
-    # Calendar urls
-    path("", include("apps.my_calendar.urls")),
-
-     
-    # eCommerce urls
-    path("", include("apps.ecommerce.urls")),
-
-    # Academy urls
-    path("", include("apps.academy.urls")),
-
-    # Logistics urls
-    path("", include("apps.logistics.urls")),
-
-    # Invoice urls
-    path("", include("apps.invoice.urls")),
-
-    # User urls
-    path("", include("apps.users.urls")),
-
-    # Access urls
-    path("", include("apps.access.urls")),
-
-    # Pages urls
-    path("", include("apps.pages.urls")),
-
-    # Auth urls
-    path("", include("apps.authentication.urls")),
-
-    # Wizard urls
-    path("", include("apps.wizard_examples.urls")),
-
-    # ModalExample urls
-    path("", include("apps.modal_examples.urls")),
- 
-    # Forms urls
-    path("", include("apps.forms.urls")),
-
-    # FormLayouts urls
-    path("", include("apps.form_layouts.urls")),
-
-    # FormWizard urls
-    path("", include("apps.form_wizard.urls")),
-
-    # FormValidation urls
-    path("", include("apps.form_validation.urls")),
-
-    # Tables urls
-    path("", include("apps.tables.urls")),
-
-    # Chart urls
-    path("", include("apps.charts.urls")),
-
-     
-    # auth urls
-    path("", include("auth.urls")),
-
-    # transaction urls
-    path("", include("apps.transactions.urls")),
+    
+    # App URLs (authenticated access)
+    path("account/", include(("apps.account.urls", "account"), namespace="account")),
+    path("content/", include(("apps.content.urls", "content"), namespace="content")),
+    path("meetings/", include(("apps.meetings.urls", "meetings"), namespace="meetings")),
+    path("assessment/", include(("apps.assessment.urls", "assessment"), namespace="assessment")),
+    path("repository/", include(("apps.repository.urls", "repository"), namespace="repository")),
+    path("booking/", include(("apps.booking.urls", "booking"), namespace="booking")),
+    path("dashboard/", include(("apps.dashboards.urls", "dashboards"), namespace="dashboards")),
 ]
 
+# Add media files serving in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Error handlers
 handler404 = SystemView.as_view(template_name="pages_misc_error.html", status=404)
 handler403 = SystemView.as_view(template_name="pages_misc_not_authorized.html", status=403)
 handler400 = SystemView.as_view(template_name="pages_misc_error.html", status=400)

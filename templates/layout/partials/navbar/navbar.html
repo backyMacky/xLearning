@@ -14,7 +14,7 @@
       <!--  Brand demo (display only for navbar-full and hide on below xl) -->
       {% if navbar_full %}
       <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
-        <a href="{% url 'index' %}" class="app-brand-link">
+        <a href="{% url 'dashboards:overview' %}" class="app-brand-link">
           <span class="app-brand-logo demo">
             {% include 'partials/logo.html' %}
           </span>
@@ -137,14 +137,14 @@
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-calendar ti-26px text-heading"></i>
                     </span>
-                    <a href="{% url 'app-calendar' %}" class="stretched-link">Calendar</a>
+                    <a href="" class="stretched-link">Calendar</a>
                     <small>Appointments</small>
                   </div>
                   <div class="dropdown-shortcuts-item col">
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-file-dollar ti-26px text-heading"></i>
                     </span>
-                    <a href="{% url 'app-invoice-list' %}" class="stretched-link">Invoice App</a>
+                    <a href="" class="stretched-link">Invoice App</a>
                     <small>Manage Accounts</small>
                   </div>
                 </div>
@@ -153,14 +153,14 @@
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-user ti-26px text-heading"></i>
                     </span>
-                    <a href="{% url 'app-user-list' %}" class="stretched-link">User App</a>
+                    <a href="" class="stretched-link">User App</a>
                     <small>Manage Users</small>
                   </div>
                   <div class="dropdown-shortcuts-item col">
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-users ti-26px text-heading"></i>
                     </span>
-                    <a href="{% url 'app-access-roles' %}" class="stretched-link">Role Management</a>
+                    <a href="" class="stretched-link">Role Management</a>
                     <small>Permission</small>
                   </div>
                 </div>
@@ -169,14 +169,14 @@
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-device-desktop-analytics ti-26px text-heading"></i>
                     </span>
-                    <a href="{% url 'index' %}" class="stretched-link">Dashboard</a>
+                    <a href="{% url 'dashboards:overview' %}" class="stretched-link">Dashboard</a>
                     <small>User Dashboard</small>
                   </div>
                   <div class="dropdown-shortcuts-item col">
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-settings ti-26px text-heading"></i>
                     </span>
-                    <a href="{% url 'pages-account-settings-security' %}" class="stretched-link">Setting</a>
+                    <a href="" class="stretched-link">Setting</a>
                     <small>Account Settings</small>
                   </div>
                 </div>
@@ -185,14 +185,14 @@
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-help ti-26px text-heading"></i>
                     </span>
-                    <a href="{% url 'pages-faq' %}" class="stretched-link">FAQs</a>
+                    <a href=" class="stretched-link">FAQs</a>
                     <small>FAQs & Articles</small>
                   </div>
                   <div class="dropdown-shortcuts-item col">
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-square ti-26px text-heading"></i>
                     </span>
-                    <a href="{% url 'modal-examples' %}" class="stretched-link">Modals</a>
+                    
                     <small>Useful Popups</small>
                   </div>
                 </div>
@@ -409,7 +409,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
-                <a class="dropdown-item mt-0" href="{% url 'pages-account-settings-account' %}">
+                <a class="dropdown-item mt-0" href="">
                   <div class="d-flex align-items-center">
                     <div class="flex-shrink-0 me-2">
                       <div class="avatar avatar-online">
@@ -433,17 +433,17 @@
                 <div class="dropdown-divider my-1 mx-n2"></div>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'pages-profile-user' %}">
+                <a class="dropdown-item" href="">
                   <i class="ti ti-user me-3 ti-md"></i><span class="align-middle">My Profile</span>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'pages-account-settings-account' %}">
+                <a class="dropdown-item" href="">
                   <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Settings</span>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'pages-account-settings-billing' %}">
+                <a class="dropdown-item" href="">
                   <span class="d-flex align-items-center align-middle">
                     <i class="flex-shrink-0 ti ti-file-dollar me-3 ti-md"></i><span class="flex-grow-1 align-middle">Billing</span>
                     <span class="flex-shrink-0 badge bg-danger d-flex align-items-center justify-content-center">4</span>
@@ -454,12 +454,12 @@
                 <div class="dropdown-divider my-1 mx-n2"></div>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'pages-faq' %}">
+                <a class="dropdown-item" href="">
                   <i class="ti ti-currency-dollar me-3 ti-md"></i><span class="align-middle">Pricing</span>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'pages-pricing' %}">
+                <a class="dropdown-item" href="">
                   <i class="ti ti-question-mark me-3 ti-md"></i><span class="align-middle">FAQ</span>
                 </a>
               </li>
@@ -476,7 +476,7 @@
                   <span class="text-success"><i class='ti ti-circle-check ti-md'></i></span>
                 </span>
                 {% else %}
-                <a class="dropdown-item d-flex justify-content-between align-content-center" href="{% url 'verify-email-page' %}">
+                <a class="dropdown-item d-flex justify-content-between align-content-center" href="">
                   <span>
                     <i class='ti ti-user-circle me-2 ti-md'></i>
                     <span class="align-middle">Not Verified</span>
@@ -486,7 +486,7 @@
                 {% endif %}
               </li>
               <li class="mt-1">
-                <form action="{% url 'logout' %}" method="post">
+                <form action="{% url 'account:logout' %}" method="post">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-sm btn-danger d-flex w-100">
                     <span class="align-middle">Log Out</span>
