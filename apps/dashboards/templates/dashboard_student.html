@@ -1,0 +1,679 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Student Dashboard - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/swiper/swiper.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/swiper/swiper.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static 'js/dashboards-student.js' %}"></script>
+{% endblock page_js %}
+
+{% block content %}
+
+<!-- Student Stats Overview -->
+<div class="row">
+  <div class="col-lg-8 mb-4">
+    <div class="card">
+      <div class="d-flex align-items-center row">
+        <div class="col-sm-7">
+          <div class="card-body">
+            <h4 class="card-title mb-1">Welcome back, {{request.user.username}} 👋</h4>
+            <p class="mb-4">Track your learning progress</p>
+            
+            <div class="d-flex align-items-center pt-1 mb-3">
+              <div class="d-flex justify-content-between flex-grow-1 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-primary rounded">
+                      <i class="ti ti-book ti-md"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{enrolled_courses|default:"0"}}</h5>
+                    <span>Enrolled Courses</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-success rounded">
+                      <i class="ti ti-checkbox ti-md"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{completed_lessons|default:"0"}}</h5>
+                    <span>Completed Lessons</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="d-flex align-items-center">
+              <div class="d-flex justify-content-between flex-grow-1 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-info rounded">
+                      <i class="ti ti-credit-card ti-md"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{credit_balance|default:"0"}}</h5>
+                    <span>Credits Available</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-warning rounded">
+                      <i class="ti ti-chart-pie ti-md"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{avg_score|default:"0"}}%</h5>
+                    <span>Average Score</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="d-flex align-items-center mt-4">
+              <a href="{% url 'content:course_list' %}" class="btn btn-primary me-2">
+                <i class="ti ti-book me-1"></i> Browse Courses
+              </a>
+              <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-primary">
+                <i class="ti ti-calendar-event me-1"></i> Book a Session
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-5 text-center text-sm-left">
+          <div class="card-body pb-0 px-0 px-md-4">
+            <img src="{% static 'img/illustrations/student-illustration.png' %}" height="140" alt="Student Illustration" class="img-fluid">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Upcoming Sessions -->
+  <div class="col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Upcoming Sessions</h5>
+        <a href="{% url 'meetings:meeting_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if upcoming_meetings %}
+          {% for meeting in upcoming_meetings %}
+          <div class="d-flex mb-3 pb-1 {% if not forloop.last %}border-bottom{% endif %}">
+            <div class="flex-shrink-0 me-3">
+              <div class="avatar">
+                <div class="avatar-initial rounded bg-label-primary">
+                  <i class="ti ti-video ti-md"></i>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0">{{ meeting.title }}</h6>
+                <small class="text-muted">
+                  {{ meeting.start_time|date:"M d, h:i A" }}
+                  {% if meeting.teacher %}
+                  • {{ meeting.teacher.username }}
+                  {% endif %}
+                </small>
+              </div>
+              {% if meeting.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" %}
+              <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">Join</a>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-calendar-off ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No upcoming sessions</h6>
+            <p class="mb-4">You don't have any scheduled sessions</p>
+            <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-primary">Book a Session</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Course Progress Section -->
+<div class="row">
+  <!-- Course Progress -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title mb-0">My Course Progress</h5>
+        <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-outline-primary">All Courses</a>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% if course_progress %}
+            {% for course in course_progress %}
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-none bg-transparent border">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                      {% if course.image %}
+                        <img src="{{ course.image.url }}" class="me-3 rounded" width="40" alt="{{ course.title }}">
+                      {% else %}
+                        <div class="avatar me-3">
+                          <div class="avatar-initial rounded bg-label-{{ forloop.counter|divisibleby:3|yesno:"success,info,primary" }}">
+                            <i class="ti ti-book ti-sm"></i>
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div>
+                        <h6 class="mb-0">{{ course.title }}</h6>
+                        <small class="text-muted">{{ course.teacher }}</small>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="progress w-100" style="height: 8px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ course.progress }}%" aria-valuenow="{{ course.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                      <span class="ms-3">{{ course.progress }}%</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                      <small class="text-muted">{{ course.completed_lessons }}/{{ course.lessons_count }} lessons</small>
+                      {% if course.next_lesson %}
+                        <a href="{% url 'content:lesson_detail' lesson_id=course.next_lesson.id %}" class="btn btn-sm btn-primary">Continue</a>
+                      {% endif %}
+                    </div>
+                    
+                    <div class="text-end">
+                      <a href="{% url 'content:course_detail' course_id=course.id %}" class="text-primary">View Course</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+            {% if course_progress|length == 0 %}
+              <div class="col-12">
+                <div class="text-center py-5">
+                  <div class="avatar avatar-md mb-3">
+                    <div class="avatar-initial rounded-circle bg-label-primary">
+                      <i class="ti ti-books ti-md"></i>
+                    </div>
+                  </div>
+                  <h6 class="mb-1">No courses enrolled</h6>
+                  <p class="mb-3">Browse available courses to start your learning journey</p>
+                  <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">Browse Courses</a>
+                </div>
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="col-12">
+              <div class="text-center py-5">
+                <div class="avatar avatar-md mb-3">
+                  <div class="avatar-initial rounded-circle bg-label-primary">
+                    <i class="ti ti-books ti-md"></i>
+                  </div>
+                </div>
+                <h6 class="mb-1">No courses enrolled</h6>
+                <p class="mb-3">Browse available courses to start your learning journey</p>
+                <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">Browse Courses</a>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Assessment Results -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title mb-0">Recent Assessment Results</h5>
+        <a href="{% url 'assessment:quiz_list' %}" class="btn btn-sm btn-outline-primary">All Quizzes</a>
+      </div>
+      <div class="card-body">
+        {% if assessment_results %}
+          {% for result in assessment_results %}
+            <div class="d-flex mb-3 pb-1 {% if not forloop.last %}border-bottom{% endif %}">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-{% if result.score >= 70 %}success{% elif result.score >= 50 %}warning{% else %}danger{% endif %}">
+                  <i class="ti ti-file-text ti-md"></i>
+                </div>
+              </div>
+              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                <div>
+                  <h6 class="mb-0">{{ result.title }}</h6>
+                  <small class="text-muted">{{ result.course_title }}</small>
+                </div>
+                <div class="d-flex align-items-center">
+                  <div>
+                    <h6 class="mb-0 text-{% if result.score >= 70 %}success{% elif result.score >= 50 %}warning{% else %}danger{% endif %}">{{ result.score }}%</h6>
+                    <small class="text-muted">{{ result.correct_answers }}/{{ result.total_questions }}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-report ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No assessment results yet</h6>
+            <p class="mb-3">Take quizzes to test your knowledge</p>
+            <a href="{% url 'assessment:quiz_list' %}" class="btn btn-sm btn-primary">Browse Quizzes</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Learning Statistics -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Learning Activity</h5>
+      </div>
+      <div class="card-body">
+        <div id="learningActivityChart" class="mb-3" style="min-height: 250px;"></div>
+        
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <div class="avatar-initial rounded bg-label-primary">
+                  <i class="ti ti-clock ti-sm"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ total_hours|default:"0" }}h</h6>
+                <small>This Week</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <div class="avatar-initial rounded bg-label-success">
+                  <i class="ti ti-checkbox ti-sm"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ total_completed|default:"0" }}</h6>
+                <small>Lessons Completed</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <div class="avatar-initial rounded bg-label-info">
+                  <i class="ti ti-file-text ti-sm"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ assessments_taken|default:"0" }}</h6>
+                <small>Quizzes Taken</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <div class="avatar-initial rounded bg-label-warning">
+                  <i class="ti ti-calendar-event ti-sm"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ total_sessions|default:"0" }}</h6>
+                <small>Sessions Attended</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Available Booking Slots -->
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title mb-0">Available Booking Slots</h5>
+        <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if available_slots %}
+          {% for slot in available_slots %}
+            <div class="d-flex mb-3 pb-1 {% if not forloop.last %}border-bottom{% endif %}">
+              <div class="flex-shrink-0 me-3">
+                <div class="avatar">
+                  <div class="avatar-initial rounded bg-label-primary">
+                    <i class="ti ti-calendar-event ti-md"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                <div class="me-2">
+                  <h6 class="mb-0">{{ slot.day_of_week }}, {{ slot.date }}</h6>
+                  <small class="text-muted">{{ slot.time }} ({{ slot.duration }} min) • {{ slot.teacher }}</small>
+                </div>
+                <a href="{% url 'booking:book_slot' slot_id=slot.id %}" class="btn btn-sm btn-primary">Book</a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-calendar-off ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No available slots</h6>
+            <p class="mb-3">Check back later for available booking slots</p>
+            <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-primary">View Booking</a>
+          </div>
+        {% endif %}
+        
+        <div class="d-flex align-items-center justify-content-between mt-4 pt-1 border-top">
+          <div>
+            <h6 class="mb-1">Your Credit Balance</h6>
+            <p class="mb-0 text-muted">For booking sessions</p>
+          </div>
+          <div class="d-flex align-items-center">
+            <h5 class="mb-0 text-primary me-2">{{ credit_balance|default:"0" }}</h5>
+            <a href="{% url 'booking:purchase_credits' %}" class="btn btn-sm btn-outline-primary">
+              <i class="ti ti-plus me-1"></i> Add Credits
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Learning Resources Section -->
+<div class="row">
+  <!-- Learning Resources -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title mb-0">Learning Resources</h5>
+        <a href="{% url 'repository:dashboard' %}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if resources %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Course</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for resource in resources %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-2">
+                          <div class="avatar-initial rounded bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
+                            <i class="ti ti-{{ resource.icon|default:"file" }} ti-sm"></i>
+                          </div>
+                        </div>
+                        <div>
+                          <h6 class="mb-0">{{ resource.title }}</h6>
+                          <small class="text-muted">{{ resource.file_type }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ resource.course_title }}</td>
+                    <td>
+                      <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon">
+                        <i class="ti ti-download"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-file ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No resources yet</h6>
+            <p class="mb-3">Resources will appear when you enroll in courses</p>
+            <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">Browse Courses</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- My Files -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title mb-0">My Files</h5>
+        <a href="{% url 'repository:upload_file' %}" class="btn btn-sm btn-primary">
+          <i class="ti ti-upload me-1"></i> Upload
+        </a>
+      </div>
+      <div class="card-body">
+        {% if student_files %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Course</th>
+                  <th>Views</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for file in student_files %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-2">
+                          <div class="avatar-initial rounded bg-label-{{ file.file_type|lower|cut:" "|default:"primary" }}">
+                            <i class="ti ti-{{ file.icon|default:"file" }} ti-sm"></i>
+                          </div>
+                        </div>
+                        <span>{{ file.title }}</span>
+                      </div>
+                    </td>
+                    <td>{{ file.course_title }}</td>
+                    <td>{{ file.view_count }}</td>
+                    <td>
+                      <div class="d-flex">
+                        <a href="{% url 'repository:download_file' file_id=file.id %}" class="btn btn-sm btn-icon">
+                          <i class="ti ti-download"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-upload ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No files uploaded</h6>
+            <p class="mb-3">Upload your assignment files and documents</p>
+            <a href="{% url 'repository:upload_file' %}" class="btn btn-sm btn-primary">Upload Files</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recommended Courses -->
+{% if recommended_courses %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Recommended for You</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% for course in recommended_courses %}
+            <div class="col-md-4 mb-4 mb-md-0">
+              <div class="card shadow-none bg-transparent border h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    {% if course.image %}
+                      <img src="{{ course.image.url }}" class="me-3 rounded" width="46" alt="{{ course.title }}">
+                    {% else %}
+                      <div class="avatar me-3">
+                        <div class="avatar-initial rounded bg-label-{{ forloop.counter|divisibleby:3|yesno:"success,info,primary" }}">
+                          <i class="ti ti-book ti-md"></i>
+                        </div>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <h6 class="mb-0">{{ course.title }}</h6>
+                      <small class="text-muted">{{ course.teacher }}</small>
+                    </div>
+                  </div>
+                  <p class="mb-3">{{ course.description }}</p>
+                  <a href="{% url 'content:course_detail' course_id=course.id %}" class="btn btn-primary w-100">View Course</a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Learning Activity Chart
+    const learningActivityOptions = {
+      series: [{
+        name: 'Hours Spent',
+        data: {{ weekly_hours|default:"[0, 0, 0, 0, 0, 0, 0]"|safe }}
+      }],
+      chart: {
+        height: 250,
+        type: 'area',
+        toolbar: {
+          show: false
+        },
+        sparkline: {
+          enabled: false
+        }
+      },
+      grid: {
+        show: false,
+        padding: {
+          left: 0,
+          right: 0
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        width: 2,
+        curve: 'smooth'
+      },
+      legend: {
+        show: false
+      },
+      colors: ['#696cff'],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.2,
+          stops: [0, 90, 100]
+        }
+      },
+      xaxis: {
+        categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
+        labels: {
+          style: {
+            colors: '#b9b9c3',
+            fontSize: '13px'
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: '#b9b9c3',
+            fontSize: '13px'
+          }
+        }
+      },
+      tooltip: {
+        x: {
+          show: false
+        }
+      }
+    };
+    
+    if (document.querySelector("#learningActivityChart")) {
+      const learningActivityChart = new ApexCharts(
+        document.querySelector("#learningActivityChart"),
+        learningActivityOptions
+      );
+      learningActivityChart.render();
+    }
+  });
+</script>
+{% endblock %}

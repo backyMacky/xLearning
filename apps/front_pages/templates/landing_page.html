@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Landing Page - Front Pages{% endblock %}
+{% block title %}LinguaConnect - All-in-one Platform for Language Teachers{% endblock %}
 
 {% block vendor_css %}
 {{ block.super }}
@@ -19,7 +19,7 @@
 
 {% block page_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static  'vendor/css/pages/front-page-landing.css' %}">
+<link rel="stylesheet" href="{% static 'vendor/css/pages/front-page-landing.css' %}">
 {% endblock page_css %}
 
 {% block page_js %}
@@ -46,7 +46,7 @@
                   <h2 class="hero-sub-title h6 mb-4">Streamline your language teaching workflow</h2>
                   <p class="mb-4">The all-in-one platform for language teachers to manage students, content, and scheduling in one integrated system.</p>
                   <div class="landing-hero-btn">
-                    <a href="{% url 'landing-page' %}#landingPricing" class="btn btn-primary btn-lg">Get started now</a>
+                    <a href="{% url 'front_pages:pricing-page' %}" class="btn btn-primary btn-lg">Get started now</a>
                   </div>
                 </div>
               </div>
@@ -57,7 +57,9 @@
               </div>
             </div>
           </div>
-      
+        </div>
+      </div>
+    </div>
   </section>
   <!-- Hero: End -->
 
@@ -65,57 +67,57 @@
   <section id="landingFeatures" class="section-py landing-features">
     <div class="container">
       <div class="text-center mb-4">
-        <span class="badge bg-label-primary">Useful Features</span>
+        <span class="badge bg-label-primary">Key Benefits</span>
       </div>
       <h4 class="text-center mb-1">
         <span class="position-relative fw-extrabold z-1">Everything you need
           <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="laptop charging" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
         </span>
-        to start your next project
+        for effective language teaching
       </h4>
-      <p class="text-center mb-12">Not just a set of tools, the package includes ready-to-deploy conceptual application.</p>
+      <p class="text-center mb-12">A comprehensive platform designed specifically for language teachers and their students.</p>
       <div class="features-icon-wrapper row gx-0 gy-6 g-sm-12">
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="text-center mb-4">
             <img src="{% static 'img/front-pages/icons/laptop.png' %}" alt="laptop charging" />
           </div>
-          <h5 class="mb-2">Quality Code</h5>
-          <p class="features-icon-description">Code structure that all developers will easily understand and fall in love with.</p>
+          <h5 class="mb-2">Reduced Administrative Time</h5>
+          <p class="features-icon-description">Automates scheduling, reminders, and resource management for language teachers.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="text-center mb-4">
             <img src="{% static 'img/front-pages/icons/rocket.png' %}" alt="transition up" />
           </div>
-          <h5 class="mb-2">Continuous Updates</h5>
-          <p class="features-icon-description">Free updates for the next 12 months, including new demos and features.</p>
+          <h5 class="mb-2">Enhanced Student Experience</h5>
+          <p class="features-icon-description">Provides organized access to lessons, resources, and progress tracking.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="text-center mb-4">
             <img src="{% static 'img/front-pages/icons/paper.png' %}" alt="edit" />
           </div>
-          <h5 class="mb-2">Stater-Kit</h5>
-          <p class="features-icon-description">Start your project quickly without having to remove unnecessary features.</p>
+          <h5 class="mb-2">Improved Teaching Efficiency</h5>
+          <p class="features-icon-description">Centralizes content management and assessment tools for better outcomes.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="text-center mb-4">
             <img src="{% static 'img/front-pages/icons/check.png' %}" alt="3d select solid" />
           </div>
-          <h5 class="mb-2">API Ready</h5>
-          <p class="features-icon-description">Just change the endpoint and see your own data loaded within seconds.</p>
+          <h5 class="mb-2">Scalable Solution</h5>
+          <p class="features-icon-description">Built to handle growth beyond your current student base as your teaching expands.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="text-center mb-4">
             <img src="{% static 'img/front-pages/icons/user.png' %}" alt="lifebelt" />
           </div>
           <h5 class="mb-2">Excellent Support</h5>
-          <p class="features-icon-description">An easy-to-follow doc with lots of references and code examples.</p>
+          <p class="features-icon-description">Dedicated customer service to help you make the most of the platform.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="text-center mb-4">
             <img src="{% static 'img/front-pages/icons/keyboard.png' %}" alt="google docs" />
           </div>
-          <h5 class="mb-2">Well Documented</h5>
-          <p class="features-icon-description">An easy-to-follow doc with lots of references and code examples.</p>
+          <h5 class="mb-2">Comprehensive Documentation</h5>
+          <p class="features-icon-description">Detailed guides and tutorials to help you utilize all features effectively.</p>
         </div>
       </div>
     </div>
@@ -129,16 +131,16 @@
       <div class="row align-items-center gx-0 gy-4 g-lg-5 mb-5 pb-md-5">
         <div class="col-md-6 col-lg-5 col-xl-3">
           <div class="mb-4">
-            <span class="badge bg-label-primary">Real Customers Reviews</span>
+            <span class="badge bg-label-primary">Teacher Testimonials</span>
           </div>
           <h4 class="mb-1">
-            <span class="position-relative fw-extrabold z-1">What people say
+            <span class="position-relative fw-extrabold z-1">What teachers say
               <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="laptop charging" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
             </span>
           </h4>
           <p class="mb-5 mb-md-12">
-            See what our customers have to<br class="d-none d-xl-block" />
-            say about their experience.
+            See what language educators have to<br class="d-none d-xl-block" />
+            say about their experience with LinguaConnect.
           </p>
           <div class="landing-reviews-btns">
             <button id="reviews-previous-btn" class="btn btn-label-primary reviews-btn me-4 scaleX-n1-rtl" type="button">
@@ -160,8 +162,7 @@
                         <img src="{% static 'img/front-pages/branding/logo-1.png' %}" alt="client logo" class="client-logo img-fluid" />
                       </div>
                       <p>
-                        “Vuexy is hands down the most useful front end Bootstrap theme I've ever used. I can't wait
-                        to use it again for my next project.”
+                        "LinguaConnect has transformed how I organize my language classes. The scheduling and resource management features save me hours each week."
                       </p>
                       <div class="text-warning mb-4">
                         <i class="ti ti-star-filled"></i>
@@ -175,8 +176,8 @@
                           <img src="{% static 'img/avatars/1.png' %}" alt="Avatar" class="rounded-circle" />
                         </div>
                         <div>
-                          <h6 class="mb-0">Cecilia Payne</h6>
-                          <p class="small text-muted mb-0">CEO of Airbnb</p>
+                          <h6 class="mb-0">Maria Rodriguez</h6>
+                          <p class="small text-muted mb-0">Spanish Teacher</p>
                         </div>
                       </div>
                     </div>
@@ -189,8 +190,7 @@
                         <img src="{% static 'img/front-pages/branding/logo-2.png' %}" alt="client logo" class="client-logo img-fluid" />
                       </div>
                       <p>
-                        “I've never used a theme as versatile and flexible as Vuexy. It's my go to for building
-                        dashboard sites on almost any project.”
+                        "My students love the interface and how easy it is to access their learning materials. I've seen a notable improvement in their engagement."
                       </p>
                       <div class="text-warning mb-4">
                         <i class="ti ti-star-filled"></i>
@@ -204,8 +204,8 @@
                           <img src="{% static 'img/avatars/2.png' %}" alt="Avatar" class="rounded-circle" />
                         </div>
                         <div>
-                          <h6 class="mb-0">Eugenia Moore</h6>
-                          <p class="small text-muted mb-0">Founder of Hubspot</p>
+                          <h6 class="mb-0">Jean Pierre</h6>
+                          <p class="small text-muted mb-0">French Language School</p>
                         </div>
                       </div>
                     </div>
@@ -218,8 +218,7 @@
                         <img src="{% static 'img/front-pages/branding/logo-3.png' %}" alt="client logo" class="client-logo img-fluid" />
                       </div>
                       <p>
-                        This template is really clean & well documented. The docs are really easy to understand and
-                        it's always easy to find a screenshot from their website.
+                        "The assessment tools have revolutionized how I track student progress. I can now provide more personalized instruction based on real data."
                       </p>
                       <div class="text-warning mb-4">
                         <i class="ti ti-star-filled"></i>
@@ -233,8 +232,8 @@
                           <img src="{% static 'img/avatars/3.png' %}" alt="Avatar" class="rounded-circle" />
                         </div>
                         <div>
-                          <h6 class="mb-0">Curtis Fletcher</h6>
-                          <p class="small text-muted mb-0">Design Lead at Dribbble</p>
+                          <h6 class="mb-0">Akiko Tanaka</h6>
+                          <p class="small text-muted mb-0">Japanese Instructor</p>
                         </div>
                       </div>
                     </div>
@@ -247,8 +246,7 @@
                         <img src="{% static 'img/front-pages/branding/logo-4.png' %}" alt="client logo" class="client-logo img-fluid" />
                       </div>
                       <p>
-                        All the requirements for developers have been taken into consideration, so I’m able to build
-                        any interface I want.
+                        "As my language tutoring business grew, LinguaConnect scaled with me. I now manage 15 students effortlessly on the platform."
                       </p>
                       <div class="text-warning mb-4">
                         <i class="ti ti-star-filled"></i>
@@ -262,8 +260,8 @@
                           <img src="{% static 'img/avatars/4.png' %}" alt="Avatar" class="rounded-circle" />
                         </div>
                         <div>
-                          <h6 class="mb-0">Sara Smith</h6>
-                          <p class="small text-muted mb-0">Founder of Continental</p>
+                          <h6 class="mb-0">Hans Mueller</h6>
+                          <p class="small text-muted mb-0">German Language Tutor</p>
                         </div>
                       </div>
                     </div>
@@ -276,8 +274,7 @@
                         <img src="{% static 'img/front-pages/branding/logo-5.png' %}" alt="client logo" class="client-logo img-fluid" />
                       </div>
                       <p>
-                        “I've never used a theme as versatile and flexible as Vuexy. It's my go to for building
-                        dashboard sites on almost any project.”
+                        "The content management system allowed me to create a digital library of resources that my students can access anytime. Game changer!"
                       </p>
                       <div class="text-warning mb-4">
                         <i class="ti ti-star-filled"></i>
@@ -291,37 +288,8 @@
                           <img src="{% static 'img/avatars/5.png' %}" alt="Avatar" class="rounded-circle" />
                         </div>
                         <div>
-                          <h6 class="mb-0">Eugenia Moore</h6>
-                          <p class="small text-muted mb-0">Founder of Hubspot</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card h-100">
-                    <div class="card-body text-body d-flex flex-column justify-content-between h-100">
-                      <div class="mb-4">
-                        <img src="{% static 'img/front-pages/branding/logo-6.png' %}" alt="client logo" class="client-logo img-fluid" />
-                      </div>
-                      <p>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam nemo mollitia, ad eum
-                        officia numquam nostrum repellendus consequuntur!
-                      </p>
-                      <div class="text-warning mb-4">
-                        <i class="ti ti-star-filled"></i>
-                        <i class="ti ti-star-filled"></i>
-                        <i class="ti ti-star-filled"></i>
-                        <i class="ti ti-star-filled"></i>
-                        <i class="ti ti-star"></i>
-                      </div>
-                      <div class="d-flex align-items-center">
-                        <div class="avatar me-3 avatar-sm">
-                          <img src="{% static 'img/avatars/1.png' %}" alt="Avatar" class="rounded-circle" />
-                        </div>
-                        <div>
-                          <h6 class="mb-0">Sara Smith</h6>
-                          <p class="small text-muted mb-0">Founder of Continental</p>
+                          <h6 class="mb-0">Li Wei</h6>
+                          <p class="small text-muted mb-0">Mandarin Teacher</p>
                         </div>
                       </div>
                     </div>
@@ -365,19 +333,19 @@
   </section>
   <!-- Real customers reviews: End -->
 
-  <!-- Our great team: Start -->
+  <!-- Our team: Start -->
   <section id="landingTeam" class="section-py landing-team">
     <div class="container">
       <div class="text-center mb-4">
-        <span class="badge bg-label-primary">Our Great Team</span>
+        <span class="badge bg-label-primary">Our Development Team</span>
       </div>
       <h4 class="text-center mb-1">
-        <span class="position-relative fw-extrabold z-1">Supported
+        <span class="position-relative fw-extrabold z-1">Expert Team
           <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="laptop charging" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
         </span>
-        by Real People
+        Behind LinguaConnect
       </h4>
-      <p class="text-center mb-md-11 pb-0 pb-xl-12">Who is behind these great-looking interfaces?</p>
+      <p class="text-center mb-md-11 pb-0 pb-xl-12">Meet the talented people who created this powerful platform</p>
       <div class="row gy-12 mt-2">
         <div class="col-lg-3 col-sm-6">
           <div class="card mt-3 mt-lg-0 shadow-none">
@@ -426,7 +394,7 @@
       </div>
     </div>
   </section>
-  <!-- Our great team: End -->
+  <!-- Our team: End -->
 
   <!-- Pricing plans: Start -->
   <section id="landingPricing" class="section-py bg-body landing-pricing">
@@ -435,12 +403,12 @@
         <span class="badge bg-label-primary">Pricing Plans</span>
       </div>
       <h4 class="text-center mb-1">
-        <span class="position-relative fw-extrabold z-1">Tailored pricing plans
+        <span class="position-relative fw-extrabold z-1">Plans for every teacher
           <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="laptop charging" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
         </span>
-        designed for you
+        from solo tutors to language schools
       </h4>
-      <p class="text-center pb-2 mb-7">All plans include 40+ advanced tools and features to boost your product.<br />Choose the best plan to fit your needs.</p>
+      <p class="text-center pb-2 mb-7">All plans include core features to help you manage your language classes.<br />Choose the best plan to fit your needs.</p>
       <div class="text-center mb-12">
         <div class="position-relative d-inline-block pt-3 pt-md-0">
           <label class="switch switch-sm switch-primary me-0">
@@ -465,7 +433,7 @@
             <div class="card-header">
               <div class="text-center">
                 <img src="{% static 'img/front-pages/icons/paper-airplane.png' %}" alt="paper airplane icon" class="mb-8 pb-2" />
-                <h4 class="mb-0">Basic</h4>
+                <h4 class="mb-0">Solo Teacher</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <span class="price-monthly h2 text-primary fw-extrabold mb-0">$19</span>
                   <span class="price-yearly h2 text-primary fw-extrabold mb-0 d-none">$14</span>
@@ -481,61 +449,55 @@
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Timeline
+                    Up to 10 students
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Basic search
+                    Resource library
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Live chat widget
+                    Basic scheduling
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Email marketing
+                    Email notifications
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Custom Forms
+                    Progress tracking
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Traffic analytics
-                  </h6>
-                </li>
-                <li>
-                  <h6 class="mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Basic Support
+                    Email support
                   </h6>
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="{% url 'payment-page' %}" class="btn btn-label-primary">Get Started</a>
+                <a href="" class="btn btn-label-primary">Get Started</a>
               </div>
             </div>
           </div>
         </div>
         <!-- Basic Plan: End -->
 
-        <!-- Favourite Plan: Start -->
+        <!-- Pro Plan: Start -->
         <div class="col-xl-4 col-lg-6">
           <div class="card border border-primary shadow-xl">
             <div class="card-header">
               <div class="text-center">
                 <img src="{% static 'img/front-pages/icons/plane.png' %}" alt="plane icon" class="mb-8 pb-2" />
-                <h4 class="mb-0">Team</h4>
+                <h4 class="mb-0">Language Pro</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <span class="price-monthly h2 text-primary fw-extrabold mb-0">$29</span>
                   <span class="price-yearly h2 text-primary fw-extrabold mb-0 d-none">$22</span>
@@ -551,61 +513,55 @@
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Everything in basic
+                    Everything in Solo Teacher
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Timeline with database
+                    Up to 30 students
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Advanced search
+                    Advanced assessment tools
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Marketing automation
+                    Student communication portal
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Advanced chatbot
+                    Automated reminders
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Campaign management
-                  </h6>
-                </li>
-                <li>
-                  <h6 class="mb-3">
-                    <span class="badge badge-center rounded-pill bg-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Collaboration tools
+                    Priority support
                   </h6>
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="{% url 'payment-page' %}" class="btn btn-primary">Get Started</a>
+                <a href=" " class="btn btn-primary">Get Started</a>
               </div>
             </div>
           </div>
         </div>
-        <!-- Favourite Plan: End -->
+        <!-- Pro Plan: End -->
 
-        <!-- Standard Plan: Start -->
+        <!-- Enterprise Plan: Start -->
         <div class="col-xl-4 col-lg-6">
           <div class="card">
             <div class="card-header">
               <div class="text-center">
                 <img src="{% static 'img/front-pages/icons/shuttle-rocket.png' %}" alt="shuttle rocket icon" class="mb-8 pb-2" />
-                <h4 class="mb-0">Enterprise</h4>
+                <h4 class="mb-0">Language School</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <span class="price-monthly h2 text-primary fw-extrabold mb-0">$49</span>
                   <span class="price-yearly h2 text-primary fw-extrabold mb-0 d-none">$37</span>
@@ -621,53 +577,47 @@
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Everything in premium
+                    Everything in Language Pro
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Timeline with database
+                    Unlimited students
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Fuzzy search
+                    Multi-teacher management
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    A/B testing sanbox
+                    Advanced analytics dashboard
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Custom permissions
+                    API access
                   </h6>
                 </li>
                 <li>
                   <h6 class="mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Social media automation
-                  </h6>
-                </li>
-                <li>
-                  <h6 class="mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-2"><i class="ti ti-check ti-14px"></i></span>
-                    Sales automation tools
+                    Dedicated account manager
                   </h6>
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="{% url 'payment-page' %}" class="btn btn-label-primary">Get Started</a>
+                <a href="" class="btn btn-label-primary">Get Started</a>
               </div>
             </div>
           </div>
         </div>
-        <!-- Standard Plan: End -->
+        <!-- Enterprise Plan: End -->
       </div>
     </div>
   </section>
@@ -681,10 +631,10 @@
           <div class="card border border-primary shadow-none">
             <div class="card-body text-center">
               <img src="{% static 'img/front-pages/icons/laptop.png' %}" alt="laptop" class="mb-4" />
-              <h3 class="mb-0">7.1k+</h3>
+              <h3 class="mb-0">95%</h3>
               <p class="fw-medium mb-0">
-                Support Tickets<br />
-                Resolved
+                Reduction in<br />
+                Administrative Time
               </p>
             </div>
           </div>
@@ -693,10 +643,10 @@
           <div class="card border border-success shadow-none">
             <div class="card-body text-center">
               <img src="{% static 'img/front-pages/icons/user-success.png' %}" alt="laptop" class="mb-4" />
-              <h3 class="mb-0">50k+</h3>
+              <h3 class="mb-0">2,000+</h3>
               <p class="fw-medium mb-0">
-                Join creatives<br />
-                community
+                Teachers using<br />
+                LinguaConnect
               </p>
             </div>
           </div>
@@ -707,8 +657,8 @@
               <img src="{% static 'img/front-pages/icons/diamond-info.png' %}" alt="laptop" class="mb-4" />
               <h3 class="mb-0">4.8/5</h3>
               <p class="fw-medium mb-0">
-                Highly Rated<br />
-                Products
+                Average Teacher<br />
+                Satisfaction
               </p>
             </div>
           </div>
@@ -717,10 +667,10 @@
           <div class="card border border-warning shadow-none">
             <div class="card-body text-center">
               <img src="{% static 'img/front-pages/icons/check-warning.png' %}" alt="laptop" class="mb-4" />
-              <h3 class="mb-0">100%</h3>
+              <h3 class="mb-0">14 days</h3>
               <p class="fw-medium mb-0">
-                Money Back<br />
-                Guarantee
+                Free Trial<br />
+                Available
               </p>
             </div>
           </div>
@@ -752,75 +702,62 @@
           <div class="accordion" id="accordionExample">
             <div class="card accordion-item">
               <h2 class="accordion-header" id="headingOne">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#accordionOne" aria-expanded="true" aria-controls="accordionOne">
-                  Do you charge for each upgrade?
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionOne" aria-expanded="true" aria-controls="accordionOne">
+                  How does LinguaConnect help with scheduling?
                 </button>
               </h2>
 
               <div id="accordionOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                 <div class="accordion-body">
-                  Lemon drops chocolate cake gummies carrot cake chupa chups muffin topping. Sesame snaps icing
-                  marzipan gummi bears macaroon dragée danish caramels powder. Bear claw dragée pastry topping
-                  soufflé. Wafer gummi bears marshmallow pastry pie.
+                  LinguaConnect provides an intuitive calendar interface where you can schedule lessons, set recurring appointments, and manage availability. Students receive automatic notifications for upcoming lessons, and you'll get reminders as well. The system handles time zone differences automatically.
                 </div>
               </div>
             </div>
             <div class="card accordion-item">
               <h2 class="accordion-header" id="headingTwo">
                 <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionTwo" aria-expanded="false" aria-controls="accordionTwo">
-                  Do I need to purchase a license for each website?
+                  Can I manage resources and learning materials?
                 </button>
               </h2>
               <div id="accordionTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
                 <div class="accordion-body">
-                  Dessert ice cream donut oat cake jelly-o pie sugar plum cheesecake. Bear claw dragée oat cake
-                  dragée ice cream halvah tootsie roll. Danish cake oat cake pie macaroon tart donut gummies. Jelly
-                  beans candy canes carrot cake. Fruitcake chocolate chupa chups.
+                  Yes! LinguaConnect includes a comprehensive content management system where you can upload, organize, and share learning materials with your students. You can categorize resources by level, topic, or student group, and track which students have accessed which materials.
                 </div>
               </div>
             </div>
             <div class="card accordion-item active">
               <h2 class="accordion-header" id="headingThree">
                 <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#accordionThree" aria-expanded="false" aria-controls="accordionThree">
-                  What is regular license?
+                  How does student progress tracking work?
                 </button>
               </h2>
               <div id="accordionThree" class="accordion-collapse collapse show" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                 <div class="accordion-body">
-                  Regular license can be used for end products that do not charge users for access or service(access
-                  is free and there will be no monthly subscription fee). Single regular license can be used for
-                  single end product and end product can be used by you or your client. If you want to sell end
-                  product to multiple clients then you will need to purchase separate license for each client. The
-                  same rule applies if you want to use the same end product on multiple domains(unique setup). For
-                  more info on regular license you can check official description.
+                  LinguaConnect includes assessment tools that allow you to create and administer tests, track scores, and generate progress reports. You can set learning goals, track completion rates, and visualize improvement over time. Students can also see their own progress, which increases motivation and engagement.
                 </div>
               </div>
             </div>
             <div class="card accordion-item">
               <h2 class="accordion-header" id="headingFour">
                 <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionFour" aria-expanded="false" aria-controls="accordionFour">
-                  What is extended license?
+                  Is LinguaConnect suitable for group classes?
                 </button>
               </h2>
               <div id="accordionFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
                 <div class="accordion-body">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis et aliquid quaerat possimus maxime!
-                  Mollitia reprehenderit neque repellat deleniti delectus architecto dolorum maxime, blanditiis
-                  earum ea, incidunt quam possimus cumque.
+                  Absolutely! LinguaConnect allows you to create and manage student groups, send group communications, assign group activities, and track collective progress. This makes it perfect for language schools, group tutoring, or classroom settings.
                 </div>
               </div>
             </div>
             <div class="card accordion-item">
               <h2 class="accordion-header" id="headingFive">
                 <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionFive" aria-expanded="false" aria-controls="accordionFive">
-                  Which license is applicable for SASS application?
+                  How secure is student information on LinguaConnect?
                 </button>
               </h2>
               <div id="accordionFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
                 <div class="accordion-body">
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sequi molestias exercitationem ab cum
-                  nemo facere voluptates veritatis quia, eveniet veniam at et repudiandae mollitia ipsam quasi
-                  labore enim architecto non!
+                  We take data security very seriously. LinguaConnect uses industry-standard encryption for all data, complies with privacy regulations, and provides tools for data management. You control access permissions for student information, and we never share or sell user data.
                 </div>
               </div>
             </div>
@@ -837,9 +774,9 @@
     <div class="container">
       <div class="row align-items-center gy-12">
         <div class="col-lg-6 text-start text-sm-center text-lg-start">
-          <h3 class="cta-title text-primary fw-bold mb-0">Ready to Get Started?</h3>
-          <h5 class="text-body mb-8">Start your project with a 14-day free trial</h5>
-          <a href="{% url 'payment-page' %}" class="btn btn-lg btn-primary">Get Started</a>
+          <h3 class="cta-title text-primary fw-bold mb-0">Ready to Transform Your Teaching?</h3>
+          <h5 class="text-body mb-8">Start with a 14-day free trial. No credit card required.</h5>
+          <a href="" class="btn btn-lg btn-primary">Get Started</a>
         </div>
         <div class="col-lg-6 pt-lg-12 text-center text-lg-end">
           <img src="{% static 'img/front-pages/landing-page/cta-dashboard.png' %}" alt="cta dashboard" class="img-fluid mt-lg-4" />
@@ -853,15 +790,15 @@
   <section id="landingContact" class="section-py bg-body landing-contact">
     <div class="container">
       <div class="text-center mb-4">
-        <span class="badge bg-label-primary">Contact US</span>
+        <span class="badge bg-label-primary">Contact Us</span>
       </div>
       <h4 class="text-center mb-1">
-        <span class="position-relative fw-extrabold z-1">Let's work
+        <span class="position-relative fw-extrabold z-1">Let's discuss
           <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="laptop charging" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
         </span>
-        together
+        your specific needs
       </h4>
-      <p class="text-center mb-12 pb-md-4">Any question or remark? just write us a message</p>
+      <p class="text-center mb-12 pb-md-4">Have questions or need a customized solution? Our team is here to help.</p>
       <div class="row g-6">
         <div class="col-lg-5">
           <div class="contact-img-box position-relative border p-2 h-100">
@@ -874,7 +811,7 @@
                     <div class="badge bg-label-primary rounded p-1_5 me-3"><i class="ti ti-mail ti-lg"></i></div>
                     <div>
                       <p class="mb-0">Email</p>
-                      <h6 class="mb-0"><a href="mailto:example@gmail.com" class="text-heading">example@gmail.com</a></h6>
+                      <h6 class="mb-0"><a href="mailto:support@linguaconnect.com" class="text-heading">support@linguaconnect.com</a></h6>
                     </div>
                   </div>
                 </div>
@@ -883,7 +820,7 @@
                     <div class="badge bg-label-success rounded p-1_5 me-3"><i class="ti ti-phone-call ti-lg"></i></div>
                     <div>
                       <p class="mb-0">Phone</p>
-                      <h6 class="mb-0"><a href="tel:+1234-568-963" class="text-heading">+1234 568 963</a></h6>
+                      <h6 class="mb-0"><a href="tel:+1-555-123-4567" class="text-heading">+1-555-123-4567</a></h6>
                     </div>
                   </div>
                 </div>
@@ -894,16 +831,16 @@
         <div class="col-lg-7">
           <div class="card h-100">
             <div class="card-body">
-              <h4 class="mb-2">Send a message</h4>
+              <h4 class="mb-2">Tell us about your teaching needs</h4>
               <p class="mb-6">
-                If you would like to discuss anything related to payment, account, licensing,<br class="d-none d-lg-block" />
-                partnerships, or have pre-sales questions, you’re at the right place.
+                Whether you're a solo language tutor or run a language school,<br class="d-none d-lg-block" />
+                we're here to help you find the right solution.
               </p>
               <form>
                 <div class="row g-4">
                   <div class="col-md-6">
                     <label class="form-label" for="contact-form-fullname">Full Name</label>
-                    <input type="text" class="form-control" id="contact-form-fullname" placeholder="john" />
+                    <input type="text" class="form-control" id="contact-form-fullname" placeholder="John Doe" />
                   </div>
                   <div class="col-md-6">
                     <label class="form-label" for="contact-form-email">Email</label>
@@ -911,10 +848,10 @@
                   </div>
                   <div class="col-12">
                     <label class="form-label" for="contact-form-message">Message</label>
-                    <textarea id="contact-form-message" class="form-control" rows="7" placeholder="Write a message"></textarea>
+                    <textarea id="contact-form-message" class="form-control" rows="7" placeholder="How can we help you?"></textarea>
                   </div>
                   <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Send inquiry</button>
+                    <button type="submit" class="btn btn-primary">Send message</button>
                   </div>
                 </div>
               </form>

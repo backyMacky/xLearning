@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Dashboard - Analytics{% endblock %}
+{% block title %}Learning Platform - Dashboard{% endblock title %}
 
 {% block vendor_css %}
 {{ block.super }}
@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="{% static 'vendor/libs/swiper/swiper.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
-<link rel="stylesheet" href="{% static 'vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
@@ -21,753 +20,726 @@
 <script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
 {% endblock vendor_js %}
 
-{% block page_css %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'vendor/css/pages/cards-advance.css' %}" />
-{% endblock page_css %}
-
 {% block page_js %}
 {{ block.super }}
 <script src="{% static 'js/dashboards-analytics.js' %}"></script>
 {% endblock page_js %}
 
 {% block content %}
-<div class="row g-6">
-  <!-- Website Analytics -->
-  <div class="col-lg-6">
-    <div class="swiper-container swiper-container-horizontal swiper swiper-card-advance-bg" id="swiper-with-pagination-cards">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide">
-          <div class="row">
-            <div class="col-12">
-              <h5 class="text-white mb-0">Website Analytics</h5>
-              <small>Total 28.5% Conversion Rate</small>
-            </div>
-            <div class="row">
-              <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
-                <h6 class="text-white mt-0 mt-md-3 mb-4">Traffic</h6>
-                <div class="row">
-                  <div class="col-6">
-                    <ul class="list-unstyled mb-0">
-                      <li class="d-flex mb-4 align-items-center">
-                        <p class="mb-0 fw-medium me-2 website-analytics-text-bg">28%</p>
-                        <p class="mb-0">Sessions</p>
-                      </li>
-                      <li class="d-flex align-items-center">
-                        <p class="mb-0 fw-medium me-2 website-analytics-text-bg">1.2k</p>
-                        <p class="mb-0">Leads</p>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="col-6">
-                    <ul class="list-unstyled mb-0">
-                      <li class="d-flex mb-4 align-items-center">
-                        <p class="mb-0 fw-medium me-2 website-analytics-text-bg">3.1k</p>
-                        <p class="mb-0">Page Views</p>
-                      </li>
-                      <li class="d-flex align-items-center">
-                        <p class="mb-0 fw-medium me-2 website-analytics-text-bg">12%</p>
-                        <p class="mb-0">Conversions</p>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-               <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
-                <img src="{% static 'img/illustrations/card-website-analytics-1.png' %}" alt="Website Analytics" height="150" class="card-website-analytics-img">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="swiper-slide">
-          <div class="row">
-            <div class="col-12">
-              <h5 class="text-white mb-0">Website Analytics</h5>
-              <small>Total 28.5% Conversion Rate</small>
-            </div>
-            <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
-              <h6 class="text-white mt-0 mt-md-3 mb-4">Spending</h6>
-              <div class="row">
-                <div class="col-6">
-                  <ul class="list-unstyled mb-0">
-                    <li class="d-flex mb-4 align-items-center">
-                      <p class="mb-0 fw-medium me-2 website-analytics-text-bg">12h</p>
-                      <p class="mb-0">Spend</p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                      <p class="mb-0 fw-medium me-2 website-analytics-text-bg">127</p>
-                      <p class="mb-0">Order</p>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-6">
-                  <ul class="list-unstyled mb-0">
-                    <li class="d-flex mb-4 align-items-center">
-                      <p class="mb-0 fw-medium me-2 website-analytics-text-bg">18</p>
-                      <p class="mb-0">Order Size</p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                      <p class="mb-0 fw-medium me-2 website-analytics-text-bg">2.3k</p>
-                      <p class="mb-0">Items</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
-              <img src="{% static 'img/illustrations/card-website-analytics-2.png' %}" alt="Website Analytics" height="150" class="card-website-analytics-img">
-            </div>
-          </div>
-        </div>
-        <div class="swiper-slide">
-          <div class="row">
-            <div class="col-12">
-              <h5 class="text-white mb-0">Website Analytics</h5>
-              <small>Total 28.5% Conversion Rate</small>
-            </div>
-            <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
-              <h6 class="text-white mt-0 mt-md-3 mb-4">Revenue Sources</h6>
-              <div class="row">
-                <div class="col-6">
-                  <ul class="list-unstyled mb-0">
-                    <li class="d-flex mb-4 align-items-center">
-                      <p class="mb-0 fw-medium me-2 website-analytics-text-bg">268</p>
-                      <p class="mb-0">Direct</p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                      <p class="mb-0 fw-medium me-2 website-analytics-text-bg">62</p>
-                      <p class="mb-0">Referral</p>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-6">
-                  <ul class="list-unstyled mb-0">
-                    <li class="d-flex mb-4 align-items-center">
-                      <p class="mb-0 fw-medium me-2 website-analytics-text-bg">890</p>
-                      <p class="mb-0">Organic</p>
-                    </li>
-                    <li class="d-flex align-items-center">
-                      <p class="mb-0 fw-medium me-2 website-analytics-text-bg">1.2k</p>
-                      <p class="mb-0">Campaign</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
-              <img src="{% static 'img/illustrations/card-website-analytics-3.png' %}" alt="Website Analytics" height="150" class="card-website-analytics-img">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="swiper-pagination"></div>
-    </div>
-  </div>
-  <!--/ Website Analytics -->
 
-  <!-- Average Daily Sales -->
-  <div class="col-xl-3 col-sm-6">
-    <div class="card h-100">
-      <div class="card-header pb-0">
-        <h5 class="mb-3 card-title">Average Daily Sales</h5>
-        <p class="mb-0 text-body">Total Sales This Month</p>
-        <h4 class="mb-0">$28,450</h4>
-      </div>
-      <div class="card-body px-0">
-        <div id="averageDailySales"></div>
+<!-- Welcome Banner Section -->
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="d-flex align-items-center row">
+        <div class="col-sm-7">
+          <div class="card-body">
+            <h4 class="card-title mb-1">Welcome back, {{request.user.username}}! 🎉</h4>
+            <p class="mb-4">Track your progress and manage your learning journey</p>
+            
+            <div class="d-flex align-items-center pt-2">
+              <div class="d-flex justify-content-between flex-grow-1 align-items-center flex-wrap gap-2">
+                {% if request.user.is_teacher %}
+                <!-- Teacher stats -->
+                <div>
+                  <h5 class="mb-0">{{course_count|default:"0"}}</h5>
+                  <small>Active Courses</small>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{student_count|default:"0"}}</h5>
+                  <small>Active Students</small>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{upcoming_sessions|default:"0"}}</h5>
+                  <small>Upcoming Sessions</small>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{teaching_hours|default:"0"}}h</h5>
+                  <small>This Month</small>
+                </div>
+                {% else %}
+                <!-- Student stats -->
+                <div>
+                  <h5 class="mb-0">{{enrolled_courses|default:"0"}}</h5>
+                  <small>Enrolled Courses</small>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{completed_lessons|default:"0"}}</h5>
+                  <small>Completed Lessons</small>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{credit_balance|default:"0"}}</h5>
+                  <small>Credits Available</small>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{avg_score|default:"0"}}%</h5>
+                  <small>Avg Score</small>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="mt-4">
+              {% if request.user.is_teacher %}
+              <a href="{% url 'content:create_course' %}" class="btn btn-primary me-2">
+                <i class="ti ti-plus me-1"></i> New Course
+              </a>
+              <a href="{% url 'meetings:create_meeting' %}" class="btn btn-outline-primary">
+                <i class="ti ti-calendar-plus me-1"></i> Schedule Session
+              </a>
+              {% else %}
+              <a href="{% url 'content:course_list' %}" class="btn btn-primary me-2">
+                <i class="ti ti-book me-1"></i> Browse Courses
+              </a>
+              <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-primary">
+                <i class="ti ti-calendar-event me-1"></i> Book Session
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-5 text-center text-sm-left">
+          <div class="card-body pb-0 px-0 px-md-4">
+            <img src="{% static 'img/illustrations/man-with-laptop-light.png' %}" height="140" alt="View Badge User" data-app-dark-img="illustrations/man-with-laptop-dark.png" data-app-light-img="illustrations/man-with-laptop-light.png">
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <!--/ Average Daily Sales -->
+</div>
 
-  <!-- Sales Overview -->
-  <div class="col-xl-3 col-sm-6">
-    <div class="card h-100">
+<!-- Quick Navigation Menu -->
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
       <div class="card-header">
-        <div class="d-flex justify-content-between">
-          <p class="mb-0 text-body">Sales Overview</p>
-          <p class="card-text fw-medium text-success">+18.2%</p>
-        </div>
-        <h4 class="card-title mb-1">$42.5k</h4>
+        <h5 class="card-title mb-0">Quick Navigation</h5>
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-4">
-            <div class="d-flex gap-2 align-items-center mb-2">
-              <span class="badge bg-label-info p-1 rounded"><i class="ti ti-shopping-cart ti-sm"></i></span>
-              <p class="mb-0">Order</p>
-            </div>
-            <h5 class="mb-0 pt-1">62.2%</h5>
-            <small class="text-muted">6,440</small>
+          {% for link in quick_links %}
+          <div class="col-md-3 mb-3">
+            <a href="{{ link.url }}" class="d-flex align-items-center py-3 px-4 rounded bg-label-primary bg-opacity-10 text-center flex-column">
+              <i class="ti ti-{{ link.icon }} ti-lg mb-2"></i>
+              <span>{{ link.name }}</span>
+            </a>
           </div>
-          <div class="col-4">
-            <div class="divider divider-vertical">
-              <div class="divider-text">
-                <span class="badge-divider-bg bg-label-secondary">VS</span>
-              </div>
-            </div>
-          </div>
-          <div class="col-4 text-end">
-            <div class="d-flex gap-2 justify-content-end align-items-center mb-2">
-              <p class="mb-0">Visits</p>
-              <span class="badge bg-label-primary p-1 rounded"><i class="ti ti-link ti-sm"></i></span>
-            </div>
-            <h5 class="mb-0 pt-1">25.5%</h5>
-            <small class="text-muted">12,749</small>
-          </div>
-        </div>
-        <div class="d-flex align-items-center mt-6">
-          <div class="progress w-100" style="height: 10px;">
-            <div class="progress-bar bg-info" style="width: 70%" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-            <div class="progress-bar bg-primary" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
   </div>
-  <!--/ Sales Overview -->
+</div>
 
-  <!-- Earning Reports -->
-  <div class="col-lg-6">
+<div class="row">
+  <!-- Upcoming Sessions Panel -->
+  <div class="col-md-6 col-lg-6 order-2 order-lg-1 mb-4">
     <div class="card h-100">
-      <div class="card-header pb-0 d-flex justify-content-between">
-        <div class="card-title mb-0">
-          <h5 class="mb-1">Earning Reports</h5>
-          <p class="card-subtitle">Weekly Earnings Overview</p>
-        </div>
-        <div class="dropdown">
-          <button class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1" type="button" id="earningReportsId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="ti ti-dots-vertical ti-md text-muted"></i>
-          </button>
-          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="earningReportsId">
-            <a class="dropdown-item" href="javascript:void(0);">View More</a>
-            <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-          </div>
-        </div>
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Upcoming Sessions</h5>
+        <a href="{% url 'meetings:meeting_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
       </div>
       <div class="card-body">
-        <div class="row align-items-center g-md-8">
-          <div class="col-12 col-md-5 d-flex flex-column">
-            <div class="d-flex gap-2 align-items-center mb-3 flex-wrap">
-              <h2 class="mb-0">$468</h2>
-              <div class="badge rounded bg-label-success">+4.2%</div>
-            </div>
-            <small class="text-body">You informed of this week compared to last week</small>
-          </div>
-          <div class="col-12 col-md-7 ps-xl-8">
-            <div id="weeklyEarningReports"></div>
-          </div>
-        </div>
-        <div class="border rounded p-5 mt-5">
-          <div class="row gap-4 gap-sm-0">
-            <div class="col-12 col-sm-4">
-              <div class="d-flex gap-2 align-items-center">
-                <div class="badge rounded bg-label-primary p-1"><i class="ti ti-currency-dollar ti-sm"></i></div>
-                <h6 class="mb-0 fw-normal">Earnings</h6>
-              </div>
-              <h4 class="my-2">$545.69</h4>
-              <div class="progress w-75" style="height:4px">
-                <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+        {% if upcoming_meetings %}
+          {% for meeting in upcoming_meetings %}
+          <div class="d-flex mb-3 pb-1 {% if not forloop.last %}border-bottom{% endif %}">
+            <div class="flex-shrink-0 me-3">
+              <div class="avatar rounded">
+                <div class="avatar-initial rounded bg-label-primary">
+                  <i class="ti ti-video ti-md"></i>
+                </div>
               </div>
             </div>
-            <div class="col-12 col-sm-4">
-              <div class="d-flex gap-2 align-items-center">
-                <div class="badge rounded bg-label-info p-1"><i class="ti ti-chart-pie-2 ti-sm"></i></div>
-                <h6 class="mb-0 fw-normal">Profit</h6>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2">
+                <h6 class="mb-0">{{ meeting.title }}</h6>
+                <small>{{ meeting.start_time|date:"M d, h:i A" }} - {{ meeting.duration }} min</small>
               </div>
-              <h4 class="my-2">$256.34</h4>
-              <div class="progress w-75" style="height:4px">
-                <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
-            </div>
-            <div class="col-12 col-sm-4">
-              <div class="d-flex gap-2 align-items-center">
-                <div class="badge rounded bg-label-danger p-1"><i class="ti ti-brand-paypal ti-sm"></i></div>
-                <h6 class="mb-0 fw-normal">Expense</h6>
-              </div>
-              <h4 class="my-2">$74.19</h4>
-              <div class="progress w-75" style="height:4px">
-                <div class="progress-bar bg-danger" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
+              {% if meeting.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" %}
+              <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">Join</a>
+              {% else %}
+              <span class="badge bg-label-info">Upcoming</span>
+              {% endif %}
             </div>
           </div>
-        </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-calendar-off ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No upcoming sessions</h6>
+            <p class="mb-4">You don't have any scheduled sessions yet</p>
+            <a href="{% if request.user.is_teacher %}{% url 'meetings:create_meeting' %}{% else %}{% url 'booking:dashboard' %}{% endif %}" class="btn btn-sm btn-primary">
+              {% if request.user.is_teacher %}Schedule Session{% else %}Book a Session{% endif %}
+            </a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
-  <!--/ Earning Reports -->
 
-  <!-- Support Tracker -->
-  <div class="col-md-6">
+  <!-- Recent Activity -->
+  <div class="col-md-6 col-lg-6 order-1 order-lg-2 mb-4">
     <div class="card h-100">
-      <div class="card-header d-flex justify-content-between">
-        <div class="card-title mb-0">
-          <h5 class="mb-1">Support Tracker</h5>
-          <p class="card-subtitle">Last 7 Days</p>
-        </div>
-        <div class="dropdown">
-          <button class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1" type="button" id="supportTrackerMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="ti ti-dots-vertical ti-md text-muted"></i>
-          </button>
-          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="supportTrackerMenu">
-            <a class="dropdown-item" href="javascript:void(0);">View More</a>
-            <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-          </div>
-        </div>
-      </div>
-      <div class="card-body row">
-        <div class="col-12 col-sm-4 col-md-12 col-lg-4">
-          <div class="mt-lg-4 mt-lg-2 mb-lg-6 mb-2">
-            <h2 class="mb-0">164</h2>
-            <p class="mb-0">Total Tickets</p>
-          </div>
-          <ul class="p-0 m-0">
-            <li class="d-flex gap-4 align-items-center mb-lg-3 pb-1">
-              <div class="badge rounded bg-label-primary p-1_5"><i class="ti ti-ticket ti-md"></i></div>
-              <div>
-                <h6 class="mb-0 text-nowrap">New Tickets</h6>
-                <small class="text-muted">142</small>
-              </div>
-            </li>
-            <li class="d-flex gap-4 align-items-center mb-lg-3 pb-1">
-              <div class="badge rounded bg-label-info p-1_5"><i class="ti ti-circle-check ti-md"></i></div>
-              <div>
-                <h6 class="mb-0 text-nowrap">Open Tickets</h6>
-                <small class="text-muted">28</small>
-              </div>
-            </li>
-            <li class="d-flex gap-4 align-items-center pb-1">
-              <div class="badge rounded bg-label-warning p-1_5"><i class="ti ti-clock ti-md"></i></div>
-              <div>
-                <h6 class="mb-0 text-nowrap">Response Time</h6>
-                <small class="text-muted">1 Day</small>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="col-12 col-sm-8 col-md-12 col-lg-8">
-          <div id="supportTracker"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--/ Support Tracker -->
-
-  <!-- Sales By Country -->
-  <div class="col-xxl-4 col-md-6">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between">
-        <div class="card-title mb-0">
-          <h5 class="mb-1">Sales by Countries</h5>
-          <p class="card-subtitle">Monthly Sales Overview</p>
-        </div>
-        <div class="dropdown">
-          <button class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1" type="button" id="salesByCountry" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="ti ti-dots-vertical ti-md text-muted"></i>
-          </button>
-          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="salesByCountry">
-            <a class="dropdown-item" href="javascript:void(0);">Download</a>
-            <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-            <a class="dropdown-item" href="javascript:void(0);">Share</a>
-          </div>
-        </div>
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Recent Activity</h5>
       </div>
       <div class="card-body">
         <ul class="p-0 m-0">
-          <li class="d-flex align-items-center mb-4">
-            <div class="avatar flex-shrink-0 me-4">
-              <i class="fis fi fi-us rounded-circle fs-2"></i>
-            </div>
-            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-              <div class="me-2">
-                <div class="d-flex align-items-center">
-                  <h6 class="mb-0 me-1">$8,567k</h6>
-
+          {% if recent_activities %}
+            {% for activity in recent_activities %}
+            <li class="d-flex mb-4">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-{{ activity.color|default:"primary" }}">
+                  <i class="ti ti-{{ activity.icon|default:"activity" }} ti-md"></i>
                 </div>
-                <small class="text-body">United states</small>
               </div>
-              <div class="user-progress">
-                <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
-                  <i class='ti ti-chevron-up'></i>
-                  25.8%
-                </p>
-              </div>
-            </div>
-          </li>
-          <li class="d-flex align-items-center mb-4">
-            <div class="avatar flex-shrink-0 me-4">
-              <i class="fis fi fi-br rounded-circle fs-2"></i>
-            </div>
-            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-              <div class="me-2">
-                <div class="d-flex align-items-center">
-                  <h6 class="mb-0 me-1">$2,415k</h6>
+              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                <div class="me-2">
+                  <h6 class="mb-0">{{ activity.title }}</h6>
+                  <small>{{ activity.description }}</small>
                 </div>
-                <small class="text-body">Brazil</small>
-              </div>
-              <div class="user-progress">
-                <p class="text-danger fw-medium mb-0 d-flex align-items-center gap-1">
-                  <i class='ti ti-chevron-down'></i>
-                  6.2%
-                </p>
-              </div>
-            </div>
-          </li>
-          <li class="d-flex align-items-center mb-4">
-            <div class="avatar flex-shrink-0 me-4">
-              <i class="fis fi fi-in rounded-circle fs-2"></i>
-            </div>
-            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-              <div class="me-2">
-                <div class="d-flex align-items-center">
-                  <h6 class="mb-0 me-1">$865k</h6>
+                <div class="user-progress d-flex align-items-center gap-1">
+                  <span class="text-muted">{{ activity.time_ago }}</span>
                 </div>
-                <small class="text-body">India</small>
               </div>
-              <div class="user-progress">
-                <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
-                  <i class='ti ti-chevron-up'></i>
-                  12.4%
-                </p>
-              </div>
-            </div>
-          </li>
-          <li class="d-flex align-items-center mb-4">
-            <div class="avatar flex-shrink-0 me-4">
-              <i class="fis fi fi-au rounded-circle fs-2"></i>
-            </div>
-            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-              <div class="me-2">
-                <div class="d-flex align-items-center">
-                  <h6 class="mb-0 me-1">$745k</h6>
+            </li>
+            {% endfor %}
+          {% else %}
+            <!-- Placeholder activities when no data available -->
+            <li class="d-flex mb-4">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-primary">
+                  <i class="ti ti-book-2 ti-md"></i>
                 </div>
-                <small class="text-body">Australia</small>
               </div>
-              <div class="user-progress">
-                <p class="text-danger fw-medium mb-0 d-flex align-items-center gap-1">
-                  <i class='ti ti-chevron-down'></i>
-                  11.9%
-                </p>
-              </div>
-            </div>
-          </li>
-          <li class="d-flex align-items-center mb-4">
-            <div class="avatar flex-shrink-0 me-4">
-              <i class="fis fi fi-fr rounded-circle fs-2"></i>
-            </div>
-            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-              <div class="me-2">
-                <div class="d-flex align-items-center">
-                  <h6 class="mb-0 me-1">$45</h6>
+              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                <div class="me-2">
+                  <h6 class="mb-0">Start your learning journey</h6>
+                  <small>Explore courses and resources</small>
                 </div>
-                <small class="text-body">France</small>
-              </div>
-              <div class="user-progress">
-                <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
-                  <i class='ti ti-chevron-up'></i>
-                  16.2%
-                </p>
-              </div>
-            </div>
-          </li>
-          <li class="d-flex align-items-center">
-            <div class="avatar flex-shrink-0 me-4">
-              <i class="fis fi fi-cn rounded-circle fs-2"></i>
-            </div>
-            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-              <div class="me-2">
-                <div class="d-flex align-items-center">
-                  <h6 class="mb-0 me-1">$12k</h6>
+                <div class="user-progress d-flex align-items-center gap-1">
+                  <span class="text-muted">Just now</span>
                 </div>
-                <small class="text-body">China</small>
               </div>
-              <div class="user-progress">
-                <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
-                  <i class='ti ti-chevron-up'></i>
-                  14.8%
-                </p>
+            </li>
+            <li class="d-flex mb-4">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-success">
+                  <i class="ti ti-calendar ti-md"></i>
+                </div>
               </div>
-            </div>
-          </li>
+              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                <div class="me-2">
+                  <h6 class="mb-0">Book your first session</h6>
+                  <small>Choose from available time slots</small>
+                </div>
+                <div class="user-progress d-flex align-items-center gap-1">
+                  <span class="text-muted">Try now</span>
+                </div>
+              </div>
+            </li>
+          {% endif %}
         </ul>
       </div>
     </div>
   </div>
-  <!--/ Sales By Country -->
+</div>
 
-  <!-- Total Earning -->
-  <div class="col-xxl-4 col-md-6">
+<!-- Progress & Statistics -->
+<div class="row">
+  <!-- Course Progress -->
+  <div class="col-lg-7 col-xl-8 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">{% if request.user.is_teacher %}Course Engagement{% else %}My Course Progress{% endif %}</h5>
+      </div>
+      <div class="card-body">
+        {% if courses %}
+          {% for course in courses %}
+          <div class="d-flex mb-4 pb-1 {% if not forloop.last %}border-bottom{% endif %}">
+            <div class="avatar flex-shrink-0 me-3">
+              {% if course.image %}
+                <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded">
+              {% else %}
+                <div class="avatar-initial rounded bg-label-{{ forloop.counter|divisibleby:3|yesno:"success,info,primary" }}">
+                  <i class="ti ti-book ti-md"></i>
+                </div>
+              {% endif %}
+            </div>
+            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+              <div class="me-2 flex-grow-1">
+                <h6 class="mb-0">{{ course.title }}</h6>
+                <div class="d-flex align-items-center">
+                  {% if request.user.is_teacher %}
+                    <small>{{ course.students_count }} student{{ course.students_count|pluralize }}</small>
+                  {% else %}
+                    <small>{{ course.lessons_count }} lesson{{ course.lessons_count|pluralize }}</small>
+                  {% endif %}
+                </div>
+                <div class="progress mt-2" style="height: 6px;">
+                  <div class="progress-bar bg-{{ forloop.counter|divisibleby:3|yesno:"success,info,primary" }}" role="progressbar" 
+                       style="width: {{ course.progress|default:0 }}%" 
+                       aria-valuenow="{{ course.progress|default:0 }}" 
+                       aria-valuemin="0" 
+                       aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-1">
+                  <small>Progress: {{ course.progress|default:"0" }}%</small>
+                  {% if not request.user.is_teacher %}
+                    <small>{{ course.completed_lessons|default:"0" }}/{{ course.lessons_count }} completed</small>
+                  {% endif %}
+                </div>
+              </div>
+              <a href="{% url 'content:course_detail' course_id=course.id %}" class="btn btn-sm btn-icon rounded-pill btn-outline-primary">
+                <i class="ti ti-chevron-right"></i>
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-books ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No courses yet</h6>
+            <p class="mb-4">
+              {% if request.user.is_teacher %}
+                Start creating courses to see engagement metrics
+              {% else %}
+                Enroll in courses to track your learning progress
+              {% endif %}
+            </p>
+            <a href="{% if request.user.is_teacher %}{% url 'content:create_course' %}{% else %}{% url 'content:course_list' %}{% endif %}" class="btn btn-sm btn-primary">
+              {% if request.user.is_teacher %}Create Course{% else %}Browse Courses{% endif %}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning Statistics -->
+  <div class="col-lg-5 col-xl-4 mb-4">
     <div class="card h-100">
       <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-          <h5 class="mb-0 card-title">Total Earning</h5>
-          <div class="dropdown">
-            <button class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1" type="button" id="totalEarning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="ti ti-dots-vertical ti-md text-muted"></i>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="totalEarning">
-              <a class="dropdown-item" href="javascript:void(0);">View More</a>
-              <a class="dropdown-item" href="javascript:void(0);">Delete</a>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex align-items-center">
-          <h2 class="mb-0 me-2">87%</h2>
-          <i class="ti ti-chevron-up text-success me-1"></i>
-          <h6 class="text-success mb-0">25.8%</h6>
-        </div>
+        <h5 class="card-title mb-0">Learning Statistics</h5>
       </div>
       <div class="card-body">
-        <div id="totalEarningChart"></div>
-        <div class="d-flex align-items-start my-4">
-          <div class="badge rounded bg-label-primary p-2 me-4 rounded"><i class="ti ti-brand-paypal ti-md"></i></div>
-          <div class="d-flex justify-content-between w-100 gap-2 align-items-center">
-            <div class="me-2">
-              <h6 class="mb-0">Total Revenue</h6>
-              <small class="text-body">Client Payment</small>
+        <div id="learningActivityChart" class="mb-3" style="min-height: 220px;"></div>
+        
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <div class="avatar-initial rounded bg-label-primary">
+                  <i class="ti ti-clock ti-sm"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ total_hours|default:"0" }}h</h6>
+                <small>Total Hours</small>
+              </div>
             </div>
-            <h6 class="mb-0 text-success">+$126</h6>
           </div>
-        </div>
-        <div class="d-flex align-items-start">
-          <div class="badge rounded bg-label-secondary p-2 me-4 rounded"><i class="ti ti-currency-dollar ti-md"></i></div>
-          <div class="d-flex justify-content-between w-100 gap-2 align-items-center">
-            <div class="me-2">
-              <h6 class="mb-0">Total Sales</h6>
-              <small class="text-body">Refund</small>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <div class="avatar-initial rounded bg-label-success">
+                  <i class="ti ti-checkbox ti-sm"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ total_completed|default:"0" }}</h6>
+                <small>Completed</small>
+              </div>
             </div>
-            <h6 class="mb-0 text-success">+$98</h6>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <div class="avatar-initial rounded bg-label-info">
+                  <i class="ti ti-file-text ti-sm"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ assessments_taken|default:"0" }}</h6>
+                <small>Assessments</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="d-flex align-items-center gap-2">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <div class="avatar-initial rounded bg-label-warning">
+                  <i class="ti ti-calendar-event ti-sm"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">{{ total_sessions|default:"0" }}</h6>
+                <small>Sessions</small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!--/ Total Earning -->
-
-  <!-- Monthly Campaign State -->
-  <div class="col-xxl-4 col-md-6">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between">
-        <div class="card-title mb-0">
-          <h5 class="mb-1">Monthly Campaign State</h5>
-          <p class="card-subtitle">8.52k Social Visiters</p>
-        </div>
-        <div class="dropdown">
-          <button class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1" type="button" id="MonthlyCampaign" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="ti ti-dots-vertical ti-md text-muted"></i>
-          </button>
-          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="MonthlyCampaign">
-            <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-            <a class="dropdown-item" href="javascript:void(0);">Download</a>
-            <a class="dropdown-item" href="javascript:void(0);">View All</a>
-          </div>
-        </div>
-      </div>
-      <div class="card-body">
-        <ul class="p-0 m-0">
-          <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-success rounded p-1_5"><i class="ti ti-mail ti-md"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Emails</h6>
-              <div class="d-flex">
-                <p class="mb-0">12,346</p>
-                <p class="ms-4 text-success mb-0">0.3%</p>
-              </div>
-            </div>
-          </li>
-          <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-info rounded p-1_5"><i class="ti ti-link ti-md"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Opened</h6>
-              <div class="d-flex">
-                <p class="mb-0">8,734</p>
-                <p class="ms-4 text-success mb-0">2.1%</p>
-              </div>
-            </div>
-          </li>
-          <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-warning rounded p-1_5"><i class="ti ti-mouse ti-md"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Clicked</h6>
-              <div class="d-flex">
-                <p class="mb-0">967</p>
-                <p class="ms-4 text-danger mb-0">1.4%</p>
-              </div>
-            </div>
-          </li>
-          <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-primary rounded p-1_5"><i class="ti ti-users ti-md"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Subscribe</h6>
-              <div class="d-flex">
-                <p class="mb-0">345</p>
-                <p class="ms-4 text-success mb-0">8.5%</p>
-              </div>
-            </div>
-          </li>
-          <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-secondary rounded p-1_5"><i class="ti ti-alert-triangle ti-md"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Complaints</h6>
-              <div class="d-flex">
-                <p class="mb-0">10</p>
-                <p class="ms-4 text-danger mb-0">1.5%</p>
-              </div>
-            </div>
-          </li>
-          <li class="d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-danger rounded p-1_5"><i class="ti ti-ban ti-md"></i></div>
-            <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Unsubscribe</h6>
-              <div class="d-flex">
-                <p class="mb-0">86</p>
-                <p class="ms-4 text-success mb-0">0.8%</p>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <!--/ Monthly Campaign State -->
-
-  <!-- Source Visit -->
-  <div class="col-xxl-4 col-xl-6 col-lg-12">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between">
-        <div class="card-title mb-0">
-          <h5 class="mb-1">Source Visits</h5>
-          <p class="card-subtitle">38.4k Visitors</p>
-        </div>
-        <div class="dropdown">
-          <button class="btn btn-text-secondary rounded-pill text-muted border-0 p-2 me-n1" type="button" id="sourceVisits" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="ti ti-dots-vertical ti-md text-muted"></i>
-          </button>
-          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sourceVisits">
-            <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-            <a class="dropdown-item" href="javascript:void(0);">Download</a>
-            <a class="dropdown-item" href="javascript:void(0);">View All</a>
-          </div>
-        </div>
-      </div>
-      <div class="card-body">
-        <ul class="list-unstyled mb-0">
-          <li class="mb-6">
-            <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-shadow ti-md"></i></div>
-              <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
-                <div class="me-2">
-                  <h6 class="mb-0">Direct Source</h6>
-                  <small class="text-body">Direct link click</small>
-                </div>
-                <div class="d-flex align-items-center">
-                  <p class="mb-0">1.2k</p>
-                  <div class="ms-4 badge bg-label-success">+4.2%</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="mb-6">
-            <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-globe ti-md"></i></div>
-              <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
-                <div class="me-2">
-                  <h6 class="mb-0">Social Network</h6>
-                  <small class="text-body">Social Channels</small>
-                </div>
-                <div class="d-flex align-items-center">
-                  <p class="mb-0">31.5k</p>
-                  <div class="ms-4 badge bg-label-success">+8.2%</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="mb-6">
-            <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-mail ti-md"></i></div>
-              <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
-                <div class="me-2">
-                  <h6 class="mb-0">Email Newsletter</h6>
-                  <small class="text-body">Mail Campaigns</small>
-                </div>
-                <div class="d-flex align-items-center">
-                  <p class="mb-0">893</p>
-                  <div class="ms-4 badge bg-label-success">+2.4%</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="mb-6">
-            <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-external-link ti-md"></i></div>
-              <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
-                <div class="me-2">
-                  <h6 class="mb-0">Referrals</h6>
-                  <small class="text-body">Impact Radius Visits</small>
-                </div>
-                <div class="d-flex align-items-center">
-                  <p class="mb-0">342</p>
-                  <div class="ms-4 badge bg-label-danger">-0.4%</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="mb-6">
-            <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-ad ti-md"></i></div>
-              <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
-                <div class="me-2">
-                  <h6 class="mb-0">ADVT</h6>
-                  <small class="text-body">Google ADVT</small>
-                </div>
-                <div class="d-flex align-items-center">
-                  <p class="mb-0">2.15k</p>
-                  <div class="ms-4 badge bg-label-success">+9.1%</div>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i class="ti ti-star ti-md"></i></div>
-              <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
-                <div class="me-2">
-                  <h6 class="mb-0">Other</h6>
-                  <small class="text-body">Many Sources</small>
-                </div>
-                <div class="d-flex align-items-center">
-                  <p class="mb-0">12.5k</p>
-                  <div class="ms-4 badge bg-label-success">+6.2%</div>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <!--/ Source Visit -->
-
-  <!-- Projects table -->
-  <div class="col-xxl-8">
-    <div class="card">
-      <div class="card-datatable table-responsive">
-        <table class="datatables-projects table table-sm">
-          <thead>
-            <tr>
-              <th></th>
-              <th></th>
-              <th>Project</th>
-              <th>Leader</th>
-              <th>Team</th>
-              <th class="w-px-200">Progress</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-    </div>
-  </div>
-  <!--/ Projects table -->
 </div>
+
+<!-- Resources & Action Items -->
+<div class="row">
+  <!-- Latest Resources -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Latest Resources</h5>
+        <a href="{% url 'repository:dashboard' %}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if resources %}
+        <div class="table-responsive">
+          <table class="table table-borderless">
+            <thead>
+              <tr>
+                <th>Resource</th>
+                <th>Type</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for resource in resources %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-2">
+                      <div class="avatar-initial rounded bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
+                        <i class="ti ti-{{ resource.icon|default:"file" }} ti-sm"></i>
+                      </div>
+                    </div>
+                    <span>{{ resource.title }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
+                    {{ resource.file_type|default:"Document" }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon">
+                      <i class="ti ti-download"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <div class="avatar avatar-md mb-3">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-file ti-md"></i>
+            </div>
+          </div>
+          <h6 class="mb-1">No resources yet</h6>
+          <p class="mb-4">
+            {% if request.user.is_teacher %}
+              Start adding resources for your students
+            {% else %}
+              No learning resources are available yet
+            {% endif %}
+          </p>
+          <a href="{% if request.user.is_teacher %}{% url 'repository:upload_teacher_resource' %}{% else %}{% url 'repository:dashboard' %}{% endif %}" class="btn btn-sm btn-primary">
+            {% if request.user.is_teacher %}Upload Resource{% else %}Browse Resources{% endif %}
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Items/To-Do List -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Action Items</h5>
+      </div>
+      <div class="card-body">
+        {% if tasks %}
+          {% for task in tasks %}
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <input class="form-check-input me-2" type="checkbox" id="task{{ forloop.counter }}" {% if task.completed %}checked{% endif %}>
+              <label class="form-check-label {% if task.completed %}text-decoration-line-through{% endif %}" for="task{{ forloop.counter }}">
+                {{ task.description }}
+              </label>
+            </div>
+            <span class="badge bg-label-{{ task.priority_color }}">{{ task.due_date }}</span>
+          </div>
+          {% endfor %}
+        {% else %}
+          <!-- Placeholder tasks when no data available -->
+          {% if request.user.is_teacher %}
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <input class="form-check-input me-2" type="checkbox" id="task1">
+              <label class="form-check-label" for="task1">Create your first course</label>
+            </div>
+            <span class="badge bg-label-danger">Today</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <input class="form-check-input me-2" type="checkbox" id="task2">
+              <label class="form-check-label" for="task2">Upload course materials</label>
+            </div>
+            <span class="badge bg-label-warning">Soon</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <input class="form-check-input me-2" type="checkbox" id="task3">
+              <label class="form-check-label" for="task3">Schedule your first session</label>
+            </div>
+            <span class="badge bg-label-info">This week</span>
+          </div>
+          {% else %}
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <input class="form-check-input me-2" type="checkbox" id="task1">
+              <label class="form-check-label" for="task1">Enroll in a course</label>
+            </div>
+            <span class="badge bg-label-danger">Today</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center">
+              <input class="form-check-input me-2" type="checkbox" id="task2">
+              <label class="form-check-label" for="task2">Book your first session</label>
+            </div>
+            <span class="badge bg-label-warning">Soon</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <input class="form-check-input me-2" type="checkbox" id="task3">
+              <label class="form-check-label" for="task3">Complete profile setup</label>
+            </div>
+            <span class="badge bg-label-info">This week</span>
+          </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Announcements -->
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Announcements</h5>
+      </div>
+      <div class="card-body">
+        {% if announcements %}
+          <div class="row">
+            {% for announcement in announcements %}
+            <div class="col-md-4 mb-3">
+              <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                  <div class="avatar">
+                    {% if announcement.author.profile.profile_image %}
+                      <img src="{{ announcement.author.profile.profile_image.url }}" alt="User" class="rounded-circle">
+                    {% else %}
+                      <div class="avatar-initial rounded-circle bg-label-{{ forloop.counter|divisibleby:3|yesno:"success,info,primary" }}">
+                        <i class="ti ti-user ti-sm"></i>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-1">{{ announcement.title }}</h6>
+                  <p class="mb-1">{{ announcement.content|truncatechars:100 }}</p>
+                  <small class="text-muted">Posted by {{ announcement.author.username }} - {{ announcement.created_at|timesince }} ago</small>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- Placeholder announcements when no data available -->
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                  <div class="avatar">
+                    <div class="avatar-initial rounded-circle bg-label-primary">
+                      <i class="ti ti-bell ti-sm"></i>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-1">Welcome to the Learning Platform</h6>
+                  <p class="mb-1">Get started with your learning journey by exploring courses and connecting with teachers.</p>
+                  <small class="text-muted">Posted by Admin - Just now</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                  <div class="avatar">
+                    <div class="avatar-initial rounded-circle bg-label-success">
+                      <i class="ti ti-calendar-event ti-sm"></i>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-1">New Features Available</h6>
+                  <p class="mb-1">Check out our new booking system and enhanced repository features for managing your learning resources.</p>
+                  <small class="text-muted">Posted by System - 2 days ago</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                  <div class="avatar">
+                    <div class="avatar-initial rounded-circle bg-label-info">
+                      <i class="ti ti-bulb ti-sm"></i>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-1">Learning Tips</h6>
+                  <p class="mb-1">Schedule regular study sessions and practice consistently to maximize your learning progress.</p>
+                  <small class="text-muted">Posted by Admin - 1 week ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Learning Activity Chart
+    const learningActivityOptions = {
+      series: [{
+        name: 'Hours Spent',
+        data: {{ weekly_hours|default:"[0, 0, 0, 0, 0, 0, 0]"|safe }}
+      }],
+      chart: {
+        height: 220,
+        type: 'area',
+        toolbar: {
+          show: false
+        },
+        sparkline: {
+          enabled: false
+        }
+      },
+      grid: {
+        show: false,
+        padding: {
+          left: 0,
+          right: 0
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        width: 2,
+        curve: 'smooth'
+      },
+      legend: {
+        show: false
+      },
+      colors: ['#696cff'],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.2,
+          stops: [0, 90, 100]
+        }
+      },
+      xaxis: {
+        categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
+        labels: {
+          style: {
+            colors: '#b9b9c3',
+            fontSize: '13px'
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: '#b9b9c3',
+            fontSize: '13px'
+          }
+        }
+      },
+      tooltip: {
+        x: {
+          show: false
+        }
+      }
+    };
+    
+    if (document.querySelector("#learningActivityChart")) {
+      const learningActivityChart = new ApexCharts(
+        document.querySelector("#learningActivityChart"),
+        learningActivityOptions
+      );
+      learningActivityChart.render();
+    }
+    
+    // Initialize task checkboxes
+    document.querySelectorAll('.form-check-input').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const label = this.nextElementSibling;
+        if (this.checked) {
+          label.classList.add('text-decoration-line-through');
+        } else {
+          label.classList.remove('text-decoration-line-through');
+        }
+        
+        // Here you would also make an AJAX call to update the task status in the backend
+        // Example:
+        // fetch('/api/tasks/update/', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        //   },
+        //   body: JSON.stringify({
+        //     task_id: this.id.replace('task', ''),
+        //     completed: this.checked
+        //   })
+        // });
+      });
+    });
+  });
+</script>
 {% endblock %}

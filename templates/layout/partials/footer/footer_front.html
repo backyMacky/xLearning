@@ -6,7 +6,7 @@
     <div class="container">
       <div class="row gx-0 gy-6 g-lg-10">
         <div class="col-lg-5">
-          <a href="{% url 'landing-page' %}" class="app-brand-link mb-6">
+          <a href="/" class="app-brand-link mb-6">
             <span class="app-brand-logo demo">
               {% include 'partials/logo.html' with height=20 bgcolor="fill: #fff;" %}
             </span>
@@ -49,16 +49,16 @@
           <h6 class="footer-title mb-6">Pages</h6>
           <ul class="list-unstyled">
             <li class="mb-4">
-              <a href="{% url 'pricing-page' %}" class="footer-link">Pricing</a>
+              <a href="{% url 'front_pages:pricing-page' %}" class="footer-link">Pricing</a>
             </li>
             <li class="mb-4">
-              <a href="{% url 'payment-page' %}" class="footer-link">Payment<span class="badge rounded bg-primary ms-2">New</span></a>
+              <a href="" class="footer-link">Payment<span class="badge rounded bg-primary ms-2">New</span></a>
             </li>
             <li class="mb-4">
-              <a href="{% url 'checkout-page' %}" class="footer-link">Checkout</a>
+              <a href="" class="footer-link">Checkout</a>
             </li>
             <li class="mb-4">
-              <a href="{% url 'help-center-landing' %}" class="footer-link">Help Center</a>
+              <a href="{% url 'front_pages:help-center-landing' %}" class="footer-link">Help Center</a>
             </li>
             <li class="mb-4">
               <a href="" target="_blank" class="footer-link">Login/Register</a>

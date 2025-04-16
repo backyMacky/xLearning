@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Checkout Card - Front Pages{% endblock %}
+{% block title %}LinguaConnect Checkout - Complete Your Order{% endblock %}
 
 {% block vendor_css %}
 {{ block.super }}
@@ -40,11 +40,170 @@
 {% block content %}
 <section class="section-py bg-body first-section-pt">
   <div class="container">
-    <!--/ Checkout Wizard -->
-    {% include "partials/wizard_ex_checkout.html" %}
+    <!-- Custom wizard header -->
+    <div class="bs-stepper checkout-wizard shadow-none">
+      <div class="bs-stepper-header border-bottom-0">
+        <div class="d-flex flex-wrap gap-4 checkout-wizard-steps">
+          <!-- Step 1 -->
+          <div class="step cursor-pointer active">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle rounded-4 d-flex align-items-center justify-content-center">
+                <i class="ti ti-file-text fs-5 ti-sm"></i>
+              </span>
+              <span class="bs-stepper-label flex-column">
+                <span class="label-text">LinguaConnect Plan</span>
+                <span class="subtitile fw-normal text-body">Plan selection</span>
+              </span>
+            </button>
+          </div>
+          <!-- divider -->
+          <div class="line">
+            <i class="ti ti-chevron-right"></i>
+          </div>
+          <!-- Step 2 -->
+          <div class="step cursor-pointer">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle rounded-4 d-flex align-items-center justify-content-center">
+                <i class="ti ti-truck fs-5 ti-sm"></i>
+              </span>
+              <span class="bs-stepper-label flex-column">
+                <span class="label-text">Subscription Details</span>
+                <span class="subtitile fw-normal text-body">Billing information</span>
+              </span>
+            </button>
+          </div>
+          <!-- divider -->
+          <div class="line">
+            <i class="ti ti-chevron-right"></i>
+          </div>
+          <!-- Step 3 -->
+          <div class="step cursor-pointer">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle rounded-4 d-flex align-items-center justify-content-center">
+                <i class="ti ti-credit-card fs-5 ti-sm"></i>
+              </span>
+              <span class="bs-stepper-label flex-column">
+                <span class="label-text">Payment</span>
+                <span class="subtitile fw-normal text-body">Payment details</span>
+              </span>
+            </button>
+          </div>
+          <!-- divider -->
+          <div class="line">
+            <i class="ti ti-chevron-right"></i>
+          </div>
+          <!-- Step 4 -->
+          <div class="step cursor-pointer">
+            <button type="button" class="step-trigger">
+              <span class="bs-stepper-circle rounded-4 d-flex align-items-center justify-content-center">
+                <i class="ti ti-check fs-5 ti-sm"></i>
+              </span>
+              <span class="bs-stepper-label flex-column">
+                <span class="label-text">Complete</span>
+                <span class="subtitile fw-normal text-body">Order complete</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="bs-stepper-content p-0 mt-1">
+        <div class="row">
+          <div class="col-xl-9 m-auto">
+            <form id="wizard-checkout-form" onsubmit="return false">
+              <!-- Content for Step 1 -->
+              <div id="checkout-plan" class="content active dstepper-block">
+                <div class="mb-4 pb-1">
+                  <h4 class="mt-2">Select Your LinguaConnect Plan</h4>
+                  <p>Choose the plan that best suits your language teaching needs</p>
+                </div>
+                <div class="row mb-5">
+                  <div class="col-md mb-md-0 mb-3">
+                    <div class="form-check custom-option custom-option-icon border-2">
+                      <label class="form-check-label custom-option-content rounded-pill cursor-pointer" for="soloTeacherPlan">
+                        <span class="custom-option-body">
+                          <i class='ti ti-user-check mb-2 rounded-4 bg-label-primary p-1'></i>
+                          <span class="custom-option-title mb-0">Solo Teacher</span>
+                          <span class="text-body">Up to 10 students</span>
+                          <span class="d-flex justify-content-center">
+                            <sup class="text-body mt-3">$</sup>
+                            <span class="h3">14</span>
+                            <sub class="text-body align-self-end mb-2">/month</sub>
+                          </span>
+                        </span>
+                        <input name="customRadioIcon" class="form-check-input" type="radio" value="soloTeacher" id="soloTeacherPlan" />
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md mb-md-0 mb-3">
+                    <div class="form-check custom-option custom-option-icon border-2 active">
+                      <label class="form-check-label custom-option-content rounded-pill cursor-pointer" for="languageProPlan">
+                        <span class="custom-option-body">
+                          <i class='ti ti-rocket mb-2 rounded-4 bg-label-primary p-1'></i>
+                          <span class="custom-option-title mb-0">Language Pro</span>
+                          <span class="text-body">Up to 30 students</span>
+                          <span class="d-flex justify-content-center">
+                            <sup class="text-body mt-3">$</sup>
+                            <span class="h3">22</span>
+                            <sub class="text-body align-self-end mb-2">/month</sub>
+                          </span>
+                        </span>
+                        <input name="customRadioIcon" class="form-check-input" type="radio" value="languagePro" id="languageProPlan" checked />
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md">
+                    <div class="form-check custom-option custom-option-icon border-2">
+                      <label class="form-check-label custom-option-content rounded-pill cursor-pointer" for="languageSchoolPlan">
+                        <span class="custom-option-body">
+                          <i class='ti ti-school mb-2 rounded-4 bg-label-primary p-1'></i>
+                          <span class="custom-option-title mb-0">Language School</span>
+                          <span class="text-body">Unlimited students</span>
+                          <span class="d-flex justify-content-center">
+                            <sup class="text-body mt-3">$</sup>
+                            <span class="h3">37</span>
+                            <sub class="text-body align-self-end mb-2">/month</sub>
+                          </span>
+                        </span>
+                        <input name="customRadioIcon" class="form-check-input" type="radio" value="languageSchool" id="languageSchoolPlan" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
 
-    <!-- Add new address modal -->
-    {% include "partials/_modals/modal_add_new_address.html" %}
+                <label class="ps-1 mb-3" for="subscription-duration">Subscription Duration</label>
+                <div class="row mb-4">
+                  <div class="col-md col-md-12">
+                    <div class="d-flex justify-content-between">
+                      <div class="d-flex gap-2">
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="subscriptionDuration" id="monthly-sub" />
+                          <label class="form-check-label" for="monthly-sub">
+                            Monthly
+                          </label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="subscriptionDuration" id="annual-sub" checked />
+                          <label class="form-check-label" for="annual-sub">
+                            Annual (Save 25%)
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-grid gap-3 d-flex justify-content-between">
+                  <a href="{% url 'pricing-page' %}" class="btn btn-label-secondary">Back to Pricing</a>
+                  <button class="btn btn-primary btn-next">Next</button>
+                </div>
+              </div>
+
+              <!-- Remaining checkout steps would be included here -->
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 {% endblock %}

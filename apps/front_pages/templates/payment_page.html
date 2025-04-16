@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Payment Page - Front Pages{% endblock %}
+{% block title %}LinguaConnect Payment - Complete Your Subscription{% endblock %}
 
 {% block vendor_js %}
 {{ block.super }}
@@ -27,9 +27,9 @@
     <div class="card px-3">
       <div class="row">
         <div class="col-lg-7 card-body border-end p-md-8">
-          <h4 class="mb-2">Checkout</h4>
-          <p class="mb-0">All plans include 40+ advanced tools and features to boost your product. <br>
-            Choose the best plan to fit your needs.</p>
+          <h4 class="mb-2">Complete Your LinguaConnect Subscription</h4>
+          <p class="mb-0">You're about to unlock powerful tools designed specifically for language teachers.<br>
+            Fill in the details below to get started.</p>
           <div class="row g-5 py-8">
             <div class="col-md col-lg-12 col-xl-6">
               <div class="form-check custom-option custom-option-basic checked">
@@ -59,7 +59,7 @@
             <div class="row g-6">
               <div class="col-md-6">
                 <label class="form-label" for="billings-email">Email Address</label>
-                <input type="text" id="billings-email" class="form-control" placeholder="john.doe@gmail.com" />
+                <input type="text" id="billings-email" class="form-control" placeholder="teacher@example.com" />
               </div>
               <div class="col-md-6">
                 <label class="form-label" for="billings-password">Password</label>
@@ -96,7 +96,7 @@
                 <div class="col-12">
                   <label class="form-label" for="billings-card-num">Card number</label>
                   <div class="input-group input-group-merge">
-                    <input type="text" id="billings-card-num" class="form-control billing-card-mask" placeholder="7465 8374 5837 5067" aria-describedby="paymentCard" />
+                    <input type="text" id="billings-card-num" class="form-control billing-card-mask" placeholder="1234 5678 9012 3456" aria-describedby="paymentCard" />
                     <span class="input-group-text cursor-pointer p-1" id="paymentCard"><span class="card-type"></span></span>
 
                   </div>
@@ -111,7 +111,7 @@
                 </div>
                 <div class="col-md-3">
                   <label class="form-label" for="billings-card-cvv">CVV</label>
-                  <input type="text" id="billings-card-cvv" class="form-control billing-cvv-mask" maxlength="3" placeholder="965" />
+                  <input type="text" id="billings-card-cvv" class="form-control billing-cvv-mask" maxlength="3" placeholder="123" />
                 </div>
               </div>
             </form>
@@ -119,11 +119,11 @@
         </div>
         <div class="col-lg-5 card-body p-md-8">
           <h4 class="mb-2">Order Summary</h4>
-          <p class="mb-8">It can help you manage and service orders before,<br> during and after fulfilment.</p>
+          <p class="mb-8">Your subscription to LinguaConnect will provide powerful tools<br> to transform your language teaching practice.</p>
           <div class="bg-lighter p-6 rounded">
-            <p>A simple start for everyone</p>
+            <p>Language Pro Plan - Annual Subscription</p>
             <div class="d-flex align-items-center mb-4">
-              <h1 class="text-heading mb-0">$59.99</h1>
+              <h1 class="text-heading mb-0">$22.99</h1>
               <sub class="h6 text-body mb-n3">/month</sub>
             </div>
             <div class="d-grid">
@@ -132,26 +132,26 @@
           </div>
           <div class="mt-5">
             <div class="d-flex justify-content-between align-items-center">
-              <p class="mb-0">Subtotal</p>
-              <h6 class="mb-0">$85.99</h6>
+              <p class="mb-0">Annual subtotal</p>
+              <h6 class="mb-0">$275.88</h6>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-2">
               <p class="mb-0">Tax</p>
-              <h6 class="mb-0">$4.99</h6>
+              <h6 class="mb-0">$27.59</h6>
             </div>
             <hr>
             <div class="d-flex justify-content-between align-items-center mt-4 pb-1">
               <p class="mb-0">Total</p>
-              <h6 class="mb-0">$90.98</h6>
+              <h6 class="mb-0">$303.47</h6>
             </div>
             <div class="d-grid mt-5">
               <button class="btn btn-success">
-                <span class="me-2">Proceed with Payment</span>
+                <span class="me-2">Complete Payment</span>
                 <i class="ti ti-arrow-right scaleX-n1-rtl"></i>
               </button>
             </div>
 
-            <p class="mt-8">By continuing, you accept to our Terms of Services and Privacy Policy. Please note that payments are non-refundable.</p>
+            <p class="mt-8">By continuing, you accept to our Terms of Services and Privacy Policy. Your subscription will automatically renew at the end of your billing period unless canceled.</p>
           </div>
         </div>
       </div>

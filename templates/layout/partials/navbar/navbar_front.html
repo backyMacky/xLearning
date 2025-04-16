@@ -8,7 +8,7 @@
           <i class="ti ti-menu-2 ti-lg align-middle text-heading fw-medium"></i>
         </button>
         <!-- Mobile menu toggle: End-->
-        <a href="{% url 'landing-page' %}" class="app-brand-link">
+        <a href="{% url 'front_pages:home' %}" class="app-brand-link">
           <span class="app-brand-logo demo">{% include 'partials/logo.html' %}</span>
           <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1">{% get_theme_variables 'template_name' %}</span>
         </a>
@@ -21,21 +21,21 @@
         </button>
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link fw-medium" aria-current="page" href="{% url 'landing-page' %}#landingHero">Home</a>
+            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'home' %}active{% endif %}" aria-current="page" href="{% url 'front_pages:home' %}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link fw-medium" href="{% url 'landing-page' %}#landingFeatures">Features</a>
+            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'features' %}active{% endif %}" href="{% url 'front_pages:features' %}">Features</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link fw-medium" href="{% url 'landing-page' %}#landingTeam">Team</a>
+            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'team' %}active{% endif %}" href="{% url 'front_pages:team' %}">Team</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link fw-medium" href="{% url 'landing-page' %}#landingFAQ">FAQ</a>
+            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'front_pages:faq' %}">FAQ</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link fw-medium" href="{% url 'landing-page' %}#landingContact">Contact us</a>
+            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'front_pages:contact' %}">Contact us</a>
           </li>
-          <li class="nav-item mega-dropdown {% if '/front/pricing/' in active_url or '/front/payment/' in active_url or '/front/checkout/' in active_url or '/front/help_center/' in active_url %}active{% endif %}">
+          <li class="nav-item mega-dropdown {% if 'pricing' in request.resolver_match.url_name or 'payment' in request.resolver_match.url_name or 'checkout' in request.resolver_match.url_name or 'help_center' in request.resolver_match.url_name %}active{% endif %}">
             <a href="javascript:void(0);" class="nav-link dropdown-toggle navbar-ex-14-mega-dropdown mega-dropdown fw-medium" aria-expanded="false" data-bs-toggle="mega-dropdown" data-trigger="hover">
               <span data-i18n="Pages">Pages</span>
             </a>
@@ -50,25 +50,25 @@
                   </div>
                   <ul class="nav flex-column">
                     <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link {% if '/front/pricing/' in active_url %}active{% endif %}" href="{% url 'pricing-page' %}">
+                      <a class="nav-link mega-dropdown-link {% if request.resolver_match.url_name == 'pricing-page' %}active{% endif %}" href="{% url 'front_pages:pricing-page' %}">
                         <i class='ti ti-circle me-1'></i>
                         <span data-i18n="Pricing">Pricing</span>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link {% if '/front/payment/' in active_url %}active{% endif %}" href="{% url 'payment-page' %}">
+                      <a class="nav-link mega-dropdown-link {% if request.resolver_match.url_name == 'payment-page' %}active{% endif %}" href="{% url 'front_pages:payment-page' %}">
                         <i class='ti ti-circle me-1'></i>
                         <span data-i18n="Payment">Payment</span>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link {% if '/front/checkout/' in active_url %}active{% endif %}" href="{% url 'checkout-page' %}">
+                      <a class="nav-link mega-dropdown-link {% if request.resolver_match.url_name == 'checkout-page' %}active{% endif %}" href="{% url 'front_pages:checkout-page' %}">
                         <i class='ti ti-circle me-1'></i>
                         <span data-i18n="Checkout">Checkout</span>
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link {% if '/front/help_center/' in active_url %}active{% endif %}" href="{% url 'help-center-landing' %}">
+                      <a class="nav-link mega-dropdown-link {% if request.resolver_match.url_name == 'help-center-landing' %}active{% endif %}" href="{% url 'front_pages:help-center-landing' %}">
                         <i class='ti ti-circle me-1'></i>
                         <span data-i18n="Help Center">Help Center</span>
                       </a>
@@ -84,19 +84,13 @@
                   </div>
                   <ul class="nav flex-column">
                     <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
+                      <a class="nav-link mega-dropdown-link" href="{% url 'account:login' %}" target="_blank">
                         <i class='ti ti-circle me-1'></i>
                         Login (Basic)
                       </a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Login (Cover)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
+                      <a class="nav-link mega-dropdown-link" href="{% url 'account:register' %}" target="_blank">
                         <i class='ti ti-circle me-1'></i>
                         Register (Basic)
                       </a>
@@ -104,95 +98,7 @@
                     <li class="nav-item">
                       <a class="nav-link mega-dropdown-link" href="" target="_blank">
                         <i class='ti ti-circle me-1'></i>
-                        Register (Cover)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Register (Multi-steps)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Forgot Password (Basic)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Forgot Password (Cover)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Reset Password (Basic)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Reset Password (Cover)
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-12 col-lg">
-                  <div class="h6 d-flex align-items-center mb-3 mb-lg-5">
-                    <div class="avatar flex-shrink-0 me-3">
-                      <span class="avatar-initial rounded bg-label-primary"><i class='ti ti-file-analytics ti-lg'></i></span>
-                    </div>
-                    <span class="ps-1">Other</span>
-                  </div>
-                  <ul class="nav flex-column">
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Error
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Under Maintenance
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Coming Soon
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Not Authorized
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Verify Email (Basic)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Verify Email (Cover)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Two Steps (Basic)
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="" target="_blank">
-                        <i class='ti ti-circle me-1'></i>
-                        Two Steps (Cover)
+                        Forgot Password
                       </a>
                     </li>
                   </ul>
@@ -206,7 +112,7 @@
             </div>
           </li>
           <li class="nav-item">
-            <a class="nav-link fw-medium" href="" target="_blank">Admin</a>
+            <a class="nav-link fw-medium" href="{% url 'admin:index' %}" target="_blank">Admin</a>
           </li>
         </ul>
       </div>
@@ -319,4 +225,3 @@
     </div>
   </div>
 </nav>
-<!-- Navbar: End -->
