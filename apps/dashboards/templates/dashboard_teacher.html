@@ -27,21 +27,6 @@
 
 {% block content %}
 
-{% if admin_view %}
-<div class="alert alert-info">
-  <div class="d-flex">
-    <i class="ti ti-info-circle me-2"></i>
-    <div>
-      {% if viewing_as_teacher %}
-        <strong>Admin View:</strong> You are viewing the teacher dashboard as {{ viewing_as_teacher }}.
-      {% else %}
-        <strong>Admin View:</strong> You are viewing sample dashboard data.
-      {% endif %}
-    </div>
-  </div>
-</div>
-{% endif %}
-
 <!-- Teacher Stats Overview -->
 <div class="row">
   <div class="col-lg-8 mb-4">

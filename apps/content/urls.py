@@ -27,6 +27,7 @@ urlpatterns = [
     path('modules/<int:module_id>/delete/', views.ModuleDeleteView.as_view(), name='delete_module'),
     
     # Lessons
+    path('lessons/', views.LessonListView.as_view(), name='lesson_list'),
     path('modules/<int:module_id>/lessons/create/', views.LessonCreateView.as_view(), name='create_lesson'),
     path('courses/<slug:course_slug>/lessons/<slug:lesson_slug>/', views.LessonDetailView.as_view(), name='lesson_detail'),
     path('lessons/<slug:lesson_slug>/edit/', views.LessonUpdateView.as_view(), name='edit_lesson'),

@@ -1,0 +1,315 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ current_language.name|default:"All Languages" }} Courses - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<!-- Language Selection Header -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+      <h4 class="mb-0">
+        {% if current_language %}
+        <div class="d-flex align-items-center gap-2">
+          {% if current_language.flag_icon %}
+          <i class="{{ current_language.flag_icon }} fs-3"></i>
+          {% endif %}
+          <span>{{ current_language.name }} Courses</span>
+        </div>
+        {% else %}
+        <span>All Language Courses</span>
+        {% endif %}
+      </h4>
+      
+      <div class="language-selector">
+        <label for="languageFilter" class="form-label mb-0 me-2">Choose a language:</label>
+        <select id="languageFilter" class="form-select language-select" style="min-width: 200px;">
+          <option value="{% url 'content:course_list' %}">All Languages</option>
+          {% for language in languages %}
+          <option value="{% url 'content:language_courses' language_code=language.code %}" 
+                  {% if current_language.code == language.code %}selected{% endif %}>
+            {{ language.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Language Overview (only when a specific language is selected) -->
+{% if current_language %}
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="card-title">About {{ current_language.name }}</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="language-info">
+          <!-- This would be populated with language-specific information from the database -->
+          <p class="mb-3">
+            Learn {{ current_language.name }} with our comprehensive courses designed for all skill levels. 
+            From basic conversation skills to advanced fluency, our structured curriculum will guide you through your language learning journey.
+          </p>
+          <h6>Why learn {{ current_language.name }}?</h6>
+          <ul>
+            <li>Spoken by approximately {{ current_language.speakers_count|default:"millions of" }} people worldwide</li>
+            <li>Open doors to new career opportunities</li>
+            <li>Experience the rich culture and literature firsthand</li>
+            <li>Connect with native speakers around the globe</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="level-guide card shadow-none border">
+          <div class="card-header py-2">
+            <h6 class="card-title mb-0">Proficiency Levels</h6>
+          </div>
+          <div class="list-group list-group-flush">
+            {% for level in levels %}
+            <div class="list-group-item p-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <strong>{{ level.code }}</strong>
+                <span>{{ level.name }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Filters and Sorting -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" action="{% if current_language %}{% url 'content:language_courses' language_code=current_language.code %}{% else %}{% url 'content:course_list' %}{% endif %}">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="{{ filter_form.level.id_for_label }}" class="form-label">Level</label>
+          {{ filter_form.level }}
+        </div>
+        <div class="col-md-6">
+          <label for="{{ filter_form.q.id_for_label }}" class="form-label">Search</label>
+          {{ filter_form.q }}
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="ti ti-search me-1"></i> Filter
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Course Cards -->
+<div class="row g-4">
+  {% if courses %}
+    {% for course in courses %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="d-flex flex-column">
+                {% if course.image %}
+                  <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded img-fluid mb-3" style="max-height: 150px; width: auto;">
+                {% else %}
+                  <div class="rounded bg-label-primary p-3 mb-3">
+                    <i class="ti ti-book-2 ti-lg"></i>
+                  </div>
+                {% endif %}
+                <h5 class="card-title mb-0">{{ course.title }}</h5>
+                <div class="d-flex align-items-center mt-1">
+                  <span class="badge bg-label-primary me-2">{{ course.language.name }}</span>
+                  <span class="badge bg-label-info">{{ course.level.code }}</span>
+                </div>
+              </div>
+              {% if course.is_featured %}
+                <span class="badge bg-warning">Featured</span>
+              {% endif %}
+            </div>
+            
+            <p class="card-text mb-3">{{ course.description|truncatechars:120 }}</p>
+            
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm me-2">
+                  {% if course.teacher.profile.profile_image %}
+                    <img src="{{ course.teacher.profile.profile_image.url }}" alt="{{ course.teacher.username }}" class="rounded-circle">
+                  {% else %}
+                    <div class="avatar-initial rounded-circle bg-label-secondary">
+                      <i class="ti ti-user"></i>
+                    </div>
+                  {% endif %}
+                </div>
+                <small>{{ course.teacher.username }}</small>
+              </div>
+              <small class="text-muted">{{ course.duration_weeks }} week{{ course.duration_weeks|pluralize }}</small>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <a href="{% url 'content:course_detail' slug=course.slug %}" class="btn btn-primary">View Course</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="col-12 text-center py-5">
+      <div class="avatar avatar-md mb-3">
+        <div class="avatar-initial rounded-circle bg-label-primary">
+          <i class="ti ti-search ti-md"></i>
+        </div>
+      </div>
+      <h5>No courses found</h5>
+      {% if current_language %}
+        <p>No courses are currently available for {{ current_language.name }}{% if request.GET %} with the selected filters{% endif %}.</p>
+      {% else %}
+        <p>Try adjusting your search or filter criteria.</p>
+      {% endif %}
+      
+      {% if request.GET %}
+        {% if current_language %}
+          <a href="{% url 'content:language_courses' language_code=current_language.code %}" class="btn btn-primary">Clear Filters</a>
+        {% else %}
+          <a href="{% url 'content:course_list' %}" class="btn btn-primary">Clear Filters</a>
+        {% endif %}
+      {% else %}
+        <a href="{% url 'content:course_list' %}" class="btn btn-primary">Browse All Courses</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="d-flex justify-content-center mt-4">
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+            <i class="ti ti-chevrons-left"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+            <i class="ti ti-chevron-left"></i>
+          </a>
+        </li>
+      {% endif %}
+
+      {% for num in paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active">
+            <span class="page-link">{{ num }}</span>
+          </li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+            <i class="ti ti-chevron-right"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+            <i class="ti ti-chevrons-right"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endif %}
+
+<!-- Language Learning Resources -->
+<div class="card mt-4">
+  <div class="card-header">
+    <h5 class="card-title">Learning Resources</h5>
+  </div>
+  <div class="card-body">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card bg-label-primary h-100">
+          <div class="card-body d-flex flex-column">
+            <div class="mb-3">
+              <i class="ti ti-book ti-lg"></i>
+            </div>
+            <h5 class="card-title">Free Study Materials</h5>
+            <p class="card-text">Access vocabulary lists, grammar guides, and practice exercises to supplement your learning.</p>
+            <a href="{% url 'content:resource_list' %}" class="btn btn-primary mt-auto">
+              Browse Resources
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card bg-label-info h-100">
+          <div class="card-body d-flex flex-column">
+            <div class="mb-3">
+              <i class="ti ti-users ti-lg"></i>
+            </div>
+            <h5 class="card-title">Learning Communities</h5>
+            <p class="card-text">Join our language exchange forums and practice with fellow learners from around the world.</p>
+            <a href="#" class="btn btn-info mt-auto">
+              Join a Community
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card bg-label-success h-100">
+          <div class="card-body d-flex flex-column">
+            <div class="mb-3">
+              <i class="ti ti-video ti-lg"></i>
+            </div>
+            <h5 class="card-title">Live Sessions</h5>
+            <p class="card-text">Book one-on-one or group sessions with expert teachers for personalized guidance.</p>
+            <a href="{% url 'meetings:meeting_list' %}" class="btn btn-success mt-auto">
+              Browse Sessions
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select2 for dropdowns
+    $('.form-select').select2();
+    
+    // Language selector redirect
+    document.getElementById('languageFilter').addEventListener('change', function() {
+      window.location.href = this.value;
+    });
+  });
+</script>
+{% endblock %}

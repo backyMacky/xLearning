@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.utils.text import slugify
 from django.db.models import Count, Q
 from web_project import TemplateLayout
+from web_project.template_helpers.theme import TemplateHelper
 
 from .models import (
     Course, LearningModule, Lesson, Resource, Language, 
@@ -16,7 +17,7 @@ from .models import (
 from .forms import (
     CourseForm, ModuleForm, LessonForm, ResourceForm,
     CourseFilterForm, ResourceFilterForm
-)  # We'll create these forms later
+)
 
 from .api import get_course_lessons, mark_lesson_complete
 
@@ -40,13 +41,25 @@ class LanguageCoursesView(ListView):
         return Course.objects.filter(is_published=True).select_related('language', 'level', 'teacher')
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         language_code = self.kwargs.get('language_code')
         if language_code:
             context['current_language'] = get_object_or_404(Language, code=language_code)
+        
         context['languages'] = Language.objects.filter(is_active=True)
         context['levels'] = LanguageLevel.objects.all()
         context['filter_form'] = CourseFilterForm(self.request.GET)
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
 
 
@@ -83,7 +96,9 @@ class CourseListView(ListView):
         return queryset
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         context['languages'] = Language.objects.filter(is_active=True)
         context['levels'] = LanguageLevel.objects.all()
         context['filter_form'] = CourseFilterForm(self.request.GET)
@@ -93,6 +108,14 @@ class CourseListView(ListView):
             is_featured=True, 
             is_published=True
         ).select_related('language', 'level').order_by('?')[:5]
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
         
         return context
 
@@ -112,12 +135,23 @@ class TeacherCourseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         ).prefetch_related('students')
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         context['published_count'] = self.get_queryset().filter(is_published=True).count()
         context['draft_count'] = self.get_queryset().filter(is_published=False).count()
         context['total_students'] = User.objects.filter(
             enrolled_courses__teacher=self.request.user
         ).distinct().count()
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
 
 
@@ -136,7 +170,8 @@ class StudentCourseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         )
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
         
         # Calculate progress for each course
         courses_with_progress = []
@@ -166,6 +201,14 @@ class StudentCourseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
             'language', 'level', 'teacher'
         ).order_by('?')[:3]
         
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'enrolled_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
 
 
@@ -177,7 +220,9 @@ class CourseDetailView(DetailView):
     slug_url_kwarg = 'slug'
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         course = self.get_object()
         
         # Check if user is enrolled
@@ -215,6 +260,14 @@ class CourseDetailView(DetailView):
             language=course.language,
             is_published=True
         ).exclude(id=course.id).order_by('?')[:3]
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
         
         return context
 
@@ -287,9 +340,20 @@ class CourseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         context['title'] = 'Create New Course'
         context['submit_text'] = 'Create Course'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
 
 
@@ -305,9 +369,20 @@ class CourseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user == course.teacher or self.request.user.is_superuser
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         context['title'] = 'Edit Course'
         context['submit_text'] = 'Update Course'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
 
 
@@ -321,6 +396,20 @@ class CourseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         course = self.get_object()
         return self.request.user == course.teacher or self.request.user.is_superuser
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
 
 
 class ModuleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -340,11 +429,22 @@ class ModuleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         course = get_object_or_404(Course, slug=self.kwargs.get('course_slug'))
         context['course'] = course
         context['title'] = f'Add Module to {course.title}'
         context['submit_text'] = 'Create Module'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
     
     def get_success_url(self):
@@ -363,11 +463,22 @@ class ModuleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user == module.course.teacher or self.request.user.is_superuser
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         module = self.get_object()
         context['course'] = module.course
         context['title'] = f'Edit Module: {module.title}'
         context['submit_text'] = 'Update Module'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
     
     def get_success_url(self):
@@ -385,10 +496,56 @@ class ModuleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         module = self.get_object()
         return self.request.user == module.course.teacher or self.request.user.is_superuser
     
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+    
     def get_success_url(self):
         module = self.get_object()
         return reverse('content:course_detail', kwargs={'slug': module.course.slug})
 
+
+class LessonListView(LoginRequiredMixin, ListView):
+    """View to list all lessons"""
+    model = Lesson
+    context_object_name = 'lessons'
+    template_name = 'lesson_list.html'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        if self.request.user.is_teacher:
+            # Teachers see lessons from courses they teach
+            return Lesson.objects.filter(
+                module__course__teacher=self.request.user
+            ).select_related('module', 'module__course')
+        else:
+            # Students see lessons from courses they're enrolled in
+            return Lesson.objects.filter(
+                module__course__students=self.request.user
+            ).select_related('module', 'module__course')
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'content-lessons'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
 
 class LessonCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """View to create a new lesson in a module"""
@@ -407,12 +564,23 @@ class LessonCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         module = get_object_or_404(LearningModule, id=self.kwargs.get('module_id'))
         context['module'] = module
         context['course'] = module.course
         context['title'] = f'Add Lesson to {module.title}'
         context['submit_text'] = 'Create Lesson'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
     
     def get_success_url(self):
@@ -432,12 +600,23 @@ class LessonUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user == lesson.module.course.teacher or self.request.user.is_superuser
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         lesson = self.get_object()
         context['module'] = lesson.module
         context['course'] = lesson.module.course
         context['title'] = f'Edit Lesson: {lesson.title}'
         context['submit_text'] = 'Update Lesson'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
     
     def get_success_url(self):
@@ -454,6 +633,20 @@ class LessonDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         lesson = self.get_object()
         return self.request.user == lesson.module.course.teacher or self.request.user.is_superuser
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'my_courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
     
     def get_success_url(self):
         lesson = self.get_object()
@@ -478,7 +671,9 @@ class LessonDetailView(LoginRequiredMixin, DetailView):
         )
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         lesson = self.get_object()
         course = lesson.module.course
         
@@ -530,15 +725,20 @@ class LessonDetailView(LoginRequiredMixin, DetailView):
         # Get related resources for this lesson
         context['resources'] = Resource.objects.filter(lesson=lesson)
         
-        # Get other students' comments or discussions if applicable
-        # context['comments'] = LessonComment.objects.filter(lesson=lesson).order_by('-created_at')
-        
         # Check if lesson is completed by the current student
         if self.request.user.is_student:
             context['is_completed'] = LessonCompletion.objects.filter(
                 student=self.request.user,
                 lesson=lesson
             ).exists()
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'courses'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
         
         return context
 
@@ -617,13 +817,23 @@ class ResourceListView(LoginRequiredMixin, ListView):
         return queryset
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         context['filter_form'] = ResourceFilterForm(self.request.GET)
         
         # Get languages and levels for filters
         context['languages'] = Language.objects.filter(is_active=True)
         context['levels'] = LanguageLevel.objects.all()
         context['resource_types'] = Resource.RESOURCE_TYPES
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'resources'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
         
         return context
 
@@ -651,9 +861,20 @@ class ResourceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return reverse('content:resource_list')
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         context['title'] = 'Create New Resource'
         context['submit_text'] = 'Create Resource'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'resources'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
 
 
@@ -678,15 +899,27 @@ class ResourceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse('content:resource_list')
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
         context['title'] = 'Edit Resource'
         context['submit_text'] = 'Update Resource'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'resources'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
         return context
 
 
 class ResourceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """View to delete a resource"""
     model = Resource
+    template_name = 'resource_confirm_delete.html'
     pk_url_kwarg = 'resource_id'
     success_url = reverse_lazy('content:resource_list')
     
@@ -694,6 +927,20 @@ class ResourceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         """Only the creator or admin can delete resources"""
         resource = self.get_object()
         return self.request.user == resource.created_by or self.request.user.is_superuser
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'resources'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
     
     def get(self, request, *args, **kwargs):
         """Skip confirmation page and redirect to POST handling"""

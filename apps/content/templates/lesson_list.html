@@ -1,0 +1,435 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}My Lessons - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header border-bottom">
+    <div class="d-flex justify-content-between align-items-center row">
+      <div class="col-12 col-md-6 d-flex align-items-center">
+        <h5 class="card-title mb-0">My Lessons</h5>
+        <span class="badge bg-label-primary ms-3">{{ lessons.count }} lessons</span>
+      </div>
+      <div class="col-12 col-md-6 d-flex justify-content-md-end justify-content-center mt-3 mt-md-0">
+        {% if request.user.is_teacher %}
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" id="createLessonDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ti ti-plus me-1"></i> Create Lesson
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="createLessonDropdown">
+            {% for course in request.user.taught_courses.all %}
+              <li class="dropdown-item-group">
+                <h6 class="dropdown-header">{{ course.title }}</h6>
+                {% for module in course.modules.all %}
+                <li><a class="dropdown-item" href="{% url 'content:create_lesson' module_id=module.id %}">For {{ module.title }}</a></li>
+                {% empty %}
+                <li><a class="dropdown-item disabled">No modules available</a></li>
+                {% endfor %}
+              </li>
+              <li><hr class="dropdown-divider"></li>
+            {% empty %}
+            <li><a class="dropdown-item" href="{% url 'content:create_course' %}">Create a course first</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <!-- Filters -->
+    <form method="get" action="{% url 'content:lesson_list' %}" class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="course-filter" class="form-label">Course</label>
+          <select id="course-filter" name="course" class="form-select">
+            <option value="">All Courses</option>
+            {% if request.user.is_teacher %}
+              {% for course in request.user.taught_courses.all %}
+                <option value="{{ course.id }}" {% if request.GET.course == course.id|stringformat:"i" %}selected{% endif %}>{{ course.title }}</option>
+              {% endfor %}
+            {% else %}
+              {% for course in request.user.enrolled_courses.all %}
+                <option value="{{ course.id }}" {% if request.GET.course == course.id|stringformat:"i" %}selected{% endif %}>{{ course.title }}</option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="module-filter" class="form-label">Module</label>
+          <select id="module-filter" name="module" class="form-select">
+            <option value="">All Modules</option>
+            <!-- Will be populated via JS based on course selection -->
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="search-filter" class="form-label">Search</label>
+          <input type="text" id="search-filter" name="q" class="form-control" placeholder="Search lessons..." value="{{ request.GET.q|default:'' }}">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="ti ti-search me-1"></i> Filter
+          </button>
+        </div>
+      </div>
+    </form>
+    
+    <!-- Lesson List -->
+    <div class="row g-4">
+      {% if lessons %}
+        {% for lesson in lessons %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div class="d-flex flex-column">
+                    {% if lesson.module.course.image %}
+                      <img src="{{ lesson.module.course.image.url }}" alt="{{ lesson.module.course.title }}" class="rounded img-fluid mb-3" style="max-height: 100px; width: auto;">
+                    {% else %}
+                      <div class="rounded bg-label-primary p-3 mb-3">
+                        <i class="ti ti-book-2 ti-lg"></i>
+                      </div>
+                    {% endif %}
+                    <h5 class="card-title mb-0">{{ lesson.title }}</h5>
+                    <small class="text-muted">{{ lesson.module.course.title }} - {{ lesson.module.title }}</small>
+                  </div>
+                  
+                  <!-- Badge for lesson status -->
+                  {% if request.user.is_student %}
+                    {% if lesson.completions.all %}
+                      <span class="badge bg-success">Completed</span>
+                    {% else %}
+                      <span class="badge bg-label-secondary">Not Started</span>
+                    {% endif %}
+                  {% endif %}
+                </div>
+                
+                <!-- Lesson info -->
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="badge bg-label-primary">Module {{ lesson.module.order }}</span>
+                  <span class="badge bg-label-info">{{ lesson.duration_minutes }} min</span>
+                </div>
+                
+                <p class="card-text mb-3">{{ lesson.content|truncatechars:100 }}</p>
+                
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-2">
+                      {% if lesson.module.course.teacher.profile.profile_image %}
+                        <img src="{{ lesson.module.course.teacher.profile.profile_image.url }}" alt="{{ lesson.module.course.teacher.username }}" class="rounded-circle">
+                      {% else %}
+                        <div class="avatar-initial rounded-circle bg-label-secondary">
+                          <i class="ti ti-user"></i>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <small>{{ lesson.module.course.teacher.username }}</small>
+                  </div>
+                  <small class="text-muted">Lesson {{ lesson.order }}</small>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="d-grid gap-2">
+                  <a href="{% url 'content:lesson_detail' course_slug=lesson.module.course.slug lesson_slug=lesson.slug %}" class="btn btn-primary">
+                    <i class="ti ti-book me-1"></i> View Lesson
+                  </a>
+                  {% if request.user.is_teacher and lesson.module.course.teacher == request.user %}
+                  <div class="d-flex gap-2">
+                    <a href="{% url 'content:edit_lesson' lesson_slug=lesson.slug %}" class="btn btn-outline-primary flex-grow-1">
+                      <i class="ti ti-edit me-1"></i> Edit
+                    </a>
+                    <a href="{% url 'content:delete_lesson' lesson_slug=lesson.slug %}" class="btn btn-outline-danger flex-grow-1">
+                      <i class="ti ti-trash me-1"></i> Delete
+                    </a>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12 text-center py-5">
+          <div class="avatar avatar-md mb-3">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-search ti-md"></i>
+            </div>
+          </div>
+          <h5>No lessons found</h5>
+          <p>{% if request.GET %}Try adjusting your search or filter criteria{% else %}{% if request.user.is_teacher %}Start by creating lessons for your courses{% else %}You haven't enrolled in any courses yet{% endif %}{% endif %}</p>
+          
+          {% if request.GET %}
+            <a href="{% url 'content:lesson_list' %}" class="btn btn-primary">Clear Filters</a>
+          {% else %}
+            {% if request.user.is_teacher %}
+              <a href="{% url 'content:teacher_courses' %}" class="btn btn-primary">View My Courses</a>
+            {% else %}
+              <a href="{% url 'content:course_list' %}" class="btn btn-primary">Browse Courses</a>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                <i class="ti ti-chevrons-left"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                <i class="ti ti-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                <i class="ti ti-chevron-right"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                <i class="ti ti-chevrons-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recent Progress -->
+{% if request.user.is_student %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title">Your Learning Progress</h5>
+    <p class="card-text">Track your recent progress across courses</p>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Total Lessons</th>
+            <th>Completed</th>
+            <th>Progress</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for course in request.user.enrolled_courses.all %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                {% if course.image %}
+                  <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded me-3" style="height: 40px; width: 40px; object-fit: cover;">
+                {% else %}
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded bg-label-primary">
+                      <i class="ti ti-book-2"></i>
+                    </div>
+                  </div>
+                {% endif %}
+                <div>
+                  <h6 class="mb-0">{{ course.title }}</h6>
+                  <small>{{ course.language.name }} - {{ course.level.code }}</small>
+                </div>
+              </div>
+            </td>
+            <td>{{ course.modules.all.count }}</td>
+            <td>0</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="progress w-100 me-2" style="height: 8px;">
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small>0%</small>
+              </div>
+            </td>
+            <td>
+              <a href="{% url 'content:course_detail' slug=course.slug %}" class="btn btn-sm btn-primary">Continue</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center">
+              <p class="mb-0 py-3">You haven't enrolled in any courses yet.</p>
+              <a href="{% url 'content:course_list' %}" class="btn btn-primary btn-sm">Browse Courses</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Teacher Analytics -->
+{% if request.user.is_teacher %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title">Lesson Engagement Analytics</h5>
+    <p class="card-text">Track how students are engaging with your lessons</p>
+  </div>
+  <div class="card-body">
+    <div class="row g-4">
+      <!-- Top Lessons by Completion Rate -->
+      <div class="col-md-6">
+        <div class="card shadow-none border">
+          <div class="card-header">
+            <h6 class="card-title mb-0">Most Completed Lessons</h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              {% for lesson in top_completed_lessons|default:lessons|slice:":5" %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-0">{{ lesson.title }}</h6>
+                  <small>{{ lesson.module.course.title }}</small>
+                </div>
+                <span class="badge bg-primary rounded-pill">
+                  {{ lesson.completions.count }} completions
+                </span>
+              </li>
+              {% empty %}
+              <li class="list-group-item text-center">No data available</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recent Student Activity -->
+      <div class="col-md-6">
+        <div class="card shadow-none border">
+          <div class="card-header">
+            <h6 class="card-title mb-0">Recent Student Activity</h6>
+          </div>
+          <div class="card-body">
+            <ul class="timeline mb-0">
+              {% for completion in recent_completions|default:'' %}
+              <li class="timeline-item timeline-item-transparent">
+                <span class="timeline-point timeline-point-success"></span>
+                <div class="timeline-event">
+                  <div class="timeline-header mb-1">
+                    <h6 class="mb-0">{{ completion.student.username }} completed a lesson</h6>
+                    <small>{{ completion.completed_at|timesince }} ago</small>
+                  </div>
+                  <p class="mb-0">{{ completion.lesson.title }} in {{ completion.lesson.module.course.title }}</p>
+                </div>
+              </li>
+              {% empty %}
+              <li class="text-center p-3">No recent activity</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select2 for dropdowns
+    $('.form-select').select2();
+    
+    // Course-Module filtering relationship
+    const courseSelect = document.getElementById('course-filter');
+    const moduleSelect = document.getElementById('module-filter');
+    
+    // Module data structure (populated from the backend or via AJAX)
+    const modulesByCourse = {
+      {% if request.user.is_teacher %}
+        {% for course in request.user.taught_courses.all %}
+          "{{ course.id }}": [
+            {% for module in course.modules.all %}
+              { id: {{ module.id }}, title: "{{ module.title }}" },
+            {% endfor %}
+          ],
+        {% endfor %}
+      {% else %}
+        {% for course in request.user.enrolled_courses.all %}
+          "{{ course.id }}": [
+            {% for module in course.modules.all %}
+              { id: {{ module.id }}, title: "{{ module.title }}" },
+            {% endfor %}
+          ],
+        {% endfor %}
+      {% endif %}
+    };
+    
+    // Update module options based on selected course
+    function updateModuleOptions() {
+      const courseId = courseSelect.value;
+      
+      // Clear current options
+      moduleSelect.innerHTML = '<option value="">All Modules</option>';
+      
+      if (courseId && modulesByCourse[courseId]) {
+        modulesByCourse[courseId].forEach(module => {
+          const option = document.createElement('option');
+          option.value = module.id;
+          option.textContent = module.title;
+          
+          // Set as selected if it matches current URL param
+          if (new URLSearchParams(window.location.search).get('module') === module.id.toString()) {
+            option.selected = true;
+          }
+          
+          moduleSelect.appendChild(option);
+        });
+      }
+      
+      // Refresh Select2
+      $(moduleSelect).trigger('change');
+    }
+    
+    // Initialize module options
+    updateModuleOptions();
+    
+    // Update when course changes
+    courseSelect.addEventListener('change', updateModuleOptions);
+  });
+</script>
+{% endblock %}

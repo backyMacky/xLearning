@@ -1,0 +1,248 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %} - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/dropzone/dropzone.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/quill/editor.js' %}"></script>
+<script src="{% static 'vendor/libs/dropzone/dropzone.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">{{ title }}</h5>
+    <a href="{% if course %}{% url 'content:course_detail' slug=course.slug %}{% else %}{% url 'content:teacher_courses' %}{% endif %}" class="btn btn-outline-secondary btn-sm">
+      <i class="ti ti-arrow-left me-1"></i> Back
+    </a>
+  </div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data" id="courseForm">
+      {% csrf_token %}
+      
+      <!-- Form errors -->
+      {% if form.errors %}
+      <div class="alert alert-danger mb-4">
+        <div class="alert-body">
+          Please correct the errors below:
+          <ul class="mb-0 mt-1">
+            {% for field in form %}
+              {% if field.errors %}
+                {% for error in field.errors %}
+                  <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+              {% endif %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+      
+      <div class="row g-4">
+        <!-- Course Title -->
+        <div class="col-12">
+          <label for="{{ form.title.id_for_label }}" class="form-label">Course Title</label>
+          {{ form.title }}
+          {% if form.title.help_text %}
+          <small class="form-text text-muted">{{ form.title.help_text }}</small>
+          {% endif %}
+        </div>
+        
+        <!-- Course Language and Level -->
+        <div class="col-md-6">
+          <label for="{{ form.language.id_for_label }}" class="form-label">Language</label>
+          {{ form.language }}
+          {% if form.language.help_text %}
+          <small class="form-text text-muted">{{ form.language.help_text }}</small>
+          {% endif %}
+        </div>
+        <div class="col-md-6">
+          <label for="{{ form.level.id_for_label }}" class="form-label">Level</label>
+          {{ form.level }}
+          {% if form.level.help_text %}
+          <small class="form-text text-muted">{{ form.level.help_text }}</small>
+          {% endif %}
+        </div>
+        
+        <!-- Course Duration -->
+        <div class="col-md-6">
+          <label for="{{ form.duration_weeks.id_for_label }}" class="form-label">Duration (weeks)</label>
+          {{ form.duration_weeks }}
+          {% if form.duration_weeks.help_text %}
+          <small class="form-text text-muted">{{ form.duration_weeks.help_text }}</small>
+          {% endif %}
+        </div>
+        
+        <!-- Course Image -->
+        <div class="col-md-6">
+          <label for="{{ form.image.id_for_label }}" class="form-label">Course Image</label>
+          <div class="input-group">
+            {{ form.image }}
+          </div>
+          {% if form.image.help_text %}
+          <small class="form-text text-muted">{{ form.image.help_text }}</small>
+          {% endif %}
+          
+          {% if course and course.image %}
+          <div class="mt-2">
+            <p class="mb-1">Current image:</p>
+            <img src="{{ course.image.url }}" alt="{{ course.title }}" class="img-thumbnail" style="max-height: 150px;">
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Course Description -->
+        <div class="col-12">
+          <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+          {{ form.description }}
+          {% if form.description.help_text %}
+          <small class="form-text text-muted">{{ form.description.help_text }}</small>
+          {% endif %}
+        </div>
+        
+        <!-- Course Settings -->
+        <div class="col-12">
+          <h6 class="fw-semibold">Course Settings</h6>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-2">
+                {{ form.is_published }}
+                <label class="form-check-label" for="{{ form.is_published.id_for_label }}">
+                  Published
+                  <small class="d-block text-muted">Make this course visible to students</small>
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check form-switch mb-2">
+                {{ form.is_featured }}
+                <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                  Featured
+                  <small class="d-block text-muted">Highlight this course on the platform</small>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Submit Buttons -->
+        <div class="col-12 d-flex justify-content-end gap-2">
+          <a href="{% if course %}{% url 'content:course_detail' slug=course.slug %}{% else %}{% url 'content:teacher_courses' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">{{ submit_text|default:"Save" }}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if course %}
+<!-- Module Management Section -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Course Modules</h5>
+    <a href="{% url 'content:create_module' course_slug=course.slug %}" class="btn btn-primary btn-sm">
+      <i class="ti ti-plus me-1"></i> Add Module
+    </a>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th style="width: 50px;">Order</th>
+            <th>Title</th>
+            <th>Lessons</th>
+            <th style="width: 150px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for module in course.modules.all|dictsort:"order" %}
+          <tr>
+            <td>{{ module.order }}</td>
+            <td>
+              <strong>{{ module.title }}</strong>
+              {% if module.description %}
+              <p class="text-muted mb-0 small">{{ module.description|truncatechars:60 }}</p>
+              {% endif %}
+            </td>
+            <td>{{ module.lessons.count }}</td>
+            <td>
+              <div class="d-flex gap-2">
+                <a href="{% url 'content:create_lesson' module_id=module.id %}" class="btn btn-sm btn-icon btn-primary" data-bs-toggle="tooltip" title="Add Lesson">
+                  <i class="ti ti-plus"></i>
+                </a>
+                <a href="{% url 'content:edit_module' module_id=module.id %}" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="Edit Module">
+                  <i class="ti ti-edit"></i>
+                </a>
+                <a href="{% url 'content:delete_module' module_id=module.id %}" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="Delete Module">
+                  <i class="ti ti-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center py-4">
+              <p class="mb-2">No modules have been created for this course yet.</p>
+              <a href="{% url 'content:create_module' course_slug=course.slug %}" class="btn btn-primary btn-sm">Add First Module</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select2 for dropdowns
+    $('.form-select').select2();
+    
+    // Initialize rich text editor for description
+    var quill = new Quill('#{{ form.description.id_for_label }}', {
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'color': [] }, { 'background': [] }],
+          ['link'],
+          ['clean']
+        ]
+      },
+      theme: 'snow'
+    });
+    
+    // Sync Quill editor with hidden textarea for form submission
+    var form = document.getElementById('courseForm');
+    form.addEventListener('submit', function() {
+      var descriptionInput = document.querySelector('textarea[name="description"]');
+      descriptionInput.value = quill.root.innerHTML;
+    });
+    
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  });
+</script>
+{% endblock %}
