@@ -1,0 +1,262 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ lesson.title }} - {{ lesson.module.course.title }} - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <!-- Navigation Header -->
+  <div class="col-12 mb-4">
+    <div class="card bg-transparent shadow-none border-0">
+      <div class="card-body p-0">
+        <div class="d-flex align-items-center mb-2">
+          <a href="{% url 'content:course_detail' slug=course.slug %}" class="text-muted me-2">
+            <i class="ti ti-arrow-left"></i> Back to Course
+          </a>
+          <div class="ms-auto">
+            <span class="badge bg-label-primary">{{ lesson.module.course.language.name }}</span>
+            <span class="badge bg-label-info ms-1">{{ lesson.module.course.level.name }}</span>
+          </div>
+        </div>
+        
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'content:course_list' %}">Courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'content:course_detail' slug=course.slug %}">{{ course.title }}</a></li>
+            <li class="breadcrumb-item">{{ lesson.module.title }}</li>
+            <li class="breadcrumb-item active">{{ lesson.title }}</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="col-lg-8 mb-4">
+    <div class="card">
+      <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0">{{ lesson.title }}</h4>
+        
+        {% if request.user == course.teacher %}
+          <div class="dropdown">
+            <button class="btn btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" type="button" id="lessonActionMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="ti ti-dots-vertical"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="lessonActionMenu">
+              <a class="dropdown-item" href="{% url 'content:edit_lesson' lesson_slug=lesson.slug %}">
+                <i class="ti ti-edit me-1"></i> Edit Lesson
+              </a>
+              <form method="post" action="{% url 'content:delete_lesson' lesson_slug=lesson.slug %}">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this lesson?')">
+                  <i class="ti ti-trash me-1"></i> Delete Lesson
+                </button>
+              </form>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="card-body">
+        <!-- Duration and metadata -->
+        <div class="d-flex align-items-center text-muted mb-4">
+          <div>
+            <i class="ti ti-clock me-1"></i>
+            <span>{{ lesson.duration_minutes }} min</span>
+          </div>
+          
+          {% if lesson.video_url %}
+            <div class="ms-3">
+              <i class="ti ti-video me-1"></i>
+              <span>Video</span>
+            </div>
+          {% endif %}
+          
+          {% if lesson.audio_url %}
+            <div class="ms-3">
+              <i class="ti ti-music me-1"></i>
+              <span>Audio</span>
+            </div>
+          {% endif %}
+          
+          {% if lesson.attachment %}
+            <div class="ms-3">
+              <i class="ti ti-file me-1"></i>
+              <span>Attachment</span>
+            </div>
+          {% endif %}
+        </div>
+        
+        <!-- Video content -->
+        {% if lesson.video_url %}
+          <div class="mb-4">
+            <div class="ratio ratio-16x9">
+              {% if 'youtube.com' in lesson.video_url or 'youtu.be' in lesson.video_url %}
+                {% if 'youtu.be/' in lesson.video_url %}
+                  {% with video_id=lesson.video_url|cut:'https://youtu.be/' %}
+                    <iframe src="https://www.youtube.com/embed/{{ video_id }}" title="{{ lesson.title }}" allowfullscreen></iframe>
+                  {% endwith %}
+                {% else %}
+                  {% with video_id=lesson.video_url|cut:'https://www.youtube.com/watch?v=' %}
+                    <iframe src="https://www.youtube.com/embed/{{ video_id }}" title="{{ lesson.title }}" allowfullscreen></iframe>
+                  {% endwith %}
+                {% endif %}
+              {% elif 'vimeo.com' in lesson.video_url %}
+                {% with video_id=lesson.video_url|cut:'https://vimeo.com/' %}
+                  <iframe src="https://player.vimeo.com/video/{{ video_id }}" title="{{ lesson.title }}" allowfullscreen></iframe>
+                {% endwith %}
+              {% else %}
+                <div class="d-flex align-items-center justify-content-center bg-dark text-white">
+                  <div class="text-center">
+                    <i class="ti ti-video ti-xl mb-2"></i>
+                    <p>Video available at: <a href="{{ lesson.video_url }}" target="_blank" class="text-primary">{{ lesson.video_url }}</a></p>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+        
+        <!-- Audio content -->
+        {% if lesson.audio_url %}
+          <div class="mb-4">
+            {% if 'soundcloud.com' in lesson.audio_url %}
+              <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url={{ lesson.audio_url }}"></iframe>
+            {% else %}
+              <div class="card bg-light">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-music ti-lg me-2"></i>
+                    <div>
+                      <h6 class="mb-0">Audio Resource</h6>
+                      <a href="{{ lesson.audio_url }}" target="_blank">Listen to Audio</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+        
+        <!-- Main lesson content -->
+        <div class="lesson-content mb-4">
+          {{ lesson.content|safe }}
+        </div>
+        
+        <!-- Attachment -->
+        {% if lesson.attachment %}
+          <div class="card bg-light mb-4">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <i class="ti ti-file-download ti-lg me-3"></i>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">Lesson Attachment</h6>
+                  <p class="mb-0 text-muted">{{ lesson.attachment.name|cut:"lesson_attachments/" }}</p>
+                </div>
+                <a href="{{ lesson.attachment.url }}" class="btn btn-primary" download>
+                  <i class="ti ti-download me-1"></i> Download
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+        
+        <!-- Navigation buttons -->
+        <div class="mt-5">
+          <div class="row">
+            <div class="col-6">
+              {% if prev_lesson %}
+                <a href="{% url 'content:lesson_detail' course_slug=course.slug lesson_slug=prev_lesson.slug %}" class="btn btn-outline-primary">
+                  <i class="ti ti-chevron-left me-1"></i> Previous Lesson
+                </a>
+              {% endif %}
+            </div>
+            <div class="col-6 text-end">
+              {% if next_lesson %}
+                <a href="{% url 'content:lesson_detail' course_slug=course.slug lesson_slug=next_lesson.slug %}" class="btn btn-primary">
+                  Next Lesson <i class="ti ti-chevron-right ms-1"></i>
+                </a>
+              {% else %}
+                <a href="{% url 'content:course_detail' slug=course.slug %}" class="btn btn-success">
+                  <i class="ti ti-check me-1"></i> Complete Course
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sidebar -->
+  <div class="col-lg-4 mb-4">
+    <!-- Module Lessons Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{{ lesson.module.title }}</h5>
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          {% for module_lesson in lesson.module.lessons.all %}
+            <li class="list-group-item {% if module_lesson.id == lesson.id %}active{% endif %}">
+              <div class="d-flex align-items-center">
+                {% if module_lesson.id in completed_lessons %}
+                  <i class="ti ti-circle-check {% if module_lesson.id == lesson.id %}text-white{% else %}text-success{% endif %} me-2"></i>
+                {% else %}
+                  <i class="ti ti-circle {% if module_lesson.id == lesson.id %}text-white{% else %}text-muted{% endif %} me-2"></i>
+                {% endif %}
+                
+                <div class="flex-grow-1">
+                  <a href="{% url 'content:lesson_detail' course_slug=course.slug lesson_slug=module_lesson.slug %}" class="{% if module_lesson.id == lesson.id %}text-white{% endif %}">
+                    {{ module_lesson.title }}
+                  </a>
+                  <div class="small {% if module_lesson.id == lesson.id %}text-white-50{% else %}text-muted{% endif %}">
+                    {{ module_lesson.duration_minutes }} min
+                  </div>
+                </div>
+                
+                {% if module_lesson.id == lesson.id %}
+                  <span class="badge bg-white text-primary">Current</span>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Course Progress Card -->
+    {% if is_enrolled %}
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Your Progress</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span>Course Completion</span>
+          <span class="fw-bold">{{ progress_percentage }}%</span>
+        </div>
+        <div class="progress mb-3" style="height: 8px;">
+          <div class="progress-bar bg-primary" role="progressbar" style="width: {{ progress_percentage }}%" aria-valuenow="{{ progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        
+        <form method="post" action="{% url 'content:mark_lesson_complete' lesson_id=lesson.id %}" class="mt-4">
+          {% csrf_token %}
+          {% if lesson.id in completed_lessons %}
+            <button type="submit" name="action" value="incomplete" class="btn btn-outline-primary w-100">
+              <i class="ti ti-circle-x me-1"></i> Mark as Incomplete
+            </button>
+          {% else %}
+            <button type="submit" name="action" value="complete" class="btn btn-primary w-100">
+              <i class="ti ti-check me-1"></i> Mark as Complete
+            </button>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

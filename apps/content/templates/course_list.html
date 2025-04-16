@@ -1,0 +1,223 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Course Catalog - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header border-bottom">
+    <div class="d-flex justify-content-between align-items-center row">
+      <div class="col-12 col-md-6 d-flex align-items-center">
+        <h5 class="card-title mb-0">Course Catalog</h5>
+        <span class="badge bg-label-primary ms-3">{{ courses.count }} courses</span>
+      </div>
+      <div class="col-12 col-md-6 d-flex justify-content-md-end justify-content-center mt-3 mt-md-0">
+        {% if request.user.is_teacher %}
+        <a href="{% url 'content:create_course' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i> Create Course
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <!-- Filters -->
+    <form method="get" action="{% url 'content:course_list' %}" class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label for="{{ filter_form.language.id_for_label }}" class="form-label">Language</label>
+          {{ filter_form.language }}
+        </div>
+        <div class="col-md-3">
+          <label for="{{ filter_form.level.id_for_label }}" class="form-label">Level</label>
+          {{ filter_form.level }}
+        </div>
+        <div class="col-md-4">
+          <label for="{{ filter_form.q.id_for_label }}" class="form-label">Search</label>
+          {{ filter_form.q }}
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="ti ti-search me-1"></i> Filter
+          </button>
+        </div>
+      </div>
+    </form>
+    
+    <!-- Course Cards -->
+    <div class="row g-4">
+      {% if courses %}
+        {% for course in courses %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div class="d-flex flex-column">
+                    {% if course.image %}
+                      <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded img-fluid mb-3" style="max-height: 150px; width: auto;">
+                    {% else %}
+                      <div class="rounded bg-label-primary p-3 mb-3">
+                        <i class="ti ti-book-2 ti-lg"></i>
+                      </div>
+                    {% endif %}
+                    <h5 class="card-title mb-0">{{ course.title }}</h5>
+                    <div class="d-flex align-items-center mt-1">
+                      <span class="badge bg-label-primary me-2">{{ course.language.name }}</span>
+                      <span class="badge bg-label-info">{{ course.level.code }}</span>
+                    </div>
+                  </div>
+                  {% if course.is_featured %}
+                    <span class="badge bg-warning">Featured</span>
+                  {% endif %}
+                </div>
+                
+                <p class="card-text mb-3">{{ course.description|truncatechars:120 }}</p>
+                
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-2">
+                      {% if course.teacher.profile.profile_image %}
+                        <img src="{{ course.teacher.profile.profile_image.url }}" alt="{{ course.teacher.username }}" class="rounded-circle">
+                      {% else %}
+                        <div class="avatar-initial rounded-circle bg-label-secondary">
+                          <i class="ti ti-user"></i>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <small>{{ course.teacher.username }}</small>
+                  </div>
+                  <small class="text-muted">{{ course.duration_weeks }} week{{ course.duration_weeks|pluralize }}</small>
+                </div>
+                
+                <div class="d-grid gap-2">
+                  <a href="{% url 'content:course_detail' slug=course.slug %}" class="btn btn-primary">View Course</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12 text-center py-5">
+          <div class="avatar avatar-md mb-3">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-search ti-md"></i>
+            </div>
+          </div>
+          <h5>No courses found</h5>
+          <p>Try adjusting your search or filter criteria</p>
+          <a href="{% url 'content:course_list' %}" class="btn btn-primary">Clear Filters</a>
+        </div>
+      {% endif %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                <i class="ti ti-chevrons-left"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                <i class="ti ti-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                <i class="ti ti-chevron-right"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                <i class="ti ti-chevrons-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Featured Courses -->
+{% if featured_courses %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="card-title">Featured Courses</h5>
+  </div>
+  <div class="card-body">
+    <div class="row g-4">
+      {% for course in featured_courses %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                {% if course.image %}
+                  <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded me-3" style="height: 60px; width: 60px; object-fit: cover;">
+                {% else %}
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded bg-label-primary">
+                      <i class="ti ti-book-2"></i>
+                    </div>
+                  </div>
+                {% endif %}
+                <div>
+                  <h6 class="mb-0">{{ course.title }}</h6>
+                  <small>{{ course.language.name }} - {{ course.level.code }}</small>
+                </div>
+              </div>
+              <p class="card-text small mb-2">{{ course.description|truncatechars:80 }}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small>By {{ course.teacher.username }}</small>
+                <a href="{% url 'content:course_detail' slug=course.slug %}" class="btn btn-sm btn-primary">View</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select2 for dropdowns
+    $('.form-select').select2();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ title }} - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/quill/typography.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/quill/quill.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center">
+        <a href="{% url 'content:course_detail' slug=module.course.slug %}" class="me-2">
+          <i class="ti ti-arrow-left"></i>
+        </a>
+        <h5 class="card-title mb-0">{{ title }}</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          
+          <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Lesson Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+              <div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <label for="editor" class="form-label">Content</label>
+            <div id="editor" style="height: 300px"></div>
+            {{ form.content }}
+            {% if form.content.errors %}
+              <div class="invalid-feedback d-block">{{ form.content.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="{{ form.video_url.id_for_label }}" class="form-label">Video URL (optional)</label>
+              {{ form.video_url }}
+              {% if form.video_url.errors %}
+                <div class="invalid-feedback d-block">{{ form.video_url.errors.0 }}</div>
+              {% endif %}
+              <small class="text-muted">YouTube, Vimeo, etc.</small>
+            </div>
+            <div class="col-md-6">
+              <label for="{{ form.audio_url.id_for_label }}" class="form-label">Audio URL (optional)</label>
+              {{ form.audio_url }}
+              {% if form.audio_url.errors %}
+                <div class="invalid-feedback d-block">{{ form.audio_url.errors.0 }}</div>
+              {% endif %}
+              <small class="text-muted">SoundCloud, direct link, etc.</small>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.attachment.id_for_label }}" class="form-label">Attachment (optional)</label>
+            {{ form.attachment }}
+            {% if form.attachment.errors %}
+              <div class="invalid-feedback d-block">{{ form.attachment.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">PDF, document, presentation, etc.</small>
+            {% if form.instance.attachment %}
+              <div class="mt-2">
+                <span class="badge bg-label-info">Current file: {{ form.instance.attachment.name|cut:"lesson_attachments/" }}</span>
+              </div>
+            {% endif %}
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="{{ form.duration_minutes.id_for_label }}" class="form-label">Duration (minutes)</label>
+              {{ form.duration_minutes }}
+              {% if form.duration_minutes.errors %}
+                <div class="invalid-feedback d-block">{{ form.duration_minutes.errors.0 }}</div>
+              {% endif %}
+              <small class="text-muted">Estimated time to complete the lesson</small>
+            </div>
+            <div class="col-md-6">
+              <label for="{{ form.order.id_for_label }}" class="form-label">Order</label>
+              {{ form.order }}
+              {% if form.order.errors %}
+                <div class="invalid-feedback d-block">{{ form.order.errors.0 }}</div>
+              {% endif %}
+              <small class="text-muted">Display order in the module (lower values appear first)</small>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'content:course_detail' slug=module.course.slug %}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Quill for rich text editor
+    var quill = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          ['blockquote', 'code-block'],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],
+          [{ 'indent': '-1'}, { 'indent': '+1' }],
+          [{ 'align': [] }],
+          ['link', 'image', 'video'],
+          ['clean']
+        ]
+      }
+    });
+    
+    // Set initial content if available
+    const contentField = document.querySelector('#{{ form.content.id_for_label }}');
+    if (contentField.value) {
+      quill.root.innerHTML = contentField.value;
+    }
+    
+    // When form is submitted, update hidden textarea with Quill content
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+      contentField.value = quill.root.innerHTML;
+    });
+    <script>
+{% endblock %}

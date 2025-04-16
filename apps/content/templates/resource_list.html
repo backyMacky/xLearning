@@ -1,0 +1,244 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Learning Resources - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header border-bottom">
+    <div class="d-flex justify-content-between align-items-center row">
+      <div class="col-12 col-md-6 d-flex align-items-center">
+        <h5 class="card-title mb-0">Learning Resources</h5>
+        <span class="badge bg-label-primary ms-3">{{ resources.count }} resources</span>
+      </div>
+      <div class="col-12 col-md-6 d-flex justify-content-md-end justify-content-center mt-3 mt-md-0">
+        {% if request.user.is_teacher %}
+        <a href="{% url 'content:create_resource' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i> Add Resource
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <!-- Filters -->
+    <form method="get" action="{% url 'content:resource_list' %}" class="mb-4">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label for="{{ filter_form.language.id_for_label }}" class="form-label">Language</label>
+          {{ filter_form.language }}
+        </div>
+        <div class="col-md-3">
+          <label for="{{ filter_form.level.id_for_label }}" class="form-label">Level</label>
+          {{ filter_form.level }}
+        </div>
+        <div class="col-md-2">
+          <label for="{{ filter_form.resource_type.id_for_label }}" class="form-label">Type</label>
+          {{ filter_form.resource_type }}
+        </div>
+        <div class="col-md-2">
+          <label for="{{ filter_form.q.id_for_label }}" class="form-label">Search</label>
+          {{ filter_form.q }}
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="ti ti-search me-1"></i> Filter
+          </button>
+        </div>
+      </div>
+    </form>
+    
+    <!-- Resources DataTable -->
+    <div class="table-responsive">
+      <table class="table table-hover dt-responsive" id="resourcesTable">
+        <thead>
+          <tr>
+            <th>Resource</th>
+            <th>Type</th>
+            <th>Language</th>
+            <th>Level</th>
+            <th>Course</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if resources %}
+            {% for resource in resources %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-3">
+                      {% if resource.resource_type == 'document' %}
+                        <div class="avatar-initial rounded bg-label-primary">
+                          <i class="ti ti-file-text ti-sm"></i>
+                        </div>
+                      {% elif resource.resource_type == 'video' %}
+                        <div class="avatar-initial rounded bg-label-danger">
+                          <i class="ti ti-video ti-sm"></i>
+                        </div>
+                      {% elif resource.resource_type == 'audio' %}
+                        <div class="avatar-initial rounded bg-label-warning">
+                          <i class="ti ti-music ti-sm"></i>
+                        </div>
+                      {% elif resource.resource_type == 'image' %}
+                        <div class="avatar-initial rounded bg-label-success">
+                          <i class="ti ti-photo ti-sm"></i>
+                        </div>
+                      {% elif resource.resource_type == 'link' %}
+                        <div class="avatar-initial rounded bg-label-info">
+                          <i class="ti ti-link ti-sm"></i>
+                        </div>
+                      {% else %}
+                        <div class="avatar-initial rounded bg-label-secondary">
+                          <i class="ti ti-file ti-sm"></i>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div>
+                      <h6 class="mb-0">{{ resource.title }}</h6>
+                      <small class="text-muted">{{ resource.created_by.username }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ resource.get_resource_type_display }}</td>
+                <td>{{ resource.language.name }}</td>
+                <td>{{ resource.level.name }}</td>
+                <td>
+                  {% if resource.course %}
+                    <a href="{% url 'content:course_detail' slug=resource.course.slug %}">{{ resource.course.title }}</a>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="dropdown">
+                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                      <i class="ti ti-dots-vertical"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                      {% if resource.file %}
+                        <a class="dropdown-item" href="{{ resource.file.url }}" target="_blank">
+                          <i class="ti ti-download me-1"></i> Download
+                        </a>
+                      {% endif %}
+                      {% if resource.external_url %}
+                        <a class="dropdown-item" href="{{ resource.external_url }}" target="_blank">
+                          <i class="ti ti-external-link me-1"></i> Open Link
+                        </a>
+                      {% endif %}
+                      {% if request.user == resource.created_by or request.user.is_superuser %}
+                        <a class="dropdown-item" href="{% url 'content:edit_resource' resource_id=resource.id %}">
+                          <i class="ti ti-edit me-1"></i> Edit
+                        </a>
+                        <form method="post" action="{% url 'content:delete_resource' resource_id=resource.id %}">
+                          {% csrf_token %}
+                          <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this resource?')">
+                            <i class="ti ti-trash me-1"></i> Delete
+                          </button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6" class="text-center py-4">
+                <div class="avatar avatar-md mb-3 mx-auto">
+                  <div class="avatar-initial rounded-circle bg-label-primary">
+                    <i class="ti ti-file-search ti-md"></i>
+                  </div>
+                </div>
+                <h6 class="mb-1">No resources found</h6>
+                <p class="mb-0">Try adjusting your search or filter criteria</p>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="d-flex justify-content-center mt-4">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                <i class="ti ti-chevrons-left"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                <i class="ti ti-chevron-left"></i>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                <i class="ti ti-chevron-right"></i>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                <i class="ti ti-chevrons-right"></i>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select2 for dropdowns
+    $('.form-select').select2();
+    
+    // Initialize DataTable
+    const resourcesTable = $('#resourcesTable').DataTable({
+      dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>><"table-responsive"t><"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+      lengthMenu: [10, 25, 50, 100],
+      responsive: true,
+      searching: false, // We're using our own search form
+      ordering: true,
+      paging: false // We're using Django's pagination
+    });
+  });
+</script>
+{% endblock %}

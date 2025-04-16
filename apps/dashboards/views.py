@@ -477,6 +477,21 @@ class TeacherDashboardView(LoginRequiredMixin, TemplateView):
     """Teacher-specific dashboard view"""
     template_name = "dashboard_teacher.html"
     
+    def get(self, request, *args, **kwargs):
+        # Admin users can access all dashboards
+        if request.user.is_superuser or request.user.is_staff:
+            return super().get(request, *args, **kwargs)
+            
+        # Check if user has the is_teacher attribute and it's True
+        if hasattr(request.user, 'is_teacher') and request.user.is_teacher:
+            return super().get(request, *args, **kwargs)
+        elif hasattr(request.user, 'is_student') and request.user.is_student:
+            # Redirect students to student dashboard
+            return redirect('dashboards:dashboard-student')
+        else:
+            # For users without defined roles, show general dashboard
+            return redirect('dashboards:overview')
+    
     def get_context_data(self, **kwargs):
         # Initialize the template layout from the base class
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
@@ -491,15 +506,52 @@ class TeacherDashboardView(LoginRequiredMixin, TemplateView):
         now = timezone.now()
         user = self.request.user
         
-        # Redirect students away from the teacher dashboard
-        if not user.is_teacher:
-            return redirect('dashboards:dashboard-student')
-        
         # Initialize data containers
         context['now'] = now
         
         # ===== Teacher Statistics =====
-        # Get all courses taught by this teacher
+        # For admin users viewing the teacher dashboard, provide sample data
+        if user.is_superuser or user.is_staff:
+            if not hasattr(user, 'is_teacher') or not user.is_teacher:
+                # Add a note that this is admin view
+                context['admin_view'] = True
+                
+                # Provide some sample data or fetch data for all teachers
+                try:
+                    # Get teacher users
+                    teacher_users = User.objects.filter(is_teacher=True)
+                    
+                    if teacher_users.exists():
+                        # Use the first teacher's data for demonstration
+                        sample_teacher = teacher_users.first()
+                        context['viewing_as_teacher'] = sample_teacher.username
+                        
+                        # Set user to the sample teacher for data fetching
+                        user = sample_teacher
+                    else:
+                        # No teachers in the system, provide defaults
+                        context['course_count'] = 0
+                        context['student_count'] = 0
+                        context['upcoming_sessions'] = 0
+                        context['teaching_hours'] = 0
+                        context['course_analytics'] = []
+                        context['student_activities'] = []
+                        context['resources'] = []
+                        context['weekly_schedule'] = []
+                        return context
+                except:
+                    # Fallback to defaults if error occurs
+                    context['course_count'] = 0
+                    context['student_count'] = 0
+                    context['upcoming_sessions'] = 0
+                    context['teaching_hours'] = 0
+                    context['course_analytics'] = []
+                    context['student_activities'] = []
+                    context['resources'] = []
+                    context['weekly_schedule'] = []
+                    return context
+        
+        # Get all courses taught by this teacher (or sample teacher for admin)
         taught_courses = Course.objects.filter(teacher=user)
         context['course_count'] = taught_courses.count()
         
@@ -788,10 +840,24 @@ class TeacherDashboardView(LoginRequiredMixin, TemplateView):
         else:
             return 'File'
 
-
 class StudentDashboardView(LoginRequiredMixin, TemplateView):
     """Student-specific dashboard view"""
     template_name = "dashboard_student.html"
+    
+    def get(self, request, *args, **kwargs):
+        # Admin users can access all dashboards
+        if request.user.is_superuser or request.user.is_staff:
+            return super().get(request, *args, **kwargs)
+            
+        # Check if user has the is_student attribute and it's True
+        if hasattr(request.user, 'is_student') and request.user.is_student:
+            return super().get(request, *args, **kwargs)
+        elif hasattr(request.user, 'is_teacher') and request.user.is_teacher:
+            # Redirect teachers to teacher dashboard
+            return redirect('dashboards:dashboard-teacher')
+        else:
+            # For users without defined roles, show general dashboard
+            return redirect('dashboards:overview')
     
     def get_context_data(self, **kwargs):
         # Initialize the template layout from the base class
@@ -807,9 +873,48 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
         now = timezone.now()
         user = self.request.user
         
-        # Redirect teachers away from the student dashboard
-        if not user.is_student:
-            return redirect('dashboards:dashboard-teacher')
+        # For admin users viewing the student dashboard, provide sample data
+        if user.is_superuser or user.is_staff:
+            if not hasattr(user, 'is_student') or not user.is_student:
+                # Add a note that this is admin view
+                context['admin_view'] = True
+                
+                # Provide some sample data or fetch data for a sample student
+                try:
+                    # Get student users
+                    student_users = User.objects.filter(is_student=True)
+                    
+                    if student_users.exists():
+                        # Use the first student's data for demonstration
+                        sample_student = student_users.first()
+                        context['viewing_as_student'] = sample_student.username
+                        
+                        # Set user to the sample student for data fetching
+                        user = sample_student
+                    else:
+                        # No students in the system, provide defaults
+                        context['enrolled_courses'] = 0
+                        context['completed_lessons'] = 0
+                        context['credit_balance'] = 0
+                        context['avg_score'] = 0
+                        context['course_progress'] = []
+                        context['upcoming_meetings'] = []
+                        context['assessment_results'] = []
+                        context['resources'] = []
+                        context['student_files'] = []
+                        return context
+                except:
+                    # Fallback to defaults if error occurs
+                    context['enrolled_courses'] = 0
+                    context['completed_lessons'] = 0
+                    context['credit_balance'] = 0
+                    context['avg_score'] = 0
+                    context['course_progress'] = []
+                    context['upcoming_meetings'] = []
+                    context['assessment_results'] = []
+                    context['resources'] = []
+                    context['student_files'] = []
+                    return context
         
         # Initialize data containers
         context['now'] = now
@@ -1063,6 +1168,7 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
             pass
         
         context['available_slots'] = available_slots
+        
         
         # ===== Student Files =====
         student_files = []

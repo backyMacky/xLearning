@@ -27,6 +27,21 @@
 
 {% block content %}
 
+{% if admin_view %}
+<div class="alert alert-info">
+  <div class="d-flex">
+    <i class="ti ti-info-circle me-2"></i>
+    <div>
+      {% if viewing_as_teacher %}
+        <strong>Admin View:</strong> You are viewing the teacher dashboard as {{ viewing_as_teacher }}.
+      {% else %}
+        <strong>Admin View:</strong> You are viewing sample dashboard data.
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <!-- Teacher Stats Overview -->
 <div class="row">
   <div class="col-lg-8 mb-4">
@@ -118,40 +133,63 @@
         <a href="{% url 'meetings:meeting_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
       </div>
       <div class="card-body p-0">
-        {% with today_schedule=weekly_schedule|selectattr:"is_today"|first %}
-          {% if today_schedule and today_schedule.meetings %}
-            <div class="p-3 mb-1 rounded bg-label-primary d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="mb-0">{{ today_schedule.day_name }}</h6>
-                <small>{{ today_schedule.date }}</small>
-              </div>
-              <div class="badge bg-primary">Today</div>
-            </div>
-            <ul class="p-0 m-0 pt-2">
-              {% for meeting in today_schedule.meetings %}
-              <li class="d-flex mb-3 pb-1 px-3">
-                <div class="avatar flex-shrink-0 me-3">
-                  <span class="avatar-initial rounded bg-label-info">
-                    <i class="ti ti-video ti-sm"></i>
-                  </span>
-                </div>
-                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between">
-                  <div class="me-2">
-                    <h6 class="mb-0">{{ meeting.title }}</h6>
-                    <small>{{ meeting.start_time }} ({{ meeting.duration }} min)</small> •
-                    <small>{{ meeting.student_count }} student{{ meeting.student_count|pluralize }}</small>
+        {% comment %}
+        Instead of using `selectattr` filter or `break`, we'll use a variable to
+        track whether we found today's schedule and showed it
+        {% endcomment %}
+        {% with found_today=False %}
+          {% for day in weekly_schedule %}
+            {% if day.is_today and not found_today %}
+              {% with found_today=True %}
+                {% if day.meetings %}
+                  <div class="p-3 mb-1 rounded bg-label-primary d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="mb-0">{{ day.day_name }}</h6>
+                      <small>{{ day.date }}</small>
+                    </div>
+                    <div class="badge bg-primary">Today</div>
                   </div>
-                  <div>
-                    {% now "H:i" as current_time %}
-                    {% if meeting.start_time <= current_time|add:"0:10" and meeting.start_time >= current_time|add:"-0:60" %}
-                      <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-sm btn-primary">Join</a>
-                    {% endif %}
+                  <ul class="p-0 m-0 pt-2">
+                    {% for meeting in day.meetings %}
+                    <li class="d-flex mb-3 pb-1 px-3">
+                      <div class="avatar flex-shrink-0 me-3">
+                        <span class="avatar-initial rounded bg-label-info">
+                          <i class="ti ti-video ti-sm"></i>
+                        </span>
+                      </div>
+                      <div class="d-flex w-100 flex-wrap align-items-center justify-content-between">
+                        <div class="me-2">
+                          <h6 class="mb-0">{{ meeting.title }}</h6>
+                          <small>{{ meeting.start_time }} ({{ meeting.duration }} min)</small> •
+                          <small>{{ meeting.student_count }} student{{ meeting.student_count|pluralize }}</small>
+                        </div>
+                        <div>
+                          {% now "H:i" as current_time %}
+                          {% if meeting.start_time <= current_time|add:"0:10" and meeting.start_time >= current_time|add:"-0:60" %}
+                            <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-sm btn-primary">Join</a>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <div class="d-flex align-items-center justify-content-center flex-column p-5">
+                    <div class="avatar avatar-md mb-3">
+                      <div class="avatar-initial rounded-circle bg-label-primary">
+                        <i class="ti ti-calendar-off ti-md"></i>
+                      </div>
+                    </div>
+                    <h6 class="mb-1">No sessions today</h6>
+                    <p class="mb-3 text-center">You don't have any scheduled sessions for today.</p>
+                    <a href="{% url 'meetings:create_meeting' %}" class="btn btn-sm btn-primary">Schedule Session</a>
                   </div>
-                </div>
-              </li>
-              {% endfor %}
-            </ul>
-          {% else %}
+                {% endif %}
+              {% endwith %}
+            {% endif %}
+          {% endfor %}
+          
+          {% if not found_today %}
             <div class="d-flex align-items-center justify-content-center flex-column p-5">
               <div class="avatar avatar-md mb-3">
                 <div class="avatar-initial rounded-circle bg-label-primary">
@@ -383,7 +421,7 @@
     <div class="card h-100">
       <div class="card-header d-flex justify-content-between">
         <h5 class="card-title mb-0">Teaching Resources</h5>
-        <a href="{% url 'repository:upload_teacher_resource' %}" class="btn btn-sm btn-primary">
+        <a href="" class="btn btn-sm btn-primary">
           <i class="ti ti-plus me-0 me-sm-1"></i>
           <span class="d-none d-sm-inline-block">Add Resource</span>
         </a>
@@ -421,7 +459,7 @@
                     <td>{{ resource.views }}</td>
                     <td>
                       <div class="d-flex">
-                        <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon me-2">
+                        <a href="" class="btn btn-sm btn-icon me-2">
                           <i class="ti ti-download"></i>
                         </a>
                         <!-- Add edit button if needed -->
@@ -441,7 +479,7 @@
             </div>
             <h6 class="mb-1">No resources yet</h6>
             <p class="mb-3">Upload resources for your students</p>
-            <a href="{% url 'repository:upload_teacher_resource' %}" class="btn btn-sm btn-primary">Upload Resource</a>
+            <a href="" class="btn btn-sm btn-primary">Upload Resource</a>
           </div>
         {% endif %}
       </div>
