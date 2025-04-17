@@ -336,6 +336,39 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.teacher = self.request.user
+        
+        # First ensure we have the required languages in the database
+        languages = [
+            {'name': 'English', 'code': 'en', 'is_active': True},
+            {'name': 'French', 'code': 'fr', 'is_active': True},
+            {'name': 'Spanish', 'code': 'es', 'is_active': True},
+            {'name': 'Swahili', 'code': 'sw', 'is_active': True},
+        ]
+        
+        from apps.content.models import Language, LanguageLevel
+        
+        for idx, lang_data in enumerate(languages, 1):
+            Language.objects.get_or_create(
+                id=idx,
+                defaults=lang_data
+            )
+        
+        # Also ensure we have the required levels in the database
+        levels = [
+            {'code': 'A1', 'name': 'Beginner', 'description': 'Basic understanding of simple phrases.'},
+            {'code': 'A2', 'name': 'Elementary', 'description': 'Can communicate in simple tasks.'},
+            {'code': 'B1', 'name': 'Intermediate', 'description': 'Can deal with most travel situations.'},
+            {'code': 'B2', 'name': 'Upper Intermediate', 'description': 'Can interact with fluency.'},
+            {'code': 'C1', 'name': 'Advanced', 'description': 'Can use language flexibly and effectively.'},
+            {'code': 'C2', 'name': 'Proficient', 'description': 'Can understand everything heard or read.'},
+        ]
+        
+        for idx, level_data in enumerate(levels, 1):
+            LanguageLevel.objects.get_or_create(
+                id=idx,
+                defaults=level_data
+            )
+        
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
@@ -354,7 +387,6 @@ class CourseCreateView(LoginRequiredMixin, CreateView):
         TemplateHelper.map_context(context)
         
         return context
-
 
 class CourseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View to update an existing course"""

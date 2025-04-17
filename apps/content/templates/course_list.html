@@ -203,25 +203,25 @@
               <label for="quick-course-language" class="form-label">Language</label>
               <select class="form-select" id="quick-course-language" name="language" required>
                 <option value="">Select language</option>
-                {% for language in languages %}
-                  <option value="{{ language.id }}">{{ language.name }}</option>
-                {% endfor %}
+                <!-- Hardcoded language options -->
+                <option value="1">English</option>
+                <option value="2">French</option>
+                <option value="3">Spanish</option>
+                <option value="4">Swahili</option>
               </select>
-              {% if not languages %}
-                <div class="text-danger mt-1">No languages available. Please add languages first.</div>
-              {% endif %}
             </div>
             <div class="col-md-6">
               <label for="quick-course-level" class="form-label">Level</label>
               <select class="form-select" id="quick-course-level" name="level" required>
                 <option value="">Select level</option>
-                {% for level in levels %}
-                  <option value="{{ level.id }}">{{ level.code }} - {{ level.name }}</option>
-                {% endfor %}
+                <!-- Hardcoded level options -->
+                <option value="1">A1 - Beginner</option>
+                <option value="2">A2 - Elementary</option>
+                <option value="3">B1 - Intermediate</option>
+                <option value="4">B2 - Upper Intermediate</option>
+                <option value="5">C1 - Advanced</option>
+                <option value="6">C2 - Proficient</option>
               </select>
-              {% if not levels %}
-                <div class="text-danger mt-1">No levels available. Please add language levels first.</div>
-              {% endif %}
             </div>
           </div>
 
