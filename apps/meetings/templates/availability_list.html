@@ -1,0 +1,140 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Teacher Availability - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Manage Your Availability</h5>
+    <div>
+      <a href="{% url 'meetings:create_availability' %}" class="btn btn-primary">
+        <i class="ti ti-plus me-1"></i> Add Availability Slot
+      </a>
+      <a href="{% url 'meetings:calendar' %}" class="btn btn-outline-primary ms-2">
+        <i class="ti ti-calendar me-1"></i> View Calendar
+      </a>
+    </div>
+  </div>
+  <div class="card-body">
+    <p class="mb-4">Set your regular availability to let students know when you're available for booking sessions.</p>
+    
+    {% if availability_slots %}
+      <div class="table-responsive">
+        <table class="table table-hover availability-table">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot in availability_slots %}
+              <tr>
+                <td>
+                  {% with day_index=slot.day_of_week %}
+                    {% if day_index == 0 %}Monday{% elif day_index == 1 %}Tuesday{% elif day_index == 2 %}Wednesday{% elif day_index == 3 %}Thursday{% elif day_index == 4 %}Friday{% elif day_index == 5 %}Saturday{% elif day_index == 6 %}Sunday{% endif %}
+                  {% endwith %}
+                </td>
+                <td>{{ slot.start_time|time:"h:i A" }}</td>
+                <td>{{ slot.end_time|time:"h:i A" }}</td>
+                <td>
+                  {% with hours=slot.start_time|time:"H"|add:"0" end_hours=slot.end_time|time:"H"|add:"0" minutes=slot.start_time|time:"i"|add:"0" end_minutes=slot.end_time|time:"i"|add:"0" %}
+                    {% with total_minutes=end_hours|add:"-"|add:hours|add:"*60"|add:end_minutes|add:"-"|add:minutes %}
+                      {{ total_minutes|floatformat:"0" }} minutes
+                    {% endwith %}
+                  {% endwith %}
+                </td>
+                <td>
+                  {% if slot.is_available %}
+                    <span class="badge bg-label-success">Active Now</span>
+                  {% else %}
+                    <span class="badge bg-label-primary">Scheduled</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'meetings:delete_availability' availability_id=slot.id %}" class="btn btn-sm btn-icon btn-danger">
+                    <i class="ti ti-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-center py-5">
+        <div class="mb-3">
+          <i class="ti ti-clock-off ti-3x text-primary opacity-50"></i>
+        </div>
+        <h5>No availability slots set</h5>
+        <p class="mb-4">You haven't set any regular availability times yet.</p>
+        <a href="{% url 'meetings:create_availability' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i> Add Availability Slot
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Tips Card -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Availability Tips</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6 mb-3 mb-md-0">
+        <h6><i class="ti ti-info-circle me-1"></i> What is availability?</h6>
+        <p class="mb-0">
+          Availability slots represent your regular weekly schedule when you're available to teach.
+          These times will be visible to students when they book sessions.
+        </p>
+      </div>
+      <div class="col-md-6">
+        <h6><i class="ti ti-bulb me-1"></i> Best Practices</h6>
+        <ul class="mb-0">
+          <li>Set availability for at least several hours each week</li>
+          <li>Include a mix of mornings, afternoons, and evenings</li>
+          <li>Consider including weekend slots for working students</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTables
+    $('.availability-table').DataTable({
+      responsive: true,
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 10,
+      language: {
+        searchPlaceholder: 'Search...',
+        search: ''
+      }
+    });
+  });
+</script>
+{% endblock %}

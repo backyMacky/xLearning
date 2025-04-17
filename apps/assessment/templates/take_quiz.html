@@ -1,0 +1,131 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Take Quiz: {{ quiz.title }}{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ quiz.title }}</h5>
+        <div>
+          <span class="badge bg-label-primary">{{ questions|length }} Questions</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info mb-4">
+          <h6 class="alert-heading mb-1"><i class="ti ti-info-circle me-1"></i> Quiz Instructions</h6>
+          <p class="mb-0">
+            Answer all questions to the best of your ability. Once submitted, you won't be able to retake this quiz.
+            Your results will be available immediately after submission.
+          </p>
+        </div>
+
+        {% if questions %}
+        <form id="quiz-form" method="post" action="{% url 'assessment:take_quiz' quiz_id=quiz.id %}">
+          {% csrf_token %}
+          
+          <div>
+            {% for question in questions %}
+            <div class="mb-4 p-3 border rounded">
+              <div class="mb-3">
+                <h6 class="fw-bold">Question {{ forloop.counter }}: {{ question.text }}</h6>
+                <div class="text-muted small">{{ question.get_question_type_display }}</div>
+              </div>
+              
+              {% if question.question_type == 'multiple_choice' %}
+                <div class="mb-2">
+                  {% for option in question.options.all %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" 
+                           id="option_{{ question.id }}_{{ option.id }}" value="{{ option.text }}" required>
+                    <label class="form-check-label" for="option_{{ question.id }}_{{ option.id }}">
+                      {{ option.text }}
+                    </label>
+                  </div>
+                  {% endfor %}
+                </div>
+              
+              {% elif question.question_type == 'true_false' %}
+                <div class="mb-2">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" 
+                           id="true_{{ question.id }}" value="True" required>
+                    <label class="form-check-label" for="true_{{ question.id }}">True</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" 
+                           id="false_{{ question.id }}" value="False" required>
+                    <label class="form-check-label" for="false_{{ question.id }}">False</label>
+                  </div>
+                </div>
+              
+              {% elif question.question_type == 'short_answer' %}
+                <div class="mb-2">
+                  <input type="text" class="form-control" name="question_{{ question.id }}" 
+                         placeholder="Your answer..." required>
+                </div>
+              
+              {% elif question.question_type == 'essay' %}
+                <div class="mb-2">
+                  <textarea class="form-control" name="question_{{ question.id }}" rows="4" 
+                            placeholder="Your answer..." required></textarea>
+                </div>
+              {% endif %}
+              
+            </div>
+            {% endfor %}
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'assessment:quiz_detail' quiz_id=quiz.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i> Back to Quiz
+            </a>
+            <button type="submit" class="btn btn-primary" id="submit-quiz">
+              <i class="ti ti-file-check me-1"></i> Submit Quiz
+            </button>
+          </div>
+        </form>
+        {% else %}
+        <div class="alert alert-warning">
+          <div class="d-flex">
+            <i class="ti ti-alert-triangle me-2"></i>
+            <div>This quiz doesn't have any questions yet.</div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <a href="{% url 'assessment:quiz_list' %}" class="btn btn-primary">
+            <i class="ti ti-arrow-left me-1"></i> Back to Quizzes
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const quizForm = document.getElementById('quiz-form');
+    
+    if (quizForm) {
+      quizForm.addEventListener('submit', function(e) {
+        // Confirm submission
+        if (!confirm('Are you sure you want to submit this quiz? You won\'t be able to change your answers later.')) {
+          e.preventDefault();
+          return false;
+        }
+        
+        // Disable submit button to prevent double submission
+        document.getElementById('submit-quiz').disabled = true;
+        document.getElementById('submit-quiz').innerHTML = '<i class="ti ti-loader ti-spin me-1"></i> Submitting...';
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,283 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Assessment - Quizzes{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{% if request.user.is_teacher %}My Quizzes{% else %}Available Quizzes{% endif %}</h5>
+        {% if request.user.is_teacher %}
+        <a href="{% url 'assessment:create_quiz' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i> Create Quiz
+        </a>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <div class="row g-4 mb-4">
+          {% if request.user.is_teacher %}
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-primary">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Total Quizzes</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2">{{ total_quizzes|default:"0" }}</h4>
+                    </div>
+                    <span class="badge bg-label-success">Created</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-primary">
+                      <i class="ti ti-file-text"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-info">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Student Average</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2">{{ avg_score|default:"0" }}%</h4>
+                    </div>
+                    <span class="badge bg-label-info">Performance</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-info">
+                      <i class="ti ti-chart-bar"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-success">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Students</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2">{{ student_count|default:"0" }}</h4>
+                    </div>
+                    <span class="badge bg-label-success">Participation</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-success">
+                      <i class="ti ti-users"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <!-- Student stats -->
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-primary">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Available Quizzes</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2">{{ available_quizzes|default:"0" }}</h4>
+                    </div>
+                    <span class="badge bg-label-primary">New</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-primary">
+                      <i class="ti ti-file-plus"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-success">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Completed Quizzes</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2">{{ completed_quizzes|default:"0" }}</h4>
+                    </div>
+                    <span class="badge bg-label-success">Finished</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-success">
+                      <i class="ti ti-check"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-info">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Your Average Score</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2">{{ avg_score|default:"0" }}%</h4>
+                    </div>
+                    <span class="badge bg-label-info">Performance</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-info">
+                      <i class="ti ti-chart-pie"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        {% if quizzes %}
+        <div class="table-responsive">
+          <table class="table table-hover" id="quizzes-table">
+            <thead>
+              <tr>
+                <th>Quiz</th>
+                <th>Course</th>
+                {% if request.user.is_teacher %}
+                <th>Questions</th>
+                <th>Created</th>
+                {% else %}
+                <th>Status</th>
+                {% endif %}
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for quiz in quizzes %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-3">
+                      <div class="avatar-initial rounded-circle bg-label-primary">
+                        <i class="ti ti-file-text ti-sm"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h6 class="mb-0">{{ quiz.title }}</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span>{{ quiz.course.title }}</span>
+                </td>
+                {% if request.user.is_teacher %}
+                <td>
+                  <span>{{ quiz.questions.count }}</span>
+                </td>
+                <td>
+                  <span>{{ quiz.created_at|date:"M d, Y" }}</span>
+                </td>
+                {% else %}
+                <td>
+                  {% if quiz.id in completed_quizzes %}
+                  <span class="badge bg-label-success">Completed</span>
+                  {% else %}
+                  <span class="badge bg-label-primary">Available</span>
+                  {% endif %}
+                </td>
+                {% endif %}
+                <td>
+                  <div class="d-flex align-items-center">
+                    <a href="{% url 'assessment:quiz_detail' quiz_id=quiz.id %}" class="btn btn-sm btn-icon me-2">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                    {% if request.user.is_teacher %}
+                    <a href="{% url 'assessment:edit_quiz' quiz_id=quiz.id %}" class="btn btn-sm btn-icon me-2">
+                      <i class="ti ti-edit"></i>
+                    </a>
+                    <a href="{% url 'assessment:delete_quiz' quiz_id=quiz.id %}" class="btn btn-sm btn-icon">
+                      <i class="ti ti-trash"></i>
+                    </a>
+                    {% else %}
+                    {% if quiz.id not in completed_quizzes %}
+                    <a href="{% url 'assessment:take_quiz' quiz_id=quiz.id %}" class="btn btn-sm btn-primary">
+                      Take Quiz
+                    </a>
+                    {% else %}
+                    <a href="{% url 'assessment:quiz_results' quiz_id=quiz.id %}" class="btn btn-sm btn-info">
+                      View Results
+                    </a>
+                    {% endif %}
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <div class="avatar avatar-md mb-3">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-file-text ti-md"></i>
+            </div>
+          </div>
+          <h6 class="mb-3">No quizzes found</h6>
+          <p class="mb-3">
+            {% if request.user.is_teacher %}
+            You haven't created any quizzes yet. Start creating quizzes for your courses.
+            {% else %}
+            There are no available quizzes for your enrolled courses.
+            {% endif %}
+          </p>
+          {% if request.user.is_teacher %}
+          <a href="{% url 'assessment:create_quiz' %}" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i> Create Quiz
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  $(document).ready(function() {
+    $('#quizzes-table').DataTable({
+      responsive: true,
+      order: [[0, 'asc']],
+      pageLength: 10,
+      language: {
+        paginate: {
+          previous: '<i class="ti ti-chevron-left"></i>',
+          next: '<i class="ti ti-chevron-right"></i>'
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Meeting Details - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <!-- Meeting Info Card -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Meeting Details</h5>
+        <a href="{% url 'meetings:meeting_list' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Meetings
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="card-title">{{ meeting.title }}</h4>
+          
+          {% if is_active %}
+            <div class="badge bg-success p-2">
+              <i class="ti ti-player-play me-1"></i> Active Now
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="mb-4">
+          <div class="table-responsive">
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <th class="ps-0" width="30%">Date:</th>
+                  <td>{{ meeting.start_time|date:"l, F j, Y" }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Time:</th>
+                  <td>{{ meeting.start_time|date:"h:i A" }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Duration:</th>
+                  <td>{{ meeting.duration }} minutes</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Status:</th>
+                  <td>
+                    {% if meeting.start_time > now %}
+                      <span class="badge bg-label-primary">Upcoming</span>
+                    {% elif is_active %}
+                      <span class="badge bg-label-success">Active</span>
+                    {% else %}
+                      <span class="badge bg-label-secondary">Completed</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <th class="ps-0">{% if is_teacher %}Students:{% else %}Teacher:{% endif %}</th>
+                  <td>
+                    {% if is_teacher %}
+                      <div class="d-flex flex-wrap gap-1">
+                        {% for student in meeting.students.all %}
+                          <span class="badge bg-label-info">{{ student.username }}</span>
+                        {% empty %}
+                          <span class="text-muted">No students enrolled</span>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <span>{{ meeting.teacher.username }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Meeting Link -->
+        {% if meeting.meeting_link %}
+          <div class="alert alert-primary mb-4">
+            <div class="d-flex">
+              <i class="ti ti-video me-2 mt-1"></i>
+              <div>
+                <h6 class="alert-heading mb-1">Meeting Link</h6>
+                <p class="mb-0">
+                  <a href="{{ meeting.meeting_link }}" target="_blank" class="alert-link">{{ meeting.meeting_link }}</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+        
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+          {% if meeting.start_time|date:"U"|add:"0" < now|date:"U"|add:"300" and meeting.start_time|date:"U"|add:"0" > now|date:"U"|add:"-3600" %}
+            <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-primary">
+              <i class="ti ti-video me-1"></i> Join Meeting
+            </a>
+          {% endif %}
+          
+          {% if is_teacher and meeting.teacher == request.user %}
+            {% if meeting.start_time > now %}
+              <a href="{% url 'meetings:edit_meeting' meeting_id=meeting.id %}" class="btn btn-info">
+                <i class="ti ti-edit me-1"></i> Edit Meeting
+              </a>
+              
+              <a href="{% url 'meetings:send_reminder' meeting_id=meeting.id %}" class="btn btn-warning">
+                <i class="ti ti-bell me-1"></i> Send Reminder
+              </a>
+              
+              <a href="{% url 'meetings:cancel_meeting' meeting_id=meeting.id %}" class="btn btn-danger">
+                <i class="ti ti-trash me-1"></i> Cancel Meeting
+              </a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Side column -->
+  <div class="col-md-4">
+    <!-- Time Remaining Card (for upcoming meetings) -->
+    {% if meeting.start_time > now %}
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <h5 class="card-title mb-3">Time Until Meeting</h5>
+          <div id="meeting-countdown" 
+               data-meeting-time="{{ meeting.start_time|date:'c' }}"
+               class="d-flex justify-content-center">
+            <div class="mx-2 text-center">
+              <h3 id="days">0</h3>
+              <small>Days</small>
+            </div>
+            <div class="mx-2 text-center">
+              <h3 id="hours">0</h3>
+              <small>Hours</small>
+            </div>
+            <div class="mx-2 text-center">
+              <h3 id="minutes">0</h3>
+              <small>Minutes</small>
+            </div>
+            <div class="mx-2 text-center">
+              <h3 id="seconds">0</h3>
+              <small>Seconds</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- Quick Info Card -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Important Information</h5>
+      </div>
+      <div class="card-body">
+        <ul class="ps-3 mb-0">
+          <li class="mb-2">Please join the meeting 5 minutes before the scheduled time.</li>
+          <li class="mb-2">Make sure your camera and microphone are working properly.</li>
+          <li class="mb-2">Have all necessary materials ready before the meeting starts.</li>
+          <li>If you encounter any technical issues, please contact support.</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Related Resources Card (optional) -->
+    {% if related_resources %}
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Related Resources</h5>
+        </div>
+        <div class="card-body">
+          <ul class="ps-3 mb-0">
+            {% for resource in related_resources %}
+              <li class="mb-2">
+                <a href="{{ resource.url }}">{{ resource.title }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Countdown timer for upcoming meetings
+    const countdownElement = document.getElementById('meeting-countdown');
+    
+    if (countdownElement) {
+      const meetingTime = new Date(countdownElement.dataset.meetingTime);
+      
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = meetingTime - now;
+        
+        if (distance < 0) {
+          // Meeting time has passed
+          document.getElementById('days').textContent = '0';
+          document.getElementById('hours').textContent = '0';
+          document.getElementById('minutes').textContent = '0';
+          document.getElementById('seconds').textContent = '0';
+          return;
+        }
+        
+        // Calculate time units
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        // Update the countdown
+        document.getElementById('days').textContent = days;
+        document.getElementById('hours').textContent = hours;
+        document.getElementById('minutes').textContent = minutes;
+        document.getElementById('seconds').textContent = seconds;
+      }
+      
+      // Initial update
+      updateCountdown();
+      
+      // Update every second
+      setInterval(updateCountdown, 1000);
+    }
+  });
+</script>
+{% endblock %}

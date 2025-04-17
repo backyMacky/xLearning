@@ -1,0 +1,173 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Create Availability Slot - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Add Availability Slot</h5>
+        <a href="{% url 'meetings:availability_list' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Availability
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="day_of_week" class="form-label">Day of Week</label>
+            <select class="form-select" id="day_of_week" name="day_of_week" required>
+              <option value="">Select a day</option>
+              {% for value, label in day_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="start_time" class="form-label">Start Time</label>
+              <input type="text" class="form-control flatpickr-time" id="start_time" name="start_time" placeholder="HH:MM" required />
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label for="end_time" class="form-label">End Time</label>
+              <input type="text" class="form-control flatpickr-time" id="end_time" name="end_time" placeholder="HH:MM" required />
+            </div>
+          </div>
+          
+          <div class="card shadow-none bg-light border mb-4">
+            <div class="card-body">
+              <h6 class="card-title">Availability Settings</h6>
+              
+              <div class="form-text mb-3">
+                This availability slot will repeat weekly on the selected day.
+                Students will be able to book sessions during these hours.
+              </div>
+              
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="generate_slots" name="generate_slots" checked />
+                <label class="form-check-label" for="generate_slots">
+                  Automatically create booking slots for this time
+                </label>
+                <div class="form-text">
+                  If enabled, booking slots will be created for the next 8 weeks.
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-end">
+            <a href="{% url 'meetings:availability_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-plus me-1"></i> Add Availability
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Availability Guidelines -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Availability Guidelines</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          <div class="d-flex">
+            <i class="ti ti-info-circle me-2 mt-1"></i>
+            <div>
+              <p class="mb-0">
+                <strong>Recurring Availability:</strong> The slot you create will appear on your calendar every week on the selected day, allowing students to book sessions during these times.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="d-flex">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-primary">
+                  <i class="ti ti-clock"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-1">Duration Flexibility</h6>
+                <p class="text-muted mb-0">
+                  Set blocks of at least 1-2 hours to give students flexibility in booking.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="d-flex">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-success">
+                  <i class="ti ti-calendar-check"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-1">Consistency Matters</h6>
+                <p class="text-muted mb-0">
+                  Keeping a consistent schedule helps students plan their learning routine.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize flatpickr for time inputs
+    flatpickr(".flatpickr-time", {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr: true
+    });
+    
+    // Time validation
+    const startTimeInput = document.getElementById('start_time');
+    const endTimeInput = document.getElementById('end_time');
+    
+    function validateTimes() {
+      if (startTimeInput.value && endTimeInput.value) {
+        const startTime = startTimeInput._flatpickr.selectedDates[0];
+        const endTime = endTimeInput._flatpickr.selectedDates[0];
+        
+        // Reset end time if it's before or equal to start time
+        if (endTime <= startTime) {
+          endTimeInput._flatpickr.clear();
+        }
+      }
+    }
+    
+    startTimeInput.addEventListener('change', validateTimes);
+    endTimeInput.addEventListener('change', validateTimes);
+  });
+</script>
+{% endblock %}

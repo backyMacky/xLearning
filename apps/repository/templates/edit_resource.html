@@ -1,0 +1,143 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Edit Resource - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xl-8 col-lg-7 col-md-7 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Edit Resource</h5>
+        <a href="{% url 'repository:resource_detail' resource_id=object.id %}" class="btn btn-sm btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i> Back to Resource
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="title" class="form-label">Resource Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ object.title }}" required>
+            <div class="invalid-feedback">Please provide a resource title.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ object.description }}</textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label for="course" class="form-label">Associate with Course (Optional)</label>
+            <select class="select2 form-select" id="course" name="course">
+              <option value="">Not associated with a course</option>
+              {% for course in courses %}
+                <option value="{{ course.id }}" {% if object.course_id == course.id %}selected{% endif %}>{{ course.title }}</option>
+              {% endfor %}
+            </select>
+            <small class="form-text text-muted">If associated with a course, the resource will be available to all students enrolled in the course (if public).</small>
+          </div>
+          
+          <div class="mb-3">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" id="is_public" name="is_public" {% if object.is_public %}checked{% endif %}>
+              <label class="form-check-label" for="is_public">Make Resource Public</label>
+            </div>
+            <small class="form-text text-muted">Public resources are available to all students in the associated course. Private resources are only available to specifically selected students.</small>
+          </div>
+          
+          <div class="mb-3" id="share-with-students-container" {% if object.is_public %}style="display: none;"{% endif %}>
+            <label for="share_with_students" class="form-label">Share with Specific Students</label>
+            <select class="select2 form-select" id="share_with_students" name="share_with_students" multiple>
+              {% for student in students %}
+                <option value="{{ student.id }}" {% if student in shared_with %}selected{% endif %}>{{ student.username }}</option>
+              {% endfor %}
+            </select>
+            <small class="form-text text-muted">Select students to share this resource with (if not making it public).</small>
+          </div>
+          
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-outline-secondary me-2" onclick="window.history.back();">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update Resource</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2
+    $('.select2').select2();
+    
+    // Toggle "Share with students" based on "is_public" checkbox
+    $('#is_public').change(function() {
+      if ($(this).is(':checked')) {
+        $('#share-with-students-container').hide();
+      } else {
+        $('#share-with-students-container').show();
+      }
+    });
+    
+    // Course selection changes
+    $('#course').on('change', function() {
+      const courseId = $(this).val();
+      
+      if (courseId) {
+        // Fetch students for this course
+        $.ajax({
+          url: `/content/api/courses/${courseId}/students/`,
+          method: 'GET',
+          success: function(data) {
+            // Update the student selection dropdown
+            const studentSelect = $('#share_with_students');
+            studentSelect.empty();
+            
+            data.forEach(function(student) {
+              studentSelect.append(`<option value="${student.id}">${student.username}</option>`);
+            });
+            
+            studentSelect.trigger('change');
+          }
+        });
+      }
+    });
+    
+    // Form validation
+    (function () {
+      'use strict'
+      
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll('.needs-validation')
+      
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+          
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })()
+  });
+</script>
+{% endblock %}

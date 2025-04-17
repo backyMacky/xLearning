@@ -1,0 +1,510 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Learning Platform - Repository Dashboard{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+
+<!-- Repository Dashboard Overview -->
+<div class="row">
+  <div class="col-lg-8 mb-4">
+    <div class="card">
+      <div class="d-flex align-items-center row">
+        <div class="col-sm-7">
+          <div class="card-body">
+            <h4 class="card-title mb-1">
+              {% if is_teacher %}
+                Teacher Repository Dashboard
+              {% else %}
+                Student Repository Dashboard
+              {% endif %}
+            </h4>
+            <p class="mb-4">Manage your files and access learning resources</p>
+            
+            <div class="d-flex align-items-center pt-1 mb-3">
+              <div class="d-flex justify-content-between flex-grow-1 flex-wrap gap-2">
+                {% if is_teacher %}
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-primary rounded">
+                      <i class="ti ti-file ti-md"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{total_resources|default:"0"}}</h5>
+                    <span>Total Resources</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-success rounded">
+                      <i class="ti ti-eye ti-md"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{resource_views|default:"0"}}</h5>
+                    <span>Resource Views</span>
+                  </div>
+                </div>
+                {% else %}
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-primary rounded">
+                      <i class="ti ti-file ti-md"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{total_files|default:"0"}}</h5>
+                    <span>My Files</span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar">
+                    <div class="avatar-initial bg-label-success rounded">
+                      <i class="ti ti-book ti-md"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{total_resources|default:"0"}}</h5>
+                    <span>Available Resources</span>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="d-flex align-items-center mt-4">
+              {% if is_teacher %}
+              <a href="{% url 'repository:upload_resource' %}" class="btn btn-primary me-2">
+                <i class="ti ti-upload me-1"></i> Upload Resource
+              </a>
+              <a href="{% url 'repository:create_collection' %}" class="btn btn-outline-primary">
+                <i class="ti ti-folder-plus me-1"></i> Create Collection
+              </a>
+              {% else %}
+              <a href="{% url 'repository:upload_file' %}" class="btn btn-primary me-2">
+                <i class="ti ti-upload me-1"></i> Upload File
+              </a>
+              <a href="{% url 'repository:create_collection' %}" class="btn btn-outline-primary">
+                <i class="ti ti-folder-plus me-1"></i> Create Collection
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-5 text-center text-sm-left">
+          <div class="card-body pb-0 px-0 px-md-4">
+            <img src="{% static 'img/illustrations/file-storage-light.png' %}" height="140" alt="File Storage" data-app-dark-img="illustrations/file-storage-dark.png" data-app-light-img="illustrations/file-storage-light.png">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Collections Overview -->
+  <div class="col-lg-4 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Collections</h5>
+        <a href="{% url 'repository:create_collection' %}" class="btn btn-sm btn-outline-primary">
+          <i class="ti ti-plus me-1"></i> Create
+        </a>
+      </div>
+      <div class="card-body">
+        {% if collections %}
+          <ul class="list-group list-group-flush">
+            {% for collection in collections %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <a href="{% url 'repository:collection_detail' collection_id=collection.id %}" class="d-flex align-items-center">
+                  <i class="ti ti-folder me-2 text-primary"></i>
+                  <span>{{ collection.name }}</span>
+                </a>
+                {% if collection.parent %}
+                <small class="text-muted d-block">in {{ collection.parent.name }}</small>
+                {% endif %}
+              </div>
+              <div>
+                {% if is_teacher %}
+                <span class="badge bg-label-primary">{{ collection.resources.count }} resources</span>
+                {% else %}
+                <span class="badge bg-label-primary">{{ collection.student_files.count }} files</span>
+                {% endif %}
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-folders ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No collections yet</h6>
+            <p class="mb-3">Create collections to organize your files</p>
+            <a href="{% url 'repository:create_collection' %}" class="btn btn-sm btn-primary">Create Collection</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  {% if is_teacher %}
+  <!-- Teacher Resources -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title mb-0">My Resources</h5>
+        <a href="{% url 'repository:upload_resource' %}" class="btn btn-sm btn-primary">
+          <i class="ti ti-upload me-1"></i> Upload Resource
+        </a>
+      </div>
+      <div class="card-body">
+        {% if resources %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Course</th>
+                  <th>Access Status</th>
+                  <th>Uploaded</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for resource in resources|slice:":5" %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-3">
+                          <div class="avatar-initial rounded bg-label-primary">
+                            <i class="ti ti-file-text ti-sm"></i>
+                          </div>
+                        </div>
+                        <div>
+                          <a href="{% url 'repository:resource_detail' resource_id=resource.id %}">
+                            <strong>{{ resource.title }}</strong>
+                          </a>
+                          {% if resource.description %}
+                          <small class="text-muted d-block">{{ resource.description|truncatechars:50 }}</small>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if resource.course %}
+                        {{ resource.course.title }}
+                      {% else %}
+                        <span class="text-muted">Not assigned</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if resource.is_public %}
+                        <span class="badge bg-label-success">Public</span>
+                      {% else %}
+                        <span class="badge bg-label-secondary">Private</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ resource.upload_date|date:"M d, Y" }}</td>
+                    <td>
+                      <div class="d-flex">
+                        <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon me-2">
+                          <i class="ti ti-download"></i>
+                        </a>
+                        <a href="{% url 'repository:edit_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon">
+                          <i class="ti ti-edit"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if resources.count > 5 %}
+            <div class="text-center mt-3">
+              <a href="{% url 'repository:resource_list' %}" class="btn btn-sm btn-primary">View All Resources ({{ resources.count }})</a>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-file ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No resources yet</h6>
+            <p class="mb-3">Upload resources to share with your students</p>
+            <a href="{% url 'repository:upload_resource' %}" class="btn btn-sm btn-primary">Upload Resource</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if resource_types %}
+  <!-- Resource Types Chart -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Resource Types</h5>
+      </div>
+      <div class="card-body">
+        <div id="resourceTypeChart" style="min-height: 300px;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Recent Resource Access -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Recent Resource Access</h5>
+      </div>
+      <div class="card-body">
+        {% with recent_access=resources.first.access_logs.all|slice:":5" %}
+        {% if recent_access %}
+          <ul class="timeline ms-2 mb-0">
+            {% for access in recent_access %}
+              <li class="timeline-item timeline-item-transparent">
+                <span class="timeline-point timeline-point-primary"></span>
+                <div class="timeline-event">
+                  <div class="timeline-header">
+                    <h6 class="mb-0">{{ access.student.username }}</h6>
+                    <small class="text-muted">{{ access.access_time|timesince }} ago</small>
+                  </div>
+                  <p class="mb-0">Accessed "{{ access.resource.title }}"</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-info">
+                <i class="ti ti-eye-off ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No recent activity</h6>
+            <p class="mb-0">Your resources haven't been accessed recently</p>
+          </div>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  
+  {% else %}
+  <!-- Student Files -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">My Files</h5>
+        <a href="{% url 'repository:upload_file' %}" class="btn btn-sm btn-primary">
+          <i class="ti ti-upload me-1"></i> Upload
+        </a>
+      </div>
+      <div class="card-body">
+        {% if student_files %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Course</th>
+                  <th>Uploaded</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for file in student_files|slice:":5" %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-3">
+                          <div class="avatar-initial rounded bg-label-primary">
+                            <i class="ti ti-file ti-sm"></i>
+                          </div>
+                        </div>
+                        <div>
+                          <a href="{% url 'repository:file_detail' file_id=file.id %}">
+                            <strong>{{ file.title }}</strong>
+                          </a>
+                          {% if file.description %}
+                          <small class="text-muted d-block">{{ file.description|truncatechars:50 }}</small>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {% if file.course %}
+                        {{ file.course.title }}
+                      {% else %}
+                        <span class="text-muted">Personal</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ file.upload_date|date:"M d, Y" }}</td>
+                    <td>
+                      <div class="d-flex">
+                        <a href="{% url 'repository:download_file' file_id=file.id %}" class="btn btn-sm btn-icon me-2">
+                          <i class="ti ti-download"></i>
+                        </a>
+                        <a href="{% url 'repository:edit_file' file_id=file.id %}" class="btn btn-sm btn-icon">
+                          <i class="ti ti-edit"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if student_files.count > 5 %}
+            <div class="text-center mt-3">
+              <a href="{% url 'repository:file_list' %}" class="btn btn-sm btn-primary">View All Files ({{ student_files.count }})</a>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-file-upload ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No files yet</h6>
+            <p class="mb-3">Upload your first file</p>
+            <a href="{% url 'repository:upload_file' %}" class="btn btn-sm btn-primary">Upload File</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Learning Resources -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title m-0 me-2">Learning Resources</h5>
+        <a href="{% url 'repository:resource_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if resources %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Teacher</th>
+                  <th>Course</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for resource in resources|slice:":5" %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-3">
+                          <div class="avatar-initial rounded bg-label-primary">
+                            <i class="ti ti-file-text ti-sm"></i>
+                          </div>
+                        </div>
+                        <a href="{% url 'repository:resource_detail' resource_id=resource.id %}">
+                          {{ resource.title }}
+                        </a>
+                      </div>
+                    </td>
+                    <td>{{ resource.teacher.username }}</td>
+                    <td>
+                      {% if resource.course %}
+                        {{ resource.course.title }}
+                      {% else %}
+                        <span class="text-muted">Not assigned</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon">
+                        <i class="ti ti-download"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-info">
+                <i class="ti ti-books ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No resources available</h6>
+            <p class="mb-0">Enroll in courses to access learning resources</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if is_teacher and resource_types %}
+    // Resource Types Chart
+    const resourceTypeOptions = {
+      series: [{% for type, count in resource_types.items %}{{ count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+      chart: {
+        height: 300,
+        type: 'pie',
+      },
+      labels: [{% for type, count in resource_types.items %}'{{ type }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
+          },
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }],
+      colors: ['#696cff', '#03c3ec', '#71dd37', '#ffab00', '#ff3e1d', '#8592a3']
+    };
+    
+    if (document.querySelector("#resourceTypeChart")) {
+      const resourceTypeChart = new ApexCharts(
+        document.querySelector("#resourceTypeChart"),
+        resourceTypeOptions
+      );
+      resourceTypeChart.render();
+    }
+    {% endif %}
+  });
+</script>
+{% endblock %}

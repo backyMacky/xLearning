@@ -1,0 +1,313 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}My Assessment Results{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <!-- Performance Overview Card -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">My Assessment Results</h5>
+        <a href="{% url 'assessment:quiz_list' %}" class="btn btn-primary">
+          <i class="ti ti-file-text me-1"></i> Available Quizzes
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Performance Summary -->
+          <div class="col-md-4 mb-4 mb-md-0">
+            <h6 class="fw-semibold mb-2">Performance Overview</h6>
+            <div class="d-flex align-items-center mb-3">
+              <div class="me-3 position-relative">
+                <div id="avgScoreChart" style="width: 100px; height: 100px;"></div>
+                <div class="position-absolute top-50 start-50 translate-middle text-center">
+                  <h3 class="mb-0">{{ avg_score|default:"0" }}%</h3>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-0">Average Score</h6>
+                <small class="text-muted">Across all quizzes</small>
+                <div class="mt-2">
+                  <span class="badge bg-success">{{ results|length }} Quizzes Completed</span>
+                </div>
+              </div>
+            </div>
+            
+            {% if highest_score %}
+            <div class="card shadow-none bg-label-success mb-3">
+              <div class="card-body py-2">
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm me-2">
+                    <div class="avatar-initial rounded bg-success">
+                      <i class="ti ti-award ti-sm"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Best Performance</h6>
+                    <small>{{ highest_score.score }}% on "{{ highest_score.quiz.title|truncatechars:20 }}"</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            
+            {% if lowest_score %}
+            <div class="card shadow-none bg-label-danger">
+              <div class="card-body py-2">
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm me-2">
+                    <div class="avatar-initial rounded bg-danger">
+                      <i class="ti ti-alert-triangle ti-sm"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Needs Improvement</h6>
+                    <small>{{ lowest_score.score }}% on "{{ lowest_score.quiz.title|truncatechars:20 }}"</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Recent Results -->
+          <div class="col-md-8">
+            <h6 class="fw-semibold mb-2">Recent Quiz Results</h6>
+            {% if results %}
+            <div class="table-responsive">
+              <table class="table table-hover" id="results-table">
+                <thead>
+                  <tr>
+                    <th>Quiz</th>
+                    <th>Course</th>
+                    <th>Score</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for result in results %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-3">
+                          <div class="avatar-initial rounded-circle bg-label-{{ result.score|divisibleby:10|yesno:"primary,success,info,warning,danger" }}">
+                            <i class="ti ti-file-text ti-sm"></i>
+                          </div>
+                        </div>
+                        <div>
+                          <h6 class="mb-0">{{ result.quiz.title|truncatechars:30 }}</h6>
+                          <small class="text-muted">{{ result.correct }}/{{ result.total }} questions</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ result.course.title|default:"N/A" }}</td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                          <div class="progress-bar bg-{{ result.score|divisibleby:10|yesno:"primary,success,info,warning,danger" }}" role="progressbar" 
+                              style="width: {{ result.score }}%" aria-valuenow="{{ result.score }}" 
+                              aria-valuemin="0" aria-valuemax="100">
+                          </div>
+                        </div>
+                        <span>{{ result.score }}%</span>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="{% url 'assessment:quiz_results' quiz_id=result.quiz.id %}" class="btn btn-sm btn-icon">
+                        <i class="ti ti-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-file-text ti-md"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No quiz results yet</h6>
+              <p class="mb-3">You haven't taken any quizzes yet.</p>
+              <a href="{% url 'assessment:quiz_list' %}" class="btn btn-primary">Browse Available Quizzes</a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {% if results %}
+  <!-- Quiz Performance Breakdown -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Performance by Course</h5>
+      </div>
+      <div class="card-body">
+        <div id="coursePerformanceChart" style="height: 300px;"></div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if results %}
+    // Initialize DataTable
+    $('#results-table').DataTable({
+      responsive: true,
+      order: [[2, 'desc']],
+      pageLength: 5,
+      language: {
+        paginate: {
+          previous: '<i class="ti ti-chevron-left"></i>',
+          next: '<i class="ti ti-chevron-right"></i>'
+        }
+      }
+    });
+    
+    // Average Score Gauge Chart
+    const avgScoreOptions = {
+      series: [{{ avg_score|default:"0" }}],
+      chart: {
+        type: 'radialBar',
+        height: 100,
+        width: 100,
+        sparkline: {
+          enabled: true
+        }
+      },
+      grid: {
+        padding: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0
+        }
+      },
+      plotOptions: {
+        radialBar: {
+          hollow: {
+            size: '50%',
+          },
+          track: {
+            margin: 0
+          },
+          dataLabels: {
+            show: false
+          }
+        }
+      },
+      colors: [
+        {{ avg_score|default:"0" }} >= 90 ? '#28c76f' : 
+        {{ avg_score|default:"0" }} >= 70 ? '#00cfe8' : 
+        {{ avg_score|default:"0" }} >= 60 ? '#ff9f43' : 
+        '#ea5455'
+      ],
+      stroke: {
+        lineCap: 'round'
+      }
+    };
+    
+    const avgScoreChart = new ApexCharts(document.querySelector("#avgScoreChart"), avgScoreOptions);
+    avgScoreChart.render();
+    
+    // Course Performance Chart
+    const courseData = [
+      {% for result in results %}
+      { 
+        x: '{{ result.course.title|default:"Unknown Course"|truncatechars:20 }}', 
+        y: {{ result.score }},
+        color: {{ result.score }} >= 90 ? '#28c76f' : 
+              {{ result.score }} >= 70 ? '#00cfe8' : 
+              {{ result.score }} >= 60 ? '#ff9f43' : 
+              '#ea5455'
+      },
+      {% endfor %}
+    ];
+    
+    // Sort by score, highest first
+    courseData.sort((a, b) => b.y - a.y);
+    
+    const coursePerformanceOptions = {
+      series: [{
+        name: 'Score',
+        data: courseData.map(item => item.y)
+      }],
+      chart: {
+        type: 'bar',
+        height: 300,
+        toolbar: {
+          show: false
+        }
+      },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          barHeight: '40%',
+          distributed: true,
+          dataLabels: {
+            position: 'top'
+          },
+        }
+      },
+      colors: courseData.map(item => item.color),
+      dataLabels: {
+        enabled: true,
+        textAnchor: 'start',
+        style: {
+          colors: ['#fff']
+        },
+        formatter: function(val) {
+          return val + '%';
+        },
+        offsetX: 0
+      },
+      xaxis: {
+        categories: courseData.map(item => item.x),
+        max: 100
+      },
+      yaxis: {
+        labels: {
+          show: true
+        }
+      },
+      tooltip: {
+        y: {
+          formatter: function(val) {
+            return val + '%';
+          }
+        }
+      }
+    };
+    
+    const coursePerformanceChart = new ApexCharts(document.querySelector("#coursePerformanceChart"), coursePerformanceOptions);
+    coursePerformanceChart.render();
+    {% endif %}
+  });
+</script>
+{% endblock %}

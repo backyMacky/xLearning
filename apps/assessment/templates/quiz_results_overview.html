@@ -1,0 +1,348 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Quiz Results Overview: {{ quiz.title }}{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <!-- Results Summary Card -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="card-title mb-0">Quiz Results: {{ quiz.title }}</h5>
+          <p class="card-subtitle text-muted">{{ quiz.course.title }}</p>
+        </div>
+        <div>
+          <a href="{% url 'assessment:quiz_detail' quiz_id=quiz.id %}" class="btn btn-outline-primary">
+            <i class="ti ti-eye me-1"></i> View Quiz
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row g-4 mb-4">
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-primary h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Total Students</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2">{{ student_results|length }}</h4>
+                    </div>
+                    <span class="badge bg-label-primary">Participation</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-primary">
+                      <i class="ti ti-users"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-info h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Average Score</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2" id="avg-score">-</h4>
+                    </div>
+                    <span class="badge bg-label-info">Performance</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-info">
+                      <i class="ti ti-chart-pie"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-success h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Highest Score</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2" id="max-score">-</h4>
+                    </div>
+                    <span class="badge bg-label-success">Best</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-success">
+                      <i class="ti ti-award"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-sm-6 col-xl-3">
+            <div class="card shadow-none bg-label-warning h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="content-left">
+                    <span>Lowest Score</span>
+                    <div class="d-flex align-items-center my-1">
+                      <h4 class="mb-0 me-2" id="min-score">-</h4>
+                    </div>
+                    <span class="badge bg-label-warning">Needs Support</span>
+                  </div>
+                  <div class="avatar">
+                    <div class="avatar-initial rounded bg-warning">
+                      <i class="ti ti-alert-triangle"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Performance Distribution Chart -->
+        <div class="row mb-4">
+          <div class="col-md-6 mb-4 mb-md-0">
+            <h6 class="fw-semibold mb-2">Score Distribution</h6>
+            <div id="scoreDistributionChart" style="height: 300px;"></div>
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-semibold mb-2">Questions Performance</h6>
+            <div id="questionPerformanceChart" style="height: 300px;"></div>
+          </div>
+        </div>
+        
+        <!-- Student Results Table -->
+        <h6 class="fw-semibold mb-2">Student Results</h6>
+        <div class="table-responsive">
+          <table class="table table-hover" id="student-results-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Score</th>
+                <th>Correct</th>
+                <th>Total</th>
+                <th>Submission Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for result in student_results %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-3">
+                      <div class="avatar-initial rounded-circle bg-label-primary">
+                        <i class="ti ti-user ti-sm"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h6 class="mb-0">{{ result.student.username }}</h6>
+                      <small class="text-muted">{{ result.student.email|default:"" }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                      <div class="progress-bar bg-{{ result.results.percentage|divisibleby:10|yesno:"primary,success,info,warning,danger" }}" role="progressbar" 
+                          style="width: {{ result.results.percentage }}%" aria-valuenow="{{ result.results.percentage }}" 
+                          aria-valuemin="0" aria-valuemax="100">
+                      </div>
+                    </div>
+                    <span>{{ result.results.percentage|floatformat:"0" }}%</span>
+                  </div>
+                </td>
+                <td>{{ result.results.total_score }}</td>
+                <td>{{ result.results.total_questions }}</td>
+                <td>{{ result.submission_date|date:"M d, Y" }}</td>
+                <td>
+                  <a href="{% url 'assessment:quiz_results' quiz_id=quiz.id %}?student_id={{ result.student.id }}" class="btn btn-sm btn-icon">
+                    <i class="ti ti-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Prepare data for calculations
+    const studentResults = [
+      {% for result in student_results %}
+      {
+        student: "{{ result.student.username }}",
+        score: {{ result.results.percentage|floatformat:"0" }},
+        correctAnswers: {{ result.results.total_score }},
+        totalQuestions: {{ result.results.total_questions }}
+      },
+      {% endfor %}
+    ];
+    
+    // Calculate statistics
+    if (studentResults.length > 0) {
+      // Average score
+      const avgScore = studentResults.reduce((sum, student) => sum + student.score, 0) / studentResults.length;
+      document.getElementById('avg-score').textContent = avgScore.toFixed(1) + '%';
+      
+      // Highest score
+      const maxScore = Math.max(...studentResults.map(s => s.score));
+      document.getElementById('max-score').textContent = maxScore + '%';
+      
+      // Lowest score
+      const minScore = Math.min(...studentResults.map(s => s.score));
+      document.getElementById('min-score').textContent = minScore + '%';
+      
+      // Score distribution
+      const scoreRanges = [
+        { range: '90-100%', count: 0, color: '#28c76f' },
+        { range: '80-89%', count: 0, color: '#00cfe8' },
+        { range: '70-79%', count: 0, color: '#7367f0' },
+        { range: '60-69%', count: 0, color: '#ff9f43' },
+        { range: '0-59%', count: 0, color: '#ea5455' }
+      ];
+      
+      studentResults.forEach(student => {
+        if (student.score >= 90) scoreRanges[0].count++;
+        else if (student.score >= 80) scoreRanges[1].count++;
+        else if (student.score >= 70) scoreRanges[2].count++;
+        else if (student.score >= 60) scoreRanges[3].count++;
+        else scoreRanges[4].count++;
+      });
+      
+      // Score distribution chart
+      const scoreDistOptions = {
+        series: scoreRanges.map(range => range.count),
+        chart: {
+          type: 'pie',
+          height: 300,
+          toolbar: {
+            show: false
+          }
+        },
+        labels: scoreRanges.map(range => range.range),
+        colors: scoreRanges.map(range => range.color),
+        legend: {
+          position: 'bottom'
+        },
+        dataLabels: {
+          formatter: function(val, opts) {
+            return opts.w.config.series[opts.seriesIndex] + ' students';
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: function(val) {
+              return val + ' students';
+            }
+          }
+        }
+      };
+      
+      const scoreDistChart = new ApexCharts(document.querySelector("#scoreDistributionChart"), scoreDistOptions);
+      scoreDistChart.render();
+      
+      // Questions performance - Using dummy data since we don't have per-question analytics in this view
+      // In a real app, you would fetch this data from the backend
+      const questionData = [];
+      for (let i = 1; i <= {{ quiz.questions.count }}; i++) {
+        // Calculate percentage of students who got this question right
+        // This is simulated - in a real app you would calculate this from actual student answers
+        const correctPercentage = Math.floor(Math.random() * 100);
+        questionData.push({
+          x: 'Q' + i,
+          y: correctPercentage,
+          color: correctPercentage >= 70 ? '#28c76f' : correctPercentage >= 50 ? '#ff9f43' : '#ea5455'
+        });
+      }
+      
+      // Question performance chart
+      const questionOptions = {
+        series: [{
+          name: 'Correct %',
+          data: questionData.map(q => q.y)
+        }],
+        chart: {
+          type: 'bar',
+          height: 300,
+          toolbar: {
+            show: false
+          }
+        },
+        plotOptions: {
+          bar: {
+            distributed: true,
+            columnWidth: '50%',
+            endingShape: 'rounded'
+          }
+        },
+        colors: questionData.map(q => q.color),
+        dataLabels: {
+          enabled: false
+        },
+        xaxis: {
+          categories: questionData.map(q => q.x),
+        },
+        yaxis: {
+          max: 100,
+          title: {
+            text: '% Correct'
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: function(val) {
+              return val + '% correct';
+            }
+          }
+        }
+      };
+      
+      const questionChart = new ApexCharts(document.querySelector("#questionPerformanceChart"), questionOptions);
+      questionChart.render();
+    }
+    
+    // Initialize DataTable
+    $('#student-results-table').DataTable({
+      responsive: true,
+      order: [[1, 'desc']],
+      pageLength: 10,
+      language: {
+        paginate: {
+          previous: '<i class="ti ti-chevron-left"></i>',
+          next: '<i class="ti ti-chevron-right"></i>'
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

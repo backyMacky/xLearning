@@ -1,0 +1,231 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Quiz Results: {{ quiz.title }}{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <!-- Results Summary Card -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Quiz Results: {{ quiz.title }}</h5>
+        <div>
+          {% if student %}
+          <span class="badge bg-label-primary me-2">{{ student.username }}'s Results</span>
+          {% endif %}
+          <a href="{% url 'assessment:quiz_detail' quiz_id=quiz.id %}" class="btn btn-outline-primary">
+            <i class="ti ti-eye me-1"></i> View Quiz
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="d-flex align-items-center mb-4">
+              <div class="me-4 position-relative">
+                <div class="position-relative">
+                  <div id="scoreChart"></div>
+                  <div class="position-absolute top-50 start-50 translate-middle text-center">
+                    <h2 class="mb-0">{{ results.percentage|floatformat:"0" }}%</h2>
+                    <p class="mb-0 text-muted">Score</p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4 class="mb-1">
+                  {% if results.percentage >= 90 %}
+                    Excellent!
+                  {% elif results.percentage >= 80 %}
+                    Great job!
+                  {% elif results.percentage >= 70 %}
+                    Good work!
+                  {% elif results.percentage >= 60 %}
+                    Passed
+                  {% else %}
+                    Needs improvement
+                  {% endif %}
+                </h4>
+                <p>You answered {{ results.total_score }} out of {{ results.total_questions }} questions correctly.</p>
+                <div class="d-flex">
+                  <div class="d-flex align-items-center me-4">
+                    <span class="badge bg-success p-1 me-2"></span>
+                    <span>Correct: {{ results.total_score }}</span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <span class="badge bg-danger p-1 me-2"></span>
+                    <span>Incorrect: {{ results.total_questions|add:"-"|add:results.total_score }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card shadow-none bg-label-primary h-100">
+              <div class="card-body">
+                <h6 class="card-title">Quiz Information</h6>
+                <div class="mb-2">
+                  <small class="text-muted">Course</small>
+                  <p class="mb-0">{{ quiz.course.title }}</p>
+                </div>
+                <div class="mb-2">
+                  <small class="text-muted">Teacher</small>
+                  <p class="mb-0">{{ quiz.teacher.username }}</p>
+                </div>
+                <div>
+                  <small class="text-muted">Questions</small>
+                  <p class="mb-0">{{ results.total_questions }} questions</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Review -->
+        <div class="mt-4">
+          <h5 class="fw-semibold">Question Review</h5>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Question</th>
+                  <th>Your Answer</th>
+                  <th>Correct Answer</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for answer in answers %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ answer.question.text|truncatechars:60 }}</td>
+                  <td>{{ answer.text }}</td>
+                  <td>
+                    {% if answer.question.question_type == 'multiple_choice' or answer.question.question_type == 'true_false' %}
+                      {% for option in answer.question.options.all %}
+                        {% if option.is_correct %}
+                          {{ option.text }}
+                        {% endif %}
+                      {% endfor %}
+                    {% elif answer.question.question_type == 'short_answer' %}
+                      {% for option in answer.question.options.all %}
+                        {% if option.is_correct %}
+                          {{ option.text }}{% if not forloop.last %}, {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    {% else %}
+                      <em>Essay question</em>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if answer.is_correct %}
+                      <span class="badge bg-success">Correct</span>
+                    {% else %}
+                      <span class="badge bg-danger">Incorrect</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="mt-4 d-flex justify-content-between">
+          <a href="{% url 'assessment:quiz_list' %}" class="btn btn-outline-primary">
+            <i class="ti ti-list me-1"></i> All Quizzes
+          </a>
+          {% if request.user.is_student %}
+          <a href="{% url 'assessment:student_results' %}" class="btn btn-primary">
+            <i class="ti ti-chart-bar me-1"></i> My Results
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Score donut chart
+    const percentage = {{ results.percentage|floatformat:"0" }};
+    
+    const scoreOptions = {
+      series: [percentage],
+      chart: {
+        height: 200,
+        type: 'radialBar',
+        toolbar: {
+          show: false
+        }
+      },
+      plotOptions: {
+        radialBar: {
+          startAngle: -135,
+          endAngle: 135,
+          hollow: {
+            margin: 0,
+            size: '70%',
+            background: 'transparent',
+          },
+          track: {
+            background: '#e7e7e7',
+            strokeWidth: '67%',
+            margin: 0
+          },
+          dataLabels: {
+            show: false
+          }
+        }
+      },
+      colors: [
+        percentage >= 90 ? '#28c76f' : 
+        percentage >= 70 ? '#00cfe8' : 
+        percentage >= 60 ? '#ff9f43' : 
+        '#ea5455'
+      ],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'dark',
+          type: 'horizontal',
+          shadeIntensity: 0.5,
+          gradientToColors: [
+            percentage >= 90 ? '#28c76f' : 
+            percentage >= 70 ? '#00cfe8' : 
+            percentage >= 60 ? '#ff9f43' : 
+            '#ea5455'
+          ],
+          inverseColors: true,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 100]
+        }
+      },
+      stroke: {
+        lineCap: 'round'
+      }
+    };
+
+    const scoreChart = new ApexCharts(document.querySelector("#scoreChart"), scoreOptions);
+    scoreChart.render();
+  });
+</script>
+{% endblock %}

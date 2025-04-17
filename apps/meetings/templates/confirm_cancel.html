@@ -1,0 +1,86 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Cancel Meeting - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Cancel Meeting</h5>
+        <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-outline-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Meeting
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning mb-4">
+          <div class="d-flex">
+            <i class="ti ti-alert-triangle me-2 mt-1"></i>
+            <div>
+              <h6 class="alert-heading mb-1">Confirm Cancellation</h6>
+              <p class="mb-0">
+                Are you sure you want to cancel this meeting? This action cannot be undone,
+                and all participants will be notified of the cancellation.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <div class="table-responsive">
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <th class="ps-0" width="30%">Meeting Title:</th>
+                  <td>{{ meeting.title }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Date:</th>
+                  <td>{{ meeting.start_time|date:"l, F j, Y" }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Time:</th>
+                  <td>{{ meeting.start_time|date:"h:i A" }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Participants:</th>
+                  <td>{{ meeting.students.count }} student{{ meeting.students.count|pluralize }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="cancellation_reason" class="form-label">Cancellation Reason (optional)</label>
+            <textarea class="form-control" id="cancellation_reason" name="cancellation_reason" rows="3" placeholder="Enter reason for cancellation"></textarea>
+            <div class="form-text">This will be included in the notification sent to participants.</div>
+          </div>
+          
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" id="notify_participants" name="notify_participants" checked>
+            <label class="form-check-label" for="notify_participants">
+              Send notification email to all participants
+            </label>
+          </div>
+          
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-outline-secondary">
+              Keep Meeting
+            </a>
+            <button type="submit" class="btn btn-danger">
+              <i class="ti ti-trash me-1"></i> Cancel Meeting
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,319 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ title }}</h5>
+        <div>
+          <span class="badge bg-label-primary">{{ quiz.title }}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <form method="post" id="question-form">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="{{ form.text.id_for_label }}" class="form-label">Question Text</label>
+            {{ form.text.errors }}
+            <textarea class="form-control" id="{{ form.text.id_for_label }}" name="{{ form.text.html_name }}" rows="3" required>{{ form.text.value|default:'' }}</textarea>
+            <div class="form-text">The question to ask students.</div>
+          </div>
+          
+          <div class="mb-4">
+            <label for="{{ form.question_type.id_for_label }}" class="form-label">Question Type</label>
+            {{ form.question_type.errors }}
+            <select class="form-select" id="{{ form.question_type.id_for_label }}" name="{{ form.question_type.html_name }}" required>
+              {% for choice in form.question_type.field.choices %}
+              <option value="{{ choice.0 }}" {% if form.question_type.value == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Select the type of question.</div>
+          </div>
+          
+          <!-- Multiple Choice Options -->
+          <div id="multiple-choice-options" class="mb-4" style="display: none;">
+            <h6 class="fw-semibold mb-3">Answer Options</h6>
+            <div id="options-container">
+              {% if question and question.question_type == 'multiple_choice' %}
+                {% for option in options %}
+                <div class="option-row mb-2 d-flex align-items-center">
+                  <div class="form-check me-3">
+                    <input class="form-check-input" type="radio" name="correct_option" value="{{ forloop.counter0 }}" id="correct_{{ forloop.counter0 }}" {% if option.is_correct %}checked{% endif %}>
+                    <label class="form-check-label" for="correct_{{ forloop.counter0 }}">
+                      Correct
+                    </label>
+                  </div>
+                  <input type="text" class="form-control" name="options[]" value="{{ option.text }}" placeholder="Option text" required>
+                  {% if forloop.counter > 2 %}
+                  <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-option">
+                    <i class="ti ti-x"></i>
+                  </button>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="option-row mb-2 d-flex align-items-center">
+                  <div class="form-check me-3">
+                    <input class="form-check-input" type="radio" name="correct_option" value="0" id="correct_0" checked>
+                    <label class="form-check-label" for="correct_0">
+                      Correct
+                    </label>
+                  </div>
+                  <input type="text" class="form-control" name="options[]" placeholder="Option 1" required>
+                </div>
+                <div class="option-row mb-2 d-flex align-items-center">
+                  <div class="form-check me-3">
+                    <input class="form-check-input" type="radio" name="correct_option" value="1" id="correct_1">
+                    <label class="form-check-label" for="correct_1">
+                      Correct
+                    </label>
+                  </div>
+                  <input type="text" class="form-control" name="options[]" placeholder="Option 2" required>
+                </div>
+              {% endif %}
+            </div>
+            <button type="button" id="add-option" class="btn btn-sm btn-outline-primary mt-2">
+              <i class="ti ti-plus me-1"></i> Add Option
+            </button>
+          </div>
+          
+          <!-- True/False Options -->
+          <div id="true-false-options" class="mb-4" style="display: none;">
+            <h6 class="fw-semibold mb-3">Correct Answer</h6>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="correct_option" value="0" id="true_correct" 
+                     {% if question and question.question_type == 'true_false' and options.0.is_correct %}checked{% endif %}>
+              <label class="form-check-label" for="true_correct">True</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="correct_option" value="1" id="false_correct"
+                     {% if question and question.question_type == 'true_false' and options.1.is_correct %}checked{% endif %}>
+              <label class="form-check-label" for="false_correct">False</label>
+            </div>
+            <input type="hidden" name="options[]" value="True">
+            <input type="hidden" name="options[]" value="False">
+          </div>
+          
+          <!-- Short Answer Options -->
+          <div id="short-answer-options" class="mb-4" style="display: none;">
+            <h6 class="fw-semibold mb-3">Acceptable Answers</h6>
+            <div class="alert alert-info mb-3">
+              <i class="ti ti-info-circle me-1"></i> 
+              Enter all acceptable answers. Students must provide one of these answers to get the question correct.
+            </div>
+            <div id="correct-answers-container">
+              {% if question and question.question_type == 'short_answer' %}
+                {% for option in options %}
+                  {% if option.is_correct %}
+                  <div class="answer-row mb-2 d-flex align-items-center">
+                    <input type="text" class="form-control" name="correct_answers[]" value="{{ option.text }}" placeholder="Acceptable answer" required>
+                    <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-answer">
+                      <i class="ti ti-x"></i>
+                    </button>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+              <div class="answer-row mb-2 d-flex align-items-center">
+                <input type="text" class="form-control" name="correct_answers[]" placeholder="Acceptable answer" required>
+                <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-answer">
+                  <i class="ti ti-x"></i>
+                </button>
+              </div>
+              {% endif %}
+            </div>
+            <button type="button" id="add-answer" class="btn btn-sm btn-outline-primary mt-2">
+              <i class="ti ti-plus me-1"></i> Add Answer
+            </button>
+          </div>
+          
+          <!-- Essay Options -->
+          <div id="essay-options" class="mb-4" style="display: none;">
+            <div class="alert alert-info">
+              <i class="ti ti-info-circle me-1"></i> 
+              Essay questions will need to be manually graded. Students can provide a free-form written response.
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            {% if question %}
+            <a href="{% url 'assessment:edit_quiz' quiz_id=quiz.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i> Back to Quiz
+            </a>
+            {% else %}
+            <a href="{% url 'assessment:quiz_detail' quiz_id=quiz.id %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i> Back to Quiz
+            </a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-device-floppy me-1"></i> {{ submit_text }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeSelect = document.getElementById('{{ form.question_type.id_for_label }}');
+    const multipleChoiceOptions = document.getElementById('multiple-choice-options');
+    const trueFalseOptions = document.getElementById('true-false-options');
+    const shortAnswerOptions = document.getElementById('short-answer-options');
+    const essayOptions = document.getElementById('essay-options');
+    
+    // Function to show appropriate option inputs based on question type
+    function showOptionsByType() {
+      const selectedType = questionTypeSelect.value;
+      
+      multipleChoiceOptions.style.display = 'none';
+      trueFalseOptions.style.display = 'none';
+      shortAnswerOptions.style.display = 'none';
+      essayOptions.style.display = 'none';
+      
+      if (selectedType === 'multiple_choice') {
+        multipleChoiceOptions.style.display = 'block';
+      } else if (selectedType === 'true_false') {
+        trueFalseOptions.style.display = 'block';
+      } else if (selectedType === 'short_answer') {
+        shortAnswerOptions.style.display = 'block';
+      } else if (selectedType === 'essay') {
+        essayOptions.style.display = 'block';
+      }
+    }
+    
+    // Show options for initial state
+    showOptionsByType();
+    
+    // Add event listener for question type changes
+    questionTypeSelect.addEventListener('change', showOptionsByType);
+    
+    // Add option button for multiple choice
+    const addOptionBtn = document.getElementById('add-option');
+    const optionsContainer = document.getElementById('options-container');
+    
+    if (addOptionBtn) {
+      addOptionBtn.addEventListener('click', function() {
+        const optionCount = optionsContainer.querySelectorAll('.option-row').length;
+        
+        const newOption = document.createElement('div');
+        newOption.className = 'option-row mb-2 d-flex align-items-center';
+        newOption.innerHTML = `
+          <div class="form-check me-3">
+            <input class="form-check-input" type="radio" name="correct_option" value="${optionCount}" id="correct_${optionCount}">
+            <label class="form-check-label" for="correct_${optionCount}">
+              Correct
+            </label>
+          </div>
+          <input type="text" class="form-control" name="options[]" placeholder="Option ${optionCount + 1}" required>
+          <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-option">
+            <i class="ti ti-x"></i>
+          </button>
+        `;
+        
+        optionsContainer.appendChild(newOption);
+        
+        // Add event listener for the new remove button
+        newOption.querySelector('.remove-option').addEventListener('click', function() {
+          optionsContainer.removeChild(newOption);
+          updateOptionIndices();
+        });
+      });
+    }
+    
+    // Add event listeners to existing remove option buttons
+    document.querySelectorAll('.remove-option').forEach(button => {
+      button.addEventListener('click', function() {
+        this.closest('.option-row').remove();
+        updateOptionIndices();
+      });
+    });
+    
+    // Update option indices after removal
+    function updateOptionIndices() {
+      const optionRows = optionsContainer.querySelectorAll('.option-row');
+      optionRows.forEach((row, index) => {
+        row.querySelector('input[type="radio"]').value = index;
+        row.querySelector('input[type="radio"]').id = `correct_${index}`;
+        row.querySelector('label').setAttribute('for', `correct_${index}`);
+      });
+    }
+    
+    // Add answer button for short answer
+    const addAnswerBtn = document.getElementById('add-answer');
+    const answersContainer = document.getElementById('correct-answers-container');
+    
+    if (addAnswerBtn) {
+      addAnswerBtn.addEventListener('click', function() {
+        const newAnswer = document.createElement('div');
+        newAnswer.className = 'answer-row mb-2 d-flex align-items-center';
+        newAnswer.innerHTML = `
+          <input type="text" class="form-control" name="correct_answers[]" placeholder="Acceptable answer" required>
+          <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-answer">
+            <i class="ti ti-x"></i>
+          </button>
+        `;
+        
+        answersContainer.appendChild(newAnswer);
+        
+        // Add event listener for the new remove button
+        newAnswer.querySelector('.remove-answer').addEventListener('click', function() {
+          answersContainer.removeChild(newAnswer);
+        });
+      });
+    }
+    
+    // Add event listeners to existing remove answer buttons
+    document.querySelectorAll('.remove-answer').forEach(button => {
+      button.addEventListener('click', function() {
+        this.closest('.answer-row').remove();
+      });
+    });
+    
+    // Form submission validation
+    const questionForm = document.getElementById('question-form');
+    
+    if (questionForm) {
+      questionForm.addEventListener('submit', function(e) {
+        const selectedType = questionTypeSelect.value;
+        
+        if (selectedType === 'multiple_choice') {
+          // Ensure at least 2 options
+          const optionCount = optionsContainer.querySelectorAll('.option-row').length;
+          if (optionCount < 2) {
+            e.preventDefault();
+            alert('Multiple choice questions must have at least 2 options.');
+            return false;
+          }
+          
+          // Check that a correct option is selected
+          const correctSelected = optionsContainer.querySelector('input[name="correct_option"]:checked');
+          if (!correctSelected) {
+            e.preventDefault();
+            alert('Please select which option is correct.');
+            return false;
+          }
+        } else if (selectedType === 'short_answer') {
+          // Ensure at least 1 correct answer
+          const answerCount = answersContainer.querySelectorAll('.answer-row').length;
+          if (answerCount < 1) {
+            e.preventDefault();
+            alert('Short answer questions must have at least 1 acceptable answer.');
+            return false;
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

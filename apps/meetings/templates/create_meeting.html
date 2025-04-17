@@ -1,0 +1,156 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Create Meeting - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Schedule New Meeting</h5>
+        <a href="{% url 'meetings:meeting_list' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Meetings
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="title" class="form-label">Meeting Title</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Enter meeting title" required />
+          </div>
+          
+          <div class="mb-3">
+            <label for="start_time" class="form-label">Date and Time</label>
+            <input type="text" class="form-control flatpickr-date-time" id="start_time" name="start_time" placeholder="YYYY-MM-DD HH:MM" required />
+          </div>
+          
+          <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <select class="form-select" id="duration" name="duration" required>
+              <option value="">Select duration</option>
+              <option value="30">30 minutes</option>
+              <option value="45">45 minutes</option>
+              <option value="60" selected>1 hour</option>
+              <option value="90">1.5 hours</option>
+              <option value="120">2 hours</option>
+              <option value="180">3 hours</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="meeting_link" class="form-label">Meeting Link (optional)</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="ti ti-video"></i></span>
+              <input type="url" class="form-control" id="meeting_link" name="meeting_link" placeholder="https://meet.google.com/..." />
+            </div>
+            <div class="form-text">If left empty, a default link will be generated.</div>
+          </div>
+          
+          <!-- Select Course -->
+          <div class="mb-3">
+            <label for="course" class="form-label">Course (optional)</label>
+            <select class="form-select select2" id="course" name="course_id">
+              <option value="">Select a course</option>
+              {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.title }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Select a course to automatically include enrolled students.</div>
+          </div>
+          
+          <!-- Select Students -->
+          <div class="mb-3">
+            <label for="students" class="form-label">Select Students</label>
+            <select class="select2 form-select" id="students" name="students" multiple>
+              {% for student in students %}
+                <option value="{{ student.id }}">{{ student.username }} ({{ student.email }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="card shadow-none bg-light border mb-4">
+            <div class="card-body">
+              <h6 class="card-title">Meeting Options</h6>
+              
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="send_reminder" name="send_reminder" checked />
+                <label class="form-check-label" for="send_reminder">Send email reminder to participants</label>
+              </div>
+              
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="add_to_calendar" name="add_to_calendar" />
+                <label class="form-check-label" for="add_to_calendar">Add to my calendar</label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-end">
+            <a href="{% url 'meetings:meeting_list' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-calendar-plus me-1"></i> Schedule Meeting
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize flatpickr for date-time input
+    flatpickr(".flatpickr-date-time", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      minDate: "today",
+      time_24hr: true
+    });
+    
+    // Initialize Select2
+    $('.select2').select2({
+      placeholder: "Select options"
+    });
+    
+    // Handle course selection to filter students
+    $('#course').on('change', function() {
+      const courseId = $(this).val();
+      
+      if (courseId) {
+        // This is a simplified example - in a real app you'd fetch students via AJAX
+        // For demo purposes, we'll enable only students who would be in this course
+        $('#students option').each(function() {
+          // In a real implementation, you would check if this student is enrolled in the course
+          // For now, we'll just enable all options when a course is selected
+          $(this).prop('disabled', false);
+        });
+      } else {
+        // If no course selected, enable all students
+        $('#students option').prop('disabled', false);
+      }
+      
+      // Refresh Select2
+      $('#students').trigger('change');
+    });
+  });
+</script>
+{% endblock %}

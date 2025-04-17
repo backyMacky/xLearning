@@ -1,0 +1,413 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Collection: {{ collection.name }} - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <!-- Collection Overview -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-0">{{ collection.name }}</h5>
+          {% if collection.parent %}
+          <p class="mb-0 text-muted">In collection: <a href="{% url 'repository:collection_detail' collection_id=collection.parent.id %}">{{ collection.parent.name }}</a></p>
+          {% endif %}
+        </div>
+        <div>
+          <button class="btn btn-outline-danger btn-sm me-2" id="delete-collection-btn">
+            <i class="ti ti-trash me-1"></i> Delete Collection
+          </button>
+          <a href="{% url 'repository:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="ti ti-arrow-left me-1"></i> Back
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Sub-collections section -->
+        {% if subcollections %}
+        <div class="mb-4">
+          <h6 class="fw-bold mb-3">Sub-collections</h6>
+          <div class="row">
+            {% for subcollection in subcollections %}
+            <div class="col-md-4 col-lg-3 mb-3">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="ti ti-folder text-primary me-2 fs-4"></i>
+                    <h6 class="mb-0">{{ subcollection.name }}</h6>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mt-3">
+                    {% if request.user.is_teacher %}
+                    <small class="text-muted">{{ subcollection.resources.count }} resources</small>
+                    {% else %}
+                    <small class="text-muted">{{ subcollection.student_files.count }} files</small>
+                    {% endif %}
+                    <a href="{% url 'repository:collection_detail' collection_id=subcollection.id %}" class="btn btn-sm btn-primary">
+                      Open
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if request.user.is_teacher %}
+        <!-- Teacher Resources Section -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0">Resources</h6>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addResourceModal">
+              <i class="ti ti-plus me-1"></i> Add Resources
+            </button>
+          </div>
+          
+          {% if collection.resources.all %}
+          <div class="table-responsive">
+            <table class="table table-hover" id="resourcesTable">
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Course</th>
+                  <th>Uploaded</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for resource in collection.resources.all %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar avatar-sm me-3">
+                        <div class="avatar-initial rounded bg-label-primary">
+                          <i class="ti ti-file-text ti-sm"></i>
+                        </div>
+                      </div>
+                      <a href="{% url 'repository:resource_detail' resource_id=resource.id %}">{{ resource.title }}</a>
+                    </div>
+                  </td>
+                  <td>{% if resource.course %}{{ resource.course.title }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                  <td>{{ resource.upload_date|date:"M d, Y" }}</td>
+                  <td>
+                    <div class="d-flex">
+                      <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon me-2">
+                        <i class="ti ti-download"></i>
+                      </a>
+                      <form method="post" action="{% url 'repository:remove_from_collection' %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="collection_id" value="{{ collection.id }}">
+                        <input type="hidden" name="resource_id" value="{{ resource.id }}">
+                        <button type="submit" class="btn btn-sm btn-icon text-danger">
+                          <i class="ti ti-x"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-file ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No resources in this collection</h6>
+            <p class="mb-3">Add resources to organize your teaching materials</p>
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addResourceModal">
+              Add Resources
+            </button>
+          </div>
+          {% endif %}
+        </div>
+        {% else %}
+        <!-- Student Files Section -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0">My Files</h6>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addFileModal">
+              <i class="ti ti-plus me-1"></i> Add Files
+            </button>
+          </div>
+          
+          {% if collection.student_files.all %}
+          <div class="table-responsive">
+            <table class="table table-hover" id="filesTable">
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Course</th>
+                  <th>Uploaded</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for file in collection.student_files.all %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar avatar-sm me-3">
+                        <div class="avatar-initial rounded bg-label-primary">
+                          <i class="ti ti-file ti-sm"></i>
+                        </div>
+                      </div>
+                      <a href="{% url 'repository:file_detail' file_id=file.id %}">{{ file.title }}</a>
+                    </div>
+                  </td>
+                  <td>{% if file.course %}{{ file.course.title }}{% else %}<span class="text-muted">Personal</span>{% endif %}</td>
+                  <td>{{ file.upload_date|date:"M d, Y" }}</td>
+                  <td>
+                    <div class="d-flex">
+                      <a href="{% url 'repository:download_file' file_id=file.id %}" class="btn btn-sm btn-icon me-2">
+                        <i class="ti ti-download"></i>
+                      </a>
+                      <form method="post" action="{% url 'repository:remove_from_collection' %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="collection_id" value="{{ collection.id }}">
+                        <input type="hidden" name="file_id" value="{{ file.id }}">
+                        <button type="submit" class="btn btn-sm btn-icon text-danger">
+                          <i class="ti ti-x"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-file ti-md"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No files in this collection</h6>
+            <p class="mb-3">Add your files to organize your study materials</p>
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addFileModal">
+              Add Files
+            </button>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Resource Modal -->
+{% if request.user.is_teacher %}
+<div class="modal fade" id="addResourceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Resources to Collection</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% url 'repository:add_to_collection' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="collection_id" value="{{ collection.id }}">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Select Resources</label>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="select-all-resources"></th>
+                    <th>Resource</th>
+                    <th>Course</th>
+                    <th>Uploaded</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for resource in request.user.teacher_resources.all %}
+                  {% if resource not in collection.resources.all %}
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="form-check-input resource-checkbox" name="resource_ids" value="{{ resource.id }}">
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-3">
+                          <div class="avatar-initial rounded bg-label-primary">
+                            <i class="ti ti-file-text ti-sm"></i>
+                          </div>
+                        </div>
+                        <span>{{ resource.title }}</span>
+                      </div>
+                    </td>
+                    <td>{% if resource.course %}{{ resource.course.title }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+                    <td>{{ resource.upload_date|date:"M d, Y" }}</td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Selected Resources</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% else %}
+<!-- Add File Modal -->
+<div class="modal fade" id="addFileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Files to Collection</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% url 'repository:add_to_collection' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="collection_id" value="{{ collection.id }}">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Select Files</label>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="select-all-files"></th>
+                    <th>File</th>
+                    <th>Course</th>
+                    <th>Uploaded</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for file in request.user.student_files.all %}
+                  {% if file not in collection.student_files.all %}
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="form-check-input file-checkbox" name="file_ids" value="{{ file.id }}">
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-3">
+                          <div class="avatar-initial rounded bg-label-primary">
+                            <i class="ti ti-file ti-sm"></i>
+                          </div>
+                        </div>
+                        <span>{{ file.title }}</span>
+                      </div>
+                    </td>
+                    <td>{% if file.course %}{{ file.course.title }}{% else %}<span class="text-muted">Personal</span>{% endif %}</td>
+                    <td>{{ file.upload_date|date:"M d, Y" }}</td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Selected Files</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTables
+    {% if request.user.is_teacher and collection.resources.all %}
+    const resourcesTable = $('#resourcesTable').DataTable({
+      responsive: true,
+      lengthChange: false,
+      pageLength: 10,
+      searching: true,
+      info: false
+    });
+    {% elif not request.user.is_teacher and collection.student_files.all %}
+    const filesTable = $('#filesTable').DataTable({
+      responsive: true,
+      lengthChange: false,
+      pageLength: 10,
+      searching: true,
+      info: false
+    });
+    {% endif %}
+    
+    // Select all checkboxes
+    {% if request.user.is_teacher %}
+    $('#select-all-resources').on('change', function() {
+      $('.resource-checkbox').prop('checked', $(this).prop('checked'));
+    });
+    {% else %}
+    $('#select-all-files').on('change', function() {
+      $('.file-checkbox').prop('checked', $(this).prop('checked'));
+    });
+    {% endif %}
+    
+    // Delete collection button
+    $('#delete-collection-btn').on('click', function() {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You are about to delete this collection. This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel',
+        customClass: {
+          confirmButton: 'btn btn-danger me-3',
+          cancelButton: 'btn btn-outline-secondary'
+        },
+        buttonsStyling: false
+      }).then(function(result) {
+        if (result.isConfirmed) {
+          // Create a form and submit it to delete the collection
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '/repository/collections/{{ collection.id }}/delete/';
+          
+          const csrfToken = document.createElement('input');
+          csrfToken.type = 'hidden';
+          csrfToken.name = 'csrfmiddlewaretoken';
+          csrfToken.value = '{{ csrf_token }}';
+          
+          form.appendChild(csrfToken);
+          document.body.appendChild(form);
+          form.submit();
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ quiz.title }} - Quiz Details{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ quiz.title }}</h5>
+        <div>
+          {% if request.user.is_teacher %}
+          <a href="{% url 'assessment:edit_quiz' quiz_id=quiz.id %}" class="btn btn-primary me-2">
+            <i class="ti ti-edit me-1"></i> Edit Quiz
+          </a>
+          {% else %}
+            {% if not taken %}
+            <a href="{% url 'assessment:take_quiz' quiz_id=quiz.id %}" class="btn btn-primary">
+              <i class="ti ti-file-check me-1"></i> Take Quiz
+            </a>
+            {% else %}
+            <span class="badge bg-label-success me-2">Completed</span>
+            <a href="{% url 'assessment:quiz_results' quiz_id=quiz.id %}" class="btn btn-info">
+              <i class="ti ti-chart-bar me-1"></i> View Results
+            </a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <h6 class="fw-semibold">Course</h6>
+              <p>{{ quiz.course.title }}</p>
+            </div>
+            <div class="mb-3">
+              <h6 class="fw-semibold">Created By</h6>
+              <p>{{ quiz.teacher.username }}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <h6 class="fw-semibold">Created Date</h6>
+              <p>{{ quiz.created_at|date:"F d, Y" }}</p>
+            </div>
+            <div class="mb-3">
+              <h6 class="fw-semibold">Questions</h6>
+              <p>{{ questions|length }} questions</p>
+            </div>
+          </div>
+        </div>
+
+        {% if request.user.is_teacher %}
+        <!-- Teacher-specific stats -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card shadow-none bg-label-primary">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 d-flex align-items-center">
+                    <div class="avatar me-3">
+                      <div class="avatar-initial rounded bg-primary">
+                        <i class="ti ti-users"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h6 class="mb-0">{{ total_submissions|default:"0" }}</h6>
+                      <small>Students submitted</small>
+                    </div>
+                  </div>
+                  <div class="col-md-4 d-flex align-items-center">
+                    <div class="avatar me-3">
+                      <div class="avatar-initial rounded bg-success">
+                        <i class="ti ti-chart-pie"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h6 class="mb-0">{{ avg_score|default:"0" }}%</h6>
+                      <small>Average score</small>
+                    </div>
+                  </div>
+                  <div class="col-md-4 d-flex align-items-center">
+                    <a href="{% url 'assessment:quiz_results' quiz_id=quiz.id %}" class="btn btn-primary">
+                      <i class="ti ti-report me-1"></i> Full Analysis
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Questions List -->
+        <h6 class="fw-semibold">Questions</h6>
+        {% if questions %}
+        <div class="accordion" id="quizQuestions">
+          {% for question in questions %}
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ question.id }}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ question.id }}" aria-expanded="false" aria-controls="collapse{{ question.id }}">
+                <div class="d-flex justify-content-between w-100 me-2">
+                  <span>Q{{ forloop.counter }}: {{ question.text|truncatechars:60 }}</span>
+                  <span class="badge bg-label-primary">{{ question.get_question_type_display }}</span>
+                </div>
+              </button>
+            </h2>
+            <div id="collapse{{ question.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ question.id }}" data-bs-parent="#quizQuestions">
+              <div class="accordion-body">
+                <p>{{ question.text }}</p>
+                
+                {% if question.question_type == 'multiple_choice' or question.question_type == 'true_false' %}
+                <div class="mt-3">
+                  <h6>Options:</h6>
+                  <ul class="list-group">
+                    {% for option in question.options.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      {{ option.text }}
+                      {% if option.is_correct and request.user.is_teacher %}
+                      <span class="badge bg-success">Correct</span>
+                      {% endif %}
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                {% elif question.question_type == 'short_answer' and request.user.is_teacher %}
+                <div class="mt-3">
+                  <h6>Correct Answers:</h6>
+                  <ul class="list-group">
+                    {% for option in question.options.all %}
+                    {% if option.is_correct %}
+                    <li class="list-group-item">{{ option.text }}</li>
+                    {% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
+                {% elif question.question_type == 'essay' %}
+                <div class="mt-3 text-muted">
+                  <i>This is an essay question that requires a written response.</i>
+                </div>
+                {% endif %}
+                
+                {% if request.user.is_teacher %}
+                <div class="mt-3 d-flex justify-content-end">
+                  <a href="{% url 'assessment:edit_question' question_id=question.id %}" class="btn btn-sm btn-outline-primary me-2">
+                    <i class="ti ti-edit me-1"></i> Edit
+                  </a>
+                  <a href="{% url 'assessment:delete_question' question_id=question.id %}" class="btn btn-sm btn-outline-danger">
+                    <i class="ti ti-trash me-1"></i> Delete
+                  </a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+          <i class="ti ti-info-circle me-1"></i>
+          No questions have been added to this quiz yet.
+          {% if request.user.is_teacher %}
+          <a href="{% url 'assessment:add_question' quiz_id=quiz.id %}" class="alert-link">Add the first question</a>.
+          {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if request.user.is_teacher %}
+        <div class="mt-4">
+          <a href="{% url 'assessment:add_question' quiz_id=quiz.id %}" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i> Add Question
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

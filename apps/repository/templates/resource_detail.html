@@ -1,0 +1,269 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Resource: {{ resource.title }} - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xl-8 col-lg-7 col-md-7 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ resource.title }}</h5>
+        <div>
+          {% if request.user == resource.teacher %}
+          <a href="{% url 'repository:edit_resource' resource_id=resource.id %}" class="btn btn-outline-primary btn-sm me-2">
+            <i class="ti ti-edit me-1"></i> Edit
+          </a>
+          {% endif %}
+          <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-primary btn-sm me-2">
+            <i class="ti ti-download me-1"></i> Download
+          </a>
+          <a href="{% url 'repository:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="ti ti-arrow-left me-1"></i> Back
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-12">
+            <h6 class="fw-semibold">Resource Information</h6>
+            <div class="divider my-3"></div>
+            
+            <div class="d-flex mb-3">
+              <div class="flex-shrink-0 me-4">
+                <div class="avatar">
+                  <div class="avatar-initial rounded bg-label-primary">
+                    <i class="ti ti-file-text ti-md"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex flex-column">
+                <h6 class="mb-1">{{ resource.title }}</h6>
+                {% if resource.description %}
+                <p class="mb-2">{{ resource.description }}</p>
+                {% endif %}
+                <div class="d-flex flex-wrap">
+                  <span class="badge bg-label-primary me-2 mb-1">Resource</span>
+                  {% if resource.is_public %}
+                  <span class="badge bg-label-success me-2 mb-1">Public</span>
+                  {% else %}
+                  <span class="badge bg-label-secondary me-2 mb-1">Private</span>
+                  {% endif %}
+                  {% if resource.course %}
+                  <span class="badge bg-label-info me-2 mb-1">Course: {{ resource.course.title }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <p class="fw-semibold mb-0">Uploaded by</p>
+              <p class="text-muted mb-0">{{ resource.teacher.username }}</p>
+            </div>
+            
+            <div class="mb-3">
+              <p class="fw-semibold mb-0">Upload Date</p>
+              <p class="text-muted mb-0">{{ resource.upload_date|date:"F d, Y" }}</p>
+            </div>
+            
+            {% if resource.course %}
+            <div class="mb-3">
+              <p class="fw-semibold mb-0">Associated Course</p>
+              <p class="text-muted mb-0">{{ resource.course.title }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="mb-3">
+              <p class="fw-semibold mb-0">Sharing Status</p>
+              <p class="text-muted mb-0">
+                {% if resource.is_public %}
+                  Public resource, available to all enrolled students in the associated course
+                {% else %}
+                  Private resource, shared with {{ resource.shared_with.count }} specific student(s)
+                {% endif %}
+              </p>
+            </div>
+            
+            {% if request.user == resource.teacher %}
+            <div class="mb-3">
+              <p class="fw-semibold mb-0">Collections</p>
+              <div>
+                {% for collection in resource.collections.all %}
+                <a href="{% url 'repository:collection_detail' collection_id=collection.id %}" class="badge bg-label-primary me-2 mb-1">
+                  <i class="ti ti-folder me-1"></i> {{ collection.name }}
+                </a>
+                {% empty %}
+                <p class="text-muted mb-0">Not added to any collections</p>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        {% if request.user == resource.teacher %}
+        <!-- File Preview (for teacher only) -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <h6 class="fw-semibold">File Preview</h6>
+            <div class="divider my-3"></div>
+            
+            <div class="text-center py-4 rounded border">
+              <div class="d-flex justify-content-center mb-3">
+                <div class="avatar avatar-xl">
+                  <div class="avatar-initial rounded bg-label-primary">
+                    <i class="ti ti-file-text ti-lg"></i>
+                  </div>
+                </div>
+              </div>
+              <h6 class="mb-1">{{ resource.file.name|slice:"17:" }}</h6>
+              <p class="text-muted mb-3">Click the download button to view the file</p>
+              <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-primary btn-sm">
+                <i class="ti ti-download me-1"></i> Download
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Resource Access Statistics -->
+        <div class="row">
+          <div class="col-12">
+            <h6 class="fw-semibold">Access Statistics</h6>
+            <div class="divider my-3"></div>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-none bg-label-primary h-100">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar avatar-sm me-2">
+                        <div class="avatar-initial rounded bg-primary">
+                          <i class="ti ti-eye ti-sm"></i>
+                        </div>
+                      </div>
+                      <span class="fw-semibold">Total Views</span>
+                    </div>
+                    <h3 class="card-title mb-0">{{ access_count|default:"0" }}</h3>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-none bg-label-success h-100">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar avatar-sm me-2">
+                        <div class="avatar-initial rounded bg-success">
+                          <i class="ti ti-users ti-sm"></i>
+                        </div>
+                      </div>
+                      <span class="fw-semibold">Unique Students</span>
+                    </div>
+                    <h3 class="card-title mb-0">{{ student_access|length|default:"0" }}</h3>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-sm-6 col-lg-4">
+                <div class="card shadow-none bg-label-info h-100">
+                  <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar avatar-sm me-2">
+                        <div class="avatar-initial rounded bg-info">
+                          <i class="ti ti-calendar ti-sm"></i>
+                        </div>
+                      </div>
+                      <span class="fw-semibold">Last Access</span>
+                    </div>
+                    {% if access_logs.first %}
+                    <h5 class="card-title mb-0">{{ access_logs.first.access_time|timesince }} ago</h5>
+                    {% else %}
+                    <h5 class="card-title mb-0">Never</h5>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {% if access_logs %}
+            <h6 class="fw-semibold mt-4 mb-3">Recent Access Log</h6>
+            <div class="table-responsive">
+              <table class="table table-hover" id="accessLogTable">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Access Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for log in access_logs %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-sm me-3">
+                          <div class="avatar-initial rounded bg-label-primary">
+                            <i class="ti ti-user ti-sm"></i>
+                          </div>
+                        </div>
+                        <span>{{ log.student.username }}</span>
+                      </div>
+                    </td>
+                    <td>{{ log.access_time|date:"M d, Y H:i" }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-label-info">
+                  <i class="ti ti-eye-off ti-md"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No access logs</h6>
+              <p class="text-muted mb-0">This resource hasn't been accessed by any students yet</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if request.user == resource.teacher and access_logs %}
+    // Initialize DataTable for access logs
+    $('#accessLogTable').DataTable({
+      responsive: true,
+      lengthChange: false,
+      pageLength: 10,
+      searching: true,
+      info: false,
+      ordering: true,
+      order: [[1, 'desc']]  // Sort by access time, newest first
+    });
+    {% endif %}
+  });
+</script>
+{% endblock %}

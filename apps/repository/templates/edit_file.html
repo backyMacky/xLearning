@@ -1,0 +1,149 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Edit File - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xl-8 col-lg-7 col-md-7 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Edit File</h5>
+        <a href="{% url 'repository:file_detail' file_id=object.id %}" class="btn btn-sm btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i> Back to File
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="title" class="form-label">File Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ object.title }}" required>
+            <div class="invalid-feedback">Please provide a file title.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description (Optional)</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ object.description }}</textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label for="file_type" class="form-label">File Type</label>
+            <select class="form-select" id="file_type" name="file_type" required>
+              <option value="">Select file type</option>
+              <option value="Document" {% if object.file_type == 'Document' %}selected{% endif %}>Document</option>
+              <option value="Assignment" {% if object.file_type == 'Assignment' %}selected{% endif %}>Assignment</option>
+              <option value="Project" {% if object.file_type == 'Project' %}selected{% endif %}>Project</option>
+              <option value="Presentation" {% if object.file_type == 'Presentation' %}selected{% endif %}>Presentation</option>
+              <option value="Notes" {% if object.file_type == 'Notes' %}selected{% endif %}>Notes</option>
+              <option value="Other" {% if object.file_type == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+            <div class="invalid-feedback">Please select a file type.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="course" class="form-label">Course (Optional)</label>
+            <select class="select2 form-select" id="course" name="course">
+              <option value="">Not assigned to a course</option>
+              {% for course in user.enrolled_courses.all %}
+                <option value="{{ course.id }}" {% if object.course_id == course.id %}selected{% endif %}>{{ course.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="lesson" class="form-label">Lesson (Optional)</label>
+            <select class="select2 form-select" id="lesson" name="lesson" {% if not object.course %}disabled{% endif %}>
+              <option value="">Select a course first</option>
+              {% if object.course %}
+                {% for lesson in object.course.lessons.all %}
+                  <option value="{{ lesson.id }}" {% if object.lesson_id == lesson.id %}selected{% endif %}>{{ lesson.title }}</option>
+                {% endfor %}
+              {% endif %}
+            </select>
+          </div>
+          
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-outline-secondary me-2" onclick="window.history.back();">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update File</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2
+    $('.select2').select2();
+    
+    // Handle course selection to enable/disable and populate lesson dropdown
+    $('#course').on('change', function() {
+      const courseId = $(this).val();
+      const lessonSelect = $('#lesson');
+      
+      if (courseId) {
+        lessonSelect.prop('disabled', false);
+        
+        // Fetch lessons for the selected course via AJAX
+        $.ajax({
+          url: `/content/api/courses/${courseId}/lessons/`,
+          method: 'GET',
+          success: function(data) {
+            lessonSelect.empty();
+            lessonSelect.append('<option value="">Select a lesson (optional)</option>');
+            
+            data.forEach(function(lesson) {
+              lessonSelect.append(`<option value="${lesson.id}">${lesson.title}</option>`);
+            });
+          },
+          error: function() {
+            lessonSelect.empty();
+            lessonSelect.append('<option value="">Error loading lessons</option>');
+          }
+        });
+      } else {
+        lessonSelect.prop('disabled', true);
+        lessonSelect.empty();
+        lessonSelect.append('<option value="">Select a course first</option>');
+      }
+    });
+    
+    // Form validation
+    (function () {
+      'use strict'
+      
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll('.needs-validation')
+      
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+          
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })()
+  });
+</script>
+{% endblock %}

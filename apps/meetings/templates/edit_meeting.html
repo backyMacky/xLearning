@@ -1,0 +1,113 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Edit Meeting - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Edit Meeting</h5>
+        <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-outline-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Meeting
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="title" class="form-label">Meeting Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ meeting.title }}" required />
+          </div>
+          
+          <div class="mb-3">
+            <label for="start_time" class="form-label">Date and Time</label>
+            <input type="text" class="form-control flatpickr-date-time" id="start_time" name="start_time" value="{{ meeting.start_time|date:'Y-m-d H:i' }}" required />
+          </div>
+          
+          <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <select class="form-select" id="duration" name="duration" required>
+              <option value="">Select duration</option>
+              <option value="30" {% if meeting.duration == 30 %}selected{% endif %}>30 minutes</option>
+              <option value="45" {% if meeting.duration == 45 %}selected{% endif %}>45 minutes</option>
+              <option value="60" {% if meeting.duration == 60 %}selected{% endif %}>1 hour</option>
+              <option value="90" {% if meeting.duration == 90 %}selected{% endif %}>1.5 hours</option>
+              <option value="120" {% if meeting.duration == 120 %}selected{% endif %}>2 hours</option>
+              <option value="180" {% if meeting.duration == 180 %}selected{% endif %}>3 hours</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="meeting_link" class="form-label">Meeting Link</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="ti ti-video"></i></span>
+              <input type="url" class="form-control" id="meeting_link" name="meeting_link" value="{{ meeting.meeting_link }}" />
+            </div>
+          </div>
+          
+          <!-- Select Students -->
+          <div class="mb-3">
+            <label for="students" class="form-label">Select Students</label>
+            <select class="select2 form-select" id="students" name="students" multiple>
+              {% for student in students %}
+                <option value="{{ student.id }}" {% if student.id in selected_students %}selected{% endif %}>
+                  {{ student.username }} ({{ student.email }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'meetings:cancel_meeting' meeting_id=meeting.id %}" class="btn btn-danger">
+              <i class="ti ti-trash me-1"></i> Cancel Meeting
+            </a>
+            <div>
+              <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-outline-secondary me-2">Discard Changes</a>
+              <button type="submit" class="btn btn-primary">
+                <i class="ti ti-save me-1"></i> Save Changes
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize flatpickr for date-time input
+    flatpickr(".flatpickr-date-time", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      minDate: "today",
+      time_24hr: true
+    });
+    
+    // Initialize Select2
+    $('.select2').select2({
+      placeholder: "Select students"
+    });
+  });
+</script>
+{% endblock %}

@@ -71,7 +71,7 @@
           "slug": "assessment-results"
         },
         {
-          "url": "/assessment/create/",
+          "url": "/assessment/quizzes/create/",
           "external": true,
           "name": "Create Quiz",
           "slug": "assessment-create-quiz"
@@ -84,10 +84,22 @@
       "slug": "repository",
       "submenu": [
         {
+          "url": "/repository/",
+          "external": true,
+          "name": "Dashboard",
+          "slug": "repository-dashboard"
+        },
+        {
           "url": "/repository/files/",
           "external": true,
           "name": "My Files",
           "slug": "repository-files"
+        },
+        {
+          "url": "/repository/files/upload/",
+          "external": true,
+          "name": "Upload File",
+          "slug": "repository-upload-file"
         },
         {
           "url": "/repository/resources/",
@@ -96,19 +108,32 @@
           "slug": "repository-resources"
         },
         {
-          "url": "/repository/collections/",
+          "url": "/repository/resources/upload/",
           "external": true,
-          "name": "Collections",
-          "slug": "repository-collections"
+          "name": "Upload Resource",
+          "slug": "repository-upload-resource"
         },
         {
-          "url": "/repository/upload/",
+          "url": "/repository/collections/create/",
           "external": true,
-          "name": "Upload Files",
-          "slug": "repository-upload"
+          "name": "Create Collection",
+          "slug": "repository-create-collection"
+        },
+        {
+          "url": "/repository/collections/add-items/",
+          "external": true,
+          "name": "Add to Collection",
+          "slug": "repository-add-to-collection"
+        },
+        {
+          "url": "/repository/collections/remove-item/",
+          "external": true,
+          "name": "Remove from Collection",
+          "slug": "repository-remove-from-collection"
         }
       ]
-    },
+    }
+    ,
     {
       "name": "Calendar",
       "icon": "menu-icon tf-icons ti ti-calendar",

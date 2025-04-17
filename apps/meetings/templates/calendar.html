@@ -1,0 +1,142 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Meeting Calendar - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/fullcalendar/fullcalendar.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/fullcalendar/fullcalendar.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Meeting Calendar</h5>
+    <div>
+      {% if request.user.is_teacher %}
+      <a href="{% url 'meetings:create_meeting' %}" class="btn btn-primary me-2">
+        <i class="ti ti-plus me-1"></i> Schedule Meeting
+      </a>
+      {% endif %}
+      <a href="{% url 'meetings:meeting_list' %}" class="btn btn-outline-primary">
+        <i class="ti ti-list me-1"></i> Meeting List
+      </a>
+    </div>
+  </div>
+  <div class="card-body">
+    <div id="calendar"></div>
+  </div>
+</div>
+
+{% if request.user.is_teacher %}
+<!-- Legend -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Calendar Legend</h5>
+  </div>
+  <div class="card-body">
+    <div class="d-flex flex-wrap gap-3">
+      <div class="d-flex align-items-center">
+        <span class="badge bg-primary p-2 me-2"></span>
+        <span>Scheduled Meetings</span>
+      </div>
+      <div class="d-flex align-items-center">
+        <span class="badge bg-success p-2 me-2"></span>
+        <span>Availability Slots</span>
+      </div>
+      <div class="d-flex align-items-center">
+        <span class="badge bg-info p-2 me-2"></span>
+        <span>Current Time</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the calendar
+    const calendarEl = document.getElementById('calendar');
+    
+    if (calendarEl) {
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        height: 'auto',
+        navLinks: true,
+        editable: false,
+        selectable: true,
+        selectMirror: true,
+        dayMaxEvents: true,
+        nowIndicator: true,
+        slotMinTime: '08:00:00',
+        slotMaxTime: '22:00:00',
+        
+        // Handle date selection (for creating new meetings)
+        select: function(info) {
+          {% if request.user.is_teacher %}
+          // Convert to local timezone
+          const startStr = info.startStr;
+          const startDate = new Date(startStr);
+          
+          // Format for the URL
+          const year = startDate.getFullYear();
+          const month = String(startDate.getMonth() + 1).padStart(2, '0');
+          const day = String(startDate.getDate()).padStart(2, '0');
+          const hours = String(startDate.getHours()).padStart(2, '0');
+          const minutes = String(startDate.getMinutes()).padStart(2, '0');
+          
+          const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+          
+          // Redirect to create meeting page with the selected date/time
+          window.location.href = `{% url 'meetings:create_meeting' %}?start_time=${formattedDate}`;
+          {% endif %}
+        },
+        
+        // Calendar events from backend
+        events: [
+          {% for event in calendar_events %}
+          {
+            id: '{{ event.id }}',
+            title: '{{ event.title }}',
+            start: '{{ event.start }}',
+            end: '{{ event.end }}',
+            url: '{{ event.url|default:"" }}',
+            classNames: {{ event.classNames|safe }},
+            {% if event.recurring %}
+            daysOfWeek: [{{ event.day_of_week|default:"0" }}],
+            startRecur: '{{ event.start_recur|default:"" }}',
+            endRecur: '{{ event.end_recur|default:"" }}',
+            {% endif %}
+          },
+          {% endfor %}
+        ],
+        
+        // Handle event click
+        eventClick: function(info) {
+          if (info.event.url) {
+            info.jsEvent.preventDefault();
+            window.location.href = info.event.url;
+          }
+        }
+      });
+      
+      calendar.render();
+    }
+  });
+</script>
+{% endblock %}
