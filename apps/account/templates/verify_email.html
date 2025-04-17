@@ -18,8 +18,8 @@
 
 {% block content %}
 <div class="authentication-wrapper authentication-cover">
-  <!-- Logo -->
-  <a href="{% url 'index' %}" class="app-brand auth-cover-brand">
+  <!-- Logo --> <!----index in url-->
+  <a href="" class="app-brand auth-cover-brand">
     <span class="app-brand-logo demo">{% include 'partials/logo.html' with height=20 bgcolor="fill: #fff;" %}</span>
     <span class="app-brand-text demo text-heading fw-bold">{% get_theme_variables 'template_name' %}</span>
   </a>
@@ -65,11 +65,11 @@
           Back
         </a>
         {% else %}
-        <a class="btn btn-primary w-100 my-3" href="{% url 'login' %}">
+        <a class="btn btn-primary w-100 my-3" href="{% url 'account:login' %}">
           Skip for now & Login
         </a>
         <p class="text-center">Didn't get the mail?
-          <a id="btnSubmit" class="text-center" href="{% url 'send-verification' %}">
+          <a id="btnSubmit" class="text-center" href="{% url 'account:verify_email' %}">
             <span id="btnText" class="me-1">Resend</span>
             <span id="btnLoader" class="spinner-border spinner-border-sm visually-hidden" role="status" aria-hidden="true"></span>
           </a>

@@ -1,0 +1,159 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Role Details{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:role_list' %}">Roles & Permissions</a>
+</li>
+<li class="breadcrumb-item active">Role Details</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">Roles & Permissions /</span> Role Details
+  </h4>
+
+  <div class="row">
+    <!-- Role Details -->
+    <div class="col-xl-4 col-lg-5 col-md-5">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">{{ role.name }}</h5>
+            <div>
+              <a href="{% url 'account:role_edit' role.id %}" class="btn btn-primary btn-sm me-1">
+                <i class="ti ti-pencil me-1"></i> Edit
+              </a>
+              <a href="{% url 'account:role_delete' role.id %}" class="btn btn-danger btn-sm">
+                <i class="ti ti-trash me-1"></i> Delete
+              </a>
+            </div>
+          </div>
+          <p class="mb-0 mt-3">{{ role.description }}</p>
+        </div>
+        <hr class="my-0" />
+        <div class="card-body">
+          <h5 class="card-title mb-3">Details</h5>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Created</small>
+            </div>
+            <div>{{ role.created_at|date:"d M Y" }}</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Last Updated</small>
+            </div>
+            <div>{{ role.updated_at|date:"d M Y" }}</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Permissions</small>
+            </div>
+            <div>{{ role.permissions.count }} permissions</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Users with this role</small>
+            </div>
+            <div>{{ users_with_role.count }} users</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Permissions -->
+    <div class="col-xl-8 col-lg-7 col-md-7">
+      <div class="card mb-4">
+        <h5 class="card-header">Permissions</h5>
+        <div class="card-body">
+          {% if role_permissions %}
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>App</th>
+                  <th>Model</th>
+                  <th>Permission</th>
+                  <th>Codename</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for permission in role_permissions %}
+                <tr>
+                  <td>{{ permission.content_type.app_label }}</td>
+                  <td>{{ permission.content_type.model }}</td>
+                  <td>{{ permission.name }}</td>
+                  <td><code>{{ permission.codename }}</code></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted">No permissions assigned to this role.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Users with this role -->
+      <div class="card">
+        <h5 class="card-header">Users with this role</h5>
+        <div class="card-body">
+          {% if users_with_role %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>User Type</th>
+                  <th>Assigned At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user_role in users_with_role %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar avatar-sm me-3">
+                        {% if user_role.user.profile.profile_image %}
+                        <img src="{{ user_role.user.profile.profile_image.url }}" alt="Avatar" class="rounded-circle">
+                        {% else %}
+                        <span class="avatar-initial rounded-circle bg-label-primary">{{ user_role.user.username|first|upper }}</span>
+                        {% endif %}
+                      </div>
+                      <a href="{% url 'account:user_detail' user_role.user.id %}">
+                        {{ user_role.user.username }}
+                      </a>
+                    </div>
+                  </td>
+                  <td>{{ user_role.user.email }}</td>
+                  <td>{{ user_role.user.get_user_type_display }}</td>
+                  <td>{{ user_role.assigned_at|date:"d M Y" }}</td>
+                  <td>
+                    <a href="{% url 'account:user_role_remove' user_role.user.id role.id %}" class="btn btn-sm btn-danger">
+                      <i class="ti ti-trash me-1"></i> Remove
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted">No users have been assigned this role.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

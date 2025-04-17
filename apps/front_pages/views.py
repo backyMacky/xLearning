@@ -1,3 +1,4 @@
+from django.views import View
 from django.views.generic import TemplateView
 from web_project import TemplateLayout
 from web_project.template_helpers.theme import TemplateHelper
@@ -15,35 +16,103 @@ class BaseFrontPageView(TemplateView):
         return context
 
 class LandingPageView(BaseFrontPageView):
-    template_name = "landing_page.html"  # This one works because it already exists
-
-# Temporary redirects for pages without templates
-from django.views.generic import RedirectView
-
-class FeaturesPageView(RedirectView):
-    url = 'front_pages/features'  # Redirect to homepage for now
+    template_name = "landing_page.html"
     
-class TeamPageView(RedirectView):
-    url = '/'  # Redirect to homepage for now
+class ContentManagementView(BaseFrontPageView):
+    template_name = "features/content_management.html"
     
-class FAQPageView(RedirectView):
-    url = '/'  # Redirect to homepage for now
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Content Management System",
+            "page_description": "Create, organize, and share course materials with ease."
+        })
+        return context
     
-class ContactPageView(RedirectView):
-    url = '/'  # Redirect to homepage for now
-
-# Regular views for existing templates
-class PricingPageView(BaseFrontPageView):
-    template_name = "pricing_page.html"
-
-class PaymentPageView(BaseFrontPageView):
-    template_name = "payment_page.html"
-
-class CheckoutPageView(BaseFrontPageView):
-    template_name = "checkout_page.html"
-
-class HelpCenterLandingView(BaseFrontPageView):
-    template_name = "help_center_landing.html"
-
-class HelpCenterArticleView(BaseFrontPageView):
-    template_name = "help_center_article.html"
+class LiveSessionsView(BaseFrontPageView):
+    template_name = "features/live_sessions.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Live Session Management",
+            "page_description": "Schedule and manage online teaching sessions efficiently."
+        })
+        return context
+    
+class AssessmentToolsView(BaseFrontPageView):
+    template_name = "features/assessment_tools.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Assessment Tools",
+            "page_description": "Create and manage custom assessments to track student progress."
+        })
+        return context
+    
+class StudentManagementView(BaseFrontPageView):
+    template_name = "features/student_management.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Student Repositories",
+            "page_description": "Organize and track student resources and engagement."
+        })
+        return context
+    
+class BookingPaymentView(BaseFrontPageView):
+    template_name = "features/booking_payment.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Booking & Payment",
+            "page_description": "Manage your availability and track teaching hours and payments."
+        })
+        return context
+    
+class PricingView(BaseFrontPageView):
+    template_name = "pricing.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Pricing Plans",
+            "page_description": "Find the perfect plan for your teaching needs."
+        })
+        return context
+    
+class AboutView(TemplateView):
+    template_name = "about.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "About Us",
+            "page_description": "Learn more about the team behind EduTeach."
+        })
+        return context
+    
+class FAQView(TemplateView):
+    template_name = "faq.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Frequently Asked Questions",
+            "page_description": "Find answers to common questions about EduTeach."
+        })
+        return context
+    
+class ContactView(BaseFrontPageView):
+    template_name = "contact.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Contact Us",
+            "page_description": "Get in touch with our support team."
+        })
+        return context

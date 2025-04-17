@@ -1,0 +1,60 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Remove Role{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:user_list' %}">User Management</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:user_detail' user_obj.id %}">User Details</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:user_roles' user_obj.id %}">Roles</a>
+</li>
+<li class="breadcrumb-item active">Remove Role</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">User Management / {{ user_obj.username }} / Roles /</span> Remove Role
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-4">
+        <h5 class="card-header">Confirm Role Removal</h5>
+        <div class="card-body">
+          <div class="alert alert-warning mb-4">
+            <h6 class="alert-heading mb-1">Warning</h6>
+            <p class="mb-0">Are you sure you want to remove the role "{{ role.name }}" from user "{{ user_obj.username }}"?</p>
+          </div>
+          
+          <div class="mb-4">
+            <h6>Details</h6>
+            <ul class="list-unstyled">
+              <li><strong>User:</strong> {{ user_obj.username }} ({{ user_obj.email }})</li>
+              <li><strong>Role:</strong> {{ role.name }}</li>
+              <li><strong>Role Description:</strong> {{ role.description|default:"Not provided" }}</li>
+              <li><strong>Permissions in Role:</strong> {{ role.permissions.count }}</li>
+            </ul>
+          </div>
+          
+          <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-start">
+              <button type="submit" class="btn btn-danger me-2">Remove Role</button>
+              <a href="{% url 'account:user_roles' user_obj.id %}" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -87,6 +87,8 @@ TEMPLATES = [
                 "config.context_processors.my_setting",
                 "config.context_processors.get_cookie",
                 "config.context_processors.environment",
+                # Add the notification context processor
+                "apps.account.context_processors.notification_context",
             ],
             "libraries": {
                 "theme": "web_project.template_tags.theme",

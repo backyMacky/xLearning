@@ -1,0 +1,196 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Upload Resource - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/dropzone/dropzone.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/dropzone/dropzone.js' %}"></script>
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xl-8 col-lg-7 col-md-7 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Upload Teaching Resource</h5>
+        <a href="{% url 'repository:dashboard' %}" class="btn btn-sm btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="title" class="form-label">Resource Title</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Enter a title for this resource" required>
+            <div class="invalid-feedback">Please provide a resource title.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter a description for this resource"></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label for="course_id" class="form-label">Associate with Course (Optional)</label>
+            <select class="select2 form-select" id="course_id" name="course_id">
+              <option value="">Not associated with a course</option>
+              {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.title }}</option>
+              {% endfor %}
+            </select>
+            <small class="form-text text-muted">If associated with a course, the resource will be available to all students enrolled in the course (if public).</small>
+          </div>
+          
+          <div class="mb-3">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" id="is_public" name="is_public">
+              <label class="form-check-label" for="is_public">Make Resource Public</label>
+            </div>
+            <small class="form-text text-muted">Public resources are available to all students in the associated course. Private resources are only available to specifically selected students.</small>
+          </div>
+          
+          <div class="mb-3" id="share-with-students-container">
+            <label for="share_with_students" class="form-label">Share with Specific Students</label>
+            <select class="select2 form-select" id="share_with_students" name="share_with_students" multiple>
+              {% for student in students %}
+                <option value="{{ student.id }}">{{ student.username }}</option>
+              {% endfor %}
+            </select>
+            <small class="form-text text-muted">Select students to share this resource with (if not making it public).</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="collection_id" class="form-label">Add to Collection (Optional)</label>
+            <select class="select2 form-select" id="collection_id" name="collection_id">
+              <option value="">Don't add to collection</option>
+              {% for collection in collections %}
+                <option value="{{ collection.id }}">{{ collection.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label">Upload Resource File</label>
+            <div class="dropzone needsclick" id="dropzone-basic">
+              <div class="dz-message needsclick">
+                Drop file here or click to upload
+                <span class="note needsclick">(This is just for UI. Actual upload happens when you submit the form)</span>
+              </div>
+              <div class="fallback">
+                <input type="file" name="file" required>
+              </div>
+            </div>
+            <div class="invalid-feedback">Please upload a file.</div>
+          </div>
+          
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-outline-secondary me-2" onclick="window.history.back();">Cancel</button>
+            <button type="submit" class="btn btn-primary">Upload Resource</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Dropzone
+    const dropzoneBasic = new Dropzone('#dropzone-basic', {
+      url: '#',
+      autoProcessQueue: false,
+      addRemoveLinks: true,
+      maxFiles: 1,
+      init: function() {
+        this.on("addedfile", function(file) {
+          if (this.files.length > 1) {
+            this.removeFile(this.files[0]);
+          }
+          
+          // Create a hidden input for the real form submission
+          document.querySelector('.fallback input').files = new DataTransfer().files;
+          document.querySelector('.fallback input').files = new DataTransfer().files;
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          document.querySelector('.fallback input').files = dataTransfer.files;
+        });
+      }
+    });
+    
+    // Initialize Select2
+    $('.select2').select2();
+    
+    // Toggle "Share with students" based on "is_public" checkbox
+    $('#is_public').change(function() {
+      if ($(this).is(':checked')) {
+        $('#share-with-students-container').hide();
+      } else {
+        $('#share-with-students-container').show();
+      }
+    });
+    
+    // Initial state
+    if ($('#is_public').is(':checked')) {
+      $('#share-with-students-container').hide();
+    }
+    
+    // Course selection changes
+    $('#course_id').on('change', function() {
+      const courseId = $(this).val();
+      
+      if (courseId) {
+        // Fetch students for this course
+        $.ajax({
+          url: `/content/api/courses/${courseId}/students/`,
+          method: 'GET',
+          success: function(data) {
+            // Update the student selection dropdown
+            const studentSelect = $('#share_with_students');
+            studentSelect.empty();
+            
+            data.forEach(function(student) {
+              studentSelect.append(`<option value="${student.id}">${student.username}</option>`);
+            });
+            
+            studentSelect.trigger('change');
+          }
+        });
+      }
+    });
+    
+    // Form validation
+    (function () {
+      'use strict'
+      
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll('.needs-validation')
+      
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+          
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })()
+  });
+</script>
+{% endblock %}

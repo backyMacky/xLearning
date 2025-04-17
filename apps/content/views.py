@@ -119,7 +119,6 @@ class CourseListView(ListView):
         
         return context
 
-
 class TeacherCourseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """View for teachers to see courses they teach"""
     model = Course
@@ -326,14 +325,14 @@ class CourseUnenrollView(LoginRequiredMixin, UserPassesTestMixin, View):
         return redirect('content:course_list')
 
 
-class CourseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    """View to create a new course"""
+class CourseCreateView(LoginRequiredMixin, CreateView):
+    """View to create a new course - Temporarily accessible to all logged-in users for testing"""
     model = Course
     form_class = CourseForm
     template_name = 'course_form.html'
     
-    def test_func(self):
-        return self.request.user.is_teacher or self.request.user.is_superuser
+    # Removed UserPassesTestMixin and test_func for testing purposes
+    # Will be re-added later to restrict to teachers and admins
     
     def form_valid(self, form):
         form.instance.teacher = self.request.user

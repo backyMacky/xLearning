@@ -1,0 +1,168 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Roles Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:role_list' %}">Roles & Permissions</a>
+</li>
+<li class="breadcrumb-item active">Roles</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">Roles & Permissions /</span> Roles
+  </h4>
+
+  <!-- Roles List Card -->
+  <div class="card">
+    <div class="card-header border-bottom">
+      <h5 class="card-title mb-3">Roles</h5>
+      <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+        <div class="col-md-6 role_search">
+          <div class="input-group input-group-merge">
+            <span class="input-group-text" id="basic-addon-search31"><i class="ti ti-search"></i></span>
+            <input type="text" class="form-control" placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search31" value="{{ search_query }}">
+          </div>
+        </div>
+        <div class="col-md-6 text-end">
+          <a href="{% url 'account:role_create' %}" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i>
+            <span class="align-middle">Add New Role</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive text-nowrap">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Role Name</th>
+            <th>Description</th>
+            <th>Permissions</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for role in roles %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <a href="{% url 'account:role_detail' role.id %}" class="text-body fw-medium">{{ role.name }}</a>
+            </td>
+            <td>{{ role.description|truncatechars:50 }}</td>
+            <td>
+              <span class="badge bg-label-primary">{{ role.permissions.count }} permissions</span>
+            </td>
+            <td>{{ role.created_at|date:"d M Y" }}</td>
+            <td>
+              <div class="dropdown">
+                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                  <i class="ti ti-dots-vertical"></i>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{% url 'account:role_detail' role.id %}">
+                    <i class="ti ti-eye me-1"></i> View
+                  </a>
+                  <a class="dropdown-item" href="{% url 'account:role_edit' role.id %}">
+                    <i class="ti ti-pencil me-1"></i> Edit
+                  </a>
+                  <a class="dropdown-item text-danger" href="{% url 'account:role_delete' role.id %}">
+                    <i class="ti ti-trash me-1"></i> Delete
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4">No roles found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="card-footer">
+      <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item prev">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                <i class="ti ti-chevron-left"></i>
+              </a>
+            </li>
+            {% else %}
+            <li class="page-item prev disabled">
+              <a class="page-link" href="javascript:void(0);">
+                <i class="ti ti-chevron-left"></i>
+              </a>
+            </li>
+            {% endif %}
+            
+            {% for num in paginator.page_range %}
+              {% if num == page_obj.number %}
+              <li class="page-item active">
+                <a class="page-link" href="javascript:void(0);">{{ num }}</a>
+              </li>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+              </li>
+              {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item next">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">
+                <i class="ti ti-chevron-right"></i>
+              </a>
+            </li>
+            {% else %}
+            <li class="page-item next disabled">
+              <a class="page-link" href="javascript:void(0);">
+                <i class="ti ti-chevron-right"></i>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  // Handle search
+  document.querySelector('.role_search input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      const searchQuery = this.value;
+      const currentUrl = new URL(window.location);
+      
+      if (searchQuery) {
+        currentUrl.searchParams.set('search', searchQuery);
+      } else {
+        currentUrl.searchParams.delete('search');
+      }
+      
+      // Reset to page 1 when searching
+      currentUrl.searchParams.set('page', '1');
+      
+      window.location.href = currentUrl.href;
+    }
+  });
+</script>
+{% endblock page_js %}

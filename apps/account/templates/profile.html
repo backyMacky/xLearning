@@ -1,0 +1,202 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item active">Profile</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">User Profile /</span> Account
+  </h4>
+
+  <div class="row">
+    <!-- User Profile Details -->
+    <div class="col-xl-4 col-lg-5 col-md-5">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-start align-items-sm-center gap-4">
+            {% if profile_user.profile.profile_image %}
+            <img src="{{ profile_user.profile.profile_image.url }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" />
+            {% else %}
+            <div class="avatar avatar-xl">
+              <span class="avatar-initial rounded bg-label-primary">{{ profile_user.username|first|upper }}</span>
+            </div>
+            {% endif %}
+            <div class="d-flex flex-column">
+              <div class="card-title mb-0">
+                <h5>{{ profile_user.get_full_name|default:profile_user.username }}</h5>
+              </div>
+              <div class="mb-2">
+                <span class="badge bg-label-{% if profile_user.is_admin %}primary{% elif profile_user.is_teacher %}success{% else %}info{% endif %} me-1">
+                  {{ profile_user.get_user_type_display }}
+                </span>
+                <span class="badge bg-label-{% if profile_user.is_active %}success{% else %}danger{% endif %} me-1">
+                  {% if profile_user.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+              </div>
+              <div class="mb-3">
+                <small>@{{ profile_user.username }}</small>
+              </div>
+              {% if request.user == profile_user %}
+              <div>
+                <a href="{% url 'account:update_profile' %}" class="btn btn-primary me-1">
+                  <i class="ti ti-edit me-1"></i> Edit
+                </a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <hr class="my-0" />
+        <div class="card-body">
+          <h5 class="card-title mb-3">Details</h5>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Username</small>
+            </div>
+            <div>{{ profile_user.username }}</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Email</small>
+            </div>
+            <div>{{ profile_user.email }}</div>
+          </div>
+          {% if profile_user.profile.phone_number %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Phone</small>
+            </div>
+            <div>{{ profile_user.profile.phone_number }}</div>
+          </div>
+          {% endif %}
+          {% if profile_user.profile.date_of_birth %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Date of Birth</small>
+            </div>
+            <div>{{ profile_user.profile.date_of_birth|date:"d M Y" }}</div>
+          </div>
+          {% endif %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Status</small>
+            </div>
+            <div>
+              <span class="badge bg-label-{% if profile_user.is_active %}success{% else %}danger{% endif %}">
+                {% if profile_user.is_active %}Active{% else %}Inactive{% endif %}
+              </span>
+            </div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">User Type</small>
+            </div>
+            <div>{{ profile_user.get_user_type_display }}</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Verified</small>
+            </div>
+            <div>
+              <span class="badge bg-label-{% if profile_user.is_verified %}success{% else %}warning{% endif %}">
+                {% if profile_user.is_verified %}Yes{% else %}No{% endif %}
+              </span>
+            </div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Joined</small>
+            </div>
+            <div>{{ profile_user.date_joined|date:"d M Y" }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Language Preferences</h5>
+          {% if profile_user.profile.native_language or profile_user.profile.learning_language %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Native Language</small>
+            </div>
+            <div>{{ profile_user.profile.native_language|default:"Not specified" }}</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Learning Language</small>
+            </div>
+            <div>{{ profile_user.profile.learning_language|default:"Not specified" }}</div>
+          </div>
+          {% else %}
+          <p class="text-muted">No language preferences set.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- User Activity and Information -->
+    <div class="col-xl-8 col-lg-7 col-md-7">
+      {% if profile_user.profile.bio %}
+      <div class="card mb-4">
+        <h5 class="card-header">About</h5>
+        <div class="card-body">
+          <p>{{ profile_user.profile.bio }}</p>
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Additional user content sections can be added here -->
+      <div class="card mb-4">
+        <h5 class="card-header">Recent Activity</h5>
+        <div class="card-body">
+          <!-- This is a placeholder for future activity tracking -->
+          <p class="text-muted">No recent activity to display.</p>
+        </div>
+      </div>
+      
+      <!-- User specific settings/links -->
+      {% if request.user == profile_user %}
+      <div class="card">
+        <h5 class="card-header">Account Settings</h5>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="card border shadow-none">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <h5 class="mb-0">Security</h5>
+                    <i class="ti ti-shield-lock ms-2 text-primary"></i>
+                  </div>
+                  <p>Manage your password and security settings</p>
+                  <a href="{% url 'account:security_settings' %}" class="btn btn-primary btn-sm">Manage</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="card border shadow-none">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <h5 class="mb-0">Preferences</h5>
+                    <i class="ti ti-settings ms-2 text-primary"></i>
+                  </div>
+                  <p>Manage your language and notification preferences</p>
+                  <a href="{% url 'account:preferences' %}" class="btn btn-primary btn-sm">Manage</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,169 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Security Settings{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item active">Security Settings</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">Account Settings /</span> Security
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <!-- Change Password -->
+      <div class="card mb-4">
+        <h5 class="card-header">Change Password</h5>
+        <div class="card-body">
+          <form method="post" id="formChangePassword">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="change_password">
+            
+            <div class="row">
+              <div class="mb-3 col-md-6 form-password-toggle">
+                <label class="form-label" for="currentPassword">Current Password</label>
+                <div class="input-group input-group-merge">
+                  <input class="form-control" type="password" name="current_password" id="currentPassword" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" required />
+                  <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="mb-3 col-md-6 form-password-toggle">
+                <label class="form-label" for="newPassword">New Password</label>
+                <div class="input-group input-group-merge">
+                  <input class="form-control" type="password" id="newPassword" name="new_password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" required />
+                  <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
+                </div>
+              </div>
+
+              <div class="mb-3 col-md-6 form-password-toggle">
+                <label class="form-label" for="confirmPassword">Confirm New Password</label>
+                <div class="input-group input-group-merge">
+                  <input class="form-control" type="password" name="confirm_password" id="confirmPassword" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" required />
+                  <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
+                </div>
+              </div>
+              
+              <div class="col-12 mb-4">
+                <p class="fw-medium mt-2">Password Requirements:</p>
+                <ul class="ps-3 mb-0">
+                  <li class="mb-1">Minimum 8 characters long - the more, the better</li>
+                  <li class="mb-1">At least one lowercase character</li>
+                  <li>At least one number, symbol, or whitespace character</li>
+                </ul>
+              </div>
+              
+              <div>
+                <button type="submit" class="btn btn-primary me-2">Save changes</button>
+                <button type="reset" class="btn btn-label-secondary">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Two-factor Authentication -->
+      <div class="card mb-4">
+        <h5 class="card-header">Two-factor Authentication</h5>
+        <div class="card-body">
+          <p class="mb-3">Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to sign in.</p>
+          
+          <!-- Coming Soon Badge -->
+          <div class="mb-4">
+            <span class="badge bg-label-primary">Coming Soon</span>
+          </div>
+          
+          <h6>Authenticator Apps</h6>
+          <p>Use an authenticator app like Google Authenticator, Microsoft Authenticator, Authy, or 1Password to generate time-based authentication codes.</p>
+          
+          <button class="btn btn-primary mt-2" disabled>Set up authenticator app</button>
+        </div>
+      </div>
+      
+      <!-- Recent Devices -->
+      <div class="card mb-4">
+        <h5 class="card-header">Recent Devices</h5>
+        <div class="card-body">
+          <p class="mb-3">We keep track of your login activity to help you ensure no one else is accessing your account.</p>
+          
+          <!-- Coming Soon Badge -->
+          <div class="mb-4">
+            <span class="badge bg-label-primary">Coming Soon</span>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table border-top">
+              <thead>
+                <tr>
+                  <th class="text-truncate">Browser</th>
+                  <th class="text-truncate">Device</th>
+                  <th class="text-truncate">Location</th>
+                  <th class="text-truncate">Recent Activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="text-truncate">
+                    <i class="ti ti-brand-chrome me-2"></i> Chrome on Windows
+                  </td>
+                  <td class="text-truncate">Dell XPS 15</td>
+                  <td class="text-truncate">United States</td>
+                  <td class="text-truncate">10 min ago</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Password toggle
+  const togglePasswordIcons = document.querySelectorAll('.form-password-toggle i');
+  if (togglePasswordIcons) {
+    togglePasswordIcons.forEach(icon => {
+      icon.addEventListener('click', e => {
+        const input = e.target.closest('.input-group').querySelector('input');
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.remove('ti-eye-off');
+          icon.classList.add('ti-eye');
+        } else {
+          input.type = 'password';
+          icon.classList.remove('ti-eye');
+          icon.classList.add('ti-eye-off');
+        }
+      });
+    });
+  }
+  
+  // Validate password match
+  const passwordForm = document.getElementById('formChangePassword');
+  if (passwordForm) {
+    passwordForm.addEventListener('submit', function(event) {
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (newPassword !== confirmPassword) {
+        event.preventDefault();
+        alert('Passwords do not match!');
+      }
+    });
+  }
+});
+</script>
+{% endblock page_js %}

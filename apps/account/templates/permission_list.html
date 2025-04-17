@@ -1,0 +1,178 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Permissions Management{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:role_list' %}">Roles & Permissions</a>
+</li>
+<li class="breadcrumb-item active">Permissions</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">Roles & Permissions /</span> Permissions
+  </h4>
+
+  <!-- Permissions List Card -->
+  <div class="card">
+    <div class="card-header border-bottom">
+      <h5 class="card-title mb-3">Permissions</h5>
+      <div class="d-flex justify-content-between align-items-center row pb-2 gap-3 gap-md-0">
+        <div class="col-md-4 app_filter">
+          <select id="appFilter" class="form-select">
+            <option value="">All Applications</option>
+            {% for app_label in app_labels %}
+            <option value="{{ app_label }}" {% if app_filter == app_label %}selected{% endif %}>{{ app_label|title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-8 permission_search">
+          <div class="input-group input-group-merge">
+            <span class="input-group-text" id="basic-addon-search31"><i class="ti ti-search"></i></span>
+            <input type="text" class="form-control" placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search31" value="{{ search_query }}">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive text-nowrap">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Permission</th>
+            <th>Application</th>
+            <th>Model</th>
+            <th>Codename</th>
+          </tr>
+        </thead>
+        <tbody class="table-border-bottom-0">
+          {% for permission in permissions %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ permission.name }}</td>
+            <td>
+              <span class="badge bg-label-primary">{{ permission.content_type.app_label }}</span>
+            </td>
+            <td>{{ permission.content_type.model }}</td>
+            <td><code>{{ permission.codename }}</code></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center py-4">No permissions found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="card-footer">
+      <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item prev">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if app_filter %}&app={{ app_filter }}{% endif %}">
+                <i class="ti ti-chevron-left"></i>
+              </a>
+            </li>
+            {% else %}
+            <li class="page-item prev disabled">
+              <a class="page-link" href="javascript:void(0);">
+                <i class="ti ti-chevron-left"></i>
+              </a>
+            </li>
+            {% endif %}
+            
+            {% for num in paginator.page_range %}
+              {% if num == page_obj.number %}
+              <li class="page-item active">
+                <a class="page-link" href="javascript:void(0);">{{ num }}</a>
+              </li>
+              {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if app_filter %}&app={{ app_filter }}{% endif %}">{{ num }}</a>
+              </li>
+              {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item next">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if app_filter %}&app={{ app_filter }}{% endif %}">
+                <i class="ti ti-chevron-right"></i>
+              </a>
+            </li>
+            {% else %}
+            <li class="page-item next disabled">
+              <a class="page-link" href="javascript:void(0);">
+                <i class="ti ti-chevron-right"></i>
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  // Handle app filter
+  document.getElementById('appFilter').addEventListener('change', function() {
+    const selectedApp = this.value;
+    const currentUrl = new URL(window.location);
+    
+    if (selectedApp) {
+      currentUrl.searchParams.set('app', selectedApp);
+    } else {
+      currentUrl.searchParams.delete('app');
+    }
+    
+    // Preserve search query if exists
+    const searchQuery = document.querySelector('.permission_search input').value;
+    if (searchQuery) {
+      currentUrl.searchParams.set('search', searchQuery);
+    }
+    
+    // Reset to page 1 when filtering
+    currentUrl.searchParams.set('page', '1');
+    
+    window.location.href = currentUrl.href;
+  });
+  
+  // Handle search
+  document.querySelector('.permission_search input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      const searchQuery = this.value;
+      const currentUrl = new URL(window.location);
+      
+      if (searchQuery) {
+        currentUrl.searchParams.set('search', searchQuery);
+      } else {
+        currentUrl.searchParams.delete('search');
+      }
+      
+      // Preserve app filter if exists
+      const selectedApp = document.getElementById('appFilter').value;
+      if (selectedApp) {
+        currentUrl.searchParams.set('app', selectedApp);
+      }
+      
+      // Reset to page 1 when searching
+      currentUrl.searchParams.set('page', '1');
+      
+      window.location.href = currentUrl.href;
+    }
+  });
+</script>
+{% endblock page_js %}

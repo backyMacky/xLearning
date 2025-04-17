@@ -1,28 +1,28 @@
 from django.urls import path
 from .views import (
-    LandingPageView, 
-    FeaturesPageView,
-    TeamPageView,
-    FAQPageView,
-    ContactPageView,
-    PricingPageView, 
-    PaymentPageView, 
-    CheckoutPageView,
-    HelpCenterLandingView,
-    HelpCenterArticleView
+    LandingPageView,
+    ContentManagementView,
+    LiveSessionsView,
+    AssessmentToolsView,
+    StudentManagementView,
+    BookingPaymentView,
+    PricingView,
+    AboutView,
+    FAQView,
+    ContactView
 )
 
 app_name = 'front_pages'  # Adding namespace
 
 urlpatterns = [
     path("", LandingPageView.as_view(), name="home"),
-    path("features/", FeaturesPageView.as_view(), name="features"),
-    path("team/", TeamPageView.as_view(), name="team"),
-    path("faq/", FAQPageView.as_view(), name="faq"),
-    path("contact/", ContactPageView.as_view(), name="contact"),
-    path("pricing/", PricingPageView.as_view(), name="pricing-page"),
-    path("payment/", PaymentPageView.as_view(), name="payment-page"),
-    path("checkout/", CheckoutPageView.as_view(), name="checkout-page"),
-    path("help-center/", HelpCenterLandingView.as_view(), name="help-center-landing"),
-    path("help-center/article/", HelpCenterArticleView.as_view(), name="help-center-article"),
+    path("features/content-management/", ContentManagementView.as_view(), name="content-management"),
+    path("features/live-sessions/", LiveSessionsView.as_view(), name="live-sessions"),
+    path("features/assessment-tools/", AssessmentToolsView.as_view(), name="assessment-tools"),
+    path("features/student-management/", StudentManagementView.as_view(), name="student-management"),
+    path("features/booking-payment/", BookingPaymentView.as_view(), name="booking-payment"),
+    path("pricing/", PricingView.as_view(), name="pricing"),
+    path("about/", AboutView.as_view(), name="about"),
+    path("faq/", FAQView.as_view(), name="faq"),
+    path("contact/", ContactView.as_view(), name="contact"),
 ]

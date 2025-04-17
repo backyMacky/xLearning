@@ -1,0 +1,214 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}User Details{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:user_list' %}">User Management</a>
+</li>
+<li class="breadcrumb-item active">User Details</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">User Management /</span> User Details
+  </h4>
+
+  <div class="row">
+    <!-- User Profile Details -->
+    <div class="col-xl-4 col-lg-5 col-md-5">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex align-items-start align-items-sm-center gap-4">
+            {% if user_obj.profile.profile_image %}
+            <img src="{{ user_obj.profile.profile_image.url }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" />
+            {% else %}
+            <div class="avatar avatar-xl">
+              <span class="avatar-initial rounded bg-label-primary">{{ user_obj.username|first|upper }}</span>
+            </div>
+            {% endif %}
+            <div class="d-flex flex-column">
+              <div class="card-title mb-0">
+                <h5>{{ user_obj.get_full_name|default:user_obj.username }}</h5>
+              </div>
+              <div class="mb-2">
+                <span class="badge bg-label-{% if user_obj.is_admin %}primary{% elif user_obj.is_teacher %}success{% else %}info{% endif %} me-1">
+                  {{ user_obj.get_user_type_display }}
+                </span>
+                <span class="badge bg-label-{% if user_obj.is_active %}success{% else %}danger{% endif %} me-1">
+                  {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+              </div>
+              <div class="mb-3">
+                <small>@{{ user_obj.username }}</small>
+              </div>
+              <div>
+                <a href="{% url 'account:user_edit' user_obj.id %}" class="btn btn-primary me-1">
+                  <i class="ti ti-edit me-1"></i> Edit
+                </a>
+                <a href="{% url 'account:user_roles' user_obj.id %}" class="btn btn-outline-primary">
+                  <i class="ti ti-shield me-1"></i> Roles
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr class="my-0" />
+        <div class="card-body">
+          <h5 class="card-title mb-3">Details</h5>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Username</small>
+            </div>
+            <div>{{ user_obj.username }}</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Email</small>
+            </div>
+            <div>{{ user_obj.email }}</div>
+          </div>
+          {% if user_obj.profile.phone_number %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Phone</small>
+            </div>
+            <div>{{ user_obj.profile.phone_number }}</div>
+          </div>
+          {% endif %}
+          {% if user_obj.profile.date_of_birth %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Date of Birth</small>
+            </div>
+            <div>{{ user_obj.profile.date_of_birth|date:"d M Y" }}</div>
+          </div>
+          {% endif %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Status</small>
+            </div>
+            <div>
+              <span class="badge bg-label-{% if user_obj.is_active %}success{% else %}danger{% endif %}">
+                {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}
+              </span>
+            </div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">User Type</small>
+            </div>
+            <div>{{ user_obj.get_user_type_display }}</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Verified</small>
+            </div>
+            <div>
+              <span class="badge bg-label-{% if user_obj.is_verified %}success{% else %}warning{% endif %}">
+                {% if user_obj.is_verified %}Yes{% else %}No{% endif %}
+              </span>
+            </div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Joined</small>
+            </div>
+            <div>{{ user_obj.date_joined|date:"d M Y" }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Language Preferences</h5>
+          {% if user_obj.profile.native_language or user_obj.profile.learning_language %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Native Language</small>
+            </div>
+            <div>{{ user_obj.profile.native_language|default:"Not specified" }}</div>
+          </div>
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted text-uppercase">Learning Language</small>
+            </div>
+            <div>{{ user_obj.profile.learning_language|default:"Not specified" }}</div>
+          </div>
+          {% else %}
+          <p class="text-muted">No language preferences set.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- User Activity -->
+    <div class="col-xl-8 col-lg-7 col-md-7">
+      <div class="card mb-4">
+        <h5 class="card-header">User Roles</h5>
+        <div class="card-body">
+          {% if user_roles %}
+          <div class="table-responsive">
+            <table class="table table-borderless">
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Description</th>
+                  <th>Assigned</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user_role in user_roles %}
+                <tr>
+                  <td>
+                    <a href="{% url 'account:role_detail' user_role.role.id %}">{{ user_role.role.name }}</a>
+                  </td>
+                  <td>{{ user_role.role.description|truncatechars:50 }}</td>
+                  <td>{{ user_role.assigned_at|date:"d M Y" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted">User has no roles assigned.</p>
+          {% endif %}
+          <div class="mt-3 text-end">
+            <a href="{% url 'account:user_roles' user_obj.id %}" class="btn btn-primary">
+              <i class="ti ti-shield me-1"></i> Manage Roles
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      {% if user_obj.profile.bio %}
+      <div class="card mb-4">
+        <h5 class="card-header">Bio</h5>
+        <div class="card-body">
+          <p>{{ user_obj.profile.bio }}</p>
+        </div>
+      </div>
+      {% endif %}
+      
+      <div class="card">
+        <h5 class="card-header">Danger Zone</h5>
+        <div class="card-body">
+          <div class="mb-3 col-12">
+            <div class="alert alert-warning">
+              <h6 class="alert-heading mb-1">Delete User Account</h6>
+              <p class="mb-0">Once you delete this user, there is no going back. Please be certain.</p>
+            </div>
+          </div>
+          <form action="{% url 'account:user_delete' user_obj.id %}" method="get">
+            <button type="submit" class="btn btn-danger deactivate-account">Delete Account</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

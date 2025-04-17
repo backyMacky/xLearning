@@ -1,0 +1,193 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}User Preferences{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item active">Preferences</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">Account Settings /</span> Preferences
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <!-- Language Preferences -->
+      <div class="card mb-4">
+        <h5 class="card-header">Language Preferences</h5>
+        <div class="card-body">
+          <form method="post" id="formLanguagePreferences">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="language_preferences">
+            
+            <div class="row">
+              <div class="mb-3 col-md-6">
+                <label for="nativeLanguage" class="form-label">Native Language</label>
+                <select id="nativeLanguage" name="native_language" class="select2 form-select">
+                  <option value="english" {% if request.user.profile.native_language == 'english' %}selected{% endif %}>English</option>
+                  <option value="spanish" {% if request.user.profile.native_language == 'spanish' %}selected{% endif %}>Spanish</option>
+                  <option value="french" {% if request.user.profile.native_language == 'french' %}selected{% endif %}>French</option>
+                  <option value="german" {% if request.user.profile.native_language == 'german' %}selected{% endif %}>German</option>
+                  <option value="chinese" {% if request.user.profile.native_language == 'chinese' %}selected{% endif %}>Chinese</option>
+                  <option value="japanese" {% if request.user.profile.native_language == 'japanese' %}selected{% endif %}>Japanese</option>
+                  <option value="arabic" {% if request.user.profile.native_language == 'arabic' %}selected{% endif %}>Arabic</option>
+                  <option value="russian" {% if request.user.profile.native_language == 'russian' %}selected{% endif %}>Russian</option>
+                </select>
+              </div>
+              
+              <div class="mb-3 col-md-6">
+                <label for="learningLanguage" class="form-label">Learning Language</label>
+                <select id="learningLanguage" name="learning_language" class="select2 form-select">
+                  <option value="english" {% if request.user.profile.learning_language == 'english' %}selected{% endif %}>English</option>
+                  <option value="spanish" {% if request.user.profile.learning_language == 'spanish' %}selected{% endif %}>Spanish</option>
+                  <option value="french" {% if request.user.profile.learning_language == 'french' %}selected{% endif %}>French</option>
+                  <option value="german" {% if request.user.profile.learning_language == 'german' %}selected{% endif %}>German</option>
+                  <option value="chinese" {% if request.user.profile.learning_language == 'chinese' %}selected{% endif %}>Chinese</option>
+                  <option value="japanese" {% if request.user.profile.learning_language == 'japanese' %}selected{% endif %}>Japanese</option>
+                  <option value="arabic" {% if request.user.profile.learning_language == 'arabic' %}selected{% endif %}>Arabic</option>
+                  <option value="russian" {% if request.user.profile.learning_language == 'russian' %}selected{% endif %}>Russian</option>
+                </select>
+              </div>
+            </div>
+            
+            <div>
+              <button type="submit" class="btn btn-primary me-2">Save changes</button>
+              <button type="reset" class="btn btn-label-secondary">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Notification Preferences -->
+      <div class="card mb-4">
+        <h5 class="card-header">Notification Preferences</h5>
+        <div class="card-body">
+          <form method="post" id="formNotificationPreferences">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="notification_preferences">
+            
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Email Notifications</h6>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="emailNewMessages" checked />
+                  <label class="form-check-label" for="emailNewMessages">New messages</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="emailNewConnections" checked />
+                  <label class="form-check-label" for="emailNewConnections">Connection requests</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="emailCourseUpdates" checked />
+                  <label class="form-check-label" for="emailCourseUpdates">Course updates</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="emailAchievements" checked />
+                  <label class="form-check-label" for="emailAchievements">Achievements & badges</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="emailMarketing" />
+                  <label class="form-check-label" for="emailMarketing">Marketing & promotions</label>
+                </div>
+              </div>
+              
+              <div class="col-md-6 mt-4 mt-md-0">
+                <h6>Browser Notifications</h6>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="browserNewMessages" checked />
+                  <label class="form-check-label" for="browserNewMessages">New messages</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="browserNewConnections" checked />
+                  <label class="form-check-label" for="browserNewConnections">Connection requests</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="browserCourseUpdates" />
+                  <label class="form-check-label" for="browserCourseUpdates">Course updates</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="browserAchievements" checked />
+                  <label class="form-check-label" for="browserAchievements">Achievements & badges</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="browserMarketing" />
+                  <label class="form-check-label" for="browserMarketing">Marketing & promotions</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-4">
+              <span class="badge bg-label-primary">Coming Soon</span>
+            </div>
+            
+            <div class="mt-4">
+              <button type="submit" class="btn btn-primary me-2" disabled>Save changes</button>
+              <button type="reset" class="btn btn-label-secondary" disabled>Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Account Activity -->
+      <div class="card">
+        <h5 class="card-header">Account Activity</h5>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <h6>Delete Account</h6>
+                <div class="alert alert-warning">
+                  <h6 class="alert-heading mb-1">Warning</h6>
+                  <p class="mb-0">Once you delete your account, there is no going back. Please be certain.</p>
+                </div>
+                <button class="btn btn-danger deactivate-account" disabled>Delete Account</button>
+                <div class="mt-3">
+                  <span class="badge bg-label-primary">Coming Soon</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="mb-3">
+                <h6>Download Your Data</h6>
+                <p>Download all your account data including profile information, learning progress, and communications.</p>
+                <button class="btn btn-primary" disabled>Download Data</button>
+                <div class="mt-3">
+                  <span class="badge bg-label-primary">Coming Soon</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Initialize Select2
+  if (document.querySelector('.select2')) {
+    $('.select2').select2();
+  }
+});
+</script>
+{% endblock page_js %}

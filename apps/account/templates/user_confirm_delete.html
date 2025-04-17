@@ -1,0 +1,55 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Delete User{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:user_list' %}">User Management</a>
+</li>
+<li class="breadcrumb-item active">Delete User</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">User Management /</span> Delete User
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-4">
+        <h5 class="card-header">Confirm Delete</h5>
+        <div class="card-body">
+          <div class="alert alert-danger mb-4">
+            <h6 class="alert-heading mb-1">Warning</h6>
+            <p class="mb-0">Are you sure you want to delete the user "{{ user_obj.username }}"? This action cannot be undone.</p>
+          </div>
+          
+          <div class="mb-4">
+            <h6>User Details</h6>
+            <ul class="list-unstyled">
+              <li><strong>Username:</strong> {{ user_obj.username }}</li>
+              <li><strong>Email:</strong> {{ user_obj.email }}</li>
+              <li><strong>Name:</strong> {{ user_obj.get_full_name|default:"Not provided" }}</li>
+              <li><strong>User Type:</strong> {{ user_obj.get_user_type_display }}</li>
+              <li><strong>Join Date:</strong> {{ user_obj.date_joined|date:"d M Y" }}</li>
+            </ul>
+          </div>
+          
+          <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-start">
+              <button type="submit" class="btn btn-danger me-2">Confirm Delete</button>
+              <a href="{% url 'account:user_detail' user_obj.id %}" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,91 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:role_list' %}">Roles & Permissions</a>
+</li>
+<li class="breadcrumb-item active">{{ title }}</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">Roles & Permissions /</span> {{ title }}
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-4">
+        <h5 class="card-header">{{ title }}</h5>
+        <div class="card-body">
+          <form method="post" class="row g-3">
+            {% csrf_token %}
+            
+            <div class="col-md-6">
+              <label for="id_name" class="form-label">Role Name</label>
+              {{ form.name.errors }}
+              <input type="text" class="form-control" id="id_name" name="name" placeholder="Role Name" value="{{ form.name.value|default:'' }}" required>
+              {% if form.name.help_text %}<small class="form-text text-muted">{{ form.name.help_text }}</small>{% endif %}
+            </div>
+            
+            <div class="col-md-12">
+              <label for="id_description" class="form-label">Description</label>
+              {{ form.description.errors }}
+              <textarea class="form-control" id="id_description" name="description" rows="3" placeholder="Role Description">{{ form.description.value|default:'' }}</textarea>
+              {% if form.description.help_text %}<small class="form-text text-muted">{{ form.description.help_text }}</small>{% endif %}
+            </div>
+            
+            <div class="col-md-12">
+              <label for="id_permissions" class="form-label">Permissions</label>
+              {{ form.permissions.errors }}
+              <select class="select2 form-select" id="id_permissions" name="permissions" multiple>
+                {% regroup permissions by content_type.app_label as app_list %}
+                {% for app in app_list %}
+                <optgroup label="{{ app.grouper }}">
+                  {% for permission in app.list %}
+                  <option value="{{ permission.id }}" {% if permission.id in form.permissions.value %}selected{% endif %}>
+                    {{ permission.content_type.model }} | {{ permission.name }}
+                  </option>
+                  {% endfor %}
+                </optgroup>
+                {% endfor %}
+              </select>
+              {% if form.permissions.help_text %}<small class="form-text text-muted">{{ form.permissions.help_text }}</small>{% endif %}
+            </div>
+            
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+              <a href="{% url 'account:role_list' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+  $(document).ready(function() {
+    // Initialize Select2
+    $('.select2').select2();
+  });
+</script>
+{% endblock page_js %}

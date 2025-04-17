@@ -203,13 +203,6 @@
       ]
     },
     {
-      "url": "/chat/",
-      "external": true,
-      "name": "Messaging",
-      "icon": "menu-icon tf-icons ti ti-messages",
-      "slug": "chat"
-    },
-    {
       "menu_header": "Administration"
     },
     {
@@ -219,19 +212,19 @@
       "slug": "account",
       "submenu": [
         {
-          "url": "/account/users/",
+          "url": "/account/admin/users/",
           "external": true,
           "name": "All Users",
           "slug": "account-users"
         },
         {
-          "url": "/account/teachers/",
+          "url": "/account/admin/users/?type=teacher",
           "external": true,
           "name": "Teachers",
           "slug": "account-teachers"
         },
         {
-          "url": "/account/students/",
+          "url": "/account/admin/users/?type=student",
           "external": true,
           "name": "Students",
           "slug": "account-students"
@@ -247,19 +240,19 @@
               "slug": "account-profile"
             },
             {
-              "url": "/account/security/",
+              "url": "/account/settings/security/",
               "external": true,
               "name": "Security",
               "slug": "account-security"
             },
             {
-              "url": "/account/preferences/",
+              "url": "/account/settings/preferences/",
               "external": true,
               "name": "Preferences",
               "slug": "account-preferences"
             }
           ]
-        }
+        }        
       ]
     },
     {
@@ -269,13 +262,13 @@
       "slug": "access",
       "submenu": [
         {
-          "url": "/access/roles/",
+          "url": "/account/admin/roles/",
           "external": true,
           "name": "Roles",
           "slug": "access-roles"
         },
         {
-          "url": "/access/permissions/",
+          "url": "/account/admin/permissions/",
           "external": true,
           "name": "Permissions",
           "slug": "access-permissions"
@@ -283,4 +276,5 @@
       ]
     }
   ]
-}
+  }
+  

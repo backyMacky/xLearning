@@ -1,0 +1,176 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:profile' %}">Profile</a>
+</li>
+<li class="breadcrumb-item active">Edit Profile</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">User Profile /</span> Edit Profile
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-4">
+        <h5 class="card-header">Edit Profile</h5>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data" class="row g-3">
+            {% csrf_token %}
+            
+            <!-- Profile Image -->
+            <div class="col-12 mb-4">
+              <div class="d-flex align-items-start align-items-sm-center gap-4">
+                {% if request.user.profile.profile_image %}
+                <img src="{{ request.user.profile.profile_image.url }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar" />
+                {% else %}
+                <div class="avatar avatar-xl" id="avatarInitial">
+                  <span class="avatar-initial rounded bg-label-primary">{{ request.user.username|first|upper }}</span>
+                </div>
+                <img src="{% static 'img/avatars/default.png' %}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded d-none" id="uploadedAvatar" />
+                {% endif %}
+                <div class="button-wrapper">
+                  <label for="upload" class="btn btn-primary me-2 mb-2" tabindex="0">
+                    <span class="d-none d-sm-block">Upload new photo</span>
+                    <i class="ti ti-upload d-block d-sm-none"></i>
+                    <input type="file" id="upload" name="profile_image" class="account-file-input" hidden accept="image/png, image/jpeg" />
+                  </label>
+                  <button type="button" class="btn btn-outline-secondary account-image-reset mb-2">
+                    <i class="ti ti-refresh-dot d-block d-sm-none"></i>
+                    <span class="d-none d-sm-block">Reset</span>
+                  </button>
+                  <div class="text-muted">Allowed JPG or PNG. Max size of 800K</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Basic Information -->
+            <div class="col-md-6">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" class="form-control" id="username" name="username" value="{{ request.user.username }}" />
+            </div>
+            
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" value="{{ request.user.email }}" />
+            </div>
+            
+            <div class="col-md-6">
+              <label for="firstName" class="form-label">First Name</label>
+              <input type="text" class="form-control" id="firstName" name="first_name" value="{{ request.user.first_name }}" />
+            </div>
+            
+            <div class="col-md-6">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="lastName" name="last_name" value="{{ request.user.last_name }}" />
+            </div>
+            
+            <div class="col-md-6">
+              <label for="nativeLanguage" class="form-label">Native Language</label>
+              <select id="nativeLanguage" class="form-select" name="native_language">
+                <option value="" {% if not request.user.profile.native_language %}selected{% endif %}>Select language</option>
+                <option value="english" {% if request.user.profile.native_language == 'english' %}selected{% endif %}>English</option>
+                <option value="spanish" {% if request.user.profile.native_language == 'spanish' %}selected{% endif %}>Spanish</option>
+                <option value="french" {% if request.user.profile.native_language == 'french' %}selected{% endif %}>French</option>
+                <option value="german" {% if request.user.profile.native_language == 'german' %}selected{% endif %}>German</option>
+                <option value="chinese" {% if request.user.profile.native_language == 'chinese' %}selected{% endif %}>Chinese</option>
+                <option value="japanese" {% if request.user.profile.native_language == 'japanese' %}selected{% endif %}>Japanese</option>
+                <option value="arabic" {% if request.user.profile.native_language == 'arabic' %}selected{% endif %}>Arabic</option>
+                <option value="russian" {% if request.user.profile.native_language == 'russian' %}selected{% endif %}>Russian</option>
+              </select>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="learningLanguage" class="form-label">Learning Language</label>
+              <select id="learningLanguage" class="form-select" name="learning_language">
+                <option value="" {% if not request.user.profile.learning_language %}selected{% endif %}>Select language</option>
+                <option value="english" {% if request.user.profile.learning_language == 'english' %}selected{% endif %}>English</option>
+                <option value="spanish" {% if request.user.profile.learning_language == 'spanish' %}selected{% endif %}>Spanish</option>
+                <option value="french" {% if request.user.profile.learning_language == 'french' %}selected{% endif %}>French</option>
+                <option value="german" {% if request.user.profile.learning_language == 'german' %}selected{% endif %}>German</option>
+                <option value="chinese" {% if request.user.profile.learning_language == 'chinese' %}selected{% endif %}>Chinese</option>
+                <option value="japanese" {% if request.user.profile.learning_language == 'japanese' %}selected{% endif %}>Japanese</option>
+                <option value="arabic" {% if request.user.profile.learning_language == 'arabic' %}selected{% endif %}>Arabic</option>
+                <option value="russian" {% if request.user.profile.learning_language == 'russian' %}selected{% endif %}>Russian</option>
+              </select>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="phoneNumber" class="form-label">Phone Number</label>
+              <input type="text" class="form-control" id="phoneNumber" name="phone_number" value="{{ request.user.profile.phone_number|default:'' }}" />
+            </div>
+            
+            <div class="col-md-6">
+              <label for="dateOfBirth" class="form-label">Date of Birth</label>
+              <input type="date" class="form-control" id="dateOfBirth" name="date_of_birth" value="{% if request.user.profile.date_of_birth %}{{ request.user.profile.date_of_birth|date:'Y-m-d' }}{% endif %}" />
+            </div>
+            
+            <div class="col-12">
+              <label for="bio" class="form-label">Bio</label>
+              <textarea class="form-control" id="bio" name="bio" rows="4">{{ request.user.profile.bio|default:'' }}</textarea>
+            </div>
+            
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-primary me-2">Save changes</button>
+              <a href="{% url 'account:profile' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Profile image upload preview
+  const accountUserImage = document.getElementById('uploadedAvatar');
+  const avatarInitial = document.getElementById('avatarInitial');
+  const fileInput = document.querySelector('.account-file-input');
+  const resetFileInput = document.querySelector('.account-image-reset');
+  
+  if (fileInput) {
+    fileInput.onchange = () => {
+      if (fileInput.files[0]) {
+        // Show image and hide initial avatar if exists
+        if (avatarInitial) {
+          avatarInitial.classList.add('d-none');
+          accountUserImage.classList.remove('d-none');
+        }
+        accountUserImage.src = window.URL.createObjectURL(fileInput.files[0]);
+      }
+    };
+  }
+  
+  if (resetFileInput) {
+    resetFileInput.onclick = () => {
+      fileInput.value = '';
+      {% if request.user.profile.profile_image %}
+        // If user already has an image, reset to that
+        accountUserImage.src = "{{ request.user.profile.profile_image.url }}";
+      {% else %}
+        // If no image, show the initial avatar and hide the image
+        if (avatarInitial) {
+          avatarInitial.classList.remove('d-none');
+          accountUserImage.classList.add('d-none');
+        } else {
+          // Fallback to default image if avatar initial doesn't exist
+          accountUserImage.src = "{% static 'img/avatars/default.png' %}";
+        }
+      {% endif %}
+    };
+  }
+});
+</script>
+{% endblock page_js %}

@@ -1,0 +1,130 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}User Roles{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+  <a href="{% url 'dashboards:overview' %}">Home</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:user_list' %}">User Management</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'account:user_detail' user_obj.id %}">User Details</a>
+</li>
+<li class="breadcrumb-item active">Roles</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="py-3 mb-4">
+    <span class="text-muted fw-light">User Management / {{ user_obj.username }} /</span> Roles
+  </h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card mb-4">
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+          <span>Current Roles</span>
+          <a href="{% url 'account:user_role_add' user_obj.id %}" class="btn btn-primary btn-sm">
+            <i class="ti ti-plus me-1"></i> Add Role
+          </a>
+        </h5>
+        <div class="table-responsive text-nowrap">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Description</th>
+                <th>Permissions</th>
+                <th>Assigned On</th>
+                <th>Assigned By</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              {% for user_role in user_roles %}
+              <tr>
+                <td>
+                  <a href="{% url 'account:role_detail' user_role.role.id %}">{{ user_role.role.name }}</a>
+                </td>
+                <td>{{ user_role.role.description|truncatechars:50 }}</td>
+                <td>
+                  <span class="badge bg-label-primary">{{ user_role.role.permissions.count }} permissions</span>
+                </td>
+                <td>{{ user_role.assigned_at|date:"d M Y" }}</td>
+                <td>
+                  {% if user_role.assigned_by %}
+                  <a href="{% url 'account:user_detail' user_role.assigned_by.id %}">{{ user_role.assigned_by.username }}</a>
+                  {% else %}
+                  <span class="text-muted">System</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'account:user_role_remove' user_obj.id user_role.role.id %}" class="btn btn-sm btn-danger">
+                    <i class="ti ti-trash me-1"></i> Remove
+                  </a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center py-3">
+                  <p class="mb-0">User has no roles assigned.</p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      {% if available_roles %}
+      <div class="card">
+        <h5 class="card-header">Available Roles</h5>
+        <div class="table-responsive text-nowrap">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Description</th>
+                <th>Permissions</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+              {% for role in available_roles %}
+              <tr>
+                <td>
+                  <a href="{% url 'account:role_detail' role.id %}">{{ role.name }}</a>
+                </td>
+                <td>{{ role.description|truncatechars:50 }}</td>
+                <td>
+                  <span class="badge bg-label-primary">{{ role.permissions.count }} permissions</span>
+                </td>
+                <td>
+                  <form method="post" action="{% url 'account:user_role_add' user_obj.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="role_id" value="{{ role.id }}">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                      <i class="ti ti-plus me-1"></i> Assign
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+      
+      <div class="mt-4 text-end">
+        <a href="{% url 'account:user_detail' user_obj.id %}" class="btn btn-secondary">
+          <i class="ti ti-arrow-left me-1"></i> Back to User Details
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
