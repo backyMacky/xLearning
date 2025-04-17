@@ -1,0 +1,543 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Booking Dashboard - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+
+<!-- Overview Cards -->
+<div class="row">
+  {% if is_teacher %}
+  <!-- Teacher Stats -->
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-label-primary rounded">
+              <i class="ti ti-calendar-time ti-md"></i>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-sm p-0" type="button" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
+            <div class="dropdown-menu dropdown-menu-end">
+              <a href="{% url 'booking:create_slot' %}" class="dropdown-item">Create New Slot</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-info mt-4 pt-1">
+          <h5 class="mb-2">{{ total_slots }}</h5>
+          <p class="mb-0">Total Booking Slots</p>
+          <small class="text-muted">All time</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-label-success rounded">
+              <i class="ti ti-calendar-check ti-md"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-info mt-4 pt-1">
+          <h5 class="mb-2">{{ available_slots.count }}</h5>
+          <p class="mb-0">Available Slots</p>
+          <small class="text-muted">Upcoming</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-label-warning rounded">
+              <i class="ti ti-calendar-event ti-md"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-info mt-4 pt-1">
+          <h5 class="mb-2">{{ total_booked }}</h5>
+          <p class="mb-0">Booked Sessions</p>
+          <small class="text-muted">All time</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-label-info rounded">
+              <i class="ti ti-calendar-stats ti-md"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-info mt-4 pt-1">
+          <h5 class="mb-2">{{ total_completed }}</h5>
+          <p class="mb-0">Completed Sessions</p>
+          <small class="text-muted">All time</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- Student Stats -->
+  <div class="col-lg-4 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-label-primary rounded">
+              <i class="ti ti-calendar-time ti-md"></i>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-sm p-0" type="button" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
+            <div class="dropdown-menu dropdown-menu-end">
+              <a href=" " class="dropdown-item">View Available Slots</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-info mt-4 pt-1">
+          <h5 class="mb-2">{{ my_bookings.count }}</h5>
+          <p class="mb-0">Total Bookings</p>
+          <small class="text-muted">All time</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-label-success rounded">
+              <i class="ti ti-calendar-check ti-md"></i>
+            </div>
+          </div>
+        </div>
+        <div class="card-info mt-4 pt-1">
+          <h5 class="mb-2">{{ upcoming_sessions }}</h5>
+          <p class="mb-0">Upcoming Sessions</p>
+          <small class="text-muted">Booked</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-label-info rounded">
+              <i class="ti ti-credit-card ti-md"></i>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-sm p-0" type="button" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
+            <div class="dropdown-menu dropdown-menu-end">
+              <a href="{% url 'booking:purchase_credits' %}" class="dropdown-item">Buy Credits</a>
+              <a href="{% url 'booking:transaction_history' %}" class="dropdown-item">View Transactions</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-info mt-4 pt-1">
+          <h5 class="mb-2">{{ credit_balance }}</h5>
+          <p class="mb-0">Credit Balance</p>
+          <small class="text-muted">Available for booking</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% if is_teacher %}
+<!-- Teacher Booking Interface -->
+<div class="row">
+  <!-- Create Slot Button -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Manage Your Booking Slots</h5>
+        <a href="{% url 'booking:create_slot' %}" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i> Create Booking Slot
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Available Slots -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Available Slots</h5>
+      </div>
+      <div class="card-body">
+        {% if available_slots %}
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for slot in available_slots %}
+                  <tr>
+                    <td>{{ slot.start_time|date:"M d, Y" }}</td>
+                    <td>{{ slot.start_time|date:"h:i A" }}</td>
+                    <td>{{ slot.duration }} minutes</td>
+                    <td>
+                      <span class="badge bg-label-success">Available</span>
+                    </td>
+                    <td>
+                      <div class="d-flex">
+                        <a href="{% url 'booking:cancel_booking' slot_id=slot.id %}" class="btn btn-sm btn-outline-danger">
+                          <i class="ti ti-trash me-1"></i> Delete
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="mb-3">
+              <i class="ti ti-calendar-off ti-3x text-muted"></i>
+            </div>
+            <h6 class="mb-1">No available slots</h6>
+            <p class="mb-3">You don't have any available booking slots.</p>
+            <a href="{% url 'booking:create_slot' %}" class="btn btn-primary">Create New Slot</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Booked Slots -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Booked Sessions</h5>
+      </div>
+      <div class="card-body">
+        {% if booked_slots %}
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Duration</th>
+                  <th>Student</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for slot in booked_slots %}
+                  <tr>
+                    <td>{{ slot.start_time|date:"M d, Y" }}</td>
+                    <td>{{ slot.start_time|date:"h:i A" }}</td>
+                    <td>{{ slot.duration }} minutes</td>
+                    <td>{{ slot.student.username }}</td>
+                    <td>
+                      <span class="badge bg-label-primary">Booked</span>
+                    </td>
+                    <td>
+                      <div class="d-flex">
+                        {% if slot.meeting %}
+                          <a href="{{ slot.meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary me-2">
+                            <i class="ti ti-video me-1"></i> Join
+                          </a>
+                        {% endif %}
+                        <a href="{% url 'booking:cancel_booking' slot_id=slot.id %}" class="btn btn-sm btn-outline-danger">
+                          <i class="ti ti-x me-1"></i> Cancel
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="mb-3">
+              <i class="ti ti-calendar-off ti-3x text-muted"></i>
+            </div>
+            <h6 class="mb-1">No booked sessions</h6>
+            <p class="mb-4">You don't have any booked sessions at the moment.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Completed & Cancelled Slots -->
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Completed Sessions</h5>
+      </div>
+      <div class="card-body">
+        {% if completed_slots %}
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Student</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for slot in completed_slots %}
+                  <tr>
+                    <td>{{ slot.start_time|date:"M d, Y h:i A" }}</td>
+                    <td>{{ slot.student.username }}</td>
+                    <td>{{ slot.duration }} minutes</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="mb-3">
+              <i class="ti ti-calendar-off ti-3x text-muted"></i>
+            </div>
+            <h6 class="mb-1">No completed sessions</h6>
+            <p class="mb-0">Your completed sessions will appear here.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Cancelled Sessions</h5>
+      </div>
+      <div class="card-body">
+        {% if cancelled_slots %}
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Student</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for slot in cancelled_slots %}
+                  <tr>
+                    <td>{{ slot.start_time|date:"M d, Y h:i A" }}</td>
+                    <td>{{ slot.student.username|default:"N/A" }}</td>
+                    <td>{{ slot.duration }} minutes</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="mb-3">
+              <i class="ti ti-calendar-off ti-3x text-muted"></i>
+            </div>
+            <h6 class="mb-1">No cancelled sessions</h6>
+            <p class="mb-0">Your cancelled sessions will appear here.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% else %}
+<!-- Student Booking Interface -->
+<div class="row">
+  <!-- My Bookings -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">My Bookings</h5>
+        <div>
+          <a href="{% url 'booking:purchase_credits' %}" class="btn btn-primary me-2">
+            <i class="ti ti-credit-card me-1"></i> Purchase Credits
+          </a>
+          <a href="{% url 'booking:transaction_history' %}" class="btn btn-outline-secondary">
+            <i class="ti ti-history me-1"></i> Transaction History
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        {% if my_bookings %}
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Teacher</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for slot in my_bookings %}
+                  <tr>
+                    <td>{{ slot.start_time|date:"M d, Y" }}</td>
+                    <td>{{ slot.start_time|date:"h:i A" }}</td>
+                    <td>{{ slot.teacher.username }}</td>
+                    <td>{{ slot.duration }} minutes</td>
+                    <td>
+                      <span class="badge bg-label-{{ slot.status|lower|slugify }}">
+                        {{ slot.status|title }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="d-flex">
+                        {% if slot.status == 'booked' %}
+                          {% if slot.meeting %}
+                            <a href="{{ slot.meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary me-2">
+                              <i class="ti ti-video me-1"></i> Join
+                            </a>
+                          {% endif %}
+                          
+                          {% if slot.start_time|date:"U"|add:"0" > now|date:"U"|add:"86400" %}
+                            <a href="{% url 'booking:cancel_booking' slot_id=slot.id %}" class="btn btn-sm btn-outline-danger">
+                              <i class="ti ti-x me-1"></i> Cancel
+                            </a>
+                          {% endif %}
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="mb-3">
+              <i class="ti ti-calendar-off ti-3x text-muted"></i>
+            </div>
+            <h6 class="mb-1">No bookings yet</h6>
+            <p class="mb-3">You haven't booked any sessions yet.</p>
+            <a href="" class="btn btn-primary">Browse Available Slots</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Available Slots -->
+  <div class="col-12 mb-4" id="availableSlots">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Available Booking Slots</h5>
+      </div>
+      <div class="card-body">
+        {% if available_slots %}
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Teacher</th>
+                  <th>Duration</th>
+                  <th>Price</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for slot in available_slots %}
+                  <tr>
+                    <td>{{ slot.start_time|date:"M d, Y" }}</td>
+                    <td>{{ slot.start_time|date:"h:i A" }}</td>
+                    <td>{{ slot.teacher.username }}</td>
+                    <td>{{ slot.duration }} minutes</td>
+                    <td>1 credit</td>
+                    <td>
+                      <div class="d-flex">
+                        <a href="{% url 'booking:book_slot' slot_id=slot.id %}" class="btn btn-sm btn-primary">
+                          <i class="ti ti-calendar-plus me-1"></i> Book Session
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="mb-3">
+              <i class="ti ti-calendar-off ti-3x text-muted"></i>
+            </div>
+            <h6 class="mb-1">No available slots</h6>
+            <p class="mb-0">There are no available booking slots at the moment.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTables
+    $('.table').DataTable({
+      responsive: true,
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 10,
+      order: [[0, 'asc']],
+      language: {
+        searchPlaceholder: 'Search...',
+        search: ''
+      }
+    });
+  });
+</script>
+{% endblock %}

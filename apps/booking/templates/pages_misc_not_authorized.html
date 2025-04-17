@@ -1,0 +1,24 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Not Authorized - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="container-xxl container-p-y">
+  <div class="misc-wrapper">
+    <h2 class="mb-2 mx-2">You are not authorized!</h2>
+    <p class="mb-4 mx-2">You don't have permission to access this page</p>
+    <a href="/" class="btn btn-primary">Back to home</a>
+    <div class="mt-5">
+      <img src="{% static 'img/illustrations/girl-doing-yoga-light.png' %}" alt="page-misc-not-authorized" width="500" class="img-fluid">
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/css/pages/page-misc.css' %}">
+{% endblock vendor_css %}

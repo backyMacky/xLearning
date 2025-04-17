@@ -1,0 +1,89 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Create Booking Slot - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-lg-6 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Create New Booking Slot</h5>
+        <a href="{% url 'booking:dashboard' %}" class="btn btn-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="start_time" class="form-label">Date and Time</label>
+            <input type="text" class="form-control flatpickr-date-time" id="start_time" name="start_time" placeholder="YYYY-MM-DD HH:MM" required />
+            <div class="form-text">Select the date and time when your session will start.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <select class="form-select" id="duration" name="duration" required>
+              <option value="">Select duration</option>
+              <option value="30">30 minutes</option>
+              <option value="45">45 minutes</option>
+              <option value="60" selected>1 hour</option>
+              <option value="90">1.5 hours</option>
+              <option value="120">2 hours</option>
+            </select>
+            <div class="form-text">How long will the session last?</div>
+          </div>
+          
+          <div class="mb-3 mt-4">
+            <div class="alert alert-info">
+              <div class="d-flex">
+                <i class="ti ti-info-circle me-2 mt-1"></i>
+                <div>
+                  <h6 class="alert-heading mb-1">Important Information</h6>
+                  <p class="mb-0">
+                    Once created, this slot will be available for students to book. Students will pay 1 credit to book this session.
+                    You can delete the slot before it's booked.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">
+            <i class="ti ti-calendar-plus me-1"></i> Create Booking Slot
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize flatpickr for date-time input
+    flatpickr(".flatpickr-date-time", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      minDate: "today",
+      time_24hr: true
+    });
+  });
+</script>
+{% endblock %}

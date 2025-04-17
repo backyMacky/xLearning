@@ -118,19 +118,31 @@
           "url": "/meetings/calendar/",
           "external": true,
           "name": "My Schedule",
-          "slug": "meetings-schedule"
+          "slug": "meetings-calendar"
         },
         {
-          "url": "/meetings/sessions/",
+          "url": "/meetings/",
           "external": true,
-          "name": "Live Sessions",
-          "slug": "meetings-sessions"
+          "name": "All Meetings",
+          "slug": "meetings-list"
+        },
+        {
+          "url": "/meetings/create/",
+          "external": true,
+          "name": "Create Meeting",
+          "slug": "create-meeting"
         },
         {
           "url": "/meetings/availability/",
           "external": true,
+          "name": "My Availability",
+          "slug": "availability-list"
+        },
+        {
+          "url": "/meetings/availability/create/",
+          "external": true,
           "name": "Set Availability",
-          "slug": "meetings-availability"
+          "slug": "create-availability"
         }
       ]
     },
@@ -140,27 +152,27 @@
       "slug": "booking",
       "submenu": [
         {
-          "url": "/booking/slots/",
+          "url": "/booking/",
           "external": true,
-          "name": "Available Slots",
-          "slug": "booking-slots"
+          "name": "Dashboard",
+          "slug": "booking-dashboard"
         },
         {
-          "url": "/booking/create/",
+          "url": "/booking/slots/create/",
           "external": true,
           "name": "Create Slots",
           "slug": "booking-create"
         },
         {
-          "url": "/booking/credits/",
+          "url": "/booking/credits/purchase/",
           "external": true,
-          "name": "My Credits",
+          "name": "Purchase Credits",
           "slug": "booking-credits"
         },
         {
-          "url": "/booking/transactions/",
+          "url": "/booking/credits/history/",
           "external": true,
-          "name": "Transactions",
+          "name": "Transaction History",
           "slug": "booking-transactions"
         }
       ]

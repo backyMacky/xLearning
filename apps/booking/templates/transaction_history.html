@@ -1,0 +1,185 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Transaction History - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Credit Transaction History</h5>
+        <div>
+          <a href="{% url 'booking:purchase_credits' %}" class="btn btn-primary me-2">
+            <i class="ti ti-credit-card me-1"></i> Purchase Credits
+          </a>
+          <a href="{% url 'booking:dashboard' %}" class="btn btn-secondary">
+            <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="card shadow-none bg-label-primary h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="avatar me-2">
+                      <div class="avatar-initial rounded bg-label-primary">
+                        <i class="ti ti-wallet ti-md"></i>
+                      </div>
+                    </div>
+                    <span>Credit Balance</span>
+                  </div>
+                  <h4 class="mb-1">{{ balance }}</h4>
+                  <span>Available credits</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-8">
+              <div class="row g-3">
+                <!-- Count purchases -->
+                {% with purchase_count=0 %}
+                  {% for transaction in transactions %}
+                    {% if transaction.transaction_type == 'purchase' %}
+                      {% with purchase_count=purchase_count|add:1 %}{% endwith %}
+                    {% endif %}
+                  {% endfor %}
+                  
+                  <div class="col-sm-6">
+                    <div class="card shadow-none bg-label-success h-100">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                          <div class="avatar me-2">
+                            <div class="avatar-initial rounded bg-label-success">
+                              <i class="ti ti-credit-card ti-md"></i>
+                            </div>
+                          </div>
+                          <span>Purchased</span>
+                        </div>
+                        <h4 class="mb-1">{{ purchase_count }}</h4>
+                        <span>Total purchases</span>
+                      </div>
+                    </div>
+                  </div>
+                {% endwith %}
+                
+                <!-- Count bookings -->
+                {% with booking_count=0 %}
+                  {% for transaction in transactions %}
+                    {% if transaction.transaction_type == 'deduction' %}
+                      {% with booking_count=booking_count|add:1 %}{% endwith %}
+                    {% endif %}
+                  {% endfor %}
+                  
+                  <div class="col-sm-6">
+                    <div class="card shadow-none bg-label-warning h-100">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                          <div class="avatar me-2">
+                            <div class="avatar-initial rounded bg-label-warning">
+                              <i class="ti ti-calendar-event ti-md"></i>
+                            </div>
+                          </div>
+                          <span>Bookings</span>
+                        </div>
+                        <h4 class="mb-1">{{ booking_count }}</h4>
+                        <span>Sessions booked</span>
+                      </div>
+                    </div>
+                  </div>
+                {% endwith %}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {% if transactions %}
+          <div class="table-responsive">
+            <table class="table table-bordered" id="transactions-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for transaction in transactions %}
+                  <tr>
+                    <td>{{ transaction.created_at|date:"M d, Y h:i A" }}</td>
+                    <td>
+                      {% if transaction.transaction_type == 'purchase' %}
+                        <span class="badge bg-label-success">Purchase</span>
+                      {% elif transaction.transaction_type == 'deduction' %}
+                        <span class="badge bg-label-warning">Booking</span>
+                      {% elif transaction.transaction_type == 'refund' %}
+                        <span class="badge bg-label-info">Refund</span>
+                      {% elif transaction.transaction_type == 'bonus' %}
+                        <span class="badge bg-label-primary">Bonus</span>
+                      {% endif %}
+                    </td>
+                    <td>{{ transaction.description }}</td>
+                    <td>
+                      {% if transaction.transaction_type == 'purchase' or transaction.transaction_type == 'refund' or transaction.transaction_type == 'bonus' %}
+                        <span class="text-success">+{{ transaction.amount }}</span>
+                      {% else %}
+                        <span class="text-danger">-{{ transaction.amount }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <div class="mb-3">
+              <i class="ti ti-history ti-3x text-muted"></i>
+            </div>
+            <h6 class="mb-1">No transactions yet</h6>
+            <p class="mb-3">You haven't made any credit transactions yet.</p>
+            <a href="{% url 'booking:purchase_credits' %}" class="btn btn-primary">Purchase Credits</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTables
+    if (document.getElementById('transactions-table')) {
+      $('#transactions-table').DataTable({
+        responsive: true,
+        order: [[0, 'desc']], // Sort by date descending
+        pageLength: 10,
+        language: {
+          searchPlaceholder: 'Search transactions...',
+          search: ''
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Book Session - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-lg-6 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Book Learning Session</h5>
+        <a href="{% url 'booking:dashboard' %}" class="btn btn-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <div class="alert alert-primary">
+            <div class="d-flex">
+              <i class="ti ti-info-circle me-2 mt-1"></i>
+              <div>
+                <h6 class="alert-heading mb-1">Session Details</h6>
+                <p class="mb-0">
+                  You are about to book a session with <strong>{{ slot.teacher.username }}</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <div class="table-responsive">
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <th class="ps-0" width="30%">Date:</th>
+                  <td>{{ slot.start_time|date:"l, F j, Y" }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Time:</th>
+                  <td>{{ slot.start_time|date:"h:i A" }}</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Duration:</th>
+                  <td>{{ slot.duration }} minutes</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Cost:</th>
+                  <td>1 credit</td>
+                </tr>
+                <tr>
+                  <th class="ps-0">Your Balance:</th>
+                  <td>
+                    {% if credit_balance >= 1 %}
+                    <span class="badge bg-label-success">{{ credit_balance }} credits</span>
+                    {% else %}
+                    <span class="badge bg-label-danger">{{ credit_balance }} credits</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        {% if credit_balance < 1 %}
+        <div class="mb-4">
+          <div class="alert alert-danger">
+            <div class="d-flex">
+              <i class="ti ti-alert-triangle me-2 mt-1"></i>
+              <div>
+                <h6 class="alert-heading mb-1">Insufficient Credits</h6>
+                <p class="mb-0">
+                  You don't have enough credits to book this session. Please purchase more credits.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <a href="{% url 'booking:purchase_credits' %}" class="btn btn-primary">
+            <i class="ti ti-credit-card me-1"></i> Purchase Credits
+          </a>
+        </div>
+        {% else %}
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-4">
+            <div class="alert alert-warning">
+              <div class="d-flex">
+                <i class="ti ti-alert-circle me-2 mt-1"></i>
+                <div>
+                  <h6 class="alert-heading mb-1">Booking Confirmation</h6>
+                  <p class="mb-0">
+                    By confirming this booking, 1 credit will be deducted from your account.
+                    You can cancel this booking up to 24 hours before the scheduled time to receive a refund.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-calendar-plus me-1"></i> Confirm Booking
+            </button>
+          </div>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Insufficient Credits - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-lg-6 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Insufficient Credits</h5>
+        <a href="{% url 'booking:dashboard' %}" class="btn btn-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+      <div class="card-body text-center py-5">
+        <div class="mb-4">
+          <div class="avatar avatar-lg mb-3">
+            <div class="avatar-initial rounded-circle bg-label-danger">
+              <i class="ti ti-credit-card-off ti-lg"></i>
+            </div>
+          </div>
+          <h4 class="mb-2">Insufficient Credits</h4>
+          <p class="mb-4">You don't have enough credits to book this session. Please purchase more credits to continue.</p>
+        </div>
+        
+        <div class="d-flex justify-content-center gap-3">
+          <a href="{% url 'booking:purchase_credits' %}" class="btn btn-primary">
+            <i class="ti ti-credit-card me-1"></i> Purchase Credits
+          </a>
+          <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">About Credits</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <h6>What are credits?</h6>
+          <p>Credits are the currency used to book sessions with teachers on the Learning Platform. Each credit typically allows you to book one session.</p>
+        </div>
+        
+        <div class="mb-3">
+          <h6>How to get more credits?</h6>
+          <p>You can purchase credits through our secure payment system. We offer various credit packages to suit your needs.</p>
+        </div>
+        
+        <div>
+          <h6>Refund policy</h6>
+          <p>If you cancel a session more than 24 hours before the scheduled time, the credit will be refunded to your account. Late cancellations do not qualify for refunds.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

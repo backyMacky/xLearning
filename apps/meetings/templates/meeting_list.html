@@ -1,0 +1,214 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Meetings - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">My Meetings</h5>
+    {% if request.user.is_teacher %}
+    <div>
+      <a href="{% url 'meetings:create_meeting' %}" class="btn btn-primary">
+        <i class="ti ti-plus me-1"></i> Schedule Meeting
+      </a>
+      <a href="{% url 'meetings:calendar' %}" class="btn btn-outline-primary ms-2">
+        <i class="ti ti-calendar me-1"></i> View Calendar
+      </a>
+    </div>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item">
+        <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#upcoming-meetings" aria-controls="upcoming-meetings" aria-selected="true">
+          Upcoming Meetings
+        </button>
+      </li>
+      <li class="nav-item">
+        <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#past-meetings" aria-controls="past-meetings" aria-selected="false">
+          Past Meetings
+        </button>
+      </li>
+    </ul>
+    
+    <div class="tab-content">
+      <!-- Upcoming Meetings Tab -->
+      <div class="tab-pane fade show active" id="upcoming-meetings" role="tabpanel">
+        {% if upcoming_meetings %}
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover meetings-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  {% if request.user.is_teacher %}
+                    <th>Students</th>
+                  {% else %}
+                    <th>Teacher</th>
+                  {% endif %}
+                  <th>Duration</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for meeting in upcoming_meetings %}
+                  <tr>
+                    <td>{{ meeting.title }}</td>
+                    <td>{{ meeting.start_time|date:"M d, Y" }}</td>
+                    <td>{{ meeting.start_time|date:"h:i A" }}</td>
+                    {% if request.user.is_teacher %}
+                      <td>{{ meeting.students.count }}</td>
+                    {% else %}
+                      <td>{{ meeting.teacher.username }}</td>
+                    {% endif %}
+                    <td>{{ meeting.duration }} minutes</td>
+                    <td>
+                      <div class="d-flex">
+                        <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-sm btn-icon btn-primary me-1">
+                          <i class="ti ti-eye"></i>
+                        </a>
+                        
+                        {% if request.user.is_teacher and meeting.teacher == request.user %}
+                          <a href="{% url 'meetings:edit_meeting' meeting_id=meeting.id %}" class="btn btn-sm btn-icon btn-info me-1">
+                            <i class="ti ti-edit"></i>
+                          </a>
+                          <a href="{% url 'meetings:cancel_meeting' meeting_id=meeting.id %}" class="btn btn-sm btn-icon btn-danger">
+                            <i class="ti ti-trash"></i>
+                          </a>
+                        {% endif %}
+                        
+                        {% if meeting.start_time|date:"U"|add:"0" < now|date:"U"|add:"300" %}
+                          <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-success ms-1">
+                            <i class="ti ti-video me-1"></i> Join
+                          </a>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center p-5">
+            <div class="mb-3">
+              <i class="ti ti-calendar-off ti-3x text-primary opacity-50"></i>
+            </div>
+            <h5>No upcoming meetings</h5>
+            <p class="mb-4">You don't have any scheduled meetings yet.</p>
+            {% if request.user.is_teacher %}
+              <a href="{% url 'meetings:create_meeting' %}" class="btn btn-primary">
+                <i class="ti ti-plus me-1"></i> Schedule Meeting
+              </a>
+            {% else %}
+              <a href="{% url 'booking:dashboard' %}" class="btn btn-primary">
+                <i class="ti ti-calendar-plus me-1"></i> Book a Session
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Past Meetings Tab -->
+      <div class="tab-pane fade" id="past-meetings" role="tabpanel">
+        {% if past_meetings %}
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover meetings-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  {% if request.user.is_teacher %}
+                    <th>Students</th>
+                  {% else %}
+                    <th>Teacher</th>
+                  {% endif %}
+                  <th>Duration</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for meeting in past_meetings %}
+                  <tr>
+                    <td>{{ meeting.title }}</td>
+                    <td>{{ meeting.start_time|date:"M d, Y" }}</td>
+                    <td>{{ meeting.start_time|date:"h:i A" }}</td>
+                    {% if request.user.is_teacher %}
+                      <td>{{ meeting.students.count }}</td>
+                    {% else %}
+                      <td>{{ meeting.teacher.username }}</td>
+                    {% endif %}
+                    <td>{{ meeting.duration }} minutes</td>
+                    <td>
+                      <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-sm btn-icon btn-primary">
+                        <i class="ti ti-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center p-5">
+            <div class="mb-3">
+              <i class="ti ti-history ti-3x text-primary opacity-50"></i>
+            </div>
+            <h5>No past meetings</h5>
+            <p>Your completed meetings will appear here.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if request.user.is_teacher %}
+<!-- Quick Link to Availability -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Availability Management</h5>
+  </div>
+  <div class="card-body">
+    <p>Manage your availability slots to let students know when you're available for bookings.</p>
+    <a href="{% url 'meetings:availability_list' %}" class="btn btn-primary">
+      <i class="ti ti-clock me-1"></i> Manage Availability
+    </a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTables
+    $('.meetings-table').DataTable({
+      responsive: true,
+      lengthMenu: [5, 10, 25, 50],
+      pageLength: 10,
+      language: {
+        searchPlaceholder: 'Search meetings...',
+        search: ''
+      }
+    });
+  });
+</script>
+{% endblock %}
