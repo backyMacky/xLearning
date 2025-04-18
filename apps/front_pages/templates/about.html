@@ -1,0 +1,289 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}About xLearning - Modern Platform for Language Teachers{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Hero Section -->
+  <section class="section-py landing-hero">
+    <div class="text-center mb-4">
+      <span class="badge bg-label-primary">Our Story</span>
+    </div>
+    <h3 class="text-center mb-2">
+      <span class="position-relative fw-extrabold z-1">About xLearning
+        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="about icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
+      </span>
+    </h3>
+    <p class="text-center mb-5">Empowering language teachers with innovative tools to create engaging learning experiences.</p>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="section-py">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="pe-lg-5">
+          <h3 class="mb-4">Our Mission</h3>
+          <p class="mb-4">At xLearning, we're dedicated to revolutionizing language education by providing teachers with powerful tools to enhance their teaching effectiveness and student engagement.</p>
+          <p class="mb-4">We believe that every language teacher deserves access to modern, intuitive tools that make their work more efficient and their students' learning more effective.</p>
+          <div class="d-flex align-items-center mb-4">
+            <div class="badge bg-label-primary rounded p-2 me-3">
+              <i class="ti ti-check ti-lg"></i>
+            </div>
+            <div>
+              <h6 class="mb-0">Innovative Teaching Tools</h6>
+              <p class="mb-0">State-of-the-art features designed specifically for language education</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-center mb-4">
+            <div class="badge bg-label-primary rounded p-2 me-3">
+              <i class="ti ti-check ti-lg"></i>
+            </div>
+            <div>
+              <h6 class="mb-0">Student Success</h6>
+              <p class="mb-0">Comprehensive tracking and assessment tools to monitor progress</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="badge bg-label-primary rounded p-2 me-3">
+              <i class="ti ti-check ti-lg"></i>
+            </div>
+            <div>
+              <h6 class="mb-0">Teacher Support</h6>
+              <p class="mb-0">Dedicated support team and resources to help you succeed</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 mt-5 mt-lg-0">
+        <img src="{% static 'img/front-pages/landing-page/learning.jpg' %}" alt="Language Learning" class="img-fluid rounded shadow-lg" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="section-py bg-body">
+    <div class="text-center mb-4">
+      <span class="badge bg-label-primary">Our Values</span>
+    </div>
+    <h3 class="text-center mb-2">
+      <span class="position-relative fw-extrabold z-1">What We Stand For
+        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="values icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
+      </span>
+    </h3>
+    <div class="row g-4 mt-5">
+      <div class="col-lg-4 col-sm-6">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <div class="badge bg-label-primary rounded p-2 mb-4">
+              <i class="ti ti-heart ti-lg"></i>
+            </div>
+            <h5 class="mb-2">Passion for Education</h5>
+            <p class="mb-0">We're driven by a deep commitment to improving language education through technology.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-sm-6">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <div class="badge bg-label-primary rounded p-2 mb-4">
+              <i class="ti ti-bulb ti-lg"></i>
+            </div>
+            <h5 class="mb-2">Innovation</h5>
+            <p class="mb-0">We continuously evolve our platform to meet the changing needs of language teachers.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-sm-6">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <div class="badge bg-label-primary rounded p-2 mb-4">
+              <i class="ti ti-users ti-lg"></i>
+            </div>
+            <h5 class="mb-2">Community</h5>
+            <p class="mb-0">We foster a supportive community where teachers can share resources and best practices.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline Section -->
+  <section class="section-py">
+    <div class="text-center mb-4">
+      <span class="badge bg-label-primary">Our Journey</span>
+    </div>
+    <h3 class="text-center mb-2">
+      <span class="position-relative fw-extrabold z-1">How We Got Here
+        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="journey icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
+      </span>
+    </h3>
+    <p class="text-center mb-5">The story of xLearning's development and growth</p>
+
+    <div class="timeline pb-0">
+      <div class="timeline-item">
+        <span class="timeline-indicator timeline-indicator-primary">
+          <i class="ti ti-rocket"></i>
+        </span>
+        <div class="timeline-event">
+          <div class="timeline-header">
+            <h6 class="mb-0">Founded</h6>
+            <span class="text-muted">2020</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 pt-3">
+            <p>xLearning was founded by a team of language teachers and tech experts who saw a gap in the educational technology market.</p>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-indicator timeline-indicator-success">
+          <i class="ti ti-code"></i>
+        </span>
+        <div class="timeline-event">
+          <div class="timeline-header">
+            <h6 class="mb-0">Beta Launch</h6>
+            <span class="text-muted">2021</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 pt-3">
+            <p>Our first version was launched to a select group of language teachers who provided invaluable feedback for improvement.</p>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-indicator timeline-indicator-info">
+          <i class="ti ti-users"></i>
+        </span>
+        <div class="timeline-event">
+          <div class="timeline-header">
+            <h6 class="mb-0">1,000 Users</h6>
+            <span class="text-muted">2022</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 pt-3">
+            <p>We reached our first major milestone of 1,000 active teachers using the platform to manage their language classes.</p>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-indicator timeline-indicator-warning">
+          <i class="ti ti-award"></i>
+        </span>
+        <div class="timeline-event">
+          <div class="timeline-header">
+            <h6 class="mb-0">EdTech Award</h6>
+            <span class="text-muted">2023</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 pt-3">
+            <p>xLearning won the prestigious EdTech Breakthrough Award for "Best Language Learning Platform".</p>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-indicator timeline-indicator-primary">
+          <i class="ti ti-world"></i>
+        </span>
+        <div class="timeline-event">
+          <div class="timeline-header">
+            <h6 class="mb-0">Global Expansion</h6>
+            <span class="text-muted">2024</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 pt-3">
+            <p>We expanded to support teachers in over 50 countries and added support for 15 languages.</p>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-indicator timeline-indicator-success">
+          <i class="ti ti-stars"></i>
+        </span>
+        <div class="timeline-event">
+          <div class="timeline-header">
+            <h6 class="mb-0">Today</h6>
+            <span class="text-muted">2025</span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 pt-3">
+            <p>Now serving over 2,000 language teachers worldwide, with continued innovation and growth on the horizon.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="section-py bg-body">
+    <div class="text-center mb-4">
+      <span class="badge bg-label-primary">Our Team</span>
+    </div>
+    <h3 class="text-center mb-2">
+      <span class="position-relative fw-extrabold z-1">Meet the Team
+        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="team icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
+      </span>
+    </h3>
+    <p class="text-center mb-5">A diverse team of educators, developers, and language enthusiasts working together to transform language education.</p>
+    <div class="row g-4">
+      <div class="col-lg-3 col-sm-6">
+        <div class="card">
+          <div class="card-body text-center">
+            <img src="{% static 'img/avatars/1.png' %}" alt="team member" class="rounded-circle mb-4" width="100" height="100" />
+            <h5 class="mb-1">Sophie Gilbert</h5>
+            <p class="text-muted mb-0">Founder & CEO</p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <a href="#" class="btn btn-icon btn-sm btn-label-primary"><i class="ti ti-brand-linkedin ti-sm"></i></a>
+              <a href="#" class="btn btn-icon btn-sm btn-label-primary"><i class="ti ti-brand-twitter ti-sm"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="card">
+          <div class="card-body text-center">
+            <img src="{% static 'img/avatars/2.png' %}" alt="team member" class="rounded-circle mb-4" width="100" height="100" />
+            <h5 class="mb-1">Paul Miles</h5>
+            <p class="text-muted mb-0">Head of Product</p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <a href="#" class="btn btn-icon btn-sm btn-label-primary"><i class="ti ti-brand-linkedin ti-sm"></i></a>
+              <a href="#" class="btn btn-icon btn-sm btn-label-primary"><i class="ti ti-brand-twitter ti-sm"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="card">
+          <div class="card-body text-center">
+            <img src="{% static 'img/avatars/3.png' %}" alt="team member" class="rounded-circle mb-4" width="100" height="100" />
+            <h5 class="mb-1">Nannie Ford</h5>
+            <p class="text-muted mb-0">Education Director</p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <a href="#" class="btn btn-icon btn-sm btn-label-primary"><i class="ti ti-brand-linkedin ti-sm"></i></a>
+              <a href="#" class="btn btn-icon btn-sm btn-label-primary"><i class="ti ti-brand-twitter ti-sm"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="card">
+          <div class="card-body text-center">
+            <img src="{% static 'img/avatars/4.png' %}" alt="team member" class="rounded-circle mb-4" width="100" height="100" />
+            <h5 class="mb-1">Chris Watkins</h5>
+            <p class="text-muted mb-0">Technical Lead</p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+              <a href="#" class="btn btn-icon btn-sm btn-label-primary"><i class="ti ti-brand-linkedin ti-sm"></i></a>
+              <a href="#" class="btn btn-icon btn-sm btn-label-primary"><i class="ti ti-brand-twitter ti-sm"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section-py bg-body">
+    <div class="text-center">
+      <h3 class="mb-4">Ready to Transform Your Language Teaching?</h3>
+      <p class="mb-5">Join thousands of language teachers who are already using xLearning to enhance their teaching.</p>
+      <a href="{% url 'account:register' %}" class="btn btn-primary btn-lg">Start Free Trial</a>
+    </div>
+  </section>
+</div>
+{% endblock %}

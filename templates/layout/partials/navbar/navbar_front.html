@@ -179,6 +179,9 @@
             <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'front_pages:about' %}">About Us</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'blog' %}active{% endif %}" href="{% url 'front_pages:blog' %}">Blog</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'front_pages:faq' %}">FAQ</a>
           </li>
           <li class="nav-item">

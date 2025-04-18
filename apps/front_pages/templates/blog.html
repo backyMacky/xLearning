@@ -1,0 +1,434 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Language Teaching Blog - xLearning Platform{% endblock %}
+
+{% block page_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/css/pages/front-page-blog.css' %}" />
+{% endblock page_css %}
+
+{% block content %}
+<!-- Blog Header -->
+<section class="section-py bg-body first-section-pt">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="badge bg-label-primary">Blog</span>
+    </div>
+    <h3 class="text-center mb-2">
+      <span class="position-relative fw-extrabold z-1">Language Teaching Insights
+        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="blog icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
+      </span>
+    </h3>
+    <p class="text-center mb-5">Expert articles, teaching strategies, and educational resources for language educators</p>
+  </div>
+</section>
+<!-- /Blog Header -->
+
+<!-- Featured Article -->
+<section class="section-py">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="row g-0">
+            <div class="col-md-5">
+              <img class="card-img-top h-100 object-fit-cover" src="{% static 'img/front-pages/blog/effective-language-teaching.jpg' %}" alt="Effective Language Teaching">
+            </div>
+            <div class="col-md-7">
+              <div class="card-body p-4 p-lg-5">
+                <span class="badge bg-label-primary mb-3">Featured</span>
+                <h3 class="card-title mb-3">
+                  <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}" class="text-heading">Seven Effective Strategies for Modern Language Teaching</a>
+                </h3>
+                <p class="card-text mb-3">Today's language classrooms require innovative approaches that engage digital natives and accelerate learning outcomes. Research consistently demonstrates that traditional grammar-translation methods are giving way to more interactive, communicative approaches. This article explores seven evidence-based strategies that have proven particularly effective in contemporary language education settings.</p>
+                <div class="d-flex flex-wrap align-items-center mb-3">
+                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
+                    <img src="{% static 'img/avatars/8.png' %}" alt="Dr. Maria Rodriguez" class="rounded-circle me-2" width="30">
+                    <span>Dr. Maria Rodriguez</span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 12, 2025</span>
+                  </div>
+                </div>
+                <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}" class="btn btn-primary">Read Article</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /Featured Article -->
+
+<!-- Blog Categories and Filter -->
+<section class="section-py bg-body">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-9">
+        <!-- Filter Controls -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+          <div class="d-flex flex-column">
+            <h4 class="mb-2">Latest Articles</h4>
+            <p class="text-muted mb-0">Explore our collection of expert insights and practical guides</p>
+          </div>
+          <div class="d-flex align-items-center pt-3 pt-sm-0">
+            <div class="me-3">
+              <select class="form-select">
+                <option value="newest" selected>Newest</option>
+                <option value="popular">Most Popular</option>
+                <option value="trending">Trending</option>
+              </select>
+            </div>
+            <div class="input-group input-group-merge">
+              <span class="input-group-text" id="blog-search"><i class="ti ti-search"></i></span>
+              <input type="text" class="form-control" placeholder="Search articles..." aria-label="Search..." aria-describedby="blog-search" />
+            </div>
+          </div>
+        </div>
+        
+        <!-- Blog Posts -->
+        <div class="row g-4 mb-5">
+          <!-- Post 1 -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <img class="card-img-top" src="{% static 'img/front-pages/blog/technology-language-learning.jpg' %}" alt="Technology in Language Learning">
+              <div class="card-body">
+                <a href="#" class="d-block">
+                  <span class="badge bg-label-success mb-3">Technology</span>
+                </a>
+                <h4 class="card-title mb-3">
+                  <a href="{% url 'front_pages:blog-post' slug='ai-tools-language-teachers' %}" class="text-heading">10 AI Tools That Every Language Teacher Should Be Using in 2025</a>
+                </h4>
+                <p class="card-text mb-3">Artificial intelligence has revolutionized language education, offering tools that can personalize learning, provide instant feedback, and create immersive experiences. From advanced pronunciation analysis to adaptive learning systems, these technologies are reshaping how languages are taught and acquired. This comprehensive guide examines the most effective AI tools for language educators.</p>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
+                    <img src="{% static 'img/avatars/9.png' %}" alt="David Chen" class="rounded-circle me-2" width="30">
+                    <span>David Chen</span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 10, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Post 2 -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <img class="card-img-top" src="{% static 'img/front-pages/blog/cultural-immersion.jpg' %}" alt="Cultural Immersion">
+              <div class="card-body">
+                <a href="#" class="d-block">
+                  <span class="badge bg-label-info mb-3">Cultural Learning</span>
+                </a>
+                <h4 class="card-title mb-3">
+                  <a href="{% url 'front_pages:blog-post' slug='cultural-immersion-techniques' %}" class="text-heading">Cultural Immersion Techniques for Virtual Language Classrooms</a>
+                </h4>
+                <p class="card-text mb-3">Language acquisition is inseparable from cultural understanding. In virtual environments, teachers face unique challenges in creating authentic cultural experiences. This article explores innovative approaches to integrating cultural immersion into online language instruction, including virtual reality field trips, collaborative projects with native speakers, and cultural artifact analysis.</p>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
+                    <img src="{% static 'img/avatars/12.png' %}" alt="Sophie Martin" class="rounded-circle me-2" width="30">
+                    <span>Sophie Martin</span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 7, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Post 3 -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <img class="card-img-top" src="{% static 'img/front-pages/blog/assessment-strategies.jpg' %}" alt="Assessment Strategies">
+              <div class="card-body">
+                <a href="#" class="d-block">
+                  <span class="badge bg-label-warning mb-3">Assessment</span>
+                </a>
+                <h4 class="card-title mb-3">
+                  <a href="{% url 'front_pages:blog-post' slug='rethinking-language-assessment' %}" class="text-heading">Rethinking Language Assessment: Beyond Traditional Testing Methods</a>
+                </h4>
+                <p class="card-text mb-3">Traditional language tests often fail to measure communicative competence effectively. This in-depth exploration examines alternative assessment methodologies that better evaluate real-world language proficiency. From portfolio assessment to performance-based evaluation and self-assessment protocols, discover how to create more authentic and meaningful assessment experiences for language learners.</p>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
+                    <img src="{% static 'img/avatars/7.png' %}" alt="Dr. James Wilson" class="rounded-circle me-2" width="30">
+                    <span>Dr. James Wilson</span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 5, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Post 4 -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <img class="card-img-top" src="{% static 'img/front-pages/blog/neuroscience-language.jpg' %}" alt="Neuroscience of Language Learning">
+              <div class="card-body">
+                <a href="#" class="d-block">
+                  <span class="badge bg-label-danger mb-3">Research</span>
+                </a>
+                <h4 class="card-title mb-3">
+                  <a href="{% url 'front_pages:blog-post' slug='neuroscience-language-learning' %}" class="text-heading">The Neuroscience of Language Learning: Practical Applications for Teachers</a>
+                </h4>
+                <p class="card-text mb-3">Recent advances in neuroscience have transformed our understanding of how the brain acquires language. This research-based article bridges neuroscientific findings with practical classroom applications. Learn about the neural networks involved in language processing, the role of emotion in language acquisition, optimal memory formation techniques, and how to structure lessons to align with the brain's natural learning mechanisms.</p>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
+                    <img src="{% static 'img/avatars/14.png' %}" alt="Dr. Elena Kuznetsova" class="rounded-circle me-2" width="30">
+                    <span>Dr. Elena Kuznetsova</span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 2, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Post 5 -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <img class="card-img-top" src="{% static 'img/front-pages/blog/differentiated-instruction.jpg' %}" alt="Differentiated Instruction">
+              <div class="card-body">
+                <a href="#" class="d-block">
+                  <span class="badge bg-label-primary mb-3">Teaching Methods</span>
+                </a>
+                <h4 class="card-title mb-3">
+                  <a href="{% url 'front_pages:blog-post' slug='differentiated-instruction-language' %}" class="text-heading">Differentiated Instruction in the Language Classroom: Strategies for Mixed-Ability Groups</a>
+                </h4>
+                <p class="card-text mb-3">Language classrooms often contain students with vastly different proficiency levels, learning styles, and motivational factors. This comprehensive guide explores research-backed differentiation strategies that allow teachers to effectively address this diversity. From tiered assignments to flexible grouping, learn how to create an inclusive environment that challenges every student appropriately while maintaining cohesive classroom dynamics.</p>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
+                    <img src="{% static 'img/avatars/3.png' %}" alt="Michael Johnson" class="rounded-circle me-2" width="30">
+                    <span>Michael Johnson</span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>March 29, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Post 6 -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <img class="card-img-top" src="{% static 'img/front-pages/blog/pronunciation-teaching.jpg' %}" alt="Pronunciation Teaching">
+              <div class="card-body">
+                <a href="#" class="d-block">
+                  <span class="badge bg-label-success mb-3">Phonetics</span>
+                </a>
+                <h4 class="card-title mb-3">
+                  <a href="{% url 'front_pages:blog-post' slug='modern-pronunciation-teaching' %}" class="text-heading">Modern Approaches to Pronunciation Teaching: From Theory to Practice</a>
+                </h4>
+                <p class="card-text mb-3">Pronunciation instruction has evolved significantly in recent years, moving beyond drill-based methods to more holistic approaches. This article examines contemporary frameworks for teaching pronunciation, including intelligibility-based models, the integration of suprasegmental features, and technology-enhanced feedback systems. Discover practical techniques for addressing common pronunciation challenges across different language families.</p>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
+                    <img src="{% static 'img/avatars/5.png' %}" alt="Dr. Sarah Thompson" class="rounded-circle me-2" width="30">
+                    <span>Dr. Sarah Thompson</span>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>March 25, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <li class="page-item prev">
+              <a class="page-link" href="javascript:void(0);"><i class="ti ti-chevron-left ti-xs"></i></a>
+            </li>
+            <li class="page-item active">
+              <a class="page-link" href="javascript:void(0);">1</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="javascript:void(0);">2</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="javascript:void(0);">3</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="javascript:void(0);">4</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="javascript:void(0);">5</a>
+            </li>
+            <li class="page-item next">
+              <a class="page-link" href="javascript:void(0);"><i class="ti ti-chevron-right ti-xs"></i></a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      
+      <!-- Sidebar -->
+      <div class="col-lg-3">
+        <!-- Categories -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="mb-3">Categories</h5>
+            <ul class="list-unstyled mb-0">
+              <li class="mb-3">
+                <a href="#" class="d-flex align-items-center">
+                  <i class="ti ti-chevron-right me-2 text-primary"></i>
+                  <span>Teaching Methods</span>
+                  <span class="badge bg-label-primary ms-auto">14</span>
+                </a>
+              </li>
+              <li class="mb-3">
+                <a href="#" class="d-flex align-items-center">
+                  <i class="ti ti-chevron-right me-2 text-primary"></i>
+                  <span>Technology</span>
+                  <span class="badge bg-label-primary ms-auto">21</span>
+                </a>
+              </li>
+              <li class="mb-3">
+                <a href="#" class="d-flex align-items-center">
+                  <i class="ti ti-chevron-right me-2 text-primary"></i>
+                  <span>Assessment</span>
+                  <span class="badge bg-label-primary ms-auto">8</span>
+                </a>
+              </li>
+              <li class="mb-3">
+                <a href="#" class="d-flex align-items-center">
+                  <i class="ti ti-chevron-right me-2 text-primary"></i>
+                  <span>Cultural Learning</span>
+                  <span class="badge bg-label-primary ms-auto">12</span>
+                </a>
+              </li>
+              <li class="mb-3">
+                <a href="#" class="d-flex align-items-center">
+                  <i class="ti ti-chevron-right me-2 text-primary"></i>
+                  <span>Research</span>
+                  <span class="badge bg-label-primary ms-auto">7</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="d-flex align-items-center">
+                  <i class="ti ti-chevron-right me-2 text-primary"></i>
+                  <span>Teaching Tips</span>
+                  <span class="badge bg-label-primary ms-auto">18</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Popular Articles -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="mb-3">Popular Articles</h5>
+            <div class="d-flex mb-3">
+              <div class="flex-shrink-0">
+                <img src="{% static 'img/front-pages/blog/popular-1-thumb.jpg' %}" alt="popular article" class="rounded" width="60">
+              </div>
+              <div class="flex-grow-1 ms-3">
+                <a href="#" class="h6 d-block mb-0">The Future of Language Learning: Trends for 2025 and Beyond</a>
+                <small>March 15, 2025</small>
+              </div>
+            </div>
+            <div class="d-flex mb-3">
+              <div class="flex-shrink-0">
+                <img src="{% static 'img/front-pages/blog/popular-2-thumb.jpg' %}" alt="popular article" class="rounded" width="60">
+              </div>
+              <div class="flex-grow-1 ms-3">
+                <a href="#" class="h6 d-block mb-0">Teaching Heritage Languages: Strategies for Cultural Preservation</a>
+                <small>March 8, 2025</small>
+              </div>
+            </div>
+            <div class="d-flex mb-3">
+              <div class="flex-shrink-0">
+                <img src="{% static 'img/front-pages/blog/popular-3-thumb.jpg' %}" alt="popular article" class="rounded" width="60">
+              </div>
+              <div class="flex-grow-1 ms-3">
+                <a href="#" class="h6 d-block mb-0">Motivation in Language Learning: Research-Based Strategies</a>
+                <small>February 28, 2025</small>
+              </div>
+            </div>
+            <div class="d-flex">
+              <div class="flex-shrink-0">
+                <img src="{% static 'img/front-pages/blog/popular-4-thumb.jpg' %}" alt="popular article" class="rounded" width="60">
+              </div>
+              <div class="flex-grow-1 ms-3">
+                <a href="#" class="h6 d-block mb-0">Building Vocabulary Effectively: Beyond Word Lists</a>
+                <small>February 22, 2025</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Subscribe -->
+        <div class="card bg-primary text-white mb-4">
+          <div class="card-body">
+            <h5 class="text-white mb-3">Subscribe to Our Newsletter</h5>
+            <p class="mb-3">Get weekly articles, teaching resources, and research updates directly to your inbox.</p>
+            <form>
+              <div class="mb-3">
+                <input type="email" class="form-control" placeholder="Your email">
+              </div>
+              <button type="submit" class="btn btn-light w-100">Subscribe</button>
+            </form>
+          </div>
+        </div>
+        
+        <!-- Tags -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="mb-3">Popular Tags</h5>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="#" class="badge bg-label-primary">Vocabulary</a>
+              <a href="#" class="badge bg-label-primary">Grammar</a>
+              <a href="#" class="badge bg-label-primary">Speaking</a>
+              <a href="#" class="badge bg-label-primary">Listening</a>
+              <a href="#" class="badge bg-label-primary">Reading</a>
+              <a href="#" class="badge bg-label-primary">Writing</a>
+              <a href="#" class="badge bg-label-primary">Technology</a>
+              <a href="#" class="badge bg-label-primary">Assessment</a>
+              <a href="#" class="badge bg-label-primary">Blended Learning</a>
+              <a href="#" class="badge bg-label-primary">Motivation</a>
+              <a href="#" class="badge bg-label-primary">Authentic Materials</a>
+              <a href="#" class="badge bg-label-primary">Classroom Management</a>
+              <a href="#" class="badge bg-label-primary">Research</a>
+              <a href="#" class="badge bg-label-primary">Cultural Learning</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /Blog Categories and Filter -->
+
+<!-- CTA -->
+<section class="section-py bg-primary">
+  <div class="container">
+    <div class="row justify-content-center align-items-center text-center text-lg-start">
+      <div class="col-lg-8 text-white">
+        <h3 class="text-white mb-1">Want to contribute to our blog?</h3>
+        <p class="mb-0">Share your expertise with the language teaching community</p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <a href="{% url 'front_pages:contact' %}" class="btn btn-light">Contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /CTA -->
+{% endblock %}

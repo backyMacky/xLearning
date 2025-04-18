@@ -1,7 +1,7 @@
 <!-- Footer: Start -->
 <footer class="landing-footer bg-body footer-text">
   <div class="footer-top position-relative overflow-hidden z-1">
-        <img src="{% static 'img/front-pages/backgrounds/footer-bg-' %}{{ COOKIES.style|default:style }}.png" alt="footer bg" class="footer-bg banner-bg-img z-n1" data-app-light-img="front-pages/backgrounds/footer-bg-light.png" data-app-dark-img="front-pages/backgrounds/footer-bg-dark.png" />
+    <img src="{% static 'img/front-pages/backgrounds/footer-bg-' %}{{ COOKIES.style|default:style }}.png" alt="footer bg" class="footer-bg banner-bg-img z-n1" data-app-light-img="front-pages/backgrounds/footer-bg-light.png" data-app-dark-img="front-pages/backgrounds/footer-bg-dark.png" />
 
     <div class="container">
       <div class="row gx-0 gy-6 g-lg-10">
@@ -10,13 +10,13 @@
             <span class="app-brand-logo demo">
               {% include 'partials/logo.html' with height=20 bgcolor="fill: #fff;" %}
             </span>
-            <span class="app-brand-text demo footer-link fw-bold ms-2 ps-1">{% get_theme_variables 'template_name' %}</span>
+            <span class="app-brand-text demo footer-link fw-bold ms-2 ps-1">LinguaConnect</span>
           </a>
           <p class="footer-text footer-logo-description mb-6">
-            Most developer friendly & highly customisable Admin Dashboard Template.
+            Empowering language teachers with innovative tools to create engaging learning experiences and track student progress effectively.
           </p>
           <form class="footer-form">
-            <label for="footer-email" class="small">Subscribe to newsletter</label>
+            <label for="footer-email" class="small">Subscribe to our newsletter</label>
             <div class="d-flex mt-1">
               <input type="email" class="form-control rounded-0 rounded-start-bottom rounded-start-top" id="footer-email" placeholder="Your email" />
               <button type="submit" class="btn btn-primary shadow-none rounded-0 rounded-end-bottom rounded-end-top">
@@ -26,49 +26,61 @@
           </form>
         </div>
         <div class="col-lg-2 col-md-4 col-sm-6">
-          <h6 class="footer-title mb-6">Demos</h6>
+          <h6 class="footer-title mb-6">Platform</h6>
           <ul class="list-unstyled">
             <li class="mb-4">
-              <a href="../demo-1/" target="_blank" class="footer-link">Vertical Layout</a>
+              <a href" class="footer-link">Features</a>
             </li>
             <li class="mb-4">
-              <a href="../demo-5/" target="_blank" class="footer-link">Horizontal Layout</a>
+              <a href="{% url 'front_pages:pricing' %}" class="footer-link">Pricing</a>
             </li>
             <li class="mb-4">
-              <a href="../demo-2/" target="_blank" class="footer-link">Bordered Layout</a>
+              <a href="{% url 'front_pages:about' %}" class="footer-link">About Us</a>
             </li>
             <li class="mb-4">
-              <a href="../demo-3/" target="_blank" class="footer-link">Semi Dark Layout</a>
+              <a href="{% url 'front_pages:faq' %}" class="footer-link">FAQ</a>
             </li>
             <li class="mb-4">
-              <a href="../demo-4/" target="_blank" class="footer-link">Dark Layout</a>
+              <a href="{% url 'front_pages:contact' %}" class="footer-link">Contact</a>
             </li>
           </ul>
         </div>
         <div class="col-lg-2 col-md-4 col-sm-6">
-          <h6 class="footer-title mb-6">Pages</h6>
+          <h6 class="footer-title mb-6">Resources</h6>
           <ul class="list-unstyled">
             <li class="mb-4">
-              <a href="" class="footer-link">Pricing</a>
+              <a href="{% url 'front_pages:blog' %}" class="footer-link">Blog</a>
             </li>
             <li class="mb-4">
-              <a href="" class="footer-link">Payment<span class="badge rounded bg-primary ms-2">New</span></a>
+              <a href="{% url 'front_pages:help-center' %}" class="footer-link">Help Center</a>
             </li>
             <li class="mb-4">
-              <a href="" class="footer-link">Checkout</a>
+              <a href="" class="footer-link">Webinars</a>
             </li>
             <li class="mb-4">
-              <a href="" class="footer-link">Help Center</a>
+              <a href="" class="footer-link">Teaching Resources</a>
             </li>
             <li class="mb-4">
-              <a href="" target="_blank" class="footer-link">Login/Register</a>
+              <a href" class="footer-link">Community</a>
             </li>
           </ul>
         </div>
         <div class="col-lg-3 col-md-4">
-          <h6 class="footer-title mb-6">Download our app</h6>
-          <a href="javascript:void(0);" class="d-block mb-4"><img src="{% static 'img/front-pages/landing-page/apple-icon.png' %}" alt="apple icon" /></a>
-          <a href="javascript:void(0);" class="d-block"><img src="{% static 'img/front-pages/landing-page/google-play-icon.png' %}" alt="google play icon" /></a>
+          <h6 class="footer-title mb-6">Legal</h6>
+          <ul class="list-unstyled">
+            <li class="mb-4">
+              <a href="{% url 'front_pages:privacy-policy' %}" class="footer-link">Privacy Policy</a>
+            </li>
+            <li class="mb-4">
+              <a href="{% url 'front_pages:terms-of-service' %}" class="footer-link">Terms of Service</a>
+            </li>
+            <li class="mb-4">
+              <a href="" class="footer-link">Cookie Policy</a>
+            </li>
+            <li class="mb-4">
+              <a href="" class="footer-link">GDPR Compliance</a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -79,24 +91,23 @@
         <span class="footer-bottom-text">©
           <script>
           document.write(new Date().getFullYear());
-
           </script>
         </span>
-        <a href="{% get_theme_variables 'creator_url' %}" target="_blank" class="fw-medium text-white text-white">{% get_theme_variables 'creator_name' %},</a>
-        <span class="footer-bottom-text"> Made with ❤️ for a better web.</span>
+        <a href="/" class="fw-medium text-white">LinguaConnect</a>
+        <span class="footer-bottom-text"> - Empowering Language Education</span>
       </div>
       <div>
-        <a href="{% get_theme_variables 'github_url' %}" class="me-3" target="_blank">
-          <img src="{% static 'img/front-pages/icons/github.svg' %}" alt="github icon" />
+        <a href="https://twitter.com/linguaconnect" class="me-3" target="_blank">
+          <img src="{% static 'img/front-pages/icons/twitter.svg' %}" alt="twitter icon" />
         </a>
-        <a href="{% get_theme_variables 'facebook_url' %}" class="me-3" target="_blank">
-           <img src="{% static 'img/front-pages/icons/facebook.svg' %}" alt="facebook icon" />
+        <a href="https://facebook.com/linguaconnect" class="me-3" target="_blank">
+          <img src="{% static 'img/front-pages/icons/facebook.svg' %}" alt="facebook icon" />
         </a>
-        <a href="{% get_theme_variables 'twitter_url' %}" class="me-3" target="_blank">
-           <img src="{% static 'img/front-pages/icons/twitter.svg' %}" alt="twitter icon" />
+        <a href="https://linkedin.com/company/linguaconnect" class="me-3" target="_blank">
+          <img src="{% static 'img/front-pages/icons/linkedin.svg' %}" alt="linkedin icon" />
         </a>
-        <a href="{% get_theme_variables 'instagram_url' %}" target="_blank">
-          <img src="{% static 'img/front-pages/icons/instagram.svg' %}" alt="google icon" />
+        <a href="https://instagram.com/linguaconnect" target="_blank">
+          <img src="{% static 'img/front-pages/icons/instagram.svg' %}" alt="instagram icon" />
         </a>
       </div>
     </div>
