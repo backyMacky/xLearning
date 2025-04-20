@@ -20,6 +20,10 @@ urlpatterns = [
     path('profile/<str:username>/', views.ProfileView.as_view(), name='user_profile'),
     path('api/profile/', views.ProfileAPIView.as_view(), name='profile_api'),
     
+    # Teacher Request URLs
+    path('teacher-request/', views.TeacherRequestView.as_view(), name='teacher_request'),
+    path('admin/user/<int:user_id>/teacher-approval/', views.TeacherApprovalView.as_view(), name='teacher_approval'),
+    
     # Notification URLs
     path('notifications/', views.NotificationListView.as_view(), name='notification_list'),
     path('notifications/<int:pk>/', views.NotificationDetailView.as_view(), name='notification_detail'),

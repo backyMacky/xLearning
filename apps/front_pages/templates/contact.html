@@ -1,0 +1,562 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Contact Us - xLearning Language Teaching Platform{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<style>
+  /* Modern Contact Page Styling with Updated Colors */
+  .contact-hero {
+    background: linear-gradient(135deg,rgb(119, 158, 214) 0%,rgb(163, 137, 182) 100%);
+    padding: 100px 0 50px;
+    position: relative;
+    overflow: hidden;
+    color: white;
+  }
+  
+  .contact-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.08;
+    z-index: 0;
+  }
+  
+  .contact-content {
+    position: relative;
+    z-index: 10;
+  }
+  
+  .contact-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+  }
+  
+  .contact-description {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    opacity: 0.9;
+  }
+  
+  .contact-form-section {
+    padding: 80px 0;
+    position: relative;
+    background-color: #f8f9fa;
+    overflow: hidden;
+  }
+  
+  .contact-form-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.03;
+    background-image: url('{% static "img/front-pages/backgrounds/language-pattern.png" %}');
+    background-size: cover;
+  }
+  
+  .contact-form-container {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .contact-form-card {
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+  
+  .contact-form-header {
+    padding: 25px 30px;
+    background:rgb(211, 160, 240);
+    color: white;
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .contact-form-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .contact-form-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+  
+  .contact-form-body {
+    padding: 40px;
+    background: white;
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: #495057;
+  }
+  
+  .form-control {
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+  }
+  
+  .form-control:focus {
+    border-color: #3a7bd5;
+    box-shadow: 0 0 0 0.25rem rgba(58, 123, 213, 0.25);
+  }
+  
+  .input-group-text {
+    border-radius: 10px 0 0 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-right: none;
+    color: #3a7bd5;
+  }
+  
+  .input-group .form-control {
+    border-radius: 0 10px 10px 0;
+  }
+  
+  .contact-form-submit {
+    padding: 12px 30px;
+    font-weight: 600;
+    border-radius: 10px;
+    background-color: #3a7bd5;
+    border-color: #3a7bd5;
+    transition: all 0.3s ease;
+  }
+  
+  .contact-form-submit:hover {
+    background-color: #2a6ac4;
+    border-color: #2a6ac4;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(58, 123, 213, 0.3);
+  }
+  
+  .office-section {
+    padding: 80px 0;
+    background-color: white;
+  }
+  
+  .office-card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .office-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .office-image {
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .office-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.5s ease;
+  }
+  
+  .office-card:hover .office-image img {
+    transform: scale(1.1);
+  }
+  
+  .office-content {
+    padding: 25px;
+    background: white;
+  }
+  
+  .office-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #3a7bd5;
+  }
+  
+  .office-address {
+    margin-bottom: 1.5rem;
+    color: #6c757d;
+  }
+  
+  .office-info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    color: #6c757d;
+  }
+  
+  .office-info-icon {
+    margin-right: 10px;
+    color: #3a7bd5;
+    font-size: 1rem;
+  }
+  
+  .map-button {
+    padding: 8px 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    color: #3a7bd5;
+    border: 1px solid #3a7bd5;
+    transition: all 0.3s ease;
+  }
+  
+  .map-button:hover {
+    background-color: #3a7bd5;
+    color: white;
+  }
+  
+  .faq-section {
+    padding: 80px 0;
+    background-color: #f8f9fa;
+  }
+  
+  .faq-card {
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border: none;
+  }
+  
+  .faq-question {
+    padding: 20px;
+    background-color: white;
+    font-weight: 600;
+    color: #3a7bd5;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .faq-answer {
+    padding: 0 20px 20px;
+    background-color: white;
+    color: #6c757d;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 992px) {
+    .contact-title {
+      font-size: 1.5rem;
+    }
+    
+    .contact-form-section {
+      padding: 60px 0;
+    }
+    
+    .office-card {
+      margin-bottom: 30px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .contact-hero {
+      padding: 70px 0 40px;
+    }
+    
+    .contact-title {
+      font-size: 1.5rem;
+    }
+    
+    .contact-description {
+      font-size: 1rem;
+    }
+    
+    .contact-form-section,
+    .office-section,
+    .faq-section {
+      padding: 50px 0;
+    }
+    
+    .contact-form-body {
+      padding: 30px;
+    }
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<!-- Contact Hero Section: Start -->
+<section class="contact-hero">
+  <div class="container">
+    <div class="contact-content text-center" data-aos="fade-up">
+       
+      <h3 class="contact-title">We'd Love to Hear From You</h3>
+      <p class="contact-description">Have questions about xLearning? We're here to help you transform your language teaching experience.</p>
+    </div>
+  </div>
+</section>
+<!-- Contact Hero Section: End -->
+
+<!-- Contact Form Section: Start -->
+<section class="contact-form-section">
+  <div class="contact-form-bg"></div>
+  
+  <div class="container contact-form-container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8" data-aos="fade-up">
+        <div class="contact-form-card">
+          <div class="contact-form-header">
+            <h3 class="contact-form-title">Send Us a Message</h3>
+            <p class="contact-form-subtitle">Fill out the form below and we'll get back to you within 24 hours.</p>
+          </div>
+          
+          <div class="contact-form-body">
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-warning{% endif %} mb-4" role="alert">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+            
+            <form id="contactForm" method="post" class="row g-3">
+              {% csrf_token %}
+              
+              <div class="col-md-6">
+                <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="ti ti-user"></i></span>
+                  {{ form.name }}
+                </div>
+                {% if form.name.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.name.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="col-md-6">
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                  {{ form.email }}
+                </div>
+                {% if form.email.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.email.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="col-12">
+                <label for="{{ form.subject.id_for_label }}" class="form-label">{{ form.subject.label }}</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="ti ti-writing"></i></span>
+                  {{ form.subject }}
+                </div>
+                {% if form.subject.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.subject.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="col-12">
+                <label for="{{ form.message.id_for_label }}" class="form-label">{{ form.message.label }}</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="ti ti-message"></i></span>
+                  {{ form.message }}
+                </div>
+                {% if form.message.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.message.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary contact-form-submit">
+                  <i class="ti ti-send me-1"></i> Send Message
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Contact Form Section: End -->
+
+<!-- FAQ Section: Start -->
+<section class="faq-section">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <span class="badge bg-label-primary mb-2">FAQ</span>
+      <h2 class="mb-2">Frequently Asked Questions</h2>
+      <p class="text-muted">Quick answers to common inquiries</p>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8" data-aos="fade-up">
+        <div class="faq-card">
+          <div class="faq-question">
+            How quickly will I receive a response to my inquiry?
+            <i class="ti ti-chevron-down"></i>
+          </div>
+          <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+            <p>We strive to respond to all inquiries within 24 business hours. For urgent matters, please indicate so in your subject line.</p>
+          </div>
+        </div>
+        
+        <div class="faq-card">
+          <div class="faq-question">
+            What information should I include in my message?
+            <i class="ti ti-chevron-down"></i>
+          </div>
+          <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+            <p>To help us address your inquiry most effectively, please include details about your teaching context (individual tutor, language school, etc.), the specific feature or service you're inquiring about, and any relevant account information if you're an existing customer.</p>
+          </div>
+        </div>
+        
+        <div class="faq-card">
+          <div class="faq-question">
+            I need technical support. Is this the right place to ask?
+            <i class="ti ti-chevron-down"></i>
+          </div>
+          <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+            <p>For technical support issues, existing customers should use the support portal within their xLearning dashboard for faster assistance. However, if you're unable to access your account, this contact form is appropriate.</p>
+          </div>
+        </div>
+        
+        <div class="faq-card">
+          <div class="faq-question">
+            Can I schedule a demo of xLearning?
+            <i class="ti ti-chevron-down"></i>
+          </div>
+          <div class="faq-answer" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+            <p>Yes! Please indicate in your message that you're interested in a product demo. One of our specialists will contact you to schedule a personalized demonstration of xLearning tailored to your specific teaching needs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- FAQ Section: End -->
+
+<!-- Email Support Section: Start -->
+<section class="section-py bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-xl-8 text-center text-white">
+        <h3 class="text-info mb-3">Need Immediate Assistance?</h3>
+        <p class="mb-4 text-info">For urgent inquiries, you can email our support team directly</p>
+        <a href="mailto:support@xlearning.com" class="btn btn-lg btn-primary text-white">support@xlearning.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Email Support Section: End -->
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS (Animate On Scroll)
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 100
+    });
+    
+    // Form validation
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+      contactForm.addEventListener('submit', function(e) {
+        let isValid = true;
+        const requiredFields = contactForm.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+          if (!field.value.trim()) {
+            isValid = false;
+            field.classList.add('is-invalid');
+          } else {
+            field.classList.remove('is-invalid');
+          }
+          
+          // Email validation
+          if (field.type === 'email' && field.value.trim()) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(field.value)) {
+              isValid = false;
+              field.classList.add('is-invalid');
+            }
+          }
+        });
+        
+        if (!isValid) {
+          e.preventDefault();
+        }
+      });
+      
+      // Remove invalid class on input
+      contactForm.querySelectorAll('input, textarea').forEach(field => {
+        field.addEventListener('input', function() {
+          this.classList.remove('is-invalid');
+        });
+      });
+    }
+    
+    // FAQ accordion functionality
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    if (faqQuestions) {
+      faqQuestions.forEach(question => {
+        question.addEventListener('click', function() {
+          const answer = this.nextElementSibling;
+          const icon = this.querySelector('i');
+          
+          if (answer.style.maxHeight) {
+            answer.style.maxHeight = null;
+            icon.classList.remove('ti-chevron-up');
+            icon.classList.add('ti-chevron-down');
+          } else {
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+            icon.classList.remove('ti-chevron-down');
+            icon.classList.add('ti-chevron-up');
+          }
+        });
+      });
+    }
+  });
+</script>
+{% endblock %}

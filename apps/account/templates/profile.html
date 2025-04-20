@@ -1,202 +1,578 @@
 {% extends layout_path %}
+
 {% load static %}
+{% load i18n %}
 
-{% block title %}User Profile{% endblock %}
+{% block title %}User Profile - xLearning{% endblock %}
 
-{% block breadcrumb %}
-<li class="breadcrumb-item">
-  <a href="{% url 'dashboards:overview' %}">Home</a>
-</li>
-<li class="breadcrumb-item active">Profile</li>
-{% endblock breadcrumb %}
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<style>
+  .profile-section {
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .profile-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.08;
+    z-index: 0;
+  }
+  
+  .profile-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .profile-card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  
+  .profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  }
+  
+  .profile-header {
+    background: linear-gradient(135deg, rgb(119, 158, 214) 0%, rgb(163, 137, 182) 100%);
+    padding: 80px 30px 30px;
+    color: white;
+    position: relative;
+  }
+  
+  .profile-avatar {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: white;
+    padding: 5px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  .profile-avatar-initial {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #7367f0;
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    border-radius: 50%;
+  }
+  
+  .profile-user-info {
+    text-align: center;
+  }
+  
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .profile-username {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+  }
+  
+  .profile-badges {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .profile-body {
+    padding: 30px;
+  }
+  
+  .profile-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .profile-info-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-info-item:last-child {
+    border-bottom: none;
+  }
+  
+  .profile-info-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+    margin-right: 15px;
+  }
+  
+  .profile-info-label {
+    font-weight: 500;
+    color: #6e6b7b;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .profile-info-value {
+    color: #5e5873;
+    font-weight: 500;
+  }
+  
+  .profile-action-card {
+    background-color: #f8f8f8;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .profile-action-card:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  
+  .profile-action-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .profile-action-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+  }
+  
+  .profile-action-text {
+    color: #6e6b7b;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+  
+  .language-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: white;
+  }
+  
+  .stats-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stats-card-body {
+    padding: 1.5rem;
+  }
+  
+  .stats-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #5e5873;
+  }
+  
+  .stats-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #7367f0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stats-subtitle {
+    font-size: 0.9rem;
+    color: #6e6b7b;
+  }
+  
+  .stats-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    color: white;
+  }
+</style>
+{% endblock page_css %}
 
 {% block content %}
-<div class="container-xxl flex-grow-1 container-p-y">
-  <h4 class="py-3 mb-4">
-    <span class="text-muted fw-light">User Profile /</span> Account
-  </h4>
-
-  <div class="row">
-    <!-- User Profile Details -->
-    <div class="col-xl-4 col-lg-5 col-md-5">
-      <div class="card mb-4">
-        <div class="card-body">
-          <div class="d-flex align-items-start align-items-sm-center gap-4">
-            {% if profile_user.profile.profile_image %}
-            <img src="{{ profile_user.profile.profile_image.url }}" alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" />
-            {% else %}
-            <div class="avatar avatar-xl">
-              <span class="avatar-initial rounded bg-label-primary">{{ profile_user.username|first|upper }}</span>
-            </div>
-            {% endif %}
-            <div class="d-flex flex-column">
-              <div class="card-title mb-0">
-                <h5>{{ profile_user.get_full_name|default:profile_user.username }}</h5>
+<section class="profile-section">
+  <div class="container">
+    <div class="profile-content">
+      <div class="row g-4">
+        <!-- Profile Card -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-duration="1000">
+          <div class="profile-card">
+            <div class="profile-header">
+              <div class="profile-avatar">
+                {% if profile_user.profile.profile_image %}
+                <img src="{{ profile_user.profile.profile_image.url }}" alt="{{ profile_user.username }}">
+                {% else %}
+                <div class="profile-avatar-initial">
+                  {{ profile_user.username|first|upper }}
+                </div>
+                {% endif %}
               </div>
-              <div class="mb-2">
-                <span class="badge bg-label-{% if profile_user.is_admin %}primary{% elif profile_user.is_teacher %}success{% else %}info{% endif %} me-1">
-                  {{ profile_user.get_user_type_display }}
-                </span>
-                <span class="badge bg-label-{% if profile_user.is_active %}success{% else %}danger{% endif %} me-1">
-                  {% if profile_user.is_active %}Active{% else %}Inactive{% endif %}
-                </span>
-              </div>
-              <div class="mb-3">
-                <small>@{{ profile_user.username }}</small>
-              </div>
-              {% if request.user == profile_user %}
-              <div>
-                <a href="{% url 'account:update_profile' %}" class="btn btn-primary me-1">
-                  <i class="ti ti-edit me-1"></i> Edit
+              
+              <div class="profile-user-info">
+                <h3 class="profile-name">{{ profile_user.get_full_name|default:profile_user.username }}</h3>
+                <p class="profile-username">@{{ profile_user.username }}</p>
+                
+                <div class="profile-badges">
+                  <span class="badge bg-white text-primary">
+                    {{ profile_user.get_user_type_display }}
+                  </span>
+                  
+                  {% if profile_user.is_verified %}
+                  <span class="badge bg-white text-success">
+                    <i class="ti ti-check me-1"></i> Verified
+                  </span>
+                  {% endif %}
+                </div>
+                
+                {% if request.user == profile_user %}
+                <a href="{% url 'account:update_profile' %}" class="btn btn-light">
+                  <i class="ti ti-edit me-1"></i> Edit Profile
                 </a>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="profile-body">
+              <h5 class="mb-3">Contact & Details</h5>
+              
+              <ul class="profile-info-list">
+                <li class="profile-info-item">
+                  <div class="profile-info-icon">
+                    <i class="ti ti-mail"></i>
+                  </div>
+                  <div>
+                    <div class="profile-info-label">Email</div>
+                    <div class="profile-info-value">{{ profile_user.email }}</div>
+                  </div>
+                </li>
+                
+                {% if profile_user.profile.phone_number %}
+                <li class="profile-info-item">
+                  <div class="profile-info-icon">
+                    <i class="ti ti-phone"></i>
+                  </div>
+                  <div>
+                    <div class="profile-info-label">Phone</div>
+                    <div class="profile-info-value">{{ profile_user.profile.phone_number }}</div>
+                  </div>
+                </li>
+                {% endif %}
+                
+                {% if profile_user.profile.date_of_birth %}
+                <li class="profile-info-item">
+                  <div class="profile-info-icon">
+                    <i class="ti ti-calendar"></i>
+                  </div>
+                  <div>
+                    <div class="profile-info-label">Date of Birth</div>
+                    <div class="profile-info-value">{{ profile_user.profile.date_of_birth|date:"d M Y" }}</div>
+                  </div>
+                </li>
+                {% endif %}
+                
+                <li class="profile-info-item">
+                  <div class="profile-info-icon">
+                    <i class="ti ti-calendar-check"></i>
+                  </div>
+                  <div>
+                    <div class="profile-info-label">Joined</div>
+                    <div class="profile-info-value">{{ profile_user.date_joined|date:"d M Y" }}</div>
+                  </div>
+                </li>
+              </ul>
+              
+              <h5 class="mt-4 mb-3">Languages</h5>
+              
+              {% if profile_user.profile.native_language %}
+              <div class="mb-2">
+                <div class="profile-info-label">Native Language</div>
+                <div class="language-badge bg-primary">
+                  {{ profile_user.profile.native_language|title }}
+                </div>
+              </div>
+              {% endif %}
+              
+              {% if profile_user.profile.learning_language %}
+              <div>
+                <div class="profile-info-label">
+                  {% if profile_user.is_teacher %}Teaching{% else %}Learning{% endif %} Language
+                </div>
+                <div class="language-badge bg-success">
+                  {{ profile_user.profile.learning_language|title }}
+                </div>
               </div>
               {% endif %}
             </div>
           </div>
         </div>
-        <hr class="my-0" />
-        <div class="card-body">
-          <h5 class="card-title mb-3">Details</h5>
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Username</small>
-            </div>
-            <div>{{ profile_user.username }}</div>
-          </div>
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Email</small>
-            </div>
-            <div>{{ profile_user.email }}</div>
-          </div>
-          {% if profile_user.profile.phone_number %}
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Phone</small>
-            </div>
-            <div>{{ profile_user.profile.phone_number }}</div>
-          </div>
-          {% endif %}
-          {% if profile_user.profile.date_of_birth %}
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Date of Birth</small>
-            </div>
-            <div>{{ profile_user.profile.date_of_birth|date:"d M Y" }}</div>
-          </div>
-          {% endif %}
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Status</small>
-            </div>
-            <div>
-              <span class="badge bg-label-{% if profile_user.is_active %}success{% else %}danger{% endif %}">
-                {% if profile_user.is_active %}Active{% else %}Inactive{% endif %}
-              </span>
-            </div>
-          </div>
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">User Type</small>
-            </div>
-            <div>{{ profile_user.get_user_type_display }}</div>
-          </div>
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Verified</small>
-            </div>
-            <div>
-              <span class="badge bg-label-{% if profile_user.is_verified %}success{% else %}warning{% endif %}">
-                {% if profile_user.is_verified %}Yes{% else %}No{% endif %}
-              </span>
-            </div>
-          </div>
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Joined</small>
-            </div>
-            <div>{{ profile_user.date_joined|date:"d M Y" }}</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title mb-3">Language Preferences</h5>
-          {% if profile_user.profile.native_language or profile_user.profile.learning_language %}
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Native Language</small>
-            </div>
-            <div>{{ profile_user.profile.native_language|default:"Not specified" }}</div>
-          </div>
-          <div class="mb-2">
-            <div class="d-flex justify-content-between align-items-center">
-              <small class="text-muted text-uppercase">Learning Language</small>
-            </div>
-            <div>{{ profile_user.profile.learning_language|default:"Not specified" }}</div>
-          </div>
-          {% else %}
-          <p class="text-muted">No language preferences set.</p>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-    
-    <!-- User Activity and Information -->
-    <div class="col-xl-8 col-lg-7 col-md-7">
-      {% if profile_user.profile.bio %}
-      <div class="card mb-4">
-        <h5 class="card-header">About</h5>
-        <div class="card-body">
-          <p>{{ profile_user.profile.bio }}</p>
-        </div>
-      </div>
-      {% endif %}
-      
-      <!-- Additional user content sections can be added here -->
-      <div class="card mb-4">
-        <h5 class="card-header">Recent Activity</h5>
-        <div class="card-body">
-          <!-- This is a placeholder for future activity tracking -->
-          <p class="text-muted">No recent activity to display.</p>
-        </div>
-      </div>
-      
-      <!-- User specific settings/links -->
-      {% if request.user == profile_user %}
-      <div class="card">
-        <h5 class="card-header">Account Settings</h5>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6 mb-4">
-              <div class="card border shadow-none">
-                <div class="card-body">
-                  <div class="d-flex align-items-center mb-3">
-                    <h5 class="mb-0">Security</h5>
-                    <i class="ti ti-shield-lock ms-2 text-primary"></i>
-                  </div>
-                  <p>Manage your password and security settings</p>
-                  <a href="{% url 'account:security_settings' %}" class="btn btn-primary btn-sm">Manage</a>
+        
+        <!-- Main Content -->
+        <div class="col-lg-8">
+          <div class="row g-4">
+            {% if profile_user.profile.bio %}
+            <!-- Bio Section -->
+            <div class="col-12" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100">
+              <div class="profile-card">
+                <div class="profile-body">
+                  <h5 class="mb-3">About Me</h5>
+                  <p>{{ profile_user.profile.bio }}</p>
                 </div>
               </div>
             </div>
-            <div class="col-md-6 mb-4">
-              <div class="card border shadow-none">
-                <div class="card-body">
-                  <div class="d-flex align-items-center mb-3">
-                    <h5 class="mb-0">Preferences</h5>
-                    <i class="ti ti-settings ms-2 text-primary"></i>
+            {% endif %}
+            
+            <!-- Statistics Row -->
+            <div class="col-12" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+              <div class="row g-3">
+                {% if profile_user.is_teacher %}
+                <!-- Teacher Stats -->
+                <div class="col-md-4">
+                  <div class="stats-card">
+                    <div class="stats-card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <div class="stats-value">{{ taught_courses|default:"0" }}</div>
+                        <div class="stats-subtitle">Active Courses</div>
+                      </div>
+                      <div class="stats-icon bg-primary">
+                        <i class="ti ti-book-2"></i>
+                      </div>
+                    </div>
                   </div>
-                  <p>Manage your language and notification preferences</p>
-                  <a href="{% url 'account:preferences' %}" class="btn btn-primary btn-sm">Manage</a>
+                </div>
+                
+                <div class="col-md-4">
+                  <div class="stats-card">
+                    <div class="stats-card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <div class="stats-value">{{ total_students|default:"0" }}</div>
+                        <div class="stats-subtitle">Total Students</div>
+                      </div>
+                      <div class="stats-icon bg-success">
+                        <i class="ti ti-users"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-md-4">
+                  <div class="stats-card">
+                    <div class="stats-card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <div class="stats-value">{{ teaching_hours|default:"0" }}</div>
+                        <div class="stats-subtitle">Teaching Hours</div>
+                      </div>
+                      <div class="stats-icon bg-info">
+                        <i class="ti ti-clock"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% else %}
+                <!-- Student Stats -->
+                <div class="col-md-4">
+                  <div class="stats-card">
+                    <div class="stats-card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <div class="stats-value">{{ enrolled_courses|default:"0" }}</div>
+                        <div class="stats-subtitle">Enrolled Courses</div>
+                      </div>
+                      <div class="stats-icon bg-primary">
+                        <i class="ti ti-book-2"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-md-4">
+                  <div class="stats-card">
+                    <div class="stats-card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <div class="stats-value">{{ completed_lessons|default:"0" }}</div>
+                        <div class="stats-subtitle">Completed Lessons</div>
+                      </div>
+                      <div class="stats-icon bg-success">
+                        <i class="ti ti-check"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-md-4">
+                  <div class="stats-card">
+                    <div class="stats-card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <div class="stats-value">{{ avg_score|default:"0" }}%</div>
+                        <div class="stats-subtitle">Average Score</div>
+                      </div>
+                      <div class="stats-icon bg-warning">
+                        <i class="ti ti-chart-pie"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <!-- Action Cards For Profile Owner -->
+            {% if request.user == profile_user %}
+            <div class="col-12" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="profile-action-card d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                      <div class="profile-action-icon bg-label-primary">
+                        <i class="ti ti-shield text-primary"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h5 class="profile-action-title">Security Settings</h5>
+                      <p class="profile-action-text">Manage your password and security preferences</p>
+                      <a href="{% url 'account:security_settings' %}" class="btn btn-sm btn-primary">
+                        <i class="ti ti-settings me-1"></i> Manage
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="profile-action-card d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                      <div class="profile-action-icon bg-label-success">
+                        <i class="ti ti-bell text-success"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h5 class="profile-action-title">Notifications</h5>
+                      <p class="profile-action-text">View your notifications and set preferences</p>
+                      <a href="{% url 'account:notification_list' %}" class="btn btn-sm btn-success">
+                        <i class="ti ti-bell me-1"></i> View
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="profile-action-card d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                      <div class="profile-action-icon bg-label-info">
+                        <i class="ti ti-settings-cog text-info"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h5 class="profile-action-title">Preferences</h5>
+                      <p class="profile-action-text">Customize your language and application settings</p>
+                      <a href="{% url 'account:preferences' %}" class="btn btn-sm btn-info">
+                        <i class="ti ti-settings me-1"></i> Settings
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="profile-action-card d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                      <div class="profile-action-icon bg-label-danger">
+                        <i class="ti ti-logout text-danger"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h5 class="profile-action-title">Sign Out</h5>
+                      <p class="profile-action-text">Log out from your account</p>
+                      <a href="{% url 'account:logout' %}" class="btn btn-sm btn-danger">
+                        <i class="ti ti-logout me-1"></i> Logout
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+            {% endif %}
           </div>
         </div>
       </div>
-      {% endif %}
     </div>
   </div>
-</div>
-{% endblock content %}
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animation
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 50
+    });
+  });
+</script>
+{% endblock %}

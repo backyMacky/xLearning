@@ -1,0 +1,345 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Register - xLearning{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<style>
+  .register-section {
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .register-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.08;
+    z-index: 0;
+  }
+  
+  .register-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .register-card {
+    border-radius: 20px;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .register-header {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, rgb(119, 158, 214) 0%, rgb(163, 137, 182) 100%);
+    color: white;
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .register-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .register-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+  
+  .register-body {
+    padding: 40px;
+    background: white;
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: #495057;
+  }
+  
+  .form-control {
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+  }
+  
+  .form-control:focus {
+    border-color: #7367f0;
+    box-shadow: 0 0 0 0.25rem rgba(115, 103, 240, 0.25);
+  }
+  
+  .input-group-text {
+    border-radius: 10px 0 0 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-right: none;
+    color: #7367f0;
+  }
+  
+  .input-group .form-control {
+    border-radius: 0 10px 10px 0;
+  }
+  
+  .register-submit {
+    padding: 12px 30px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .register-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(115, 103, 240, 0.3);
+  }
+  
+  .password-toggle {
+    cursor: pointer;
+  }
+  
+  .select2-container--default .select2-selection--single {
+    height: 48px;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+  }
+  
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px;
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<section class="register-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="register-content">
+          <div class="row g-0">
+            <!-- Registration Form Column -->
+            <div class="col-lg-7" data-aos="fade-right" data-aos-duration="1000">
+              <div class="register-card">
+                <div class="register-header">
+                  <h3 class="register-title">Create Your Account</h3>
+                  <p class="register-subtitle mb-0">Join xLearning to start your language teaching journey</p>
+                </div>
+                
+                <div class="register-body">
+                  {% if messages %}
+                  {% for message in messages %}
+                  <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-warning{% endif %} alert-dismissible mb-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                  {% endfor %}
+                  {% endif %}
+                  
+                  <form id="registrationForm" action="{% url 'account:register' %}" method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                      <label for="username" class="form-label">Username</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="ti ti-user"></i></span>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" autofocus>
+                      </div>
+                      <div class="form-text">Username must be unique and contain only letters, numbers, and underscores.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                      <label for="email" class="form-label">Email</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="ti ti-mail"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Your email address">
+                      </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                      <label for="password" class="form-label">Password</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="ti ti-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Create a password">
+                        <span class="input-group-text password-toggle"><i class="ti ti-eye-off"></i></span>
+                      </div>
+                      <div class="form-text">
+                        Password must be at least 8 characters and include a mix of letters and numbers.
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="native_language" class="form-label">Native Language</label>
+                        <select class="form-select select2" id="native_language" name="native_language">
+                          <option value="">Select language</option>
+                          <option value="english">English</option>
+                          <option value="spanish">Spanish</option>
+                          <option value="french">French</option>
+                          <option value="german">German</option>
+                          <option value="chinese">Chinese</option>
+                          <option value="japanese">Japanese</option>
+                          <option value="arabic">Arabic</option>
+                          <option value="russian">Russian</option>
+                        </select>
+                      </div>
+                      
+                      <div class="col-md-6 mb-3">
+                        <label for="learning_language" class="form-label">Learning Language</label>
+                        <select class="form-select select2" id="learning_language" name="learning_language">
+                          <option value="">Select language</option>
+                          <option value="english">English</option>
+                          <option value="spanish">Spanish</option>
+                          <option value="french">French</option>
+                          <option value="german">German</option>
+                          <option value="chinese">Chinese</option>
+                          <option value="japanese">Japanese</option>
+                          <option value="arabic">Arabic</option>
+                          <option value="russian">Russian</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                        <label class="form-check-label" for="terms">
+                          I agree to the <a href="{% url 'front_pages:terms-of-service' %}" target="_blank">Terms of Service</a> and <a href="{% url 'front_pages:privacy-policy' %}" target="_blank">Privacy Policy</a>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-primary register-submit">
+                        <i class="ti ti-user-plus me-2"></i> Create Account
+                      </button>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                      <p>Already have an account? <a href="{% url 'account:login' %}" class="fw-semibold">Sign in</a></p>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animation
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 50
+    });
+    
+    // Initialize Select2
+    if (document.querySelector('.select2')) {
+      $('.select2').select2({
+        width: '100%'
+      });
+    }
+    
+    // Password toggle functionality
+    const passwordToggle = document.querySelector('.password-toggle');
+    if (passwordToggle) {
+      passwordToggle.addEventListener('click', function() {
+        const passwordField = document.getElementById('password');
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        
+        // Toggle icon
+        const icon = this.querySelector('i');
+        if (type === 'password') {
+          icon.classList.remove('ti-eye');
+          icon.classList.add('ti-eye-off');
+        } else {
+          icon.classList.remove('ti-eye-off');
+          icon.classList.add('ti-eye');
+        }
+      });
+    }
+    
+    // Form validation
+    const registrationForm = document.getElementById('registrationForm');
+    if (registrationForm) {
+      registrationForm.addEventListener('submit', function(e) {
+        let isValid = true;
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const terms = document.getElementById('terms').checked;
+        
+        if (!username) {
+          isValid = false;
+          highlightError('username');
+        } else {
+          removeError('username');
+        }
+        
+        if (!email) {
+          isValid = false;
+          highlightError('email');
+        } else {
+          removeError('email');
+        }
+        
+        if (!password) {
+          isValid = false;
+          highlightError('password');
+        } else {
+          removeError('password');
+        }
+        
+        if (!terms) {
+          isValid = false;
+          document.getElementById('terms').classList.add('is-invalid');
+        } else {
+          document.getElementById('terms').classList.remove('is-invalid');
+        }
+        
+        if (!isValid) {
+          e.preventDefault();
+        }
+      });
+    }
+    
+    function highlightError(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.classList.add('is-invalid');
+      field.closest('.input-group').classList.add('has-validation');
+    }
+    
+    function removeError(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.classList.remove('is-invalid');
+    }
+  });
+</script>
+{% endblock page_js %}

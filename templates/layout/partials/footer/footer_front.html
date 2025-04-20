@@ -10,26 +10,29 @@
             <span class="app-brand-logo demo">
               {% include 'partials/logo.html' with height=20 bgcolor="fill: #fff;" %}
             </span>
-            <span class="app-brand-text demo footer-link fw-bold ms-2 ps-1">LinguaConnect</span>
+            <span class="app-brand-text demo footer-link fw-bold ms-2 ps-1">xLearning</span>
           </a>
           <p class="footer-text footer-logo-description mb-6">
             Empowering language teachers with innovative tools to create engaging learning experiences and track student progress effectively.
           </p>
-          <form class="footer-form">
-            <label for="footer-email" class="small">Subscribe to our newsletter</label>
+          <form id="footer-subscribe-form" class="footer-form">
+            {% csrf_token %}
+            <label for="footer-email" class="small text-white">Subscribe to our newsletter</label>
             <div class="d-flex mt-1">
-              <input type="email" class="form-control rounded-0 rounded-start-bottom rounded-start-top" id="footer-email" placeholder="Your email" />
-              <button type="submit" class="btn btn-primary shadow-none rounded-0 rounded-end-bottom rounded-end-top">
-                Subscribe
+              <input type="email" class="form-control rounded-0 rounded-start-bottom rounded-start-top" id="footer-email" name="email" placeholder="Your email" required />
+              <button type="submit" id="footer-subscribe-btn" class="btn btn-primary shadow-none rounded-0 rounded-end-bottom rounded-end-top">
+                <span>Subscribe</span> 
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
               </button>
             </div>
+            <div id="subscription-message" class="mt-2 small"></div>
           </form>
         </div>
         <div class="col-lg-2 col-md-4 col-sm-6">
           <h6 class="footer-title mb-6">Platform</h6>
           <ul class="list-unstyled">
             <li class="mb-4">
-              <a href" class="footer-link">Features</a>
+              <a href="{% url 'front_pages:content-management' %}" class="footer-link">Features</a>
             </li>
             <li class="mb-4">
               <a href="{% url 'front_pages:pricing' %}" class="footer-link">Pricing</a>
@@ -55,13 +58,13 @@
               <a href="{% url 'front_pages:help-center' %}" class="footer-link">Help Center</a>
             </li>
             <li class="mb-4">
-              <a href="" class="footer-link">Webinars</a>
+              <a href="#" class="footer-link">Webinars</a>
             </li>
             <li class="mb-4">
-              <a href="" class="footer-link">Teaching Resources</a>
+              <a href="#" class="footer-link">Teaching Resources</a>
             </li>
             <li class="mb-4">
-              <a href" class="footer-link">Community</a>
+              <a href="#" class="footer-link">Community</a>
             </li>
           </ul>
         </div>
@@ -75,10 +78,10 @@
               <a href="{% url 'front_pages:terms-of-service' %}" class="footer-link">Terms of Service</a>
             </li>
             <li class="mb-4">
-              <a href="" class="footer-link">Cookie Policy</a>
+              <a href="#" class="footer-link">Cookie Policy</a>
             </li>
             <li class="mb-4">
-              <a href="" class="footer-link">GDPR Compliance</a>
+              <a href="#" class="footer-link">GDPR Compliance</a>
             </li>
           </ul>
         </div>
@@ -93,20 +96,20 @@
           document.write(new Date().getFullYear());
           </script>
         </span>
-        <a href="/" class="fw-medium text-white">LinguaConnect</a>
+        <a href="/" class="fw-medium text-white">xLearning</a>
         <span class="footer-bottom-text"> - Empowering Language Education</span>
       </div>
       <div>
-        <a href="https://twitter.com/linguaconnect" class="me-3" target="_blank">
+        <a href="#" class="me-3" target="_blank">
           <img src="{% static 'img/front-pages/icons/twitter.svg' %}" alt="twitter icon" />
         </a>
-        <a href="https://facebook.com/linguaconnect" class="me-3" target="_blank">
+        <a href="#" class="me-3" target="_blank">
           <img src="{% static 'img/front-pages/icons/facebook.svg' %}" alt="facebook icon" />
         </a>
-        <a href="https://linkedin.com/company/linguaconnect" class="me-3" target="_blank">
+        <a href="#" class="me-3" target="_blank">
           <img src="{% static 'img/front-pages/icons/linkedin.svg' %}" alt="linkedin icon" />
         </a>
-        <a href="https://instagram.com/linguaconnect" target="_blank">
+        <a href="#" target="_blank">
           <img src="{% static 'img/front-pages/icons/instagram.svg' %}" alt="instagram icon" />
         </a>
       </div>
@@ -114,3 +117,85 @@
   </div>
 </footer>
 <!-- Footer: End -->
+
+{% block footer_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const subscribeForm = document.getElementById('footer-subscribe-form');
+  const subscribeBtn = document.getElementById('footer-subscribe-btn');
+  const subscribeSpinner = subscribeBtn.querySelector('.spinner-border');
+  const subscribeText = subscribeBtn.querySelector('span:not(.spinner-border)');
+  const messageDiv = document.getElementById('subscription-message');
+  
+  if (subscribeForm) {
+    subscribeForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Show loading state
+      subscribeSpinner.classList.remove('d-none');
+      subscribeText.classList.add('d-none');
+      subscribeBtn.disabled = true;
+      
+      // Get the email value
+      const email = document.getElementById('footer-email').value;
+      
+      // Prepare the data for the AJAX request
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+      
+      // Send AJAX request
+      fetch('/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Reset button state
+        subscribeSpinner.classList.add('d-none');
+        subscribeText.classList.remove('d-none');
+        subscribeBtn.disabled = false;
+        
+        // Display message
+        messageDiv.innerHTML = data.message;
+        messageDiv.className = 'mt-2 small ' + (data.success ? 'text-success' : 'text-danger');
+        
+        // Reset form if successful
+        if (data.success) {
+          subscribeForm.reset();
+          
+          // Show success alert
+          Swal.fire({
+            icon: 'success',
+            title: 'Successfully Subscribed!',
+            text: 'Thank you for subscribing to our newsletter.',
+            confirmButtonColor: '#5d87ff'
+          });
+          
+          // Clear message after 5 seconds
+          setTimeout(() => {
+            messageDiv.innerHTML = '';
+            messageDiv.className = 'mt-2 small';
+          }, 5000);
+        }
+      })
+      .catch(error => {
+        // Reset button state
+        subscribeSpinner.classList.add('d-none');
+        subscribeText.classList.remove('d-none');
+        subscribeBtn.disabled = false;
+        
+        // Display error message
+        messageDiv.innerHTML = 'An error occurred. Please try again.';
+        messageDiv.className = 'mt-2 small text-danger';
+        
+        console.error('Error:', error);
+      });
+    });
+  }
+});
+</script>
+{% endblock %}

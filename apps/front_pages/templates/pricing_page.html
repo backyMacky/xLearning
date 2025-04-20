@@ -1,3 +1,4 @@
+
 {% extends layout_path %}
 
 {% load static %}
@@ -8,263 +9,664 @@
 {% block page_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/css/pages/front-page-pricing.css' %}" />
+<style>
+  /* Enhanced styles for modernized pricing page */
+  
+  /* Curved Hero Section */
+  .pricing-hero {
+    background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
+    padding: 100px 0 160px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 0 0;
+  }
+  
+  .pricing-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/pricing-pattern.png" %}');
+    background-repeat: repeat;
+    opacity: 0.05;
+    z-index: 0;
+  }
+  
+  /* Curved bottom edge for hero section */
+  .pricing-hero::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-color: #f8f7fa;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    transform: translateY(50%);
+    z-index: 1;
+  }
+  
+  .pricing-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .pricing-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+  
+  .pricing-hero p {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 800px;
+    margin: 0 auto 2rem;
+  }
+  
+  .pricing-hero .badge {
+    padding: 8px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Price Toggle Switch */
+  .price-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 10;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    backdrop-filter: blur(5px);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .price-toggle-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 15px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .price-toggle-text.active {
+    color: #ffffff;
+  }
+  
+  .price-toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    margin: 0 10px;
+  }
+  
+  .price-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .price-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: .4s;
+    border-radius: 34px;
+  }
+  
+  .price-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  input:checked + .price-toggle-slider {
+    background-color: #7367f0;
+  }
+  
+  input:checked + .price-toggle-slider:before {
+    transform: translateX(30px);
+  }
+  
+  .savings-badge {
+    background-color: #28c76f;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Enhanced Free Trial Section */
+  .pricing-free-trial {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f2f4ff 0%, #e4e7ff 100%);
+    padding: 0;
+    margin: 80px 0;
+  }
+  
+  .free-trial-content {
+    padding: 60px 40px;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .free-trial-image-container {
+    position: relative;
+    height: 100%;
+    min-height: 300px;
+    overflow: hidden;
+  }
+  
+  .free-trial-shape {
+    position: absolute;
+    width: 140%;
+    height: 140%;
+    background-color: #7367f0;
+    border-radius: 30% 70% 70% 30% / 30% 40% 60% 70%;
+    top: -20%;
+    right: -40%;
+    z-index: 1;
+    animation: morphShape 15s infinite alternate ease-in-out;
+  }
+  
+  @keyframes morphShape {
+    0% { border-radius: 30% 70% 70% 30% / 30% 40% 60% 70%; }
+    50% { border-radius: 40% 60% 60% 40% / 40% 50% 50% 60%; }
+    100% { border-radius: 30% 70% 70% 30% / 30% 40% 60% 70%; }
+  }
+  
+  .free-trial-image {
+    position: absolute;
+    height: 90%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+  }
+  
+  .free-trial-content h4 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #5e5873;
+    margin-bottom: 1.5rem;
+  }
+  
+  .free-trial-content p {
+    font-size: 1.1rem;
+    color: #6e6b7b;
+    margin-bottom: 2rem;
+    max-width: 500px;
+  }
+  
+  .free-trial-btn {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 8px 25px -8px rgba(115, 103, 240, 0.5);
+    transition: all 0.3s ease;
+  }
+  
+  .free-trial-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px -5px rgba(115, 103, 240, 0.7);
+  }
+  
+  /* Plan cards with enhanced styling */
+  .pricing-plan-card {
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  }
+  
+  .pricing-plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  }
+  
+  .pricing-plan-card.popular {
+    transform: scale(1.05);
+    z-index: 2;
+    box-shadow: 0 15px 35px rgba(115, 103, 240, 0.2);
+    border: 2px solid #7367f0;
+  }
+  
+  .pricing-plan-card.popular:hover {
+    transform: scale(1.05) translateY(-5px);
+  }
+  
+  .pricing-plan-card .card-header {
+    background: transparent;
+    padding-top: 30px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  
+  .pricing-plan-card .popular-badge {
+    position: absolute;
+    top: 0;
+    right: 30px;
+    background: #7367f0;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 0 0 10px 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .pricing-plan-card .price {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #7367f0;
+    margin: 15px 0;
+    transition: all 0.3s ease;
+  }
+  
+  .pricing-plan-card .plan-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  
+  .pricing-plan-card .plan-description {
+    color: #6e6b7b;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+  
+  .pricing-plan-card .feature-list {
+    padding: 0 10px;
+  }
+  
+  .pricing-plan-card .feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+  }
+  
+  .pricing-plan-card .feature-icon-check {
+    color: #28c76f;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  
+  .pricing-plan-card .feature-icon-cross {
+    color: #ea5455;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  
+  /* Feature comparison section */
+  .pricing-comparison {
+    background-color: #f8f7fa;
+    border-radius: 20px;
+    padding: 60px 0;
+    margin: 80px 0;
+  }
+  
+  /* CTA Section */
+  .pricing-cta {
+    background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
+    border-radius: 20px;
+    padding: 60px 40px;
+    text-align: center;
+    margin: 80px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .pricing-cta::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/pricing-pattern.png" %}');
+    background-repeat: repeat;
+    opacity: 0.05;
+    z-index: 0;
+  }
+  
+  .pricing-cta-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .pricing-cta h3 {
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  
+  .pricing-cta p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .pricing-cta-btn {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: #fff;
+    color: #7367f0;
+    border-radius: 50px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .pricing-cta-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .pricing-hero {
+      padding: 80px 0 140px;
+    }
+    
+    .pricing-hero h1 {
+      font-size: 1.5rem;
+    }
+    
+    .pricing-plan-card.popular {
+      transform: scale(1);
+    }
+    
+    .pricing-plan-card.popular:hover {
+      transform: translateY(-10px);
+    }
+    
+    .free-trial-image-container {
+      min-height: 250px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .pricing-hero {
+      padding: 60px 0 120px;
+    }
+    
+    .pricing-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .pricing-hero p {
+      font-size: 1.1rem;
+    }
+    
+    .free-trial-content {
+      padding: 40px 20px;
+    }
+    
+    .free-trial-content h4 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
 {% endblock page_css %}
 
-{% block page_js %}
-{{ block.super }}
-<script src="{% static 'js/front-page-pricing.js' %}"></script>
-{% endblock page_js %}
-
 {% block content %}
-<!-- Pricing Plans -->
-<section class="section-py first-section-pt">
-  <div class="container">
-    <h2 class="text-center mb-2">xLearning Plans</h2>
-    <p class="text-center mb-0">All plans include core features to streamline your language teaching workflow.<br> Choose the best plan to fit your teaching needs.</p>
-    <div class="d-flex align-items-center justify-content-center flex-wrap gap-2 pt-5 pb-3 mb-5">
-      <label class="switch switch-sm ms-sm-5 ps-sm-5 me-0">
-        <span class="switch-label fs-6 text-body">Monthly</span>
-        <input type="checkbox" class="switch-input price-duration-toggler" checked />
-        <span class="switch-toggle-slider">
-          <span class="switch-on"></span>
-          <span class="switch-off"></span>
-        </span>
-        <span class="switch-label fs-6 text-body">Annually</span>
+<!-- Pricing Hero Section: Start -->
+<section class="pricing-hero">
+  <div class="container pricing-hero-content">
+   
+    <h1 class="text-center">Find the Perfect Plan for Your Teaching Journey</h1>
+    <p class="text-center">Whether you're an individual tutor or running a language school, we have a plan that fits your needs. All plans include core features with flexible pricing options.</p>
+    
+    <!-- Enhanced Pricing Toggle -->
+    <div class="price-toggle-container mt-5">
+      <span id="monthlyText" class="price-toggle-text">Monthly</span>
+      
+      <label class="price-toggle-switch">
+        <input type="checkbox" id="priceToggleSwitch" checked>
+        <span class="price-toggle-slider"></span>
       </label>
-      <div class="mt-n5 ms-n5 ms-sm-0 mb-2 d-none d-sm-flex align-items-center gap-1">
-        <i class="ti ti-corner-left-down ti-lg text-muted scaleX-n1-rtl"></i>
-        <span class="badge badge-sm bg-label-primary rounded-1 mb-3">Save up to 25%</span>
-      </div>
+      
+      <span id="annuallyText" class="price-toggle-text active">Annually</span>
+      
+      <span class="savings-badge">Save 25%</span>
     </div>
+  </div>
+</section>
+<!-- Pricing Hero Section: End -->
 
-    <div class="row g-6">
+<!-- Pricing Plans Section: Start -->
+<section class="section-py" style="margin-top: -30px; position: relative; z-index: 10;">
+  <div class="container">
+    <div class="row gy-4 justify-content-center">
       <!-- Solo Teacher -->
-      <div class="col-lg">
-        <div class="card border rounded shadow-none">
-          <div class="card-body pt-5 px-5">
-            <div class="my-3 text-center">
-              <img src="{% static 'img/illustrations/page-pricing-basic.png' %}" alt="Solo Teacher Image" height="140">
+      <div class="col-xl-4 col-lg-6">
+        <div class="card pricing-plan-card">
+          <div class="card-header position-relative">
+            <h3 class="plan-name">Solo Teacher</h3>
+            <p class="plan-description">Perfect for independent language tutors</p>
+            <div class="price">
+              <span class="price-yearly">$14</span>
+              <span class="price-monthly" style="display: none;">$19</span>
+              <span class="fs-6 fw-normal text-muted">/month</span>
             </div>
-            <h4 class="card-title text-center text-capitalize mb-1">Solo Teacher</h4>
-            <p class="text-center mb-4">Perfect for independent language tutors</p>
-            <div class="text-center h-px-50">
-              <div class="d-flex justify-content-center">
-                <sup class="h6 text-body pricing-currency mt-2 mb-0 me-1">$</sup>
-                <h1 class="price-toggle price-yearly text-primary mb-0">14</h1>
-                <h1 class="price-toggle price-monthly text-primary mb-0 d-none">19</h1>
-                <sub class="h6 text-body pricing-duration mt-auto mb-1 ms-1">/month</sub>
-              </div>
-              <small class="price-yearly price-yearly-toggle text-muted">USD 168 / year</small>
-            </div>
-
-            <ul class="list-group ps-0 mt-5 mb-4">
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Up to 10 students
+            <small class="billing-yearly">$168 billed annually</small>
+            <small class="billing-monthly" style="display: none;">Billed monthly</small>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled feature-list">
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Up to 10 students</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Basic scheduling
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Resource library & content management</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Digital resource library
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Basic scheduling system</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Student progress tracking
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Student progress tracking</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Email support
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Email support</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-secondary me-2">
-                  <i class="ti ti-x"></i>
-                </span>
-                Student communication portal
+              <li class="feature-item">
+                <i class="ti ti-x-circle feature-icon-cross"></i>
+                <span>Advanced assessment tools</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-secondary me-2">
-                  <i class="ti ti-x"></i>
-                </span>
-                Advanced analytics
+              <li class="feature-item">
+                <i class="ti ti-x-circle feature-icon-cross"></i>
+                <span>Multi-teacher management</span>
               </li>
             </ul>
-            <a href="{% url 'account:register' %}" class="btn btn-label-primary d-grid w-100">Get Started</a>
+            <div class="d-grid mt-4">
+              <a href="{% url 'account:register' %}" class="btn btn-primary">Start Free Trial</a>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Language Pro -->
-      <div class="col-lg">
-        <div class="card border-primary border shadow-none">
-          <div class="card-body position-relative pt-4">
-            <div class="position-absolute end-0 me-5 top-0 mt-4">
-              <span class="badge bg-label-primary rounded-pill">Popular</span>
+      <div class="col-xl-4 col-lg-6">
+        <div class="card pricing-plan-card popular">
+          <div class="popular-badge">Most Popular</div>
+          <div class="card-header position-relative">
+            <h3 class="plan-name">Language Pro</h3>
+            <p class="plan-description">For growing language teaching practices</p>
+            <div class="price">
+              <span class="price-yearly">$22</span>
+              <span class="price-monthly" style="display: none;">$29</span>
+              <span class="fs-6 fw-normal text-muted">/month</span>
             </div>
-            <div class="my-4 pt-2 text-center">
-              <img src="{% static 'img/illustrations/page-pricing-standard.png' %}" alt="Language Pro Image" height="140">
-            </div>
-            <h4 class="card-title text-center text-capitalize mb-1">Language Pro</h4>
-            <p class="text-center mb-4">For growing language teaching practices</p>
-            <div class="text-center h-px-50">
-              <div class="d-flex justify-content-center">
-                <sup class="h6 text-body pricing-currency mt-2 mb-0 me-1">$</sup>
-                <h1 class="price-toggle price-yearly text-primary mb-0">22</h1>
-                <h1 class="price-toggle price-monthly text-primary mb-0 d-none">29</h1>
-                <sub class="h6 text-body pricing-duration mt-auto mb-1 ms-1">/month</sub>
-              </div>
-              <small class="price-yearly price-yearly-toggle text-muted">USD 264 / year</small>
-            </div>
-
-            <ul class="list-group ps-0 mt-5 mb-4">
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Up to 30 students
+            <small class="billing-yearly">$264 billed annually</small>
+            <small class="billing-monthly" style="display: none;">Billed monthly</small>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled feature-list">
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Up to 30 students</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Advanced scheduling & reminders
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Advanced resource management</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Enhanced teaching resources
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Advanced scheduling & reminders</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Advanced progress tracking
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Comprehensive assessment tools</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Student communication portal
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Student communication portal</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Priority support
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Priority support</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-secondary me-2">
-                  <i class="ti ti-x"></i>
-                </span>
-                Multi-teacher management
+              <li class="feature-item">
+                <i class="ti ti-x-circle feature-icon-cross"></i>
+                <span>Multi-teacher management</span>
               </li>
             </ul>
-            <a href="{% url 'account:register' %}" class="btn btn-primary d-grid w-100">Get Started</a>
+            <div class="d-grid mt-4">
+              <a href="{% url 'account:register' %}" class="btn btn-primary">Start Free Trial</a>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Language School -->
-      <div class="col-lg">
-        <div class="card border rounded shadow-none">
-          <div class="card-body pt-5">
-            <div class="my-3 text-center">
-              <img src="{% static 'img/illustrations/page-pricing-enterprise.png' %}" alt="Language School Image" height="140">
+      <div class="col-xl-4 col-lg-6">
+        <div class="card pricing-plan-card">
+          <div class="card-header position-relative">
+            <h3 class="plan-name">Language School</h3>
+            <p class="plan-description">Solution for language schools & academies</p>
+            <div class="price">
+              <span class="price-yearly">$37</span>
+              <span class="price-monthly" style="display: none;">$49</span>
+              <span class="fs-6 fw-normal text-muted">/month</span>
             </div>
-            <h4 class="card-title text-center text-capitalize mb-1">Language School</h4>
-            <p class="text-center mb-4">Solution for language schools & academies</p>
-
-            <div class="text-center h-px-50">
-              <div class="d-flex justify-content-center">
-                <sup class="h6 text-body pricing-currency mt-2 mb-0 me-1">$</sup>
-                <h1 class="price-toggle price-yearly text-primary mb-0">37</h1>
-                <h1 class="price-toggle price-monthly text-primary mb-0 d-none">49</h1>
-                <sub class="h6 text-body pricing-duration mt-auto mb-1 ms-1">/month</sub>
-              </div>
-              <small class="price-yearly price-yearly-toggle text-muted">USD 444 / year</small>
-            </div>
-            <ul class="list-group ps-0 mt-5 mb-4">
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Everything in Language Pro
+            <small class="billing-yearly">$444 billed annually</small>
+            <small class="billing-monthly" style="display: none;">Billed monthly</small>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled feature-list">
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Everything in Language Pro</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Unlimited students
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Unlimited students</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Multi-teacher management
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Multi-teacher management</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Advanced analytics dashboard
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Advanced analytics dashboard</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Custom integrations
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Custom integrations</span>
               </li>
-              <li class="mb-3 d-flex align-items-center">
-                <span class="badge badge-center w-px-20 h-px-20 rounded-pill bg-label-primary me-2">
-                  <i class="ti ti-check"></i>
-                </span>
-                Dedicated account manager
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>Dedicated account manager</span>
+              </li>
+              <li class="feature-item">
+                <i class="ti ti-check-circle feature-icon-check"></i>
+                <span>API access for custom solutions</span>
               </li>
             </ul>
-            <a href="{% url 'account:register' %}" class="btn btn-label-primary d-grid w-100">Get Started</a>
+            <div class="d-grid mt-4">
+              <a href="{% url 'account:register' %}" class="btn btn-primary">Start Free Trial</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!--/ Pricing Plans -->
+<!-- Pricing Plans Section: End -->
 
-<!-- Pricing Free Trial -->
-<section class="pricing-free-trial bg-label-primary">
-  <div class="container">
-    <div class="position-relative">
-      <div class="d-flex justify-content-between flex-column-reverse flex-lg-row align-items-center py-5">
-        <div class="text-center text-lg-start">
-          <h4 class="text-primary mb-2">Still not convinced? Start with a 14-day FREE trial!</h4>
-          <p class="text-body mb-4 mb-md-5">Experience the full power of xLearning with all features unlocked for 14 days.</p>
-          <a href="{% url 'account:register' %}" class="btn btn-primary">Start 14-day free trial</a>
+<!-- Enhanced Free Trial Section: Start -->
+<section class="container">
+  <div class="pricing-free-trial">
+    <div class="row">
+      <div class="col-lg-7">
+        <div class="free-trial-content">
+          <h4>Still not convinced?<br>Start with a 14-day FREE trial!</h4>
+          <p>Experience the full power of xLearning with all features unlocked. No credit card required, and no obligation to continue after your trial ends.</p>
+          <a href="{% url 'account:register' %}" class="btn btn-primary free-trial-btn">
+            <i class="ti ti-rocket me-2"></i> Start 14-day free trial
+          </a>
         </div>
-        <!-- image -->
-        <div class="text-center">
-          <img src="{% static 'img/illustrations/girl-with-laptop.png' %}" class="img-fluid me-lg-5 pe-lg-1 mb-3 mb-lg-0" alt="Teacher with laptop" width="202">
+      </div>
+      <div class="col-lg-5">
+        <div class="free-trial-image-container">
+          <div class="free-trial-shape"></div>
+          <img src="{% static 'img/illustrations/girl-with-laptop.png' %}" class="free-trial-image" alt="Teacher with laptop">
         </div>
       </div>
     </div>
   </div>
 </section>
-<!--/ Pricing Free Trial -->
+<!-- Enhanced Free Trial Section: End -->
 
 <!-- Feature Comparison -->
-<section class="section-py pricing-plans-comparison">
+<section class="pricing-comparison">
   <div class="container">
     <div class="col-12 text-center mb-5">
       <h3 class="mb-2">Feature Comparison</h3>
@@ -299,23 +701,6 @@
             <tbody>
               <tr>
                 <td class="text-heading">14-days free trial</td>
-                <td><span class="badge badge-center rounded-pill w-px-20 h-px-20 bg-label-primary p-0">
-                    <i class="ti ti-check"></i>
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td class="text-heading">Student Management</td>
-                <td><span class="badge bg-label-primary badge-sm">10 Students</span></td>
-                <td><span class="badge bg-label-primary badge-sm">30 Students</span></td>
-                <td><span class="badge bg-label-primary badge-sm">Unlimited</span></td>
-              </tr>
-              <tr>
-                <td class="text-heading">Resource Library</td>
-                <td><span class="badge badge-center rounded-pill w-px-20 h-px-20 bg-label-primary p-0">
-                    <i class="ti ti-check"></i>
-                  </span>
-                </td>
                 <td><span class="badge badge-center rounded-pill w-px-20 h-px-20 bg-label-primary p-0">
                     <i class="ti ti-check"></i>
                   </span>
@@ -422,73 +807,77 @@
 <!--/ Feature Comparison -->
 
 <!-- FAQ Section -->
-<section class="section-py pricing-faqs rounded-bottom bg-body">
+<section class="section-py bg-body">
   <div class="container">
     <div class="text-center mb-5">
       <h4 class="mb-2">Frequently Asked Questions</h4>
       <p>Find answers to common questions about xLearning's pricing and features.</p>
     </div>
-    <div class="accordion" id="pricingFaq">
-      <div class="card accordion-item">
-        <h2 class="accordion-header" id="headingone">
-          <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#faq-1" aria-expanded="false" aria-controls="faq-1">
-            How is student count calculated in each plan?
-          </button>
-        </h2>
-        <div id="faq-1" class="accordion-collapse collapse" aria-labelledby="headingone" data-bs-parent="#pricingFaq">
-          <div class="accordion-body">
-            Student count refers to the number of active student profiles you can have in your account at one time. 
-            If a student completes their studies, you can archive their profile without affecting your limit. 
-            The Solo Teacher plan allows up to 10 active students, the Language Pro plan allows up to 30, and the 
-            Language School plan has no limit.
+    <div class="row justify-content-center">
+      <div class="col-xl-10">
+        <div class="accordion" id="pricingFaq">
+          <div class="card accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#faq-1" aria-expanded="false" aria-controls="faq-1">
+                How is student count calculated in each plan?
+              </button>
+            </h2>
+            <div id="faq-1" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#pricingFaq">
+              <div class="accordion-body">
+                Student count refers to the number of active student profiles you can have in your account at one time. 
+                If a student completes their studies, you can archive their profile without affecting your limit. 
+                The Solo Teacher plan allows up to 10 active students, the Language Pro plan allows up to 30, and the 
+                Language School plan has no limit.
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="card accordion-item active">
-        <h2 class="accordion-header" id="headingTwo">
-          <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#faq-2" aria-expanded="false" aria-controls="faq-2">
-            How does payment processing work?
-          </button>
-        </h2>
-        <div id="faq-2" class="accordion-collapse collapse show" aria-labelledby="headingTwo" data-bs-parent="#pricingFaq">
-          <div class="accordion-body">
-            We accept all major credit cards and PayPal. Your subscription will be automatically renewed unless you cancel before the next billing cycle. For annual subscriptions, we'll send a reminder email 14 days before renewal. All payment information is securely handled through our payment processor and is never stored on our servers.
+          <div class="card accordion-item active">
+            <h2 class="accordion-header" id="headingTwo">
+              <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#faq-2" aria-expanded="true" aria-controls="faq-2">
+                How does payment processing work?
+              </button>
+            </h2>
+            <div id="faq-2" class="accordion-collapse collapse show" aria-labelledby="headingTwo" data-bs-parent="#pricingFaq">
+              <div class="accordion-body">
+                We accept all major credit cards and PayPal. Your subscription will be automatically renewed unless you cancel before the next billing cycle. For annual subscriptions, we'll send a reminder email 14 days before renewal. All payment information is securely handled through our payment processor and is never stored on our servers.
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="card accordion-item">
-        <h2 class="accordion-header" id="headingThree">
-          <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#faq-3" aria-expanded="false" aria-controls="faq-3">
-            Do you offer a money-back guarantee?
-          </button>
-        </h2>
-        <div id="faq-3" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#pricingFaq">
-          <div class="accordion-body">
-            Yes, we offer a 30-day money-back guarantee on all plans. If you're not satisfied with xLearning within the first 30 days of your paid subscription, contact our support team and we'll process a full refund. This is in addition to the 14-day free trial available for all new users.
+          <div class="card accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#faq-3" aria-expanded="false" aria-controls="faq-3">
+                Do you offer a money-back guarantee?
+              </button>
+            </h2>
+            <div id="faq-3" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#pricingFaq">
+              <div class="accordion-body">
+                Yes, we offer a 30-day money-back guarantee on all plans. If you're not satisfied with xLearning within the first 30 days of your paid subscription, contact our support team and we'll process a full refund. This is in addition to the 14-day free trial available for all new users.
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="card accordion-item">
-        <h6 class="accordion-header" id="headingFour">
-          <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#faq-4" aria-expanded="false" aria-controls="faq-4">
-            Can I upgrade or downgrade my plan later?
-          </button>
-        </h6>
-        <div id="faq-4" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#pricingFaq">
-          <div class="accordion-body">
-            Yes, you can change your plan at any time. When upgrading, the new rate will be prorated for the remainder of your billing cycle. When downgrading, the new rate will take effect at the start of your next billing cycle. All your data will be preserved when changing plans, but note that if you downgrade to a plan with lower student limits, you'll need to archive excess student profiles.
+          <div class="card accordion-item">
+            <h6 class="accordion-header" id="headingFour">
+              <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#faq-4" aria-expanded="false" aria-controls="faq-4">
+                Can I upgrade or downgrade my plan later?
+              </button>
+            </h6>
+            <div id="faq-4" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#pricingFaq">
+              <div class="accordion-body">
+                Yes, you can change your plan at any time. When upgrading, the new rate will be prorated for the remainder of your billing cycle. When downgrading, the new rate will take effect at the start of your next billing cycle. All your data will be preserved when changing plans, but note that if you downgrade to a plan with lower student limits, you'll need to archive excess student profiles.
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="card accordion-item">
-        <h6 class="accordion-header" id="headingFive">
-          <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#faq-5" aria-expanded="false" aria-controls="faq-5">
-            What happens after my free trial ends?
-          </button>
-        </h6>
-        <div id="faq-5" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#pricingFaq">
-          <div class="accordion-body">
-            After your 14-day free trial ends, you'll need to select a paid plan to continue using xLearning. We'll send you reminders before the trial ends, and you can choose your plan at any time during or after the trial. If you don't select a plan, your account will become inactive but your data will be preserved for 30 days in case you decide to subscribe later.
+          <div class="card accordion-item">
+            <h6 class="accordion-header" id="headingFive">
+              <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#faq-5" aria-expanded="false" aria-controls="faq-5">
+                What happens after my free trial ends?
+              </button>
+            </h6>
+            <div id="faq-5" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#pricingFaq">
+              <div class="accordion-body">
+                After your 14-day free trial ends, you'll need to select a paid plan to continue using xLearning. We'll send you reminders before the trial ends, and you can choose your plan at any time during or after the trial. If you don't select a plan, your account will become inactive but your data will be preserved for 30 days in case you decide to subscribe later.
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -498,18 +887,103 @@
 <!--/ FAQ Section -->
 
 <!-- CTA Section -->
-<section class="section-py bg-primary position-relative text-center text-white overflow-hidden">
-  <div class="container position-relative z-10">
-    <h2 class="mb-3">Ready to get started with xLearning?</h2>
-    <p class="mb-4">Join thousands of language teachers who are already using our platform.</p>
-    <a href="{% url 'account:register' %}" class="btn btn-lg btn-light">Start Your Free Trial</a>
+<section class="container">
+  <div class="pricing-cta">
+    <div class="pricing-cta-content">
+      <h3>Ready to transform your language teaching?</h3>
+      <p>Join thousands of language teachers who are already using our platform to simplify their teaching process and enhance student engagement.</p>
+      <a href="{% url 'account:register' %}" class="btn pricing-cta-btn btn-success">
+        <i class="ti ti-rocket me-2"></i> Start Your Free Trial
+      </a>
+    </div>
   </div>
-
-  <!-- SVG Curve (Bottom) -->
-  <svg class="position-absolute bottom-0 start-0 w-100" viewBox="0 0 1440 150" xmlns="http://www.w3.org/2000/svg">
-    <path fill="#ffffff" d="M0,0 C480,150 960,150 1440,0 L1440,150 L0,150 Z"></path>
-  </svg>
 </section>
 <!--/ CTA Section -->
 
-{% endblock %} 
+{% endblock %}
+
+
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Price toggle functionality
+    const priceToggleSwitch = document.getElementById('priceToggleSwitch');
+    const monthlyText = document.getElementById('monthlyText');
+    const annuallyText = document.getElementById('annuallyText');
+    const monthlyPrices = document.querySelectorAll('.price-monthly');
+    const yearlyPrices = document.querySelectorAll('.price-yearly');
+    const monthlyBilling = document.querySelectorAll('.billing-monthly');
+    const yearlyBilling = document.querySelectorAll('.billing-yearly');
+    
+    // Set initial state (annual by default)
+    togglePricing(priceToggleSwitch.checked);
+    
+    // Toggle event listener
+    priceToggleSwitch.addEventListener('change', function() {
+      togglePricing(this.checked);
+    });
+    
+    // Click on text labels
+    monthlyText.addEventListener('click', function() {
+      priceToggleSwitch.checked = false;
+      togglePricing(false);
+    });
+    
+    annuallyText.addEventListener('click', function() {
+      priceToggleSwitch.checked = true;
+      togglePricing(true);
+    });
+    
+    function togglePricing(isAnnual) {
+      if (isAnnual) {
+        // Show annual pricing
+        monthlyText.classList.remove('active');
+        annuallyText.classList.add('active');
+        
+        monthlyPrices.forEach(price => {
+          price.style.display = 'none';
+        });
+        
+        yearlyPrices.forEach(price => {
+          price.style.display = 'inline-block';
+        });
+        
+        monthlyBilling.forEach(billing => {
+          billing.style.display = 'none';
+        });
+        
+        yearlyBilling.forEach(billing => {
+          billing.style.display = 'block';
+        });
+      } else {
+        // Show monthly pricing
+        monthlyText.classList.add('active');
+        annuallyText.classList.remove('active');
+        
+        monthlyPrices.forEach(price => {
+          price.style.display = 'inline-block';
+        });
+        
+        yearlyPrices.forEach(price => {
+          price.style.display = 'none';
+        });
+        
+        monthlyBilling.forEach(billing => {
+          billing.style.display = 'block';
+        });
+        
+        yearlyBilling.forEach(billing => {
+          billing.style.display = 'none';
+        });
+      }
+    }
+    
+    // Animation on scroll
+    const pricingCards = document.querySelectorAll('.pricing-plan-card');
+    pricingCards.forEach((card, index) => {
+      card.style.transitionDelay = (index * 0.1) + 's';
+    });
+  });
+</script>
+{% endblock page_js %}

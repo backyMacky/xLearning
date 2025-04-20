@@ -1,113 +1,327 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Pages</title>
-  
-  {% load static %}
-  {% load i18n %}
-  
-  <!-- Vendor CSS -->
-  <link rel="stylesheet" href="{% static 'vendor/libs/@form-validation/form-validation.css' %}" />
-  <link rel="stylesheet" href="{% static 'vendor/css/pages/page-auth.css' %}" />
-  
-  <!-- Core CSS -->
-  <link rel="stylesheet" href="{% static 'vendor/css/core.css' %}" />
-  <link rel="stylesheet" href="{% static 'vendor/css/theme-default.css' %}" />
-</head>
-<body>
-  <div class="authentication-wrapper authentication-cover">
-    <!-- Logo -->
-   
-    <!-- /Logo -->
-    <div class="authentication-inner row m-0">
-      <!-- /Left Text -->
-      <div class="d-none d-lg-flex col-lg-8 p-0">
-        <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center">
-          <img src="{% static 'img/illustrations/auth-login-illustration-' %}{{ COOKIES.style|default:style }}.png" alt="auth-login-cover" class="my-5 auth-illustration" data-app-light-img="illustrations/auth-login-illustration-light.png" data-app-dark-img="illustrations/auth-login-illustration-dark.png">
+{% extends layout_path %}
 
-          <img src="{% static 'img/illustrations/bg-shape-image-' %}{{ COOKIES.style|default:style }}.png" alt="auth-login-cover" class="platform-bg" data-app-light-img="illustrations/bg-shape-image-light.png" data-app-dark-img="illustrations/bg-shape-image-dark.png">
-        </div>
-      </div>
-      <!-- /Left Text -->
+{% load static %}
+{% load i18n %}
 
-      <!-- Login -->
-      <div class="d-flex col-12 col-lg-4 align-items-center authentication-bg p-sm-12 p-6">
-        <div class="w-px-400 mx-auto mt-12 pt-5">
-          <h4 class="mb-1">Welcome to Learning Platform! 👋</h4>
-          <p class="mb-6">Please sign-in to your account and start the adventure</p>
-          <div class="alert alert-primary small">
-            <p class="text-caption mb-1"> Admin Email: <strong>kareem@gmail.com</strong> / Username: <strong>kareem</strong>
-              <span class="cursor-pointer" id="admin-user"><i class="ti ti-help ti-xs text-body mb-1" data-bs-toggle="popover" data-bs-placement="top" data-bs-trigger="hover focus" title="Admin User" data-bs-content="Can access User, Roles, and Permissions pages. Possesses permissions to View, Update, Delete, and Create transactions on the Transaction Page."></i></span>
-            </p>
-            <p class="text-caption mb-1"> Client Email: <strong>kareem@gmail.com</strong> / Username: <strong>kareem</strong>
-              <span class="cursor-pointer" id="client-user"><i class="ti ti-help ti-xs text-body mb-1" data-bs-toggle="popover" data-bs-placement="top" data-bs-trigger="hover focus" title="Client User" data-bs-content="Unable to access User, Roles, and Permissions pages. Limited to viewing the Transaction page exclusively."></i></span>
-            </p>
-            <p class="text-caption mb-0">Password: <strong>kareem</strong></p>
-          </div>
-          {% if messages %}
-          {% for message in messages %}
-          <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-warning{% endif %}" role="alert">
-            {{ message }}
-          </div>
-          {% endfor %}
-          {% endif %}
+{% block title %}Login - xLearning{% endblock %}
 
-          <form id="formAuthentication" class="mb-6" action="{% url 'account:login' %}" method="post">
-            {% csrf_token %}
-            <div class="mb-6">
-              <label for="email" class="form-label">Email or Username</label>
-              <input type="email" class="form-control" id="email" name="email-username" value="kareem@gmail.com" placeholder="Email/Username" autofocus />
-            </div>
-            <div class="mb-6 form-password-toggle">
-              <label class="form-label" for="password">Password</label>
-              <div class="input-group input-group-merge">
-                <input type="password" id="password" class="form-control" name="password" value="kareem" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
-                <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<style>
+  .auth-section {
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .auth-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.08;
+    z-index: 0;
+  }
+  
+  .auth-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .auth-card {
+    border-radius: 20px;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .auth-header {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, rgb(119, 158, 214) 0%, rgb(163, 137, 182) 100%);
+    color: white;
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .auth-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .auth-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+  
+  .auth-body {
+    padding: 40px;
+    background: white;
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: #495057;
+  }
+  
+  .form-control {
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+  }
+  
+  .form-control:focus {
+    border-color: #7367f0;
+    box-shadow: 0 0 0 0.25rem rgba(115, 103, 240, 0.25);
+  }
+  
+  .input-group-text {
+    border-radius: 10px 0 0 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-right: none;
+    color: #7367f0;
+  }
+  
+  .input-group .form-control {
+    border-radius: 0 10px 10px 0;
+  }
+  
+  .auth-submit {
+    padding: 12px 30px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .auth-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(115, 103, 240, 0.3);
+  }
+  
+  .auth-demo-badge {
+    border-left: 4px solid #7367f0;
+    background-color: rgba(115, 103, 240, 0.1);
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .auth-features {
+    padding: 30px;
+    background: linear-gradient(135deg, rgb(119, 158, 214) 0%, rgb(163, 137, 182) 100%);
+    border-radius: 20px;
+    color: white;
+    height: 100%;
+  }
+  
+  .auth-feature-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+  
+  .auth-feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+  
+  .auth-feature-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin-right: 1rem;
+    font-size: 1.25rem;
+  }
+  
+  .auth-feature-text {
+    font-size: 1rem;
+  }
+  
+  .password-toggle {
+    cursor: pointer;
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="row g-0">
+          <!-- Login Form Column -->
+          <div class="col-md-6" data-aos="fade-right" data-aos-duration="1000">
+            <div class="auth-card h-100">
+              <div class="auth-header">
+                <h3 class="auth-title">Welcome Back!</h3>
+                <p class="auth-subtitle mb-0">Log in to continue your teaching journey</p>
               </div>
-            </div>
-            <div class="my-8">
-              <div class="d-flex justify-content-between">
-                <div class="form-check mb-0 ms-2">
-                  <input class="form-check-input" type="checkbox" id="remember-me">
-                  <label class="form-check-label" for="remember-me">
-                    Remember Me
-                  </label>
+              
+              <div class="auth-body">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-warning{% endif %} alert-dismissible mb-3" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <a href="">
-                  <p class="mb-0">Forgot Password?</p>
-                </a>
+                {% endfor %}
+                {% endif %}
+                
+                <!-- Demo Login Credentials -->
+                <div class="auth-demo-badge">
+                  <p class="mb-1"><strong>Demo Account:</strong></p>
+                  <p class="mb-1 small">Username: <strong>demo_teacher</strong></p>
+                  <p class="mb-0 small">Password: <strong>demo123</strong></p>
+                </div>
+                
+                <form id="loginForm" action="{% url 'account:login' %}" method="post">
+                  {% csrf_token %}
+                  
+                  <div class="mb-3">
+                    <label for="email-username" class="form-label">Email or Username</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="ti ti-user"></i></span>
+                      <input type="text" class="form-control" id="email-username" name="email-username" placeholder="Enter your email or username" autofocus>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <label for="password" class="form-label mb-0">Password</label>
+                      
+                    </div>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="ti ti-lock"></i></span>
+                      <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password">
+                      <span class="input-group-text password-toggle"><i class="ti ti-eye-off"></i></span>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="remember-me" name="remember-me">
+                      <label class="form-check-label" for="remember-me">
+                        Remember me
+                      </label>
+                    </div>
+                  </div>
+                  
+                  {% if request.GET.next %}
+                  <input type="hidden" name="next" value="{{ request.GET.next }}">
+                  {% endif %}
+                  
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary auth-submit">
+                      <i class="ti ti-login me-2"></i> Sign In
+                    </button>
+                  </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                  <p>Don't have an account?
+                  <a href="{% url 'account:register' %}" class="btn btn-link fw-semibold">Sign up</a></p>
+                </div>
+                
+                <div class="text-center mt-3">
+                  <a href="{% url 'account:forgot_password' %}" class="btn btn-link text-primary">Forgot your password?</a>
+                </div>
+                
               </div>
             </div>
-            {% if request.GET.next %}
-            <input type="hidden" name="next" value="{{request.GET.next}}">
-            {% endif %}
-            <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
-          </form>
-
-          <p class="text-center">
-            <span>New on our platform?</span>
-            <a href="{% url 'account:register' %}">
-              <span>Create an account</span>
-            </a>
-          </p>
+          </div>
         </div>
       </div>
-      <!-- /Login -->
     </div>
   </div>
+</section>
+{% endblock %}
 
-  <!-- Vendor JS -->
-  <script src="{% static 'vendor/libs/jquery/jquery.js' %}"></script>
-  <script src="{% static 'vendor/libs/popper/popper.js' %}"></script>
-  <script src="{% static 'vendor/js/bootstrap.js' %}"></script>
-  <script src="{% static 'vendor/libs/@form-validation/popular.js' %}"></script>
-  <script src="{% static 'vendor/libs/@form-validation/bootstrap5.js' %}"></script>
-  <script src="{% static 'vendor/libs/@form-validation/auto-focus.js' %}"></script>
-  
-  <!-- Page JS -->
-  <script src="{% static 'js/pages-auth.js' %}"></script>
-  <script src="{% static 'js/ui-popover.js' %}"></script>
-</body>
-</html>
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animation
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 50
+    });
+    
+    // Password toggle functionality
+    const passwordToggle = document.querySelector('.password-toggle');
+    if (passwordToggle) {
+      passwordToggle.addEventListener('click', function() {
+        const passwordField = document.getElementById('password');
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        
+        // Toggle icon
+        const icon = this.querySelector('i');
+        if (type === 'password') {
+          icon.classList.remove('ti-eye');
+          icon.classList.add('ti-eye-off');
+        } else {
+          icon.classList.remove('ti-eye-off');
+          icon.classList.add('ti-eye');
+        }
+      });
+    }
+    
+    // Form validation
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+      loginForm.addEventListener('submit', function(e) {
+        let isValid = true;
+        const emailUsername = document.getElementById('email-username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        
+        if (!emailUsername) {
+          isValid = false;
+          highlightError('email-username');
+        } else {
+          removeError('email-username');
+        }
+        
+        if (!password) {
+          isValid = false;
+          highlightError('password');
+        } else {
+          removeError('password');
+        }
+        
+        if (!isValid) {
+          e.preventDefault();
+        }
+      });
+    }
+    
+    function highlightError(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.classList.add('is-invalid');
+      field.closest('.input-group').classList.add('has-validation');
+    }
+    
+    function removeError(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.classList.remove('is-invalid');
+    }
+  });
+</script>
+{% endblock %}

@@ -10,7 +10,7 @@
         <!-- Mobile menu toggle: End-->
         <a href="{% url 'front_pages:home' %}" class="app-brand-link">
           <span class="app-brand-logo demo">{% include 'partials/logo.html' %}</span>
-          <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1">EduTeach</span>
+          <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1 text-primary">xLearning</span>
         </a>
       </div>
       <!-- Menu logo wrapper: End -->
@@ -23,154 +23,42 @@
           <li class="nav-item">
             <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'home' %}active{% endif %}" aria-current="page" href="{% url 'front_pages:home' %}">Home</a>
           </li>
-          <li class="nav-item mega-dropdown {% if 'features' in request.resolver_match.url_name %}active{% endif %}">
-            <a href="javascript:void(0);" class="nav-link dropdown-toggle navbar-ex-14-mega-dropdown mega-dropdown fw-medium" aria-expanded="false" data-bs-toggle="mega-dropdown" data-trigger="hover">
-              <span data-i18n="Features">Features</span>
+          <li class="nav-item dropdown {% if 'features' in request.resolver_match.url_name %}active{% endif %}">
+            <a href="javascript:void(0);" class="nav-link dropdown-toggle fw-medium" aria-expanded="false" data-bs-toggle="dropdown">
+              <span>Features</span>
             </a>
-            <div class="dropdown-menu p-4 p-xl-8">
-              <div class="row gy-4">
-                <div class="col-12 col-lg">
-                  <div class="h6 d-flex align-items-center mb-3 mb-lg-5">
-                    <div class="avatar flex-shrink-0 me-3">
-                      <span class="avatar-initial rounded bg-label-primary"><i class='ti ti-book ti-lg'></i></span>
-                    </div>
-                    <span class="ps-1">Content Management</span>
-                  </div>
-                  <ul class="nav flex-column">
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Course Creation</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#multimedia">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Multimedia Management</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#sharing">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Sharing Controls</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-12 col-lg">
-                  <div class="h6 d-flex align-items-center mb-3 mb-lg-5">
-                    <div class="avatar flex-shrink-0 me-3">
-                      <span class="avatar-initial rounded bg-label-primary"><i class='ti ti-video ti-lg'></i></span>
-                    </div>
-                    <span class="ps-1">Live Sessions</span>
-                  </div>
-                  <ul class="nav flex-column">
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Session Scheduling</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#integrations">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Meet Integrations</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#notes">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Session Notes</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-12 col-lg">
-                  <div class="h6 d-flex align-items-center mb-3 mb-lg-5">
-                    <div class="avatar flex-shrink-0 me-3">
-                      <span class="avatar-initial rounded bg-label-primary"><i class='ti ti-clipboard-check ti-lg'></i></span>
-                    </div>
-                    <span class="ps-1">Assessment Tools</span>
-                  </div>
-                  <ul class="nav flex-column">
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Quiz Creation</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#progress">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Progress Tracking</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#feedback">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Feedback System</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-12 col-lg">
-                  <div class="h6 d-flex align-items-center mb-3 mb-lg-5">
-                    <div class="avatar flex-shrink-0 me-3">
-                      <span class="avatar-initial rounded bg-label-primary"><i class='ti ti-folder ti-lg'></i></span>
-                    </div>
-                    <span class="ps-1">Student Management</span>
-                  </div>
-                  <ul class="nav flex-column">
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>File Repositories</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#organization">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Resource Organization</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#engagement">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Engagement Tracking</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-12 col-lg">
-                  <div class="h6 d-flex align-items-center mb-3 mb-lg-5">
-                    <div class="avatar flex-shrink-0 me-3">
-                      <span class="avatar-initial rounded bg-label-primary"><i class='ti ti-calendar ti-lg'></i></span>
-                    </div>
-                    <span class="ps-1">Booking & Payment</span>
-                  </div>
-                  <ul class="nav flex-column">
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Availability Management</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#hours">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Teaching Hours</span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link mega-dropdown-link" href="#credits">
-                        <i class='ti ti-circle me-1'></i>
-                        <span>Credit Management</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:content-management' %}">
+                  <i class="ti ti-book ti-sm me-2"></i>
+                  <span>Content Management</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:live-sessions' %}">
+                  <i class="ti ti-video ti-sm me-2"></i>
+                  <span>Live Sessions</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:assessment-tools' %}">
+                  <i class="ti ti-clipboard-check ti-sm me-2"></i>
+                  <span>Assessment Tools</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:student-management' %}">
+                  <i class="ti ti-users ti-sm me-2"></i>
+                  <span>Student Management</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:booking-payment' %}">
+                  <i class="ti ti-calendar ti-sm me-2"></i>
+                  <span>Booking & Payment</span>
+                </a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}" href="{% url 'front_pages:pricing' %}">Pricing</a>
@@ -180,9 +68,6 @@
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'blog' %}active{% endif %}" href="{% url 'front_pages:blog' %}">Blog</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'faq' %}active{% endif %}" href="{% url 'front_pages:faq' %}">FAQ</a>
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'front_pages:contact' %}">Contact Us</a>
@@ -197,22 +82,22 @@
         <!-- Style Switcher -->
         <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-1">
           <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-            <i class='ti ti-sun ti-lg'></i>
+            <i class='ti ti-sun ti-lg text-primary'></i>
           </a>
           <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
             <li>
               <a class="dropdown-item" href="javascript:void(0);" data-theme="light">
-                <span class="align-middle"><i class='ti ti-sun me-3'></i>Light</span>
+                <span class="align-middle"><i class='ti ti-sun me-2'></i>Light</span>
               </a>
             </li>
             <li>
               <a class="dropdown-item" href="javascript:void(0);" data-theme="dark">
-                <span class="align-middle"><i class="ti ti-moon-stars me-3"></i>Dark</span>
+                <span class="align-middle"><i class="ti ti-moon-stars me-2"></i>Dark</span>
               </a>
             </li>
             <li>
               <a class="dropdown-item" href="javascript:void(0);" data-theme="system">
-                <span class="align-middle"><i class="ti ti-device-desktop-analytics me-3"></i>System</span>
+                <span class="align-middle"><i class="ti ti-device-desktop-analytics me-2"></i>System</span>
               </a>
             </li>
           </ul>
@@ -224,39 +109,35 @@
         <li class="nav-item navbar-dropdown dropdown-user dropdown">
           <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
             <div class="avatar avatar-online">
-              <!-- Moke condition for displaying user avatar -->
-              {% if request.user|has_group:"admin" %}
-              <img src="{% static 'img/avatars/1.png' %}" alt class="w-px-40 h-auto rounded-circle">
+              {% if request.user.profile.profile_image %}
+              <img src="{{ request.user.profile.profile_image.url }}" alt="user-avatar" class="w-px-40 h-auto rounded-circle">
               {% else %}
-              <img src="{% static 'img/avatars/3.png' %}" alt class="w-px-40 h-auto rounded-circle">
+              <span class="avatar-initial rounded-circle bg-primary">{{ request.user.username|first|upper }}</span>
               {% endif %}
             </div>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <a class="dropdown-item" href="">
+              <a class="dropdown-item" href="{% url 'account:profile' %}">
                 <div class="d-flex">
                   <div class="flex-shrink-0 me-3">
                     <div class="avatar avatar-online">
-                      <!-- Moke condition for displaying user avatar -->
-                      {% if request.user|has_group:"admin" %}
-                      <img src="{% static 'img/avatars/1.png' %}" alt class="w-px-40 h-auto rounded-circle">
+                      {% if request.user.profile.profile_image %}
+                      <img src="{{ request.user.profile.profile_image.url }}" alt="user-avatar" class="w-px-40 h-auto rounded-circle">
                       {% else %}
-                      <img src="{% static 'img/avatars/3.png' %}" alt class="w-px-40 h-auto rounded-circle">
+                      <span class="avatar-initial rounded-circle bg-primary">{{ request.user.username|first|upper }}</span>
                       {% endif %}
                     </div>
                   </div>
                   <div class="flex-grow-1">
                     <span class="fw-medium d-block">{{ request.user.username }}</span>
-                    {% for group in request.user.groups.all %}
-                    <small class="text-muted">{{ group.name }}</small>
-                    {% endfor %}
+                    <small class="text-muted">{{ request.user.get_user_type_display }}</small>
                   </div>
                 </div>
               </a>
             </li>
             <li>
-              <hr class="dropdown-divider">
+              <div class="dropdown-divider"></div>
             </li>
             <li>
               <a class="dropdown-item" href="{% url 'account:profile' %}">
@@ -265,20 +146,34 @@
               </a>
             </li>
             <li>
-              <a class="dropdown-item" href="">
+              <a class="dropdown-item" href="{% url 'dashboards:overview' %}">
                 <i class="ti ti-layout-dashboard me-2 ti-sm"></i>
                 <span class="align-middle">Dashboard</span>
               </a>
             </li>
+            {% if request.user.is_superuser or request.user.is_admin %}
             <li>
-              <hr class="dropdown-divider">
+              <a class="dropdown-item" href="{% url 'front_pages:contact_messages' %}">
+                <i class="ti ti-message-circle me-2 ti-sm"></i>
+                <span class="align-middle">Contact Messages</span>
+              </a>
             </li>
             <li>
-              <form action="{% url 'account:logout' %}" method="post">
+              <a class="dropdown-item" href="{% url 'front_pages:subscribers' %}">
+                <i class="ti ti-users me-2 ti-sm"></i>
+                <span class="align-middle">Subscribers</span>
+              </a>
+            </li>
+            {% endif %}
+            <li>
+              <div class="dropdown-divider"></div>
+            </li>
+            <li>
+              <form action="{% url 'account:logout' %}" method="post" class="px-3 py-2">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-sm btn-danger d-flex w-100">
-                    <span class="align-middle">Log Out</span>
-                    <i class="ti ti-logout ms-2 ti-14px"></i>
+                  <span class="align-middle">Log Out</span>
+                  <i class="ti ti-logout ms-2 ti-sm"></i>
                 </button>
               </form>
             </li>
@@ -286,10 +181,10 @@
         </li>
         {% else %}
         <li>
-          <a href="{% url 'account:login' %}" class="btn btn-primary me-2"><span class="tf-icons ti ti-login scaleX-n1-rtl me-md-1"></span><span class="d-none d-md-block">Login</span></a>
+          <a href="{% url 'account:login' %}" class="btn btn-primary me-2"><span class="tf-icons ti ti-login me-md-1"></span><span class="d-none d-md-block">Login</span></a>
         </li>
         <li>
-          <a href="{% url 'account:register' %}" class="btn btn-outline-primary"><span class="tf-icons ti ti-user-plus scaleX-n1-rtl me-md-1"></span><span class="d-none d-md-block">Register</span></a>
+          <a href="{% url 'account:register' %}" class="btn btn-outline-primary"><span class="tf-icons ti ti-user-plus me-md-1"></span><span class="d-none d-md-block">Register</span></a>
         </li>
         {% endif %}
         <!-- navbar button: End -->

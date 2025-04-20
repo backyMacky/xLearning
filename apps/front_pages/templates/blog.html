@@ -1,3 +1,4 @@
+
 {% extends layout_path %}
 
 {% load static %}
@@ -5,54 +6,779 @@
 
 {% block title %}Language Teaching Blog - xLearning Platform{% endblock %}
 
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
 {% block page_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'vendor/css/pages/front-page-blog.css' %}" />
+<style>
+  /* Custom Blog Styling */
+  .blog-hero {
+    background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
+    padding: 100px 0 160px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: -60px;
+  }
+  
+  .blog-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.08;
+    z-index: 0;
+  }
+  
+  .blog-hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  
+  .blog-hero p {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .blog-container {
+    padding: 20px;
+    border-radius: 30px 30px 0 0;
+    background: #fff;
+    margin-top: -60px;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .blog-search {
+    position: relative;
+    max-width: 600px;
+    margin: -40px auto 40px;
+  }
+  
+  .blog-search .input-group {
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .blog-search .form-control {
+    height: 60px;
+    font-size: 1.1rem;
+  }
+  
+  .blog-search .input-group-text {
+    background-color: #7367f0;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .featured-post {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  
+  .featured-post:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .featured-post-img {
+    height: 400px;
+    object-fit: cover;
+  }
+  
+  .featured-content {
+    padding: 30px;
+  }
+  
+  .featured-badge {
+    display: inline-block;
+    padding: 6px 15px;
+    border-radius: 20px;
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  .featured-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    line-height: 1.3;
+  }
+
+  .featured-title a {
+    color: #5e5873;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .featured-title a:hover {
+    color: #7367f0;
+  }
+  
+  .featured-excerpt {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #6e6b7b;
+    margin-bottom: 20px;
+  }
+  
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .featured-author-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .featured-author {
+    font-weight: 600;
+    margin-right: 15px;
+  }
+  
+  .featured-date {
+    color: #6e6b7b;
+  }
+  
+  .trending-section {
+    padding: 80px 0;
+    background-color: #f8f7fa;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .trending-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('{% static "img/front-pages/backgrounds/blob-pattern.png" %}') no-repeat center/cover;
+    opacity: 0.05;
+    z-index: 0;
+  }
+  
+  .section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: #7367f0;
+    border-radius: 2px;
+  }
+  
+  .blog-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    height: 100%;
+    background: white;
+  }
+  
+  .blog-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+  .blog-card-img-container {
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .blog-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .blog-card:hover .blog-card-img {
+    transform: scale(1.1);
+  }
+  
+  .blog-card-body {
+    padding: 25px;
+  }
+  
+  .blog-card-category {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  
+  .cat-technology {
+    background-color: rgba(40, 199, 111, 0.1);
+    color: #28c76f;
+  }
+  
+  .cat-cultural {
+    background-color: rgba(0, 207, 232, 0.1);
+    color: #00cfe8;
+  }
+  
+  .cat-assessment {
+    background-color: rgba(255, 159, 67, 0.1);
+    color: #ff9f43;
+  }
+  
+  .cat-research {
+    background-color: rgba(234, 84, 85, 0.1);
+    color: #ea5455;
+  }
+  
+  .cat-methods {
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+  }
+  
+  .blog-card-title {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+  
+  .blog-card-title a {
+    color: #5e5873;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .blog-card-title a:hover {
+    color: #7367f0;
+  }
+  
+  .blog-card-text {
+    color: #6e6b7b;
+    margin-bottom: 15px;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .blog-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .blog-author {
+    display: flex;
+    align-items: center;
+  }
+  
+  .blog-author-img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .blog-date {
+    font-size: 0.85rem;
+    color: #6e6b7b;
+  }
+  
+  .categories-section {
+    padding: 80px 0;
+    position: relative;
+  }
+  
+  .categories-section::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: #f8f7fa;
+    z-index: -1;
+  }
+  
+  .category-card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .category-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(115, 103, 240, 0.9), rgba(166, 111, 240, 0.9));
+    z-index: 0;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+  }
+  
+  .category-card:hover::before {
+    opacity: 0.95;
+  }
+  
+  .category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .category-content {
+    position: relative;
+    z-index: 1;
+    padding: 30px;
+    color: white;
+  }
+  
+  .category-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+  }
+  
+  .category-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  
+  .category-count {
+    font-size: 1rem;
+  }
+  
+  .newsletter-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .newsletter-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.08;
+    z-index: 0;
+  }
+  
+  .newsletter-container {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .newsletter-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  
+  .newsletter-description {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+  }
+  
+  .newsletter-form {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .newsletter-input {
+    flex: 1;
+    height: 60px;
+    padding: 10px 20px;
+    border: none;
+    font-size: 1.1rem;
+  }
+  
+  .newsletter-button {
+    background-color: #fff;
+    color: #7367f0;
+    border: none;
+    padding: 0 30px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .newsletter-button:hover {
+    background-color: #f8f8f8;
+  }
+  
+  .newsletter-privacy {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+  
+  .pagination-container {
+    margin-top: 50px;
+    text-align: center;
+  }
+  
+  .pagination {
+    display: inline-flex;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .page-item .page-link {
+    border: none;
+    padding: 12px 20px;
+    color: #6e6b7b;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .page-item.active .page-link {
+    background-color: #7367f0;
+    color: white;
+  }
+  
+  .page-item .page-link:hover {
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+  }
+  
+  .sidebar-container {
+    position: sticky;
+    top: 100px;
+  }
+  
+  .sidebar-widget {
+    background-color: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .sidebar-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  .category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .category-list-item {
+    margin-bottom: 15px;
+  }
+  
+  .category-list-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #6e6b7b;
+    transition: all 0.3s ease;
+    padding: 5px 0;
+    text-decoration: none;
+  }
+  
+  .category-list-link:hover {
+    color: #7367f0;
+    transform: translateX(5px);
+  }
+  
+  .category-list-icon {
+    color: #7367f0;
+    margin-right: 10px;
+  }
+  
+  .category-list-count {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .popular-post {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .popular-post:last-child {
+    margin-bottom: 0;
+  }
+  
+  .popular-post-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-right: 15px;
+  }
+  
+  .popular-post-content {
+    flex: 1;
+  }
+  
+  .popular-post-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    line-height: 1.4;
+  }
+  
+  .popular-post-title a {
+    color: #5e5873;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .popular-post-title a:hover {
+    color: #7367f0;
+  }
+  
+  .popular-post-date {
+    font-size: 0.85rem;
+    color: #6e6b7b;
+  }
+  
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .tag-link {
+    display: inline-block;
+    padding: 5px 15px;
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .tag-link:hover {
+    background-color: #7367f0;
+    color: white;
+    transform: translateY(-3px);
+  }
+  
+  .subscribe-widget {
+    background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
+    color: white;
+  }
+  
+  .subscribe-title {
+    color: white;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .subscribe-form .form-control {
+    border-radius: 20px 0 0 20px;
+    border: none;
+    height: 50px;
+  }
+  
+  .subscribe-form .btn {
+    border-radius: 0 20px 20px 0;
+    background-color: white;
+    color: #7367f0;
+    font-weight: 600;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 991px) {
+    .blog-hero {
+      padding: 80px 0 140px;
+    }
+    
+    .blog-hero h1 {
+      font-size: 2.5rem;
+    }
+    
+    .featured-post-img {
+      height: 300px;
+    }
+    
+    .featured-title {
+      font-size: 1.6rem;
+    }
+    
+    .sidebar-container {
+      margin-top: 50px;
+      position: static;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .blog-hero {
+      padding: 60px 0 120px;
+    }
+    
+    .blog-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .featured-post-img {
+      height: 250px;
+    }
+    
+    .featured-title {
+      font-size: 1.4rem;
+    }
+    
+    .featured-content {
+      padding: 20px;
+    }
+    
+    .newsletter-title {
+      font-size: 2rem;
+    }
+    
+    .newsletter-form {
+      flex-direction: column;
+    }
+    
+    .newsletter-input {
+      border-radius: 10px 10px 0 0;
+    }
+    
+    .newsletter-button {
+      border-radius: 0 0 10px 10px;
+      padding: 15px;
+    }
+  }
+</style>
 {% endblock page_css %}
 
+{% block page_js %}
+{{ block.super }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true,
+      mirror: false
+    });
+  });
+</script>
+{% endblock page_js %}
+
 {% block content %}
-<!-- Blog Header -->
-<section class="section-py bg-body first-section-pt">
+<!-- Blog Hero Section: Start -->
+<section class="blog-hero">
   <div class="container">
-    <div class="text-center mb-4">
-      <span class="badge bg-label-primary">Blog</span>
+    <div class="text-center" data-aos="fade-up">
+      <span class="badge bg-white text-primary py-2 px-3 mb-3">Language Teaching Blog</span>
+      <h1>Language Teaching Insights</h1>
+      <p>Expert articles, teaching strategies, and educational resources for language educators</p>
     </div>
-    <h3 class="text-center mb-2">
-      <span class="position-relative fw-extrabold z-1">Language Teaching Insights
-        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="blog icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
-      </span>
-    </h3>
-    <p class="text-center mb-5">Expert articles, teaching strategies, and educational resources for language educators</p>
   </div>
 </section>
-<!-- /Blog Header -->
+<!-- Blog Hero Section: End -->
 
-<!-- Featured Article -->
-<section class="section-py">
+<!-- Blog Content: Start -->
+<div class="blog-container">
   <div class="container">
-    <div class="row">
+    <!-- Search Bar -->
+    <div class="blog-search" data-aos="fade-up" data-aos-delay="200">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search for teaching topics, strategies, or resources..." aria-label="Search" aria-describedby="blog-search">
+        <span class="input-group-text" id="blog-search"><i class="ti ti-search"></i></span>
+      </div>
+    </div>
+
+    <!-- Featured Post -->
+    <div class="row mb-5" data-aos="fade-up" data-aos-delay="300">
       <div class="col-12">
-        <div class="card">
+        <div class="featured-post">
           <div class="row g-0">
-            <div class="col-md-5">
-              <img class="card-img-top h-100 object-fit-cover" src="{% static 'img/front-pages/blog/effective-language-teaching.jpg' %}" alt="Effective Language Teaching">
+            <div class="col-md-6">
+              <img src="{% static 'img/front-pages/blog/effective-language-teaching.jpg' %}" alt="Effective Language Teaching" class="featured-post-img w-100">
             </div>
-            <div class="col-md-7">
-              <div class="card-body p-4 p-lg-5">
-                <span class="badge bg-label-primary mb-3">Featured</span>
-                <h3 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}" class="text-heading">Seven Effective Strategies for Modern Language Teaching</a>
-                </h3>
-                <p class="card-text mb-3">Today's language classrooms require innovative approaches that engage digital natives and accelerate learning outcomes. Research consistently demonstrates that traditional grammar-translation methods are giving way to more interactive, communicative approaches. This article explores seven evidence-based strategies that have proven particularly effective in contemporary language education settings.</p>
-                <div class="d-flex flex-wrap align-items-center mb-3">
-                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
-                    <img src="{% static 'img/avatars/8.png' %}" alt="Dr. Maria Rodriguez" class="rounded-circle me-2" width="30">
-                    <span>Dr. Maria Rodriguez</span>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-calendar-event me-1"></i>
-                    <span>April 12, 2025</span>
-                  </div>
+            <div class="col-md-6">
+              <div class="featured-content">
+                <div class="featured-badge">Featured</div>
+                <h2 class="featured-title">
+                  <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}">Seven Effective Strategies for Modern Language Teaching</a>
+                </h2>
+                <p class="featured-excerpt">Today's language classrooms require innovative approaches that engage digital natives and accelerate learning outcomes. Research consistently demonstrates that traditional grammar-translation methods are giving way to more interactive, communicative approaches.</p>
+                <div class="featured-meta">
+                  <img src="{% static 'img/avatars/8.png' %}" alt="Dr. Maria Rodriguez" class="featured-author-img">
+                  <span class="featured-author">Dr. Maria Rodriguez</span>
+                  <span class="featured-date"><i class="ti ti-calendar-event me-1"></i> April 12, 2025</span>
                 </div>
                 <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}" class="btn btn-primary">Read Article</a>
               </div>
@@ -61,58 +787,53 @@
         </div>
       </div>
     </div>
-  </div>
-</section>
-<!-- /Featured Article -->
-
-<!-- Blog Categories and Filter -->
-<section class="section-py bg-body">
-  <div class="container">
+    
     <div class="row g-4">
       <div class="col-lg-9">
-        <!-- Filter Controls -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-          <div class="d-flex flex-column">
-            <h4 class="mb-2">Latest Articles</h4>
-            <p class="text-muted mb-0">Explore our collection of expert insights and practical guides</p>
+        <!-- Filter Controls with Animations -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center p-4 bg-white rounded-3 shadow-sm mb-4" style="animation: fadeInUp 0.5s forwards;">
+          <div class="d-flex align-items-center">
+            <div class="category-icon bg-label-primary">
+              <i class="ti ti-article"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">Latest Articles</h5>
+              <p class="text-muted mb-0">Updated regularly with fresh content</p>
+            </div>
           </div>
-          <div class="d-flex align-items-center pt-3 pt-sm-0">
-            <div class="me-3">
-              <select class="form-select">
-                <option value="newest" selected>Newest</option>
-                <option value="popular">Most Popular</option>
-                <option value="trending">Trending</option>
-              </select>
-            </div>
-            <div class="input-group input-group-merge">
-              <span class="input-group-text" id="blog-search"><i class="ti ti-search"></i></span>
-              <input type="text" class="form-control" placeholder="Search articles..." aria-label="Search..." aria-describedby="blog-search" />
-            </div>
+          <div class="d-flex align-items-center gap-2">
+            <select class="form-select border-0 bg-light">
+              <option value="newest" selected>Newest</option>
+              <option value="popular">Most Popular</option>
+              <option value="trending">Trending</option>
+            </select>
+            <button class="btn btn-icon btn-primary">
+              <i class="ti ti-search"></i>
+            </button>
           </div>
         </div>
         
-        <!-- Blog Posts -->
-        <div class="row g-4 mb-5">
+        <!-- Blog Posts Grid -->
+        <div class="row g-4 mb-5 article-grid">
           <!-- Post 1 -->
-          <div class="col-md-6">
-            <div class="card h-100">
-              <img class="card-img-top" src="{% static 'img/front-pages/blog/technology-language-learning.jpg' %}" alt="Technology in Language Learning">
+          <div class="col-md-6" style="animation: fadeInUp 0.6s forwards;">
+            <div class="card article-card h-100">
+              <div class="position-relative">
+                <img class="card-img-top" src="{% static 'img/front-pages/blog/technology-language-learning.jpg' %}" alt="Technology in Language Learning">
+                <div class="position-absolute top-0 end-0 m-3">
+                  <span class="badge bg-success">Technology</span>
+                </div>
+              </div>
               <div class="card-body">
-                <a href="#" class="d-block">
-                  <span class="badge bg-label-success mb-3">Technology</span>
-                </a>
                 <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='ai-tools-language-teachers' %}" class="text-heading">10 AI Tools That Every Language Teacher Should Be Using in 2025</a>
+                  <a href="{% url 'front_pages:blog-post' slug='ai-tools-language-teachers' %}" class="text-heading">10 AI Tools for Language Teachers in 2025</a>
                 </h4>
-                <p class="card-text mb-3">Artificial intelligence has revolutionized language education, offering tools that can personalize learning, provide instant feedback, and create immersive experiences. From advanced pronunciation analysis to adaptive learning systems, these technologies are reshaping how languages are taught and acquired. This comprehensive guide examines the most effective AI tools for language educators.</p>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
-                    <img src="{% static 'img/avatars/9.png' %}" alt="David Chen" class="rounded-circle me-2" width="30">
-                    <span>David Chen</span>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-calendar-event me-1"></i>
-                    <span>April 10, 2025</span>
+                <p class="card-text">Discover how artificial intelligence is revolutionizing language education with tools that personalize learning and provide immersive experiences.</p>
+                <div class="d-flex align-items-center mt-3">
+                  <img src="{% static 'img/avatars/9.png' %}" alt="David Chen" class="rounded-circle me-2" width="30">
+                  <div class="d-flex flex-column">
+                    <span class="fw-semibold">David Chen</span>
+                    <small class="text-muted">April 10, 2025</small>
                   </div>
                 </div>
               </div>
@@ -120,25 +841,24 @@
           </div>
           
           <!-- Post 2 -->
-          <div class="col-md-6">
-            <div class="card h-100">
-              <img class="card-img-top" src="{% static 'img/front-pages/blog/cultural-immersion.jpg' %}" alt="Cultural Immersion">
+          <div class="col-md-6" style="animation: fadeInUp 0.7s forwards;">
+            <div class="card article-card h-100">
+              <div class="position-relative">
+                <img class="card-img-top" src="{% static 'img/front-pages/blog/cultural-immersion.jpg' %}" alt="Cultural Immersion">
+                <div class="position-absolute top-0 end-0 m-3">
+                  <span class="badge bg-info">Cultural Learning</span>
+                </div>
+              </div>
               <div class="card-body">
-                <a href="#" class="d-block">
-                  <span class="badge bg-label-info mb-3">Cultural Learning</span>
-                </a>
                 <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='cultural-immersion-techniques' %}" class="text-heading">Cultural Immersion Techniques for Virtual Language Classrooms</a>
+                  <a href="{% url 'front_pages:blog-post' slug='cultural-immersion-techniques' %}" class="text-heading">Cultural Immersion for Virtual Classrooms</a>
                 </h4>
-                <p class="card-text mb-3">Language acquisition is inseparable from cultural understanding. In virtual environments, teachers face unique challenges in creating authentic cultural experiences. This article explores innovative approaches to integrating cultural immersion into online language instruction, including virtual reality field trips, collaborative projects with native speakers, and cultural artifact analysis.</p>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
-                    <img src="{% static 'img/avatars/12.png' %}" alt="Sophie Martin" class="rounded-circle me-2" width="30">
-                    <span>Sophie Martin</span>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-calendar-event me-1"></i>
-                    <span>April 7, 2025</span>
+                <p class="card-text">Innovative approaches for integrating authentic cultural experiences into online language instruction, including virtual reality field trips.</p>
+                <div class="d-flex align-items-center mt-3">
+                  <img src="{% static 'img/avatars/12.png' %}" alt="Sophie Martin" class="rounded-circle me-2" width="30">
+                  <div class="d-flex flex-column">
+                    <span class="fw-semibold">Sophie Martin</span>
+                    <small class="text-muted">April 7, 2025</small>
                   </div>
                 </div>
               </div>
@@ -146,25 +866,24 @@
           </div>
           
           <!-- Post 3 -->
-          <div class="col-md-6">
-            <div class="card h-100">
-              <img class="card-img-top" src="{% static 'img/front-pages/blog/assessment-strategies.jpg' %}" alt="Assessment Strategies">
+          <div class="col-md-6" style="animation: fadeInUp 0.8s forwards;">
+            <div class="card article-card h-100">
+              <div class="position-relative">
+                <img class="card-img-top" src="{% static 'img/front-pages/blog/assessment-strategies.jpg' %}" alt="Assessment Strategies">
+                <div class="position-absolute top-0 end-0 m-3">
+                  <span class="badge bg-warning">Assessment</span>
+                </div>
+              </div>
               <div class="card-body">
-                <a href="#" class="d-block">
-                  <span class="badge bg-label-warning mb-3">Assessment</span>
-                </a>
                 <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='rethinking-language-assessment' %}" class="text-heading">Rethinking Language Assessment: Beyond Traditional Testing Methods</a>
+                  <a href="{% url 'front_pages:blog-post' slug='rethinking-language-assessment' %}" class="text-heading">Rethinking Language Assessment Methods</a>
                 </h4>
-                <p class="card-text mb-3">Traditional language tests often fail to measure communicative competence effectively. This in-depth exploration examines alternative assessment methodologies that better evaluate real-world language proficiency. From portfolio assessment to performance-based evaluation and self-assessment protocols, discover how to create more authentic and meaningful assessment experiences for language learners.</p>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
-                    <img src="{% static 'img/avatars/7.png' %}" alt="Dr. James Wilson" class="rounded-circle me-2" width="30">
-                    <span>Dr. James Wilson</span>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-calendar-event me-1"></i>
-                    <span>April 5, 2025</span>
+                <p class="card-text">Explore alternative assessment methodologies that better evaluate real-world language proficiency beyond traditional testing.</p>
+                <div class="d-flex align-items-center mt-3">
+                  <img src="{% static 'img/avatars/7.png' %}" alt="Dr. James Wilson" class="rounded-circle me-2" width="30">
+                  <div class="d-flex flex-column">
+                    <span class="fw-semibold">Dr. James Wilson</span>
+                    <small class="text-muted">April 5, 2025</small>
                   </div>
                 </div>
               </div>
@@ -172,77 +891,24 @@
           </div>
           
           <!-- Post 4 -->
-          <div class="col-md-6">
-            <div class="card h-100">
-              <img class="card-img-top" src="{% static 'img/front-pages/blog/neuroscience-language.jpg' %}" alt="Neuroscience of Language Learning">
-              <div class="card-body">
-                <a href="#" class="d-block">
-                  <span class="badge bg-label-danger mb-3">Research</span>
-                </a>
-                <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='neuroscience-language-learning' %}" class="text-heading">The Neuroscience of Language Learning: Practical Applications for Teachers</a>
-                </h4>
-                <p class="card-text mb-3">Recent advances in neuroscience have transformed our understanding of how the brain acquires language. This research-based article bridges neuroscientific findings with practical classroom applications. Learn about the neural networks involved in language processing, the role of emotion in language acquisition, optimal memory formation techniques, and how to structure lessons to align with the brain's natural learning mechanisms.</p>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
-                    <img src="{% static 'img/avatars/14.png' %}" alt="Dr. Elena Kuznetsova" class="rounded-circle me-2" width="30">
-                    <span>Dr. Elena Kuznetsova</span>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-calendar-event me-1"></i>
-                    <span>April 2, 2025</span>
-                  </div>
+          <div class="col-md-6" style="animation: fadeInUp 0.9s forwards;">
+            <div class="card article-card h-100">
+              <div class="position-relative">
+                <img class="card-img-top" src="{% static 'img/front-pages/blog/neuroscience-language.jpg' %}" alt="Neuroscience of Language Learning">
+                <div class="position-absolute top-0 end-0 m-3">
+                  <span class="badge bg-danger">Research</span>
                 </div>
               </div>
-            </div>
-          </div>
-          
-          <!-- Post 5 -->
-          <div class="col-md-6">
-            <div class="card h-100">
-              <img class="card-img-top" src="{% static 'img/front-pages/blog/differentiated-instruction.jpg' %}" alt="Differentiated Instruction">
               <div class="card-body">
-                <a href="#" class="d-block">
-                  <span class="badge bg-label-primary mb-3">Teaching Methods</span>
-                </a>
                 <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='differentiated-instruction-language' %}" class="text-heading">Differentiated Instruction in the Language Classroom: Strategies for Mixed-Ability Groups</a>
+                  <a href="{% url 'front_pages:blog-post' slug='neuroscience-language-learning' %}" class="text-heading">The Neuroscience of Language Learning</a>
                 </h4>
-                <p class="card-text mb-3">Language classrooms often contain students with vastly different proficiency levels, learning styles, and motivational factors. This comprehensive guide explores research-backed differentiation strategies that allow teachers to effectively address this diversity. From tiered assignments to flexible grouping, learn how to create an inclusive environment that challenges every student appropriately while maintaining cohesive classroom dynamics.</p>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
-                    <img src="{% static 'img/avatars/3.png' %}" alt="Michael Johnson" class="rounded-circle me-2" width="30">
-                    <span>Michael Johnson</span>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-calendar-event me-1"></i>
-                    <span>March 29, 2025</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Post 6 -->
-          <div class="col-md-6">
-            <div class="card h-100">
-              <img class="card-img-top" src="{% static 'img/front-pages/blog/pronunciation-teaching.jpg' %}" alt="Pronunciation Teaching">
-              <div class="card-body">
-                <a href="#" class="d-block">
-                  <span class="badge bg-label-success mb-3">Phonetics</span>
-                </a>
-                <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='modern-pronunciation-teaching' %}" class="text-heading">Modern Approaches to Pronunciation Teaching: From Theory to Practice</a>
-                </h4>
-                <p class="card-text mb-3">Pronunciation instruction has evolved significantly in recent years, moving beyond drill-based methods to more holistic approaches. This article examines contemporary frameworks for teaching pronunciation, including intelligibility-based models, the integration of suprasegmental features, and technology-enhanced feedback systems. Discover practical techniques for addressing common pronunciation challenges across different language families.</p>
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center me-4 mb-md-0 mb-2">
-                    <img src="{% static 'img/avatars/5.png' %}" alt="Dr. Sarah Thompson" class="rounded-circle me-2" width="30">
-                    <span>Dr. Sarah Thompson</span>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-calendar-event me-1"></i>
-                    <span>March 25, 2025</span>
+                <p class="card-text">Bridge neuroscientific findings with practical classroom applications to optimize how students acquire language skills.</p>
+                <div class="d-flex align-items-center mt-3">
+                  <img src="{% static 'img/avatars/14.png' %}" alt="Dr. Elena Kuznetsova" class="rounded-circle me-2" width="30">
+                  <div class="d-flex flex-column">
+                    <span class="fw-semibold">Dr. Elena Kuznetsova</span>
+                    <small class="text-muted">April 2, 2025</small>
                   </div>
                 </div>
               </div>
@@ -265,12 +931,6 @@
             <li class="page-item">
               <a class="page-link" href="javascript:void(0);">3</a>
             </li>
-            <li class="page-item">
-              <a class="page-link" href="javascript:void(0);">4</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="javascript:void(0);">5</a>
-            </li>
             <li class="page-item next">
               <a class="page-link" href="javascript:void(0);"><i class="ti ti-chevron-right ti-xs"></i></a>
             </li>
@@ -280,50 +940,55 @@
       
       <!-- Sidebar -->
       <div class="col-lg-3">
-        <!-- Categories -->
-        <div class="card mb-4">
+        <!-- Categories with Icons -->
+        <div class="card mb-4 shadow-sm" style="animation: fadeInUp 0.7s forwards;">
           <div class="card-body">
-            <h5 class="mb-3">Categories</h5>
+            <h5 class="d-flex align-items-center mb-3">
+              <i class="ti ti-category me-2 text-primary"></i>Categories
+            </h5>
             <ul class="list-unstyled mb-0">
               <li class="mb-3">
-                <a href="#" class="d-flex align-items-center">
-                  <i class="ti ti-chevron-right me-2 text-primary"></i>
-                  <span>Teaching Methods</span>
+                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-chalkboard me-2 text-primary"></i>
+                    <span>Teaching Methods</span>
+                  </div>
                   <span class="badge bg-label-primary ms-auto">14</span>
                 </a>
               </li>
               <li class="mb-3">
-                <a href="#" class="d-flex align-items-center">
-                  <i class="ti ti-chevron-right me-2 text-primary"></i>
-                  <span>Technology</span>
+                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-device-laptop me-2 text-primary"></i>
+                    <span>Technology</span>
+                  </div>
                   <span class="badge bg-label-primary ms-auto">21</span>
                 </a>
               </li>
               <li class="mb-3">
-                <a href="#" class="d-flex align-items-center">
-                  <i class="ti ti-chevron-right me-2 text-primary"></i>
-                  <span>Assessment</span>
+                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-chart-bar me-2 text-primary"></i>
+                    <span>Assessment</span>
+                  </div>
                   <span class="badge bg-label-primary ms-auto">8</span>
                 </a>
               </li>
               <li class="mb-3">
-                <a href="#" class="d-flex align-items-center">
-                  <i class="ti ti-chevron-right me-2 text-primary"></i>
-                  <span>Cultural Learning</span>
+                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-world me-2 text-primary"></i>
+                    <span>Cultural Learning</span>
+                  </div>
                   <span class="badge bg-label-primary ms-auto">12</span>
                 </a>
               </li>
-              <li class="mb-3">
-                <a href="#" class="d-flex align-items-center">
-                  <i class="ti ti-chevron-right me-2 text-primary"></i>
-                  <span>Research</span>
-                  <span class="badge bg-label-primary ms-auto">7</span>
-                </a>
-              </li>
               <li>
-                <a href="#" class="d-flex align-items-center">
-                  <i class="ti ti-chevron-right me-2 text-primary"></i>
-                  <span>Teaching Tips</span>
+                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-bulb me-2 text-primary"></i>
+                    <span>Teaching Tips</span>
+                  </div>
                   <span class="badge bg-label-primary ms-auto">18</span>
                 </a>
               </li>
@@ -331,82 +996,40 @@
           </div>
         </div>
         
-        <!-- Popular Articles -->
-        <div class="card mb-4">
+        <!-- Subscribe with Animation -->
+        <div class="card bg-primary text-white mb-4 shadow-sm" style="animation: fadeInUp 0.8s forwards;">
           <div class="card-body">
-            <h5 class="mb-3">Popular Articles</h5>
-            <div class="d-flex mb-3">
-              <div class="flex-shrink-0">
-                <img src="{% static 'img/front-pages/blog/popular-1-thumb.jpg' %}" alt="popular article" class="rounded" width="60">
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <a href="#" class="h6 d-block mb-0">The Future of Language Learning: Trends for 2025 and Beyond</a>
-                <small>March 15, 2025</small>
-              </div>
+            <div class="text-center mb-3">
+              <i class="ti ti-mail text-white" style="font-size: 2.5rem;"></i>
             </div>
-            <div class="d-flex mb-3">
-              <div class="flex-shrink-0">
-                <img src="{% static 'img/front-pages/blog/popular-2-thumb.jpg' %}" alt="popular article" class="rounded" width="60">
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <a href="#" class="h6 d-block mb-0">Teaching Heritage Languages: Strategies for Cultural Preservation</a>
-                <small>March 8, 2025</small>
-              </div>
-            </div>
-            <div class="d-flex mb-3">
-              <div class="flex-shrink-0">
-                <img src="{% static 'img/front-pages/blog/popular-3-thumb.jpg' %}" alt="popular article" class="rounded" width="60">
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <a href="#" class="h6 d-block mb-0">Motivation in Language Learning: Research-Based Strategies</a>
-                <small>February 28, 2025</small>
-              </div>
-            </div>
-            <div class="d-flex">
-              <div class="flex-shrink-0">
-                <img src="{% static 'img/front-pages/blog/popular-4-thumb.jpg' %}" alt="popular article" class="rounded" width="60">
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <a href="#" class="h6 d-block mb-0">Building Vocabulary Effectively: Beyond Word Lists</a>
-                <small>February 22, 2025</small>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Subscribe -->
-        <div class="card bg-primary text-white mb-4">
-          <div class="card-body">
-            <h5 class="text-white mb-3">Subscribe to Our Newsletter</h5>
-            <p class="mb-3">Get weekly articles, teaching resources, and research updates directly to your inbox.</p>
+            <h5 class="text-white text-center mb-3">Subscribe to Our Newsletter</h5>
+            <p class="mb-3 text-center">Get weekly teaching resources directly to your inbox.</p>
             <form>
               <div class="mb-3">
                 <input type="email" class="form-control" placeholder="Your email">
               </div>
-              <button type="submit" class="btn btn-light w-100">Subscribe</button>
+              <button type="submit" class="btn btn-light w-100">
+                <i class="ti ti-send me-2"></i>Subscribe
+              </button>
             </form>
           </div>
         </div>
         
-        <!-- Tags -->
-        <div class="card">
+        <!-- Tags with Animation -->
+        <div class="card shadow-sm" style="animation: fadeInUp 0.9s forwards;">
           <div class="card-body">
-            <h5 class="mb-3">Popular Tags</h5>
+            <h5 class="d-flex align-items-center mb-3">
+              <i class="ti ti-tags me-2 text-primary"></i>Popular Tags
+            </h5>
             <div class="d-flex flex-wrap gap-2">
-              <a href="#" class="badge bg-label-primary">Vocabulary</a>
-              <a href="#" class="badge bg-label-primary">Grammar</a>
-              <a href="#" class="badge bg-label-primary">Speaking</a>
-              <a href="#" class="badge bg-label-primary">Listening</a>
-              <a href="#" class="badge bg-label-primary">Reading</a>
-              <a href="#" class="badge bg-label-primary">Writing</a>
-              <a href="#" class="badge bg-label-primary">Technology</a>
-              <a href="#" class="badge bg-label-primary">Assessment</a>
-              <a href="#" class="badge bg-label-primary">Blended Learning</a>
-              <a href="#" class="badge bg-label-primary">Motivation</a>
-              <a href="#" class="badge bg-label-primary">Authentic Materials</a>
-              <a href="#" class="badge bg-label-primary">Classroom Management</a>
-              <a href="#" class="badge bg-label-primary">Research</a>
-              <a href="#" class="badge bg-label-primary">Cultural Learning</a>
+              <a href="#" class="badge bg-label-primary article-tag">Vocabulary</a>
+              <a href="#" class="badge bg-label-primary article-tag">Grammar</a>
+              <a href="#" class="badge bg-label-primary article-tag">Speaking</a>
+              <a href="#" class="badge bg-label-primary article-tag">Listening</a>
+              <a href="#" class="badge bg-label-primary article-tag">Technology</a>
+              <a href="#" class="badge bg-label-primary article-tag">Assessment</a>
+              <a href="#" class="badge bg-label-primary article-tag">Motivation</a>
+              <a href="#" class="badge bg-label-primary article-tag">Research</a>
             </div>
           </div>
         </div>
@@ -414,21 +1037,26 @@
     </div>
   </div>
 </section>
-<!-- /Blog Categories and Filter -->
+<!-- /Redesigned Blog Categories and Filter -->
 
-<!-- CTA -->
-<section class="section-py bg-primary">
-  <div class="container">
-    <div class="row justify-content-center align-items-center text-center text-lg-start">
-      <div class="col-lg-8 text-white">
-        <h3 class="text-white mb-1">Want to contribute to our blog?</h3>
-        <p class="mb-0">Share your expertise with the language teaching community</p>
+<!-- Curved CTA Section -->
+<section class="blog-cta py-5">
+  <div class="container py-4">
+    <div class="row justify-content-center align-items-center text-center">
+      <div class="col-lg-8 text-white mb-4 mb-lg-0">
+        <div class="mb-3">
+          <i class="ti ti-pencil text-white" style="font-size: 3rem;"></i>
+        </div>
+        <h3 class="text-white fw-bold mb-3">Want to contribute to our blog?</h3>
+        <p class="mb-0">Share your expertise with our growing community of language educators worldwide</p>
       </div>
-      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-        <a href="{% url 'front_pages:contact' %}" class="btn btn-light">Contact us</a>
+      <div class="col-lg-4 text-center">
+        <a href="{% url 'front_pages:contact' %}" class="btn btn-lg btn-light">
+          <i class="ti ti-message-circle me-2"></i>Contact us
+        </a>
       </div>
     </div>
   </div>
 </section>
-<!-- /CTA -->
+<!-- /Curved CTA Section -->
 {% endblock %}

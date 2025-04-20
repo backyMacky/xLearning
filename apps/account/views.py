@@ -17,10 +17,38 @@ from django.core.mail import send_mail
 import uuid
 import datetime
 
+from web_project import TemplateLayout
+from web_project.template_helpers.theme import TemplateHelper
 from apps.account.services import NotificationService
 from .models import Notification, NotificationType, Role, UserRole, Profile, UserType
 
-# Base Mixins
+# Mixin for handling template layout (placeholder implementation)
+class TemplateLayoutMixin:
+    """Mixin to provide template layout functionality"""
+    pass
+
+# Base View for account app - Using the same pattern as front_page app
+class BaseAccountView(TemplateView):
+    """Base class for all account views to ensure consistent template handling"""
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set consistent layout properties for all account pages
+        context.update({
+            "layout": "front",  # Use the front layout like front_page app
+            "layout_path": TemplateHelper.set_layout("layout_front.html", context),
+            "active_url": self.request.path,
+            "is_front": True,  # This is consistent with front_page app
+        })
+        
+        # Map context variables to template variables
+        TemplateHelper.map_context(context)
+        
+        return context
+
+# Base Mixins for authenticated views
 class SuperUserAccessMixin(UserPassesTestMixin):
     """Mixin to ensure superusers can access everything"""
     def test_func(self):
@@ -31,19 +59,19 @@ class AdminRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_authenticated and (self.request.user.is_admin or self.request.user.is_superuser)
 
-class TemplateLayoutMixin:
-    """Mixin to initialize template context with TemplateLayout"""
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        from web_project import TemplateLayout
-        context = TemplateLayout.init(self, context)
-        return context
-
 # Authentication Views
-class RegisterView(TemplateLayoutMixin, FormView):
-    """Class-based view for user registration"""
+class RegisterView(BaseAccountView, FormView):
+    """Class-based view for user registration - all users register as students by default"""
     template_name = 'register.html'
     success_url = reverse_lazy('account:verify_email')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Create an Account",
+            "page_description": "Join xLearning and start your learning journey."
+        })
+        return context
     
     def get_form(self, form_class=None):
         # Django forms would be better here, but keeping close to original code
@@ -62,12 +90,11 @@ class RegisterView(TemplateLayoutMixin, FormView):
             messages.error(request, "Email already exists")
             return redirect('account:register')
         
-        # Create user
+        # Create user - always as student by default
         user = User.objects.create_user(username=username, email=email, password=password)
         
-        # Set user type (teacher or student)
-        user_type = request.POST.get('user_type', UserType.STUDENT)
-        user.user_type = user_type
+        # Set user type to student by default
+        user.user_type = UserType.STUDENT
         
         # Generate verification token
         token = str(uuid.uuid4())
@@ -102,10 +129,17 @@ class RegisterView(TemplateLayoutMixin, FormView):
         
         send_mail(subject, message, email_from, recipient_list)
 
-
-class LoginView(TemplateLayoutMixin, FormView):
+class LoginView(BaseAccountView, FormView):
     """Class-based view for user login"""
     template_name = 'login.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Login to Your Account",
+            "page_description": "Sign in and continue your teaching journey."
+        })
+        return context
     
     def get_form(self, form_class=None):
         # Django forms would be better here, but keeping close to original code
@@ -146,17 +180,23 @@ class LoginView(TemplateLayoutMixin, FormView):
         
         return super().form_invalid(None)
 
-
 class LogoutView(View):
     """Class-based view for user logout"""
     def get(self, request, *args, **kwargs):
         logout(request)
-        return redirect('/')
+        return redirect('front_pages:home')  # Redirect to home page instead of /
 
-
-class VerifyEmailView(TemplateLayoutMixin, TemplateView):
+class VerifyEmailView(BaseAccountView):
     """Class-based view to verify email address"""
     template_name = 'verify_email.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Verify Your Email",
+            "page_description": "Complete your registration by verifying your email address."
+        })
+        return context
     
     def get(self, request, *args, **kwargs):
         token = kwargs.get('token')
@@ -173,8 +213,7 @@ class VerifyEmailView(TemplateLayoutMixin, TemplateView):
         
         return super().get(request, *args, **kwargs)
 
-
-class ResendVerificationEmailView(View):
+class ResendVerificationEmailView(BaseAccountView, View):
     """Class-based view to resend verification email"""
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
@@ -207,11 +246,18 @@ class ResendVerificationEmailView(View):
         
         return redirect('account:verify_email')
 
-
-class ForgotPasswordView(TemplateLayoutMixin, FormView):
+class ForgotPasswordView(BaseAccountView, FormView):
     """Class-based view for password recovery"""
     template_name = 'forgot_password.html'
     success_url = reverse_lazy('account:login')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Forgot Password",
+            "page_description": "Reset your password to regain access to your account."
+        })
+        return context
     
     def get_form(self, form_class=None):
         # Django forms would be better here, but keeping close to original code
@@ -246,20 +292,23 @@ class ForgotPasswordView(TemplateLayoutMixin, FormView):
             messages.error(request, "Email not found in our system")
             return self.render_to_response(self.get_context_data())
 
-
-class ResetPasswordView(TemplateLayoutMixin, FormView):
+class ResetPasswordView(BaseAccountView, FormView):
     """Class-based view for resetting password with token validation"""
     template_name = 'reset_password.html'
     success_url = reverse_lazy('account:login')
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Reset Password",
+            "page_description": "Create a new password for your account.",
+            "token": self.kwargs.get('token')
+        })
+        return context
+    
     def get_form(self, form_class=None):
         # Django forms would be better here, but keeping close to original code
         return None
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['token'] = self.kwargs.get('token')
-        return context
     
     def get(self, request, *args, **kwargs):
         token = kwargs.get('token')
@@ -307,13 +356,55 @@ class ResetPasswordView(TemplateLayoutMixin, FormView):
             messages.error(request, "Invalid password reset link.")
             return redirect('account:forgot_password')
 
-
 # Profile Views
-class ProfileView(LoginRequiredMixin, TemplateLayoutMixin, DetailView):
+class ProfileView(LoginRequiredMixin, BaseAccountView, DetailView):
     """Class-based view for viewing user profile"""
     model = User
     template_name = 'profile.html'
     context_object_name = 'profile_user'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        
+        context.update({
+            "page_title": f"{user.username}'s Profile",
+            "page_description": "View and manage your account details."
+        })
+        
+        # Add statistics based on user type
+        if user.is_teacher:
+            # Teacher statistics
+            taught_courses = getattr(user, 'taught_courses', [])
+            if hasattr(taught_courses, 'count'):
+                context['taught_courses'] = taught_courses.count()
+            else:
+                context['taught_courses'] = 0
+            
+            # Count unique students
+            total_students = 0
+            if hasattr(taught_courses, 'all'):
+                student_ids = set()
+                for course in taught_courses.all():
+                    if hasattr(course, 'students') and hasattr(course.students, 'values_list'):
+                        student_ids.update(course.students.values_list('id', flat=True))
+                total_students = len(student_ids)
+            context['total_students'] = total_students
+            
+            # Calculate teaching hours (placeholder)
+            context['teaching_hours'] = 0
+        else:
+            # Student statistics
+            if hasattr(user, 'enrolled_courses') and hasattr(user.enrolled_courses, 'count'):
+                context['enrolled_courses'] = user.enrolled_courses.count()
+            else:
+                context['enrolled_courses'] = 0
+            
+            # Placeholder for completed lessons
+            context['completed_lessons'] = 0
+            context['avg_score'] = 0
+        
+        return context
     
     def get_object(self, queryset=None):
         username = self.kwargs.get('username')
@@ -321,13 +412,20 @@ class ProfileView(LoginRequiredMixin, TemplateLayoutMixin, DetailView):
             return get_object_or_404(User, username=username)
         return self.request.user
 
-
-class UpdateProfileView(LoginRequiredMixin, TemplateLayoutMixin, UpdateView):
+class UpdateProfileView(LoginRequiredMixin, BaseAccountView, UpdateView):
     """Class-based view for updating user profile"""
     model = Profile
     template_name = 'edit_profile.html'
     fields = ['native_language', 'learning_language', 'bio', 'phone_number', 'date_of_birth', 'profile_image']
     success_url = reverse_lazy('account:profile')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Edit Profile",
+            "page_description": "Update your profile information."
+        })
+        return context
     
     def get_object(self, queryset=None):
         return self.request.user.profile
@@ -365,14 +463,143 @@ class ProfileAPIView(LoginRequiredMixin, View):
         profile = request.user.profile
         return JsonResponse(profile.get_profile())
 
+class TeacherRequestView(LoginRequiredMixin, BaseAccountView, FormView):
+    """View for students to request teacher privileges"""
+    template_name = 'teacher_request.html'
+    success_url = reverse_lazy('account:profile')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Request Teacher Status",
+            "page_description": "Submit your request to become a teacher on the platform."
+        })
+        return context
+    
+    def get_form(self, form_class=None):
+        # Django forms would be better here, but keeping close to original code
+        return None
+    
+    def post(self, request, *args, **kwargs):
+        # Make sure the user is a student
+        if request.user.user_type != UserType.STUDENT:
+            messages.error(request, "You are already a teacher or have a different role.")
+            return redirect('account:profile')
+            
+        # Get request details
+        qualifications = request.POST.get('qualifications', '')
+        experience = request.POST.get('experience', '')
+        teaching_subjects = request.POST.get('teaching_subjects', '')
+        additional_info = request.POST.get('additional_info', '')
+        
+        # Update user profile
+        profile = request.user.profile
+        profile.teacher_request_pending = True
+        profile.teacher_request_date = timezone.now()
+        profile.teacher_qualifications = qualifications
+        profile.teacher_experience = experience
+        profile.teacher_subjects = teaching_subjects
+        profile.save()
+        
+        # Create a notification for admins
+        admin_users = User.objects.filter(is_superuser=True) | User.objects.filter(user_type=UserType.ADMIN)
+        
+        message_content = f"""
+        User {request.user.username} ({request.user.email}) has requested teacher status.
+        
+        Qualifications: {qualifications}
+        Experience: {experience}
+        Teaching Subjects: {teaching_subjects}
+        Additional Info: {additional_info}
+        """
+        
+        # Create notifications for all admins
+        for admin in admin_users:
+            NotificationService.send_notification(
+                recipient=admin,
+                title=f"Teacher Status Request from {request.user.username}",
+                message=message_content,
+                notification_type=NotificationType.SYSTEM,
+                sender=request.user,
+                action_url=reverse('account:user_detail', kwargs={'pk': request.user.id})
+            )
+        
+        messages.success(request, "Your request to become a teacher has been submitted. An administrator will review your request and get back to you soon.")
+        return redirect(self.success_url)
+
+class TeacherApprovalView(LoginRequiredMixin, AdminRequiredMixin, View):
+    """View for admins to approve or reject teacher requests"""
+    def post(self, request, *args, **kwargs):
+        user_id = kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+        action = request.POST.get('action')
+        
+        # Check if user is a student and has a pending request
+        if not hasattr(user.profile, 'teacher_request_pending') or not user.profile.teacher_request_pending:
+            messages.error(request, "This user does not have a pending teacher request.")
+            return redirect('account:user_detail', pk=user_id)
+        
+        if action == 'approve':
+            # Update user type to teacher
+            user.user_type = UserType.TEACHER
+            user.save()
+            
+            # Clear pending flag
+            user.profile.teacher_request_pending = False
+            user.profile.teacher_approved_date = timezone.now()
+            user.profile.save()
+            
+            # Notify the user
+            NotificationService.send_notification(
+                recipient=user,
+                title="Teacher Status Approved",
+                message="Congratulations! Your request to become a teacher has been approved. You now have teacher privileges on the platform.",
+                notification_type=NotificationType.SUCCESS,
+                sender=request.user
+            )
+            
+            messages.success(request, f"User {user.username} has been approved as a teacher.")
+        
+        elif action == 'reject':
+            # Clear pending flag
+            user.profile.teacher_request_pending = False
+            user.profile.save()
+            
+            # Get rejection reason
+            reason = request.POST.get('rejection_reason', 'Your request did not meet our current requirements.')
+            
+            # Notify the user
+            NotificationService.send_notification(
+                recipient=user,
+                title="Teacher Status Request Declined",
+                message=f"We regret to inform you that your request to become a teacher has been declined for the following reason: {reason}",
+                notification_type=NotificationType.INFO,
+                sender=request.user
+            )
+            
+            messages.success(request, f"User {user.username}'s teacher request has been rejected.")
+        
+        return redirect('account:user_detail', pk=user_id)
 
 # Notification Views
-class NotificationListView(LoginRequiredMixin, TemplateLayoutMixin, ListView):
+class NotificationListView(LoginRequiredMixin, BaseAccountView, ListView):
     """Class-based view to list user notifications"""
     model = Notification
     template_name = 'notification_list.html'
     context_object_name = 'notifications'
     paginate_by = 10
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Notifications",
+            "page_description": "View your notifications and stay updated.",
+            "notification_types": NotificationType.choices,
+            "selected_type": self.request.GET.get('type', ''),
+            "selected_read_status": self.request.GET.get('read_status', ''),
+            "unread_count": NotificationService.get_unread_count(self.request.user)
+        })
+        return context
     
     def get_queryset(self):
         queryset = Notification.objects.filter(recipient=self.request.user).order_by('-created_at')
@@ -388,21 +615,21 @@ class NotificationListView(LoginRequiredMixin, TemplateLayoutMixin, ListView):
             queryset = queryset.filter(read=is_read)
             
         return queryset
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['notification_types'] = NotificationType.choices
-        context['selected_type'] = self.request.GET.get('type', '')
-        context['selected_read_status'] = self.request.GET.get('read_status', '')
-        context['unread_count'] = NotificationService.get_unread_count(self.request.user)
-        return context
 
-
-class NotificationDetailView(LoginRequiredMixin, TemplateLayoutMixin, DetailView):
+class NotificationDetailView(LoginRequiredMixin, BaseAccountView, DetailView):
     """Class-based view to see notification details"""
     model = Notification
     template_name = 'notifications_detail.html'
     context_object_name = 'notification'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        notification = self.get_object()
+        context.update({
+            "page_title": notification.title,
+            "page_description": "Notification details."
+        })
+        return context
     
     def get_queryset(self):
         return Notification.objects.filter(recipient=self.request.user)
@@ -413,7 +640,6 @@ class NotificationDetailView(LoginRequiredMixin, TemplateLayoutMixin, DetailView
         if not obj.read:
             obj.mark_as_read()
         return obj
-
 
 class NotificationRedirectView(LoginRequiredMixin, View):
     """Class-based view to redirect to notification action URL and mark as read"""
@@ -432,7 +658,6 @@ class NotificationRedirectView(LoginRequiredMixin, View):
         # Otherwise redirect to notification detail
         return redirect('account:notification_detail', pk=notification.pk)
 
-
 class NotificationMarkReadView(LoginRequiredMixin, View):
     """Class-based view to mark notification as read via AJAX"""
     def post(self, request, *args, **kwargs):
@@ -449,7 +674,6 @@ class NotificationMarkReadView(LoginRequiredMixin, View):
         
         return redirect('account:notification_list')
 
-
 class NotificationMarkAllReadView(LoginRequiredMixin, View):
     """Class-based view to mark all notifications as read"""
     def post(self, request, *args, **kwargs):
@@ -461,7 +685,6 @@ class NotificationMarkAllReadView(LoginRequiredMixin, View):
         # Non-AJAX fallback
         messages.success(request, f"{count} notifications marked as read")
         return redirect('account:notification_list')
-
 
 class NotificationDeleteView(LoginRequiredMixin, View):
     """Class-based view to delete a notification"""
@@ -479,21 +702,90 @@ class NotificationDeleteView(LoginRequiredMixin, View):
         
         return redirect('account:notification_list')
 
-
 class NotificationCountView(LoginRequiredMixin, View):
     """Class-based API view to get unread notification count"""
     def get(self, request, *args, **kwargs):
         count = NotificationService.get_unread_count(request.user)
         return JsonResponse({'count': count})
 
+# Security and Preferences Views
+class SecuritySettingsView(LoginRequiredMixin, BaseAccountView):
+    """View for managing security settings"""
+    template_name = 'security_settings.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Security Settings",
+            "page_description": "Manage your account security preferences."
+        })
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+        
+        if action == 'change_password':
+            current_password = request.POST.get('current_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+            
+            # Check current password
+            if not request.user.check_password(current_password):
+                messages.error(request, "Current password is incorrect.")
+                return self.get(request, *args, **kwargs)
+            
+            # Check passwords match
+            if new_password != confirm_password:
+                messages.error(request, "New passwords do not match.")
+                return self.get(request, *args, **kwargs)
+            
+            # Update password
+            request.user.set_password(new_password)
+            request.user.save()
+            
+            messages.success(request, "Password changed successfully.")
+            # Re-authenticate user after password change
+            user = authenticate(username=request.user.username, password=new_password)
+            login(request, user)
+            
+        return self.get(request, *args, **kwargs)
 
-# User Management Views (already class-based, keeping them the same)
-class UserListView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, ListView):
+class PreferencesView(LoginRequiredMixin, BaseAccountView):
+    """View for managing user preferences"""
+    template_name = 'preferences.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "User Preferences",
+            "page_description": "Customize your account settings and preferences."
+        })
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        # Handle preference updates
+        # Example: language preference, notification settings, etc.
+        messages.success(request, "Preferences updated successfully.")
+        return self.get(request, *args, **kwargs)
+
+# Admin user management views
+class UserListView(LoginRequiredMixin, AdminRequiredMixin, BaseAccountView, ListView):
     """View for listing all users with filtering options"""
     model = User
     template_name = 'user_list.html'
     context_object_name = 'users'
     paginate_by = 10
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "User Management",
+            "page_description": "Manage all users in the system.",
+            "user_types": UserType.choices,
+            "selected_type": self.request.GET.get('type', ''),
+            "search_query": self.request.GET.get('search', '')
+        })
+        return context
     
     def get_queryset(self):
         queryset = User.objects.all().order_by('-date_joined')
@@ -514,14 +806,6 @@ class UserListView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, 
             queryset = queryset.filter(user_type=user_type)
             
         return queryset
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user_types'] = UserType.choices
-        context['selected_type'] = self.request.GET.get('type', '')
-        context['search_query'] = self.request.GET.get('search', '')
-        return context
-
 
 class UserCreateView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, CreateView):
     """View for creating a new user"""
@@ -846,7 +1130,7 @@ class SecuritySettingsView(LoginRequiredMixin, TemplateLayoutMixin, TemplateView
         return self.get(request, *args, **kwargs)
 
 
-class PreferencesView(LoginRequiredMixin, TemplateLayoutMixin, TemplateView):
+class PreferencesView(LoginRequiredMixin, TemplateView):
     """View for managing user preferences"""
     template_name = 'preferences.html'
     

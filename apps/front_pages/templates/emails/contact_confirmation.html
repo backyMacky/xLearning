@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Contacting Us</title>
+    <style type="text/css">
+        @media only screen and (max-width: 620px) {
+            table[class=body] h1 {
+                font-size: 28px !important;
+                margin-bottom: 10px !important;
+            }
+            table[class=body] p,
+            table[class=body] ul,
+            table[class=body] ol,
+            table[class=body] td,
+            table[class=body] span,
+            table[class=body] a {
+                font-size: 16px !important;
+            }
+            table[class=body] .wrapper,
+            table[class=body] .article {
+                padding: 10px !important;
+            }
+            table[class=body] .content {
+                padding: 0 !important;
+            }
+            table[class=body] .container {
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            table[class=body] .main {
+                border-left-width: 0 !important;
+                border-radius: 0 !important;
+                border-right-width: 0 !important;
+            }
+            table[class=body] .btn table {
+                width: 100% !important;
+            }
+            table[class=body] .btn a {
+                width: 100% !important;
+            }
+            table[class=body] .img-responsive {
+                height: auto !important;
+                max-width: 100% !important;
+                width: auto !important;
+            }
+        }
+        
+        /* Base styles */
+        body {
+            background-color: #f6f6f6;
+            font-family: sans-serif;
+            -webkit-font-smoothing: antialiased;
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        table {
+            border-collapse: separate;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+            width: 100%;
+        }
+        
+        table td {
+            font-family: sans-serif;
+            font-size: 14px;
+            vertical-align: top;
+        }
+        
+        /* Layout */
+        .body {
+            background-color: #f6f6f6;
+            width: 100%;
+        }
+        
+        .container {
+            display: block;
+            margin: 0 auto !important;
+            max-width: 600px;
+            padding: 10px;
+        }
+        
+        .content {
+            box-sizing: border-box;
+            display: block;
+            margin: 0 auto;
+            max-width: 600px;
+            padding: 10px;
+        }
+        
+        .main {
+            background: #ffffff;
+            border-radius: 3px;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .wrapper {
+            box-sizing: border-box;
+            padding: 30px;
+        }
+        
+        .content-block {
+            padding-bottom: 10px;
+            padding-top: 10px;
+        }
+        
+        .footer {
+            clear: both;
+            margin-top: 10px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .footer td,
+        .footer p,
+        .footer span,
+        .footer a {
+            color: #999999;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4 {
+            color: #000000;
+            font-family: sans-serif;
+            font-weight: 400;
+            line-height: 1.4;
+            margin: 0;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 500;
+            text-align: center;
+            color: #5d87ff;
+        }
+        
+        h2 {
+            font-size: 20px;
+            font-weight: 500;
+            color: #5d87ff;
+        }
+        
+        p,
+        ul,
+        ol {
+            font-family: sans-serif;
+            font-size: 14px;
+            font-weight: normal;
+            margin: 0;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        p li,
+        ul li,
+        ol li {
+            list-style-position: inside;
+            margin-left: 5px;
+        }
+        
+        a {
+            color: #5d87ff;
+            text-decoration: underline;
+        }
+        
+        /* Buttons */
+        .btn {
+            box-sizing: border-box;
+            width: 100%;
+        }
+        
+        .btn > tbody > tr > td {
+            padding-bottom: 15px;
+        }
+        
+        .btn table {
+            width: auto;
+        }
+        
+        .btn table td {
+            background-color: #ffffff;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .btn a {
+            background-color: #ffffff;
+            border: solid 1px #5d87ff;
+            border-radius: 5px;
+            box-sizing: border-box;
+            color: #5d87ff;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0;
+            padding: 12px 25px;
+            text-decoration: none;
+        }
+        
+        .btn-primary table td {
+            background-color: #5d87ff;
+        }
+        
+        .btn-primary a {
+            background-color: #5d87ff;
+            border-color: #5d87ff;
+            color: #ffffff;
+        }
+        
+        /* Message box */
+        .message-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #5d87ff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 3px;
+        }
+        
+        /* Other elements */
+        .header-logo {
+            max-height: 50px;
+            margin-bottom: 20px;
+        }
+        
+        .header-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-box {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 3px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .feature-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            text-align: center;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body class="">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+        <tr>
+            <td>&nbsp;</td>
+            <td class="container">
+                <div class="content">
+                    <table role="presentation" class="main">
+                        <tr>
+                            <td class="wrapper">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <div style="text-align: center; margin-bottom: 20px;">
+                                                <img src="https://yourwebsite.com/static/img/logo.png" alt="xLearning Logo" class="header-logo">
+                                            </div>
+                                            
+                                            <h1>Thank You for Contacting Us!</h1>
+                                            
+                                            <p>Dear {{ contact.name }},</p>
+                                            
+                                            <p>Thank you for reaching out to xLearning. We've received your message and will get back to you as soon as possible. A member of our team will review your inquiry and respond within 24 hours during business days.</p>
+                                            
+                                            <div class="message-box">
+                                                <h2>Your Message</h2>
+                                                <p><strong>Subject:</strong> {{ contact.subject }}</p>
+                                                <p><strong>Message:</strong></p>
+                                                <p style="white-space: pre-line;">{{ contact.message }}</p>
+                                            </div>
+                                            
+                                            <h2>What's Next?</h2>
+                                            
+                                            <div class="feature-row">
+                                                <div class="feature-icon">📧</div>
+                                                <div>
+                                                    <p><strong>Check your inbox</strong> - We'll respond to your inquiry via email within 24 business hours.</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="feature-row">
+                                                <div class="feature-icon">📚</div>
+                                                <div>
+                                                    <p><strong>Explore our resources</strong> - While you wait, you might find the answer to your question in our <a href="https://yourwebsite.com/help-center">Help Center</a>.</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="feature-row">
+                                                <div class="feature-icon">👩‍🏫</div>
+                                                <div>
+                                                    <p><strong>Learn more</strong> - Discover how xLearning can enhance your language teaching journey by visiting our <a href="https://yourwebsite.com/blog">Blog</a>.</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="feature-box">
+                                                <div class="feature-title">Did you know?</div>
+                                                <p>xLearning offers a 14-day free trial with full access to all features. Start transforming your language teaching experience today!</p>
+                                                
+                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="margin-top: 10px;">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td align="center">
+                                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <a href="https://yourwebsite.com/register" target="_blank">Start Free Trial</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            
+                                            <p>If you have any additional questions or concerns, please don't hesitate to reach out to us again.</p>
+                                            
+                                            <p>Best regards,<br>
+                                            The xLearning Team</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <div class="footer">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td class="content-block">
+                                    <span>© 2025 xLearning. All rights reserved.</span>
+                                    <br>
+                                    <a href="https://yourwebsite.com/privacy-policy">Privacy Policy</a> | 
+                                    <a href="https://yourwebsite.com/terms-of-service">Terms of Service</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+</body>
+</html>

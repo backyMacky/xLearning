@@ -1,6 +1,20 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView, ListView, CreateView
+from django.views.generic.edit import FormView
+from django.views import View
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.conf import settings
 from web_project import TemplateLayout
 from web_project.template_helpers.theme import TemplateHelper
+
+from .models import ContactMessage, Subscriber
+from .forms import ContactForm, SubscriberForm
 
 # Base class for all front pages to ensure consistent template handling
 class BaseFrontPageView(TemplateView):
@@ -31,9 +45,30 @@ class LandingPageView(BaseFrontPageView):
         context = super().get_context_data(**kwargs)
         context.update({
             "page_title": "Modern Platform for Language Teachers",
-            "page_description": "Comprehensive tools for teaching, assessment, and student management."
+            "page_description": "Comprehensive tools for teaching, assessment, and student management.",
+            "subscriber_form": SubscriberForm()
         })
         return context
+    
+    def post(self, request, *args, **kwargs):
+        form = SubscriberForm(request.POST)
+        if form.is_valid():
+            form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Thank you for subscribing to our newsletter!'
+                })
+            messages.success(request, 'Thank you for subscribing to our newsletter!')
+            return redirect('front_pages:home')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'message': 'This email is already subscribed or invalid.'
+                })
+            messages.error(request, 'This email is already subscribed or invalid.')
+            return self.get(request, *args, **kwargs)
 
 class ContentManagementView(BaseFrontPageView):
     """Feature page for content management capabilities"""
@@ -135,10 +170,12 @@ class FAQView(BaseFrontPageView):
             "page_description": "Find answers to common questions about our platform."
         })
         return context
-    
-class ContactView(BaseFrontPageView):
-    """Contact us page"""
+
+class ContactView(BaseFrontPageView, FormView):
+    """Contact us page with form handling"""
     template_name = "contact.html"
+    form_class = ContactForm
+    success_url = reverse_lazy('front_pages:contact_success')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -147,6 +184,121 @@ class ContactView(BaseFrontPageView):
             "page_description": "Get in touch with our support team."
         })
         return context
+    
+    def form_valid(self, form):
+        # Save the contact message to the database
+        contact = form.save()
+        
+        # Send email notification
+        try:
+            # Email to admin
+            admin_html_message = render_to_string('emails/contact_notification.html', {
+                'contact': contact,
+                'domain': self.request.get_host(),
+            })
+            admin_plain_message = strip_tags(admin_html_message)
+            
+            send_mail(
+                subject=f'New Contact Message: {contact.subject}',
+                message=admin_plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.EMAIL_HOST_USER],
+                html_message=admin_html_message,
+                fail_silently=False,
+            )
+            
+            # Confirmation email to the user
+            user_html_message = render_to_string('emails/contact_confirmation.html', {
+                'contact': contact,
+                'domain': self.request.get_host(),
+            })
+            user_plain_message = strip_tags(user_html_message)
+            
+            send_mail(
+                subject='Thank you for contacting xLearning',
+                message=user_plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[contact.email],
+                html_message=user_html_message,
+                fail_silently=False,
+            )
+            
+        except Exception as e:
+            # Log the error but don't prevent the form submission from completing
+            print(f"Email sending failed: {str(e)}")
+        
+        messages.success(self.request, "Your message has been sent successfully. We'll get back to you soon!")
+        return super().form_valid(form)
+
+class ContactSuccessView(BaseFrontPageView):
+    """Success page after contact form submission"""
+    template_name = "contact_success.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Message Sent",
+            "page_description": "Your message has been received."
+        })
+        return context
+
+class AdminRequiredMixin(UserPassesTestMixin):
+    """Mixin to ensure only admin users can access view"""
+    def test_func(self):
+        return self.request.user.is_authenticated and (
+            self.request.user.is_superuser or 
+            getattr(self.request.user, 'is_admin', False)
+        )
+
+class ContactMessageListView(LoginRequiredMixin, AdminRequiredMixin, BaseFrontPageView, ListView):
+    """Admin view to list contact messages"""
+    model = ContactMessage
+    template_name = "admin/contact_message_list.html"
+    context_object_name = "messages"
+    paginate_by = 10
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Contact Messages",
+            "page_description": "View and manage contact form submissions.",
+            "layout": "vertical",  # Override to use admin layout
+            "layout_path": TemplateHelper.set_layout("layout.html", context),  # Use admin layout template
+        })
+        return context
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status_filter = self.request.GET.get('status')
+        if status_filter and status_filter in dict(ContactMessage.ContactStatus.choices):
+            queryset = queryset.filter(status=status_filter)
+        return queryset
+
+class SubscriberListView(LoginRequiredMixin, AdminRequiredMixin, BaseFrontPageView, ListView):
+    """Admin view to list newsletter subscribers"""
+    model = Subscriber
+    template_name = "admin/subscriber_list.html"
+    context_object_name = "subscribers"
+    paginate_by = 20
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Newsletter Subscribers",
+            "page_description": "View and manage newsletter subscribers.",
+            "layout": "vertical",  # Override to use admin layout
+            "layout_path": TemplateHelper.set_layout("layout.html", context),  # Use admin layout template
+        })
+        return context
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status_filter = self.request.GET.get('status')
+        if status_filter == 'active':
+            queryset = queryset.filter(is_active=True)
+        elif status_filter == 'inactive':
+            queryset = queryset.filter(is_active=False)
+        return queryset
 
 class HelpCenterHomeView(BaseFrontPageView):
     """Help center landing page"""

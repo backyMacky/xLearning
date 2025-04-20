@@ -176,7 +176,7 @@
                     <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                       <i class="ti ti-settings ti-26px text-heading"></i>
                     </span>
-                    <a href="" class="stretched-link">Setting</a>
+                    <a href="{% url 'account:profile' %}" class="stretched-link">Setting</a>
                     <small>Account Settings</small>
                   </div>
                 </div>
@@ -433,20 +433,20 @@
                 <div class="dropdown-divider my-1 mx-n2"></div>
               </li>
               <li>
-                <a class="dropdown-item" href="">
+                <a class="dropdown-item" href="{% url 'account:profile' %}">
                   <i class="ti ti-user me-3 ti-md"></i><span class="align-middle">My Profile</span>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="">
+                <a class="dropdown-item" href="{% url 'account:security_settings' %}">
                   <i class="ti ti-settings me-3 ti-md"></i><span class="align-middle">Settings</span>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="">
+                <a class="dropdown-item" href="{% url 'booking:transaction_history' %}">
                   <span class="d-flex align-items-center align-middle">
-                    <i class="flex-shrink-0 ti ti-file-dollar me-3 ti-md"></i><span class="flex-grow-1 align-middle">Billing</span>
-                    <span class="flex-shrink-0 badge bg-danger d-flex align-items-center justify-content-center">4</span>
+                    <i class="flex-shrink-0 ti ti-file-dollar me-3 ti-md"></i><span class="flex-grow-1 align-middle">Billing history</span>
+                    
                   </span>
                 </a>
               </li>

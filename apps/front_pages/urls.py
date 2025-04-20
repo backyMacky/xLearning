@@ -1,19 +1,35 @@
 from django.urls import path
 from .views import (
+    # Landing page
     LandingPageView,
+    
+    # Features
     ContentManagementView,
     LiveSessionsView,
     AssessmentToolsView,
     StudentManagementView,
     BookingPaymentView,
+    
+    # Contact
+    ContactView,
+    ContactSuccessView,
+    ContactMessageListView,
+    SubscriberListView,
+    
+    # Static pages
     PricingView,
     AboutView,
     FAQView,
-    ContactView,
+    
+    # Help center
     HelpCenterHomeView,
     HelpCenterArticleView,
+    
+    # Legal
     PrivacyPolicyView,
     TermsOfServiceView,
+    
+    # Blog
     BlogHomeView,
     BlogPostView
 )
@@ -26,7 +42,12 @@ urlpatterns = [
     path("pricing/", PricingView.as_view(), name="pricing"),
     path("about/", AboutView.as_view(), name="about"),
     path("faq/", FAQView.as_view(), name="faq"),
+    
+    # Contact pages
     path("contact/", ContactView.as_view(), name="contact"),
+    path("contact/success/", ContactSuccessView.as_view(), name="contact_success"),
+    path("admin/contact-messages/", ContactMessageListView.as_view(), name="contact_messages"),
+    path("admin/subscribers/", SubscriberListView.as_view(), name="subscribers"),
     
     # Feature pages
     path("features/content-management/", ContentManagementView.as_view(), name="content-management"),

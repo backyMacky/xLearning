@@ -22,18 +22,570 @@
 {% block page_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/css/pages/front-page-landing.css' %}">
+<style>
+  /* Promo Banner Section */
+  .promo-banner {
+    position: relative;
+    background: linear-gradient(135deg, rgba(107, 70, 193, 0.85) 0%, rgba(159, 122, 234, 0.85) 100%);
+    overflow: hidden;
+    padding: 100px 0;
+  }
+  
+  .promo-banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.07;
+    z-index: 0;
+  }
+  
+  .promo-banner .shape-1 {
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    z-index: 1;
+    animation: float-shape-1 15s infinite alternate ease-in-out;
+  }
+  
+  .promo-banner .shape-2 {
+    position: absolute;
+    bottom: -80px;
+    left: -80px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    z-index: 1;
+    animation: float-shape-2 18s infinite alternate-reverse ease-in-out;
+  }
+  
+  .promo-banner .shape-3 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    z-index: 1;
+    animation: pulse-shape 20s infinite alternate ease-in-out;
+  }
+  
+  @keyframes float-shape-1 {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(30px, 30px) rotate(5deg); }
+  }
+  
+  @keyframes float-shape-2 {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(-30px, -20px) rotate(-5deg); }
+  }
+  
+  @keyframes pulse-shape {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.04; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.06; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.04; }
+  }
+  
+  .promo-carousel {
+    position: relative;
+    z-index: 10;
+    min-height: 400px;
+  }
+  
+  .promo-slide {
+    display: none;
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    transition: opacity 0.8s ease;
+  }
+  
+  .promo-slide.active {
+    display: block;
+    opacity: 1;
+    position: relative;
+  }
+  
+  .promo-image-wrapper {
+    padding: 20px;
+    position: relative;
+  }
+  
+  .promo-image-container {
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    height: 400px;
+    transition: all 0.5s ease;
+    position: relative;
+  }
+  
+  .promo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+  
+  .promo-slide.active .promo-image {
+    animation: subtle-zoom 10s infinite alternate ease-in-out;
+  }
+  
+  @keyframes subtle-zoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+  }
+  
+  .promo-text-content {
+    color: white;
+    padding: 20px;
+    transition: all 0.5s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fade-in-up 0.8s forwards 0.2s;
+  }
+  
+  .promo-slide.active .promo-text-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  @keyframes fade-in-up {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  .promo-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  .promo-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  
+  .promo-description {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+  
+  .promo-btn {
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .promo-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.1);
+  }
+  
+  .promo-controls {
+    position: relative;
+    z-index: 20;
+    margin-top: 30px;
+  }
+  
+  .promo-indicators {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .promo-indicator {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .promo-indicator.active {
+    width: 30px;
+    border-radius: 10px;
+    background-color: white;
+  }
+  
+  /* Enhanced Hero Section */
+  .landing-hero {
+    position: relative;
+    background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
+    overflow: hidden;
+  }
+  
+  .hero-shape-1 {
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float-1 8s ease-in-out infinite;
+  }
+  
+  .hero-shape-2 {
+    position: absolute;
+    bottom: -150px;
+    left: -100px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float-2 10s ease-in-out infinite;
+  }
+  
+  .hero-shape-3 {
+    position: absolute;
+    top: 30%;
+    left: 15%;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    animation: float-3 6s ease-in-out infinite;
+  }
+  
+  .hero-shape-4 {
+    position: absolute;
+    bottom: 20%;
+    right: 10%;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    animation: float-4 7s ease-in-out infinite;
+  }
+  
+  @keyframes float-1 {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+  }
+  
+  @keyframes float-2 {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(40px) rotate(-5deg); }
+  }
+  
+  @keyframes float-3 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(15px, -15px); }
+  }
+  
+  @keyframes float-4 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-20px, 20px); }
+  }
+  
+  .hero-text-box {
+    position: relative;
+    z-index: 10;
+  }
+  
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, #ffffff, #e2d8fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeInUp 0.8s ease forwards;
+  }
+  
+  .hero-sub-title {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.8s ease 0.2s forwards;
+    opacity: 0;
+  }
+  
+  .hero-text-box p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    max-width: 500px;
+    animation: fadeInUp 0.8s ease 0.4s forwards;
+    opacity: 0;
+  }
+  
+  .landing-hero-btn {
+    animation: fadeInUp 0.8s ease 0.6s forwards;
+    opacity: 0;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .hero-image {
+    position: relative;
+    z-index: 10;
+  }
+  
+  .video-container {
+    transform: translateY(20px);
+    opacity: 0;
+    animation: fadeInVideo 1s ease 0.8s forwards;
+  }
+  
+  @keyframes fadeInVideo {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .play-button {
+    width: 80px;
+    height: 80px;
+    transition: all 0.3s ease;
+  }
+  
+  .play-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Enhanced Feature Section */
+  .feature-icon-box {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(115, 103, 240, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover .feature-icon-box {
+    background-color: #7367f0;
+    transform: rotateY(180deg);
+  }
+  
+  .card:hover .feature-icon-box i {
+    color: white !important;
+    transform: rotateY(180deg);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .promo-carousel {
+      height: auto;
+    }
+    
+    .promo-slide .promo-content {
+      flex-direction: column;
+    }
+    
+    .promo-slide .promo-image-container {
+      height: 280px;
+      margin-bottom: 20px;
+    }
+    
+    .hero-title {
+      font-size: 2.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .promo-banner {
+      padding: 50px 0;
+    }
+    
+    .promo-slide .promo-image-container {
+      height: 220px;
+    }
+    
+    .promo-slide .promo-title {
+      font-size: 1.5rem;
+    }
+    
+    .hero-title {
+      font-size: 2rem;
+    }
+    
+    .hero-sub-title {
+      font-size: 1.1rem;
+    }
+  }
+</style>
 {% endblock page_css %}
 
 {% block page_js %}
 {{ block.super }}
 <script src="{% static 'js/front-page-landing.js' %}"></script>
+<script>
+  // Promo Carousel Functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const slides = document.querySelectorAll('.promo-slide');
+    const indicators = document.querySelectorAll('.promo-indicator');
+    let currentSlide = 0;
+    
+    function showSlide(index) {
+      // Hide all slides
+      slides.forEach(slide => {
+        slide.classList.remove('active');
+      });
+      
+      // Remove active class from all indicators
+      indicators.forEach(indicator => {
+        indicator.classList.remove('active');
+      });
+      
+      // Show the current slide and activate indicator
+      slides[index].classList.add('active');
+      indicators[index].classList.add('active');
+    }
+    
+    // Initial display
+    showSlide(currentSlide);
+    
+    // Auto-rotate slides
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }, 5000);
+    
+    // Click on indicators
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => {
+        currentSlide = index;
+        showSlide(currentSlide);
+      });
+    });
+  });
+</script>
 {% endblock page_js %}
 
 {% block content %}
 <div data-bs-spy="scroll" class="scrollspy-example">
+  <!-- Promo Banner Section: Start -->
+  <section class="promo-banner">
+    <div class="shape-1"></div>
+    <div class="shape-2"></div>
+    <div class="shape-3"></div>
+    
+    <div class="container">
+      <div class="promo-carousel">
+        <!-- Slide 1 -->
+        <div class="promo-slide active">
+          <div class="row align-items-center">
+            <div class="col-lg-6 order-lg-2">
+              <div class="promo-image-wrapper">
+                <div class="promo-image-container">
+                  <img src="{% static 'img/front-pages/landing-page/dashboard-1.jpg' %}" alt="Interactive Language Teaching" class="promo-image">
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 order-lg-1">
+              <div class="promo-text-content">
+                <span class="promo-badge">Featured</span>
+                <h3 class="promo-title">Interactive Language Teaching</h3>
+                <p class="promo-description">Engage your students with interactive tools designed specifically for language learning. Our platform provides immersive experiences that make language acquisition natural and effective.</p>
+                <a href="#landingFeatures" class="btn btn-light promo-btn">Explore Features</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Slide 2 -->
+        <div class="promo-slide">
+          <div class="row align-items-center">
+            <div class="col-lg-6 order-lg-2">
+              <div class="promo-image-wrapper">
+                <div class="promo-image-container">
+                  <img src="{% static 'img/front-pages/landing-page/dashboard-3.jpg' %}" alt="Student Progress Tracking" class="promo-image">
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 order-lg-1">
+              <div class="promo-text-content">
+                <span class="promo-badge">Analytics</span>
+                <h3 class="promo-title">Track Student Progress Effortlessly</h3>
+                <p class="promo-description">Monitor learning outcomes with comprehensive analytics and assessment tools. Visualize student improvement over time and identify areas that need additional focus.</p>
+                <a href="#landingFeatures" class="btn btn-light promo-btn">Learn More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Slide 3 -->
+        <div class="promo-slide">
+          <div class="row align-items-center">
+            <div class="col-lg-6 order-lg-2">
+              <div class="promo-image-wrapper">
+                <div class="promo-image-container">
+                  <img src="{% static 'img/front-pages/landing-page/dashboard-4.jpg' %}" alt="Resource Management" class="promo-image">
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 order-lg-1">
+              <div class="promo-text-content">
+                <span class="promo-badge">Organization</span>
+                <h3 class="promo-title">Centralized Resource Management</h3>
+                <p class="promo-description">Organize all your teaching materials in one place for easy access and sharing. Create, store, and distribute content to your students with just a few clicks.</p>
+                <a href="#landingFeatures" class="btn btn-light promo-btn">Discover More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="promo-controls">
+        <div class="promo-indicators">
+          <div class="promo-indicator active"></div>
+          <div class="promo-indicator"></div>
+          <div class="promo-indicator"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Promo Banner Section: End -->
+
   <!-- Hero: Start -->
   <section id="hero-animation">
     <div id="landingHero" class="section-py landing-hero position-relative">
+      <!-- Animated shapes -->
+      <div class="hero-shape-1"></div>
+      <div class="hero-shape-2"></div>
+      <div class="hero-shape-3"></div>
+      <div class="hero-shape-4"></div>
+      
       <img src="{% static 'img/front-pages/backgrounds/hero-bg.png' %}" alt="hero background" class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100" />
       <div class="container">
         <div id="xlearning-slideshow" class="position-relative">
@@ -41,12 +593,12 @@
             <div class="row align-items-center">
               <div class="col-lg-6">
                 <div class="hero-text-box text-center text-lg-start">
-                  <h1 class="text-primary hero-title display-6 fw-extrabold">xLearning</h1>
-                  <h2 class="hero-sub-title h6 mb-4">Transform Your Language Teaching Experience</h2>
-                  <p class="mb-4">The comprehensive platform designed specifically for language teachers to manage classes, track progress, and engage students effectively.</p>
+                  <h1 class="hero-title">xLearning</h1>
+                  <h2 class="hero-sub-title">Transform Your Language Teaching Experience</h2>
+                  <p>The comprehensive platform designed specifically for language teachers to manage classes, track progress, and engage students effectively.</p>
                   <div class="landing-hero-btn">
-                    <a href="{% url 'account:register' %}" class="btn btn-primary btn-lg">Start Free Trial</a>
-                    <a href="#landingFeatures" class="btn btn-outline-primary btn-lg ms-3">Learn More</a>
+                    <a href="{% url 'account:register' %}" class="btn btn-light btn-lg">Start Free Trial</a>
+                    <a href="#landingFeatures" class="btn btn-outline-light btn-lg ms-3">Learn More</a>
                   </div>
                 </div>
               </div>
@@ -265,18 +817,6 @@
             <div class="card h-100">
               <div class="card-body text-center text-lg-start p-4 p-lg-5">
                 <img src="{% static 'img/front-pages/icons/quote.png' %}" alt="quote" class="mb-4" />
-                <p class="mb-4">xLearning has completely transformed how I manage my teaching practice. I've been able to reduce admin time by 70% and focus more on actually teaching.</p>
-                <div class="text-center text-lg-start">
-                  <h6 class="mb-1">Maria Rodriguez</h6>
-                  <p class="mb-0">Spanish Teacher, New York</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <div class="card h-100">
-              <div class="card-body text-center text-lg-start p-4 p-lg-5">
-                <img src="{% static 'img/front-pages/icons/quote.png' %}" alt="quote" class="mb-4" />
                 <p class="mb-4">The student progress tracking features have been invaluable. I can pinpoint exactly where each student needs help and tailor my lessons accordingly.</p>
                 <div class="text-center text-lg-start">
                   <h6 class="mb-1">John Chen</h6>
@@ -303,95 +843,7 @@
     </div>
   </section>
   <!-- Testimonials: End -->
-
-  <!-- FAQ: Start -->
-  <section id="landingFAQ" class="section-py bg-body landing-faq">
-    <div class="container">
-      <div class="text-center mb-4">
-        <span class="badge bg-label-primary">FAQ</span>
-      </div>
-      <h4 class="text-center mb-1">Frequently asked
-        <span class="position-relative fw-extrabold z-1">questions
-          <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="section title icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
-        </span>
-      </h4>
-      <p class="text-center mb-5">Browse through these FAQs to find answers to commonly asked questions.</p>
-      <div class="row gy-5 align-items-center">
-        <div class="col-lg-5">
-          <div class="text-center">
-            <img src="{% static 'img/front-pages/landing-page/faq-boy-with-logos.png' %}" alt="faq illustration" class="faq-image" />
-          </div>
-        </div>
-        <div class="col-lg-7">
-          <div class="accordion" id="accordionExample">
-            <div class="card accordion-item">
-              <h2 class="accordion-header" id="headingOne">
-                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionOne" aria-expanded="true" aria-controls="accordionOne">
-                  How does xLearning help with scheduling?
-                </button>
-              </h2>
-
-              <div id="accordionOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                  xLearning provides an intuitive calendar interface where you can schedule lessons, set recurring appointments, and manage availability. Students receive automatic notifications for upcoming lessons, and you'll get reminders as well. The system handles time zone differences automatically.
-                </div>
-              </div>
-            </div>
-            <div class="card accordion-item">
-              <h2 class="accordion-header" id="headingTwo">
-                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionTwo" aria-expanded="false" aria-controls="accordionTwo">
-                  Can I manage resources and learning materials?
-                </button>
-              </h2>
-              <div id="accordionTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                  Yes! xLearning includes a comprehensive content management system where you can upload, organize, and share learning materials with your students. You can categorize resources by level, topic, or student group, and track which students have accessed which materials.
-                </div>
-              </div>
-            </div>
-            <div class="card accordion-item active">
-              <h2 class="accordion-header" id="headingThree">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#accordionThree" aria-expanded="false" aria-controls="accordionThree">
-                  How does student progress tracking work?
-                </button>
-              </h2>
-              <div id="accordionThree" class="accordion-collapse collapse show" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                  xLearning includes assessment tools that allow you to create and administer tests, track scores, and generate progress reports. You can set learning goals, track completion rates, and visualize improvement over time. Students can also see their own progress, which increases motivation and engagement.
-                </div>
-              </div>
-            </div>
-            <div class="card accordion-item">
-              <h2 class="accordion-header" id="headingFour">
-                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionFour" aria-expanded="false" aria-controls="accordionFour">
-                  Is xLearning suitable for group classes?
-                </button>
-              </h2>
-              <div id="accordionFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                  Absolutely! xLearning allows you to create and manage student groups, send group communications, assign group activities, and track collective progress. This makes it perfect for language schools, group tutoring, or classroom settings.
-                </div>
-              </div>
-            </div>
-            <div class="card accordion-item">
-              <h2 class="accordion-header" id="headingFive">
-                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionFive" aria-expanded="false" aria-controls="accordionFive">
-                  How secure is student information on xLearning?
-                </button>
-              </h2>
-              <div id="accordionFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                  We take data security very seriously. xLearning uses industry-standard encryption for all data, complies with privacy regulations, and provides tools for data management. You control access permissions for student information, and we never share or sell user data.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- FAQ: End -->
-
+ 
   <!-- Pricing Preview: Start -->
   <section id="landingPricing" class="section-py">
     <div class="container">
@@ -515,5 +967,36 @@
     </div>
   </section>
   <!-- CTA: End -->
-</div>
+
+  <section class="py-5 bg-gradient-primary position-relative">
+    <div class="position-absolute top-0 start-0 w-100">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none" class="w-100" style="height: 60px;">
+        <path fill="#f8f9fa" fill-opacity="1" d="M0,32L80,42.7C160,53,320,75,480,74.7C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"></path>
+      </svg>
+    </div>
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 text-center text-white">
+          <div class="position-relative p-4">
+            <div class="position-absolute top-0 start-50 translate-middle">
+              <div class="bg-white text-primary rounded-circle p-3 shadow">
+                <i class="ti ti-user-shield fs-2"></i>
+              </div>
+            </div>
+            <h2 class="display-6 text-white mt-4 pt-3 mb-3">Ready to Transform Your Teaching?</</h2>
+            <p class="lead text-white-50 mb-4">Gain insights into student performance, teaching effectiveness, and business metrics.
+               
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="position-absolute bottom-0 start-0 w-100">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none" class="w-100" style="height: 60px;">
+        <path fill="#ffffff" fill-opacity="1" d="M0,64L120,69.3C240,75,480,85,720,80C960,75,1200,53,1320,42.7L1440,32L1440,100L1320,100C1200,100,960,100,720,100C480,100,240,100,120,100L0,100Z"></path>
+      </svg>
+    </div>
+  </section>
+  
 {% endblock %}
+               

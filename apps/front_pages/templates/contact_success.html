@@ -1,0 +1,104 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Message Received - xLearning Platform{% endblock %}
+
+{% block content %}
+<!-- Success Header -->
+<section class="section-py bg-body first-section-pt">
+  <div class="container">
+    <div class="text-center mb-4">
+      <span class="badge bg-label-success">Success</span>
+    </div>
+    <h3 class="text-center mb-2">
+      <span class="position-relative fw-extrabold z-1">Message Received
+        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="success icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
+      </span>
+    </h3>
+    <p class="text-center mb-5">Thank you for reaching out to us. We've received your message!</p>
+  </div>
+</section>
+<!-- /Success Header -->
+
+<!-- Success Message -->
+<section class="section-py">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-none border">
+          <div class="card-body text-center p-5">
+            <div class="mb-4">
+              <img src="{% static 'img/illustrations/message-sent.png' %}" alt="Message Sent" class="img-fluid" style="max-height: 250px;">
+            </div>
+            <h4 class="mb-2">We've received your message!</h4>
+            <p class="mb-4">Our team will review your inquiry and get back to you within 24 hours. Please check your email inbox for a confirmation of your submission.</p>
+            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+              <a href="{% url 'front_pages:home' %}" class="btn btn-primary">Return to Home</a>
+              <a href="{% url 'front_pages:blog' %}" class="btn btn-outline-primary">Explore Our Blog</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /Success Message -->
+
+<!-- What to Expect -->
+<section class="section-py bg-body">
+  <div class="container">
+    <h4 class="text-center mb-5">What to Expect Next</h4>
+    
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="avatar avatar-lg bg-label-primary p-2 mb-3">
+              <i class="ti ti-mail ti-md"></i>
+            </div>
+            <h5 class="mb-2">Confirmation Email</h5>
+            <p>You should receive an automated confirmation email shortly. If you don't see it, please check your spam folder.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="avatar avatar-lg bg-label-primary p-2 mb-3">
+              <i class="ti ti-message-circle ti-md"></i>
+            </div>
+            <h5 class="mb-2">Personal Response</h5>
+            <p>A member of our team will review your message and respond personally within 24 business hours.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="avatar avatar-lg bg-label-primary p-2 mb-3">
+              <i class="ti ti-headset ti-md"></i>
+            </div>
+            <h5 class="mb-2">Support Resources</h5>
+            <p>While you wait, you can explore our help center for solutions to common questions and issues.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /What to Expect -->
+
+<!-- CTA Section -->
+<section class="section-py bg-primary text-center text-white">
+  <div class="container">
+    <h3 class="text-white mb-3">Explore while you wait</h3>
+    <p class="mb-4">Discover how xLearning can transform your language teaching experience.</p>
+    <a href="{% url 'front_pages:pricing' %}" class="btn btn-lg btn-light">View Pricing Plans</a>
+  </div>
+</section>
+<!-- /CTA Section -->
+{% endblock %}
