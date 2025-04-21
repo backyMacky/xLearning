@@ -1,0 +1,703 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ title }} - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+<script src="{% static 'vendor/libs/quill/quill.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-9 col-md-10 mx-auto">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ title }}</h5>
+        <a href="{% url 'content:instructor_dashboard' %}" class="btn btn-outline-primary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+      <div class="card-body">
+        <form method="post" id="sessionForm">
+          {% csrf_token %}
+          
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            <div class="alert-body">
+              <i class="ti ti-alert-circle me-2"></i>
+              Please correct the errors below:
+              <ul class="mb-0 mt-1">
+                {% for field in form %}
+                  {% if field.errors %}
+                    {% for error in field.errors %}
+                      <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Session Type Tabs (for first-time creation only) -->
+          {% if not is_update %}
+          <div class="mb-4">
+            <ul class="nav nav-tabs nav-fill" id="session-type-tabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link {% if is_private %}active{% endif %}" id="private-tab" data-bs-toggle="tab" data-bs-target="#private-content" type="button" role="tab" aria-controls="private-content" aria-selected="{% if is_private %}true{% else %}false{% endif %}">
+                  <i class="ti ti-user-check me-1"></i> Private 1-on-1 Session
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link {% if not is_private %}active{% endif %}" id="group-tab" data-bs-toggle="tab" data-bs-target="#group-content" type="button" role="tab" aria-controls="group-content" aria-selected="{% if not is_private %}true{% else %}false{% endif %}">
+                  <i class="ti ti-users me-1"></i> Group Session
+                </button>
+              </li>
+            </ul>
+            <input type="hidden" name="session_type" id="session_type_input" value="{% if is_private %}private{% else %}group{% endif %}">
+          </div>
+          {% endif %}
+          
+          <div class="tab-content">
+            <div class="tab-pane fade {% if is_private or not is_update %}show active{% endif %}" id="private-content" role="tabpanel" aria-labelledby="private-tab">
+              <!-- Private Session Content -->
+              <div class="row g-3">
+                {% if not is_private and not is_update %}
+                <div class="col-12">
+                  <div class="alert alert-info">
+                    <div class="d-flex align-items-center">
+                      <i class="ti ti-info-circle me-2"></i>
+                      <div>
+                        <p class="mb-0">Private sessions allow you to work one-on-one with a student. Set your availability and students can book these slots.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+                
+                <!-- Language and Level Selections -->
+                <div class="col-md-6">
+                  <label for="id_language" class="form-label">Teaching Language</label>
+                  <select id="id_language" name="language" class="form-select select2" required>
+                    <option value="">Select language</option>
+                    {% for language in languages %}
+                      <option value="{{ language.id }}" {% if form.language.value == language.id or form.instance.language.id == language.id %}selected{% endif %}>
+                        {{ language.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="id_level" class="form-label">Proficiency Level</label>
+                  <select id="id_level" name="level" class="form-select select2" required>
+                    <option value="">Select level</option>
+                    {% for level in levels %}
+                      <option value="{{ level.id }}" {% if form.level.value == level.id or form.instance.level.id == level.id %}selected{% endif %}>
+                        {{ level.code }} - {{ level.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <!-- Date & Time Picker -->
+                <div class="col-md-6">
+                  <label for="session_date" class="form-label">Session Date</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="ti ti-calendar"></i></span>
+                    <input type="text" id="session_date" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                      {% if form.instance.start_time %}
+                      value="{{ form.instance.start_time|date:'Y-m-d' }}"
+                      {% endif %}
+                      required>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="session_time" class="form-label">Session Time</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="ti ti-clock"></i></span>
+                    <input type="text" id="session_time" class="form-control flatpickr-time" placeholder="HH:MM"
+                      {% if form.instance.start_time %}
+                      value="{{ form.instance.start_time|time:'H:i' }}"
+                      {% endif %}
+                      required>
+                  </div>
+                </div>
+                
+                <!-- Hidden field for combined datetime -->
+                <input type="hidden" id="start_time_input" name="start_time" 
+                  {% if form.instance.start_time %}
+                  value="{{ form.instance.start_time|date:'Y-m-d H:i' }}"
+                  {% endif %}
+                  required>
+                
+                <!-- Duration Selection -->
+                <div class="col-md-6">
+                  <label for="id_duration_minutes" class="form-label">Session Duration</label>
+                  <select id="id_duration_minutes" name="duration_minutes" class="form-select" required>
+                    <option value="30" {% if form.duration_minutes.value == 30 or form.instance.duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
+                    <option value="45" {% if form.duration_minutes.value == 45 or form.instance.duration_minutes == 45 %}selected{% endif %}>45 minutes</option>
+                    <option value="60" {% if form.duration_minutes.value == 60 or form.instance.duration_minutes == 60 %}selected{% endif %}>1 hour</option>
+                    <option value="90" {% if form.duration_minutes.value == 90 or form.instance.duration_minutes == 90 %}selected{% endif %}>1.5 hours</option>
+                    <option value="120" {% if form.duration_minutes.value == 120 or form.instance.duration_minutes == 120 %}selected{% endif %}>2 hours</option>
+                  </select>
+                </div>
+                
+                <!-- Repeat Options -->
+                <div class="col-md-6">
+                  <label class="form-label">Repeat Schedule (Optional)</label>
+                  <select id="repeat_schedule" class="form-select">
+                    <option value="none">No repeat</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Bi-weekly</option>
+                  </select>
+                  <small class="text-muted">Create multiple slots with this schedule</small>
+                </div>
+                
+                <div id="repeat_options" class="col-12 mt-2 d-none">
+                  <div class="card bg-light-primary border">
+                    <div class="card-body">
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label class="form-label">Repeat Until</label>
+                          <div class="input-group input-group-merge">
+                            <span class="input-group-text"><i class="ti ti-calendar-event"></i></span>
+                            <input type="text" id="repeat_until" class="form-control flatpickr-date" placeholder="End date for repetition">
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">Days to Create</label>
+                          <div class="day-selector d-flex flex-wrap gap-2">
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" id="day_mon" value="mon">
+                              <label class="form-check-label" for="day_mon">Mon</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" id="day_tue" value="tue">
+                              <label class="form-check-label" for="day_tue">Tue</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" id="day_wed" value="wed">
+                              <label class="form-check-label" for="day_wed">Wed</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" id="day_thu" value="thu">
+                              <label class="form-check-label" for="day_thu">Thu</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" id="day_fri" value="fri">
+                              <label class="form-check-label" for="day_fri">Fri</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" id="day_sat" value="sat">
+                              <label class="form-check-label" for="day_sat">Sat</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="checkbox" id="day_sun" value="sun">
+                              <label class="form-check-label" for="day_sun">Sun</label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="tab-pane fade {% if not is_private and not is_update %}show active{% endif %}" id="group-content" role="tabpanel" aria-labelledby="group-tab">
+              <!-- Group Session Content -->
+              <div class="row g-3">
+                {% if is_private and not is_update %}
+                <div class="col-12">
+                  <div class="alert alert-info">
+                    <div class="d-flex align-items-center">
+                      <i class="ti ti-info-circle me-2"></i>
+                      <div>
+                        <p class="mb-0">Group sessions allow multiple students to join a single lesson. Set a title, description, and capacity limits.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+                
+                <!-- Group Session Title and Description -->
+                <div class="col-12">
+                  <label for="id_title" class="form-label">Session Title</label>
+                  <input type="text" id="id_title" name="title" class="form-control" placeholder="Enter a descriptive title for your session" 
+                    value="{% if form.title.value %}{{ form.title.value }}{% elif form.instance.title %}{{ form.instance.title }}{% endif %}" 
+                    required>
+                </div>
+                
+                <div class="col-12">
+                  <label for="description_editor" class="form-label">Session Description</label>
+                  <div id="description_editor" style="height: 150px;">
+                    {% if form.description.value %}{{ form.description.value|safe }}{% elif form.instance.description %}{{ form.instance.description|safe }}{% endif %}
+                  </div>
+                  <input type="hidden" name="description" id="description_input">
+                  <small class="text-muted">Describe what students will learn in this session</small>
+                </div>
+                
+                <!-- Group Language and Level Selections -->
+                <div class="col-md-6">
+                  <label for="id_group_language" class="form-label">Teaching Language</label>
+                  <select id="id_group_language" name="language" class="form-select select2" required>
+                    <option value="">Select language</option>
+                    {% for language in languages %}
+                      <option value="{{ language.id }}" {% if form.language.value == language.id or form.instance.language.id == language.id %}selected{% endif %}>
+                        {{ language.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="id_group_level" class="form-label">Proficiency Level</label>
+                  <select id="id_group_level" name="level" class="form-select select2" required>
+                    <option value="">Select level</option>
+                    {% for level in levels %}
+                      <option value="{{ level.id }}" {% if form.level.value == level.id or form.instance.level.id == level.id %}selected{% endif %}>
+                        {{ level.code }} - {{ level.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <!-- Group Date & Time Picker -->
+                <div class="col-md-6">
+                  <label for="group_session_date" class="form-label">Session Date</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="ti ti-calendar"></i></span>
+                    <input type="text" id="group_session_date" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                      {% if form.instance.start_time %}
+                      value="{{ form.instance.start_time|date:'Y-m-d' }}"
+                      {% endif %}
+                      required>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <label for="group_session_time" class="form-label">Session Time</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="ti ti-clock"></i></span>
+                    <input type="text" id="group_session_time" class="form-control flatpickr-time" placeholder="HH:MM"
+                      {% if form.instance.start_time %}
+                      value="{{ form.instance.start_time|time:'H:i' }}"
+                      {% endif %}
+                      required>
+                  </div>
+                </div>
+                
+                <!-- Hidden field for combined datetime -->
+                <input type="hidden" id="group_start_time_input" name="start_time" 
+                  {% if form.instance.start_time %}
+                  value="{{ form.instance.start_time|date:'Y-m-d H:i' }}"
+                  {% endif %}
+                  required>
+                
+                <!-- Group Duration and Capacity -->
+                <div class="col-md-4">
+                  <label for="id_group_duration_minutes" class="form-label">Session Duration</label>
+                  <select id="id_group_duration_minutes" name="duration_minutes" class="form-select" required>
+                    <option value="30" {% if form.duration_minutes.value == 30 or form.instance.duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
+                    <option value="45" {% if form.duration_minutes.value == 45 or form.instance.duration_minutes == 45 %}selected{% endif %}>45 minutes</option>
+                    <option value="60" {% if form.duration_minutes.value == 60 or form.instance.duration_minutes == 60 or not form.instance.duration_minutes %}selected{% endif %}>1 hour</option>
+                    <option value="90" {% if form.duration_minutes.value == 90 or form.instance.duration_minutes == 90 %}selected{% endif %}>1.5 hours</option>
+                    <option value="120" {% if form.duration_minutes.value == 120 or form.instance.duration_minutes == 120 %}selected{% endif %}>2 hours</option>
+                  </select>
+                </div>
+                
+                <div class="col-md-4">
+                  <label for="id_max_students" class="form-label">Maximum Students</label>
+                  <select id="id_max_students" name="max_students" class="form-select">
+                    <option value="5" {% if form.max_students.value == 5 or form.instance.max_students == 5 %}selected{% endif %}>5 students</option>
+                    <option value="10" {% if form.max_students.value == 10 or form.instance.max_students == 10 %}selected{% endif %}>10 students</option>
+                    <option value="15" {% if form.max_students.value == 15 or form.instance.max_students == 15 %}selected{% endif %}>15 students</option>
+                    <option value="20" {% if form.max_students.value == 20 or form.instance.max_students == 20 %}selected{% endif %}>20 students</option>
+                    <option value="30" {% if form.max_students.value == 30 or form.instance.max_students == 30 %}selected{% endif %}>30 students</option>
+                  </select>
+                </div>
+                
+                <!-- Session Price -->
+                <div class="col-md-4">
+                  <label for="id_price" class="form-label">Session Price ($)</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="ti ti-currency-dollar"></i></span>
+                    <input type="number" id="id_price" name="price" class="form-control" step="0.01" min="0" 
+                      value="{% if form.price.value %}{{ form.price.value }}{% elif form.instance.price %}{{ form.instance.price }}{% else %}0.00{% endif %}" required>
+                  </div>
+                  <small class="text-muted">Set to 0 for free sessions</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Session Preview -->
+          <div class="col-12 mt-4">
+            <div class="card bg-light border">
+              <div class="card-header bg-transparent">
+                <h6 class="card-title mb-0">Session Preview</h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <dl class="row mb-0">
+                      <dt class="col-5">Session Type:</dt>
+                      <dd class="col-7" id="preview_type">
+                        {% if is_private %}Private 1-on-1{% else %}Group{% endif %}
+                      </dd>
+                      
+                      <dt class="col-5">Language:</dt>
+                      <dd class="col-7" id="preview_language">
+                        {% if form.instance.language %}{{ form.instance.language.name }}{% else %}---{% endif %}
+                      </dd>
+                      
+                      <dt class="col-5">Level:</dt>
+                      <dd class="col-7" id="preview_level">
+                        {% if form.instance.level %}{{ form.instance.level.name }}{% else %}---{% endif %}
+                      </dd>
+                    </dl>
+                  </div>
+                  <div class="col-md-6">
+                    <dl class="row mb-0">
+                      <dt class="col-5">Date & Time:</dt>
+                      <dd class="col-7" id="preview_datetime">
+                        {% if form.instance.start_time %}{{ form.instance.start_time|date:"M d, Y" }} at {{ form.instance.start_time|time:"H:i" }}{% else %}---{% endif %}
+                      </dd>
+                      
+                      <dt class="col-5">Duration:</dt>
+                      <dd class="col-7" id="preview_duration">
+                        {% if form.instance.duration_minutes %}{{ form.instance.duration_minutes }} minutes{% else %}---{% endif %}
+                      </dd>
+                      
+                      <dt class="col-5">Status:</dt>
+                      <dd class="col-7">
+                        <span class="badge bg-label-{% if is_update %}primary{% else %}warning{% endif %}">
+                          {% if is_update %}Active{% else %}Draft{% endif %}
+                        </span>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'content:instructor_dashboard' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i> Cancel
+            </a>
+            <div>
+              {% if is_update %}
+                <button type="submit" name="action" value="save" class="btn btn-primary">
+                  <i class="ti ti-device-floppy me-1"></i> Update Session
+                </button>
+              {% else %}
+                <button type="submit" name="action" value="draft" class="btn btn-outline-primary me-2">
+                  <i class="ti ti-draft me-1"></i> Save as Draft
+                </button>
+                <button type="submit" name="action" value="publish" class="btn btn-primary">
+                  <i class="ti ti-calendar-plus me-1"></i> Create & Publish
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2 for dropdowns
+    $('.select2').select2({
+      placeholder: "Select an option",
+      allowClear: true,
+      width: '100%'
+    });
+    
+    // Initialize Flatpickr date pickers with better options
+    const datePickers = flatpickr('.flatpickr-date', {
+      enableTime: false,
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      altInput: true,
+      altFormat: "F j, Y",
+      animate: true
+    });
+    
+    // Initialize Flatpickr time pickers with better options
+    const timePickers = flatpickr('.flatpickr-time', {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: "H:i",
+      time_24hr: true,
+      minuteIncrement: 15,
+      altInput: true,
+      altFormat: "h:i K",
+      animate: true
+    });
+    
+    // Initialize Rich Text Editor for group session description
+    const descriptionEditor = new Quill('#description_editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          ['link'],
+          ['clean']
+        ]
+      }
+    });
+    
+    // Function to update hidden datetime field for private sessions
+    function updatePrivateDatetime() {
+      const dateEl = document.getElementById('session_date');
+      const timeEl = document.getElementById('session_time');
+      const combinedEl = document.getElementById('start_time_input');
+      
+      if (dateEl.value && timeEl.value) {
+        combinedEl.value = dateEl.value + ' ' + timeEl.value;
+        updatePreview();
+      }
+    }
+    
+    // Function to update hidden datetime field for group sessions
+    function updateGroupDatetime() {
+      const dateEl = document.getElementById('group_session_date');
+      const timeEl = document.getElementById('group_session_time');
+      const combinedEl = document.getElementById('group_start_time_input');
+      
+      if (dateEl.value && timeEl.value) {
+        combinedEl.value = dateEl.value + ' ' + timeEl.value;
+        updatePreview();
+      }
+    }
+    
+    // Update hidden fields when date or time changes
+    document.getElementById('session_date').addEventListener('change', updatePrivateDatetime);
+    document.getElementById('session_time').addEventListener('change', updatePrivateDatetime);
+    document.getElementById('group_session_date').addEventListener('change', updateGroupDatetime);
+    document.getElementById('group_session_time').addEventListener('change', updateGroupDatetime);
+    
+    // Handle session type tab switching
+    const sessionTypeTabs = document.querySelectorAll('#session-type-tabs .nav-link');
+    const sessionTypeInput = document.getElementById('session_type_input');
+    
+    if (sessionTypeTabs.length > 0) {
+      sessionTypeTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const type = this.id === 'private-tab' ? 'private' : 'group';
+          sessionTypeInput.value = type;
+          
+          // Update preview
+          document.getElementById('preview_type').textContent = type === 'private' ? 'Private 1-on-1' : 'Group';
+        });
+      });
+    }
+    
+    // Handle repeat schedule options
+    const repeatSelect = document.getElementById('repeat_schedule');
+    const repeatOptions = document.getElementById('repeat_options');
+    
+    if (repeatSelect) {
+      repeatSelect.addEventListener('change', function() {
+        if (this.value === 'none') {
+          repeatOptions.classList.add('d-none');
+        } else {
+          repeatOptions.classList.remove('d-none');
+        }
+      });
+    }
+    
+    // Initialize repeat until date picker
+    if (document.getElementById('repeat_until')) {
+      flatpickr('#repeat_until', {
+        enableTime: false,
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        altInput: true,
+        altFormat: "F j, Y"
+      });
+    }
+    
+    // Live preview updates
+    function updatePreview() {
+      // Determine which tab is active
+      const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
+                            document.getElementById('private-content')?.classList.contains('show');
+      
+      // Get values based on active tab
+      const prefix = isPrivateActive ? '' : 'group_';
+      
+      // Update language preview
+      const languageSelect = document.getElementById(isPrivateActive ? 'id_language' : 'id_group_language');
+      if (languageSelect && languageSelect.selectedIndex > 0) {
+        document.getElementById('preview_language').textContent = 
+          languageSelect.options[languageSelect.selectedIndex].text;
+      }
+      
+      // Update level preview
+      const levelSelect = document.getElementById(isPrivateActive ? 'id_level' : 'id_group_level');
+      if (levelSelect && levelSelect.selectedIndex > 0) {
+        document.getElementById('preview_level').textContent = 
+          levelSelect.options[levelSelect.selectedIndex].text;
+      }
+      
+      // Update date/time preview
+      const dateValue = document.getElementById(prefix + (isPrivateActive ? 'session_date' : 'session_date')).value;
+      const timeValue = document.getElementById(prefix + (isPrivateActive ? 'session_time' : 'session_time')).value;
+      
+      if (dateValue && timeValue) {
+        const dateObj = new Date(dateValue + 'T' + timeValue);
+        const options = { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        };
+        document.getElementById('preview_datetime').textContent = 
+          dateObj.toLocaleDateString('en-US', options);
+      }
+      
+      // Update duration preview
+      const durationSelect = document.getElementById(isPrivateActive ? 'id_duration_minutes' : 'id_group_duration_minutes');
+      if (durationSelect && durationSelect.selectedIndex > -1) {
+        const durationText = durationSelect.options[durationSelect.selectedIndex].text;
+        document.getElementById('preview_duration').textContent = durationText;
+      }
+    }
+    
+    // Attach change listeners to all relevant form fields
+    const previewFields = [
+      'id_language', 'id_level', 'id_duration_minutes',
+      'id_group_language', 'id_group_level', 'id_group_duration_minutes'
+    ];
+    
+    previewFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.addEventListener('change', updatePreview);
+      }
+    });
+    
+    // Update the description hidden input when form submits
+    const sessionForm = document.getElementById('sessionForm');
+    sessionForm.addEventListener('submit', function(e) {
+      // For group sessions, sync Quill editor content with hidden field
+      const editorContent = descriptionEditor.root.innerHTML;
+      document.getElementById('description_input').value = editorContent;
+      
+      // Determine which tab is active
+      const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
+                            document.getElementById('private-content')?.classList.contains('show');
+      
+      // Validate required fields based on active tab
+      if (isPrivateActive) {
+        // Validate private session fields
+        if (!document.getElementById('session_date').value) {
+          e.preventDefault();
+          alert('Please select a session date');
+          return false;
+        }
+        if (!document.getElementById('session_time').value) {
+          e.preventDefault();
+          alert('Please select a session time');
+          return false;
+        }
+      } else {
+        // Validate group session fields
+        if (!document.getElementById('id_title').value) {
+          e.preventDefault();
+          alert('Please enter a session title');
+          return false;
+        }
+        if (!document.getElementById('group_session_date').value) {
+          e.preventDefault();
+          alert('Please select a session date');
+          return false;
+        }
+        if (!document.getElementById('group_session_time').value) {
+          e.preventDefault();
+          alert('Please select a session time');
+          return false;
+        }
+      }
+    });
+    
+    // Run initial preview update
+    updatePreview();
+    
+    // Form validation
+    document.getElementById('sessionForm').addEventListener('submit', function(e) {
+      // Determine which tab is active
+      const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
+                            document.getElementById('private-content')?.classList.contains('show');
+      
+      const prefix = isPrivateActive ? '' : 'group_';
+      
+      // Check if date and time are filled
+      const dateValue = document.getElementById(prefix + 'datepicker')?.value;
+      const timeValue = document.getElementById(prefix + 'timepicker')?.value;
+      
+      if (!dateValue || !timeValue) {
+        e.preventDefault();
+        alert('Please select both a date and time for the session.');
+        return false;
+      }
+      
+      // For group sessions, ensure title is filled
+      if (!isPrivateActive) {
+        const titleValue = document.getElementById('id_title')?.value;
+        if (!titleValue || titleValue.trim() === '') {
+          e.preventDefault();
+          alert('Please provide a title for your group session.');
+          return false;
+        }
+      }
+      
+      // Check if language and level are selected
+      const langId = isPrivateActive ? 'id_language' : 'id_group_language';
+      const levelId = isPrivateActive ? 'id_level' : 'id_group_level';
+      
+      if (document.getElementById(langId).selectedIndex <= 0) {
+        e.preventDefault();
+        alert('Please select a language for the session.');
+        return false;
+      }
+      
+      if (document.getElementById(levelId).selectedIndex <= 0) {
+        e.preventDefault();
+        alert('Please select a proficiency level for the session.');
+        return false;
+      }
+      
+      // All validations passed
+      return true;
+    });
+  });
+</script>
+{% endblock %}

@@ -232,3 +232,370 @@ class Resource(models.Model):
     class Meta:
         app_label = 'content'
         ordering = ['-created_at']
+
+
+
+class SessionStatus(models.Model):
+    """Model for tracking different session statuses"""
+    CATEGORY_CHOICES = [
+        ('live', 'Live Status'),
+        ('end', 'End Status'),
+        ('system', 'System Status'),
+    ]
+    
+    name = models.CharField(max_length=50)
+    code = models.CharField(max_length=20, unique=True)
+    description = models.TextField(blank=True, null=True)
+    color = models.CharField(max_length=20, help_text="CSS color class, e.g. 'primary', 'success'", default="primary")
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='live')
+    order = models.PositiveSmallIntegerField(default=0)
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ['category', 'order']
+        verbose_name_plural = "Session Statuses"
+
+
+class BaseSession(models.Model):
+    """Abstract base model with common fields for both private and group sessions"""
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('scheduled', 'Scheduled'),
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('no-show', 'No Show'),
+    ]
+    
+    instructor = models.ForeignKey('booking.Instructor', on_delete=models.CASCADE, related_name='%(class)s_sessions')
+    language = models.ForeignKey('content.Language', on_delete=models.PROTECT, related_name='%(class)s_sessions')
+    level = models.ForeignKey('content.LanguageLevel', on_delete=models.PROTECT, related_name='%(class)s_sessions')
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    duration_minutes = models.PositiveIntegerField(default=60)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    status_detail = models.ForeignKey(SessionStatus, on_delete=models.SET_NULL, null=True, blank=True, related_name='%(class)s_sessions')
+    
+    # Dates for tracking lifecycle
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    
+    # Fields for tracking status changes
+    cancellation_reason = models.TextField(blank=True, null=True)
+    cancellation_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='%(class)s_cancellations')
+    completion_notes = models.TextField(blank=True, null=True)
+    
+    # Integration fields
+    meeting_link = models.URLField(blank=True, null=True)
+    recording_url = models.URLField(blank=True, null=True)
+    
+    @property
+    def is_cancelled(self):
+        return self.status == 'cancelled'
+    
+    @property
+    def is_completed(self):
+        return self.status == 'completed'
+    
+    @property
+    def is_active(self):
+        """Session is currently happening"""
+        now = timezone.now()
+        return (
+            self.status in ['scheduled', 'active'] and 
+            self.start_time <= now and 
+            self.end_time >= now
+        )
+    
+    @property
+    def is_upcoming(self):
+        """Session is in the future"""
+        now = timezone.now()
+        return self.status == 'scheduled' and self.start_time > now
+    
+    @property
+    def is_past(self):
+        """Session has ended"""
+        now = timezone.now()
+        return self.end_time < now
+    
+    @property
+    def duration_display(self):
+        """Return a human-readable duration"""
+        hours = self.duration_minutes // 60
+        minutes = self.duration_minutes % 60
+        
+        if hours == 0:
+            return f"{minutes} minute{'s' if minutes != 1 else ''}"
+        elif minutes == 0:
+            return f"{hours} hour{'s' if hours != 1 else ''}"
+        else:
+            return f"{hours} hour{'s' if hours != 1 else ''} {minutes} minute{'s' if minutes != 1 else ''}"
+    
+    def mark_as_published(self):
+        """Publish the session"""
+        if self.status == 'draft':
+            self.status = 'scheduled'
+            self.published_at = timezone.now()
+            self.save(update_fields=['status', 'published_at'])
+    
+    def mark_as_cancelled(self, reason=None, cancelled_by=None):
+        """Cancel the session"""
+        if self.status in ['draft', 'scheduled', 'active']:
+            self.status = 'cancelled'
+            self.cancelled_at = timezone.now()
+            self.cancellation_reason = reason
+            self.cancellation_by = cancelled_by
+            self.save(update_fields=['status', 'cancelled_at', 'cancellation_reason', 'cancellation_by'])
+    
+    def mark_as_completed(self, notes=None):
+        """Mark the session as completed"""
+        if self.status in ['scheduled', 'active']:
+            self.status = 'completed'
+            self.completed_at = timezone.now()
+            self.completion_notes = notes
+            self.save(update_fields=['status', 'completed_at', 'completion_notes'])
+    
+    def mark_as_no_show(self):
+        """Mark session as no-show when student(s) don't attend"""
+        if self.status in ['scheduled', 'active']:
+            self.status = 'no-show'
+            self.cancelled_at = timezone.now()
+            self.save(update_fields=['status', 'cancelled_at'])
+    
+    class Meta:
+        abstract = True
+
+
+class PrivateSession(BaseSession):
+    """Model for private 1-on-1 sessions"""
+    
+    # Fields unique to private sessions
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='private_sessions', null=True, blank=True)
+    is_trial = models.BooleanField(default=False)
+    
+    # Override from base class to support compatibility with existing code
+    status = models.CharField(max_length=20, choices=BaseSession.STATUS_CHOICES + [('available', 'Available'), ('booked', 'Booked')], default='draft')
+    
+    @property
+    def is_private(self):
+        return True
+    
+    @property
+    def is_available(self):
+        """Session is available for booking"""
+        return self.status == 'available' and self.is_upcoming
+    
+    @property
+    def is_booked(self):
+        """Session is booked by a student"""
+        return self.status == 'booked' and self.student is not None
+    
+    def __str__(self):
+        student_name = self.student.username if self.student else "No student"
+        return f"Private: {self.instructor.user.username} with {student_name} on {self.start_time.strftime('%Y-%m-%d %H:%M')}"
+
+
+class GroupSession(BaseSession):
+    """Model for group sessions with multiple students"""
+    
+    # Fields unique to group sessions
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    max_students = models.PositiveIntegerField(null=True, blank=True)
+    min_students = models.PositiveIntegerField(default=2)
+    students = models.ManyToManyField(User, related_name='group_sessions', blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    tags = models.CharField(max_length=255, blank=True, null=True, help_text="Comma-separated tags")
+    
+    @property
+    def is_private(self):
+        return False
+    
+    @property
+    def is_full(self):
+        """Check if session has reached max capacity"""
+        if not self.max_students:
+            return False
+        return self.students.count() >= self.max_students
+    
+    @property
+    def enrollment_percentage(self):
+        """Calculate percentage of filled slots"""
+        if not self.max_students or self.max_students == 0:
+            return 0
+        return min(100, int((self.students.count() / self.max_students) * 100))
+    
+    @property
+    def can_run(self):
+        """Check if session has minimum required participants"""
+        return self.students.count() >= self.min_students
+    
+    @property
+    def slots_available(self):
+        """Number of available slots remaining"""
+        if not self.max_students:
+            return None
+        return max(0, self.max_students - self.students.count())
+    
+    def __str__(self):
+        return f"Group: {self.title} by {self.instructor.user.username} on {self.start_time.strftime('%Y-%m-%d %H:%M')}"
+
+
+class SessionFeedback(models.Model):
+    """Model for tracking session feedback from both students and instructors"""
+    RATING_CHOICES = [
+        (1, '1 - Poor'),
+        (2, '2 - Below Average'),
+        (3, '3 - Average'),
+        (4, '4 - Good'),
+        (5, '5 - Excellent'),
+    ]
+    
+    SESSION_TYPE_CHOICES = [
+        ('private', 'Private Session'),
+        ('group', 'Group Session'),
+    ]
+    
+    # Basic information
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_session_feedback')
+    session_type = models.CharField(max_length=10, choices=SESSION_TYPE_CHOICES)
+    private_session = models.ForeignKey(PrivateSession, on_delete=models.CASCADE, null=True, blank=True, related_name='feedback')
+    group_session = models.ForeignKey(GroupSession, on_delete=models.CASCADE, null=True, blank=True, related_name='feedback')
+    
+    # Feedback details
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    # Specific feedback aspects (optional)
+    teaching_quality = models.PositiveSmallIntegerField(choices=RATING_CHOICES, null=True, blank=True)
+    technical_quality = models.PositiveSmallIntegerField(choices=RATING_CHOICES, null=True, blank=True)
+    content_relevance = models.PositiveSmallIntegerField(choices=RATING_CHOICES, null=True, blank=True)
+    
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(private_session__isnull=False) | models.Q(group_session__isnull=False),
+                name='feedback_has_session'
+            ),
+            models.UniqueConstraint(
+                fields=['user', 'private_session'],
+                name='unique_private_session_feedback',
+                condition=models.Q(private_session__isnull=False)
+            ),
+            models.UniqueConstraint(
+                fields=['user', 'group_session'],
+                name='unique_group_session_feedback',
+                condition=models.Q(group_session__isnull=False)
+            ),
+        ]
+    
+    def __str__(self):
+        session_info = ""
+        if self.private_session:
+            instructor = self.private_session.instructor.user.username
+            date = self.private_session.start_time.strftime("%Y-%m-%d")
+            session_info = f"Private session with {instructor} on {date}"
+        elif self.group_session:
+            session_info = f"Group session: {self.group_session.title}"
+            
+        return f"Feedback by {self.user.username} for {session_info} - {self.rating}/5"
+
+
+class SessionReport(models.Model):
+    """Model for instructor reports on sessions"""
+    SESSION_TYPE_CHOICES = [
+        ('private', 'Private Session'),
+        ('group', 'Group Session'),
+    ]
+    
+    PROGRESS_CHOICES = [
+        ('excellent', 'Excellent'),
+        ('good', 'Good'),
+        ('satisfactory', 'Satisfactory'),
+        ('needs_improvement', 'Needs Improvement'),
+        ('poor', 'Poor'),
+    ]
+    
+    # Session information
+    instructor = models.ForeignKey('booking.Instructor', on_delete=models.CASCADE, related_name='session_reports')
+    session_type = models.CharField(max_length=10, choices=SESSION_TYPE_CHOICES)
+    private_session = models.OneToOneField(PrivateSession, on_delete=models.CASCADE, null=True, blank=True, related_name='report')
+    group_session = models.OneToOneField(GroupSession, on_delete=models.CASCADE, null=True, blank=True, related_name='report')
+    
+    # Report details
+    summary = models.TextField()
+    topics_covered = models.TextField()
+    student_progress = models.CharField(max_length=20, choices=PROGRESS_CHOICES, default='satisfactory')
+    recommendations = models.TextField(blank=True, null=True)
+    materials_used = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # For private sessions only
+    student_strengths = models.TextField(blank=True, null=True)
+    student_weaknesses = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(private_session__isnull=False) | models.Q(group_session__isnull=False),
+                name='report_has_session'
+            ),
+        ]
+    
+    def __str__(self):
+        if self.private_session:
+            student = self.private_session.student.username if self.private_session.student else "No student"
+            date = self.private_session.start_time.strftime("%Y-%m-%d")
+            return f"Report for private session with {student} on {date}"
+        elif self.group_session:
+            return f"Report for group session: {self.group_session.title}"
+        return "Session Report"
+
+
+class SessionAttendance(models.Model):
+    """Model for tracking attendance in group sessions"""
+    session = models.ForeignKey(GroupSession, on_delete=models.CASCADE, related_name='attendance')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='session_attendance')
+    attended = models.BooleanField(default=False)
+    join_time = models.DateTimeField(null=True, blank=True)
+    leave_time = models.DateTimeField(null=True, blank=True)
+    attendance_duration = models.PositiveIntegerField(help_text="Duration in minutes", null=True, blank=True)
+    notes = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        unique_together = ['session', 'student']
+    
+    def __str__(self):
+        attendance_status = "Attended" if self.attended else "Absent"
+        return f"{self.student.username} - {attendance_status} - {self.session}"
+    
+    def mark_attended(self, join_time=None):
+        """Mark student as attended"""
+        self.attended = True
+        if join_time:
+            self.join_time = join_time
+        else:
+            self.join_time = timezone.now()
+        self.save(update_fields=['attended', 'join_time'])
+    
+    def mark_left(self, leave_time=None):
+        """Record when student left the session"""
+        if leave_time:
+            self.leave_time = leave_time
+        else:
+            self.leave_time = timezone.now()
+            
+        # Calculate duration if both join and leave times are set
+        if self.join_time and self.leave_time:
+            duration = (self.leave_time - self.join_time).total_seconds() / 60
+            self.attendance_duration = round(duration)
+            
+        self.save(update_fields=['leave_time', 'attendance_duration'])

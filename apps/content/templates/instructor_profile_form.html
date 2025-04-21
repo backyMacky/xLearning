@@ -8,15 +8,12 @@
 {% block vendor_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
-<link rel="stylesheet" href="{% static 'vendor/libs/quill/typography.css' %}" />
-<link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/tagify/tagify.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
 {{ block.super }}
 <script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
-<script src="{% static 'vendor/libs/quill/quill.js' %}"></script>
 <script src="{% static 'vendor/libs/tagify/tagify.js' %}"></script>
 {% endblock vendor_js %}
 
@@ -55,106 +52,116 @@
           </div>
           {% endif %}
 
-          <div class="row g-4">
+          <div class="row g-3">
             <!-- Profile Image -->
-            <div class="col-12 d-flex flex-column align-items-center mb-4">
-              <div class="d-flex mb-3">
+            <div class="col-md-3">
+              <div class="d-flex flex-column align-items-center">
                 {% if form.instance.profile_image %}
-                <img src="{{ form.instance.profile_image.url }}" alt="Profile Preview" id="profile-preview" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                <img src="{{ form.instance.profile_image.url }}" alt="Profile Preview" id="profile-preview" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
                 {% else %}
-                <div id="profile-preview-placeholder" class="avatar avatar-xl">
+                <div id="profile-preview-placeholder" class="avatar avatar-lg mb-3">
                   <div class="avatar-initial rounded-circle bg-label-primary">
-                    <i class="ti ti-user ti-lg"></i>
+                    <i class="ti ti-user"></i>
                   </div>
                 </div>
-                <img src="" alt="Profile Preview" id="profile-preview" class="rounded-circle d-none" style="width: 120px; height: 120px; object-fit: cover;">
+                <img src="" alt="Profile Preview" id="profile-preview" class="rounded-circle d-none mb-3" style="width: 100px; height: 100px; object-fit: cover;">
                 {% endif %}
-              </div>
-              
-              <div class="mb-3">
-                <label for="{{ form.profile_image.id_for_label }}" class="form-label">Profile Picture</label>
-                <div class="input-group">
-                  {{ form.profile_image }}
+                
+                <div class="mb-2 text-center">
+                  <label for="{{ form.profile_image.id_for_label }}" class="btn btn-outline-primary btn-sm">
+                    <i class="ti ti-upload me-1"></i> Upload
+                  </label>
+                  <input type="file" id="{{ form.profile_image.id_for_label }}" name="{{ form.profile_image.html_name }}" class="d-none" accept="image/*">
+                  {% if form.profile_image.errors %}
+                  <div class="invalid-feedback d-block small">{{ form.profile_image.errors.0 }}</div>
+                  {% endif %}
                 </div>
-                {% if form.profile_image.errors %}
-                <div class="invalid-feedback d-block">{{ form.profile_image.errors.0 }}</div>
+              </div>
+            </div>
+
+            <div class="col-md-9">
+              <div class="row g-3">
+                <!-- Availability Status -->
+                {% if form.is_available %}
+                <div class="col-md-4">
+                  <div class="form-check form-switch mt-1">
+                    {{ form.is_available }}
+                    <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
+                      Available for booking
+                    </label>
+                  </div>
+                </div>
                 {% endif %}
-                <small class="form-text text-muted">Recommended: Square image, at least 300x300 pixels</small>
+
+                <!-- Teaching Level -->
+                <div class="col-md-4">
+                  <label for="teaching_level" class="form-label">Teaching Level</label>
+                  <select class="form-select form-select-sm" name="teaching_level" id="teaching_level">
+                    <option value="">Select Level</option>
+                    <option value="A1">Beginner</option>
+                    <option value="A2">Elementary</option>
+                    <option value="B1">Intermediate</option>
+                    <option value="B2">Upper Intermediate</option>
+                    <option value="C1">Advanced</option>
+                    <option value="C2">Proficient</option>
+                  </select>
+                </div>
+
+                <!-- Language Dropdown -->
+                <div class="col-md-4">
+                  <label for="language" class="form-label">Teaching Language</label>
+                  <select class="form-select form-select-sm" name="language" id="language">
+                    <option value="">Select Language</option>
+                    <option value="english">English</option>
+                    <option value="french">French</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="swahili">Swahili</option>
+                    <option value="german">German</option>
+                    <option value="chinese">Chinese</option>
+                    <option value="arabic">Arabic</option>
+                  </select>
+                </div>
+
+                <!-- Specialties Selection -->
+                <div class="col-md-12">
+                  <label for="specialty" class="form-label">Teaching Specialty</label>
+                  <select class="form-select form-select-sm" name="specialty" id="specialty">
+                    <option value="">Select Specialty</option>
+                    <option value="grammar">Grammar</option>
+                    <option value="conversation">Conversation</option>
+                    <option value="business">Business Language</option>
+                    <option value="exam">Exam Preparation</option>
+                    <option value="literature">Literature</option>
+                    <option value="pronunciation">Pronunciation</option>
+                    <option value="writing">Writing</option>
+                    <option value="academic">Academic</option>
+                  </select>
+                </div>
               </div>
-            </div>
-
-            <!-- Hourly Rate -->
-            <div class="col-md-6">
-              <label for="{{ form.hourly_rate.id_for_label }}" class="form-label">Hourly Rate ($)</label>
-              {{ form.hourly_rate }}
-              {% if form.hourly_rate.errors %}
-              <div class="invalid-feedback d-block">{{ form.hourly_rate.errors.0 }}</div>
-              {% endif %}
-              <small class="form-text text-muted">Your rate for private 1-on-1 sessions</small>
-            </div>
-
-            <!-- Is Available -->
-            {% if form.is_available %}
-            <div class="col-md-6">
-              <label class="form-label">Availability Status</label>
-              <div class="form-check form-switch mt-2">
-                {{ form.is_available }}
-                <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
-                  Available for booking
-                  <small class="d-block text-muted">Toggle off to temporarily hide your profile from searches</small>
-                </label>
-              </div>
-            </div>
-            {% endif %}
-
-            <!-- Language Selection -->
-            <div class="col-12">
-              <label class="form-label">Teaching Languages</label>
-              <select class="select2 form-select" multiple name="languages" id="languages">
-                {% for language in languages %}
-                <option value="{{ language.id }}" {% if language.id in selected_languages %}selected{% endif %}>{{ language.name }}</option>
-                {% endfor %}
-              </select>
-              <small class="form-text text-muted">Select all languages you can teach</small>
-            </div>
-
-            <!-- Specialties Selection -->
-            <div class="col-12">
-              <label class="form-label">Teaching Specialties</label>
-              <select class="select2 form-select" multiple name="specialties" id="specialties">
-                {% for specialty in specialties %}
-                <option value="{{ specialty.id }}" {% if specialty.id in selected_specialties %}selected{% endif %}>{{ specialty.name }}</option>
-                {% endfor %}
-              </select>
-              <small class="form-text text-muted">Select your teaching specialties and focus areas</small>
             </div>
 
             <!-- Bio -->
-            <div class="col-12">
-              <label for="bio-editor" class="form-label">Professional Bio</label>
-              <div id="bio-editor" style="min-height: 200px;"></div>
-              {{ form.bio }}
+            <div class="col-md-6">
+              <label for="{{ form.bio.id_for_label }}" class="form-label">Professional Bio</label>
+              <textarea id="{{ form.bio.id_for_label }}" name="{{ form.bio.html_name }}" class="form-control" rows="3" placeholder="Briefly introduce yourself and your qualifications">{{ form.bio.value|default:'' }}</textarea>
               {% if form.bio.errors %}
               <div class="invalid-feedback d-block">{{ form.bio.errors.0 }}</div>
               {% endif %}
-              <small class="form-text text-muted">Introduce yourself, your background, and your qualifications</small>
             </div>
 
             <!-- Teaching Style -->
-            <div class="col-12">
-              <label for="teaching-style-editor" class="form-label">Teaching Style</label>
-              <div id="teaching-style-editor" style="min-height: 200px;"></div>
-              {{ form.teaching_style }}
+            <div class="col-md-6">
+              <label for="{{ form.teaching_style.id_for_label }}" class="form-label">Teaching Style</label>
+              <textarea id="{{ form.teaching_style.id_for_label }}" name="{{ form.teaching_style.html_name }}" class="form-control" rows="3" placeholder="Describe your teaching approach">{{ form.teaching_style.value|default:'' }}</textarea>
               {% if form.teaching_style.errors %}
               <div class="invalid-feedback d-block">{{ form.teaching_style.errors.0 }}</div>
               {% endif %}
-              <small class="form-text text-muted">Describe your teaching approach, methods, and philosophy</small>
             </div>
 
             <!-- Submit Buttons -->
-            <div class="col-12 d-flex justify-content-end gap-2">
-              <a href="{% url 'dashboards:dashboard-teacher' %}" class="btn btn-outline-secondary">Cancel</a>
-              <button type="submit" class="btn btn-primary">{{ submit_text|default:"Save Profile" }}</button>
+            <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+              <a href="{% url 'dashboards:dashboard-teacher' %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+              <button type="submit" class="btn btn-primary btn-sm">{{ submit_text|default:"Save Profile" }}</button>
             </div>
           </div>
         </form>
@@ -167,56 +174,6 @@
 {% block page_js_extra %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Select2 for multi-select dropdowns
-    $('.select2').select2({
-      placeholder: "Select options",
-      allowClear: true
-    });
-
-    // Initialize Quill for rich text bio
-    const bioQuill = new Quill('#bio-editor', {
-      theme: 'snow',
-      modules: {
-        toolbar: [
-          ['bold', 'italic', 'underline'],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          ['link'],
-          ['clean']
-        ]
-      }
-    });
-    
-    // Initialize Quill for teaching style
-    const teachingStyleQuill = new Quill('#teaching-style-editor', {
-      theme: 'snow',
-      modules: {
-        toolbar: [
-          ['bold', 'italic', 'underline'],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          ['link'],
-          ['clean']
-        ]
-      }
-    });
-    
-    // Set initial content if available
-    const bioField = document.querySelector('#{{ form.bio.id_for_label }}');
-    if (bioField && bioField.value) {
-      bioQuill.root.innerHTML = bioField.value;
-    }
-    
-    const teachingStyleField = document.querySelector('#{{ form.teaching_style.id_for_label }}');
-    if (teachingStyleField && teachingStyleField.value) {
-      teachingStyleQuill.root.innerHTML = teachingStyleField.value;
-    }
-    
-    // When form is submitted, update hidden textarea with Quill content
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function() {
-      bioField.value = bioQuill.root.innerHTML;
-      teachingStyleField.value = teachingStyleQuill.root.innerHTML;
-    });
-    
     // Image preview
     const profileInput = document.getElementById('{{ form.profile_image.id_for_label }}');
     const profilePreview = document.getElementById('profile-preview');

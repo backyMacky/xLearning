@@ -2,7 +2,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.contrib import messages
 from django.db.models import Q, Count, Avg
 from django.utils import timezone
@@ -13,13 +13,14 @@ from web_project.template_helpers.theme import TemplateHelper
 # Import models - adjust these based on your actual model structure
 from .models import (
     Language, LanguageLevel, Course as Session,  # Rename the import for clarity
-     Lesson
+     Lesson, Resource, SessionAttendance, SessionFeedback, SessionReport
 )
 from .forms import (
     CourseForm as SessionForm,  
-    CourseFilterForm as SessionFilterForm  
+    CourseFilterForm as SessionFilterForm,
+    ResourceFilterForm,
+    ResourceForm  
 )
-
 # We'll also need access to booking models
 from apps.booking.models import (
     Instructor, PrivateSessionSlot, GroupSession, 
@@ -474,132 +475,246 @@ class InstructorDashboardView(LoginRequiredMixin, TemplateView):
         has_instructor_profile = hasattr(user, 'instructor_profile')
         context['has_instructor_profile'] = has_instructor_profile
         
-        # Add information about teacher status
-        is_teacher = hasattr(user, 'is_teacher') and user.is_teacher
-        context['is_teacher'] = is_teacher
-        
-        # Add helpful messaging for non-teachers
-        if not is_teacher:
-            context['non_teacher_message'] = "This dashboard is designed for instructors. You can create an instructor profile to start teaching on the platform."
-        
         if has_instructor_profile:
             instructor = user.instructor_profile
             context['instructor'] = instructor
             
-            # Get private session slots
+            # Current time
             now = timezone.now()
-            context['upcoming_private_slots'] = PrivateSessionSlot.objects.filter(
+            context['now'] = now
+            
+            # Get analytics data
+            analytics_data = self.get_instructor_dashboard_data(instructor)
+            context.update(analytics_data)
+            
+            # Get available and booked slots for the calendar
+            context['available_slots'] = PrivateSessionSlot.objects.filter(
                 instructor=instructor,
+                status='available',
                 start_time__gt=now
             ).order_by('start_time')
             
-            # Group slots by status
-            context['available_slots'] = context['upcoming_private_slots'].filter(status='available')
-            context['booked_slots'] = context['upcoming_private_slots'].filter(status='booked')
-            
-            # Get past slots
-            context['past_slots'] = PrivateSessionSlot.objects.filter(
+            context['booked_slots'] = PrivateSessionSlot.objects.filter(
                 instructor=instructor,
-                start_time__lt=now
-            ).order_by('-start_time')[:10]
+                status='booked',
+                start_time__gt=now
+            ).order_by('start_time')
             
-            # Get group sessions
+            # Get upcoming group sessions
             context['upcoming_group_sessions'] = GroupSession.objects.filter(
                 instructor=instructor,
+                status='scheduled',
                 start_time__gt=now
             ).order_by('start_time')
             
-            # Get past group sessions
-            context['past_group_sessions'] = GroupSession.objects.filter(
-                instructor=instructor,
-                start_time__lt=now
-            ).order_by('-start_time')[:10]
-            
-            # Get reviews
+            # Get recent reviews
             context['recent_reviews'] = InstructorReview.objects.filter(
                 instructor=instructor
             ).order_by('-created_at')[:5]
-            
-            # Calculate statistics
-            context['total_private_sessions'] = PrivateSessionSlot.objects.filter(
-                instructor=instructor,
-                status__in=['completed', 'booked']
-            ).count()
-            
-            context['total_group_sessions'] = GroupSession.objects.filter(
-                instructor=instructor
-            ).count()
-            
-            context['total_students'] = len(set(list(PrivateSessionSlot.objects.filter(
-                instructor=instructor,
-                status__in=['completed', 'booked']
-            ).values_list('student', flat=True)) + list(GroupSession.objects.filter(
-                instructor=instructor
-            ).values_list('students', flat=True))))
-            
-            context['rating'] = instructor.rating
-        else:
-            # Provide an option to create an instructor profile
-            context['create_profile_url'] = reverse('content:create_instructor_profile')
         
         # Set active menu attributes
-        context['active_menu'] = 'content'
-        context['active_submenu'] = 'instructor_dashboard'
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'instructor-dashboard'
         
         # Set the layout path using TemplateHelper
         context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
         TemplateHelper.map_context(context)
         
         return context
+    
+    def get_instructor_dashboard_data(self, instructor):
+        """Get analytics data for the instructor dashboard"""
+        now = timezone.now()
+        data = {}
+        
+        # Active sessions (currently happening)
+        active_sessions = []
+        active_private_sessions = PrivateSessionSlot.objects.filter(
+            instructor=instructor,
+            start_time__lte=now,
+            end_time__gte=now,
+            status__in=['booked', 'active']
+        ).select_related('student', 'language', 'level')
+        
+        active_group_sessions = GroupSession.objects.filter(
+            instructor=instructor,
+            start_time__lte=now,
+            end_time__gte=now,
+            status__in=['scheduled', 'active']
+        ).select_related('language', 'level')
+        
+        # Format active sessions for the template
+        for session in active_private_sessions:
+            active_sessions.append({
+                'id': session.id,
+                'is_private': True,
+                'start_time': session.start_time,
+                'end_time': session.end_time,
+                'student': session.student,
+                'meeting_link': session.meeting_link,
+                'status': 'Active'
+            })
+        
+        for session in active_group_sessions:
+            active_sessions.append({
+                'id': session.id,
+                'is_private': False,
+                'title': session.title,
+                'start_time': session.start_time,
+                'end_time': session.end_time,
+                'students': session.students.all(),
+                'students_count': session.students.count(),
+                'max_students': session.max_students,
+                'enrollment_percentage': session.enrollment_percentage,
+                'meeting_link': session.meeting_link,
+                'status': 'Active'
+            })
+        
+        data['active_sessions'] = active_sessions
+        
+        # Upcoming sessions (scheduled for the future)
+        upcoming_sessions = []
+        upcoming_private_sessions = PrivateSessionSlot.objects.filter(
+            instructor=instructor,
+            start_time__gt=now,
+            status__in=['available', 'booked']
+        ).select_related('student', 'language', 'level')
+        
+        upcoming_group_sessions = GroupSession.objects.filter(
+            instructor=instructor,
+            start_time__gt=now,
+            status='scheduled'
+        ).select_related('language', 'level')
+        
+        # Format upcoming sessions for the template
+        for session in upcoming_private_sessions:
+            upcoming_sessions.append({
+                'id': session.id,
+                'is_private': True,
+                'start_time': session.start_time,
+                'end_time': session.end_time,
+                'student': session.student,
+                'language': session.language,
+                'level': session.level,
+                'status': session.status
+            })
+        
+        for session in upcoming_group_sessions:
+            upcoming_sessions.append({
+                'id': session.id,
+                'is_private': False,
+                'title': session.title,
+                'start_time': session.start_time,
+                'end_time': session.end_time,
+                'students': session.students.all(),
+                'students_count': session.students.count(),
+                'max_students': session.max_students,
+                'language': session.language,
+                'level': session.level,
+                'status': session.status,
+                'enrollment_percentage': session.enrollment_percentage
+            })
+        
+        data['upcoming_sessions'] = upcoming_sessions
+        
+        # Past sessions (completed, cancelled, no-show)
+        past_sessions = []
+        past_private_sessions = PrivateSessionSlot.objects.filter(
+            instructor=instructor,
+            end_time__lt=now
+        ).select_related('student').order_by('-start_time')[:10]
+        
+        past_group_sessions = GroupSession.objects.filter(
+            instructor=instructor,
+            end_time__lt=now
+        ).order_by('-start_time')[:10]
+        
+        # Format past sessions for the template
+        for session in past_private_sessions:
+            past_sessions.append({
+                'id': session.id,
+                'is_private': True,
+                'start_time': session.start_time,
+                'end_time': session.end_time,
+                'student': session.student,
+                'status': session.status,
+                'recording_url': getattr(session, 'recording_url', None)
+            })
+        
+        for session in past_group_sessions:
+            past_sessions.append({
+                'id': session.id,
+                'is_private': False,
+                'title': session.title,
+                'start_time': session.start_time,
+                'end_time': session.end_time,
+                'students': session.students.all(),
+                'students_count': session.students.count(),
+                'status': session.status,
+                'recording_url': getattr(session, 'recording_url', None)
+            })
+        
+        data['past_sessions'] = past_sessions
+        
+        # Analytics calculations
+        total_sessions = PrivateSessionSlot.objects.filter(instructor=instructor).count() + \
+                        GroupSession.objects.filter(instructor=instructor).count()
+        
+        completed_sessions = PrivateSessionSlot.objects.filter(
+            instructor=instructor, 
+            status='completed'
+        ).count() + \
+        GroupSession.objects.filter(
+            instructor=instructor,
+            status='completed'
+        ).count()
+        
+        cancelled_sessions = PrivateSessionSlot.objects.filter(
+            instructor=instructor, 
+            status='cancelled'
+        ).count() + \
+        GroupSession.objects.filter(
+            instructor=instructor,
+            status='cancelled'
+        ).count()
+        
+        # Calculate percentages
+        completed_ratio = 0
+        cancellation_ratio = 0
+        if total_sessions > 0:
+            completed_ratio = round((completed_sessions / total_sessions) * 100)
+            cancellation_ratio = round((cancelled_sessions / total_sessions) * 100)
+        
+        # Total unique students
+        student_ids = set()
+        for session in PrivateSessionSlot.objects.filter(
+            instructor=instructor,
+            student__isnull=False
+        ).values_list('student_id', flat=True):
+            student_ids.add(session)
+        
+        for session in GroupSession.objects.filter(instructor=instructor):
+            for student_id in session.students.values_list('id', flat=True):
+                student_ids.add(student_id)
+        
+        total_students = len(student_ids)
+        
+        # Add these analytics to the data
+        data['total_sessions'] = total_sessions
+        data['completed_sessions'] = completed_sessions
+        data['cancelled_sessions'] = cancelled_sessions
+        data['completed_ratio'] = completed_ratio
+        data['cancellation_ratio'] = cancellation_ratio
+        data['total_students'] = total_students
+        
+        return data
 
+    
 class SessionForm(LoginRequiredMixin, UpdateView):
     """Base form for both private and group session slot creation/editing"""
     template_name = 'session_form.html'
 
 
-class CreatePrivateSessionSlotView(SessionForm):
-    """View for instructors to create private session slots"""
-    model = PrivateSessionSlot
-    fields = ['start_time', 'duration_minutes', 'language', 'level']
-    success_url = reverse_lazy('content:instructor_dashboard')
-    
-    def form_valid(self, form):
-        # Check if user has instructor profile
-        if not hasattr(self.request.user, 'instructor_profile'):
-            messages.error(self.request, "You need to create an instructor profile first.")
-            return redirect('content:create_instructor_profile')
-        
-        # Set the instructor
-        form.instance.instructor = self.request.user.instructor_profile
-        
-        # Set status to available
-        form.instance.status = 'available'
-        
-        # Calculate end_time based on duration
-        form.instance.end_time = form.instance.start_time + timezone.timedelta(minutes=form.instance.duration_minutes)
-        
-        return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        # Initialize the template layout from the base class
-        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
-        
-        # Get languages and levels for selection
-        context['languages'] = Language.objects.filter(is_active=True)
-        context['levels'] = LanguageLevel.objects.all()
-        
-        context['title'] = 'Create Private Session Slot'
-        context['is_private'] = True
-        
-        # Set active menu attributes
-        context['active_menu'] = 'content'
-        context['active_submenu'] = 'instructor_dashboard'
-        
-        # Set the layout path using TemplateHelper
-        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
-        TemplateHelper.map_context(context)
-        
-        return context
 
 class DeleteGroupSessionView(LoginRequiredMixin, DeleteView):
     """View for instructors to delete group sessions"""
@@ -881,13 +996,25 @@ def mark_lesson_complete(request, lesson_id):
         return JsonResponse({'status': 'success', 'completed': False})
 
 
-class CreatePrivateSessionSlotView(SessionForm):
+class CreatePrivateSessionSlotView(LoginRequiredMixin, CreateView):
     """View for instructors to create private session slots"""
     model = PrivateSessionSlot
     fields = ['start_time', 'duration_minutes', 'language', 'level']
     success_url = reverse_lazy('content:instructor_dashboard')
+    template_name = 'session_form.html'
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Remove the default widgets and use flatpickr in the template
+        # Let the template handle the datetime picker properly
+        return form
     
     def form_valid(self, form):
+        # Check if user has instructor profile
+        if not hasattr(self.request.user, 'instructor_profile'):
+            messages.error(self.request, "You need to create an instructor profile first.")
+            return redirect('content:create_instructor_profile')
+        
         # Set the instructor
         form.instance.instructor = self.request.user.instructor_profile
         
@@ -896,6 +1023,9 @@ class CreatePrivateSessionSlotView(SessionForm):
         
         # Calculate end_time based on duration
         form.instance.end_time = form.instance.start_time + timezone.timedelta(minutes=form.instance.duration_minutes)
+        
+        # Set success message
+        messages.success(self.request, "Private session slot created successfully!")
         
         return super().form_valid(form)
     
@@ -911,14 +1041,61 @@ class CreatePrivateSessionSlotView(SessionForm):
         context['is_private'] = True
         
         # Set active menu attributes
-        context['active_menu'] = 'content'
-        context['active_submenu'] = 'instructor_dashboard'
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'create-private-slot'
         
         # Set the layout path using TemplateHelper
         context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
         TemplateHelper.map_context(context)
         
         return context
+    
+class UpdatePrivateSessionSlotView(LoginRequiredMixin, UpdateView):
+    """View for instructors to update private session slots"""
+    model = PrivateSessionSlot
+    fields = ['start_time', 'duration_minutes', 'language', 'level']
+    template_name = 'session_form.html'
+    pk_url_kwarg = 'slot_id'
+    success_url = reverse_lazy('content:instructor_dashboard')
+    
+    def get_queryset(self):
+        # Ensure instructors can only edit their own slots
+        return PrivateSessionSlot.objects.filter(
+            instructor=self.request.user.instructor_profile,
+            status='available'  # Only allow editing available slots
+        )
+    
+    def form_valid(self, form):
+        # Calculate end_time based on duration
+        form.instance.end_time = form.instance.start_time + timezone.timedelta(minutes=form.instance.duration_minutes)
+        
+        # Set success message
+        messages.success(self.request, "Private session slot updated successfully!")
+        
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout from the base class
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Get languages and levels for selection
+        context['languages'] = Language.objects.filter(is_active=True)
+        context['levels'] = LanguageLevel.objects.all()
+        
+        context['title'] = 'Update Private Session Slot'
+        context['is_private'] = True
+        context['is_update'] = True
+        
+        # Set active menu attributes
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'instructor-dashboard'
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
 
 class DeletePrivateSessionSlotView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """View for instructors to delete private session slots"""
@@ -964,14 +1141,20 @@ class DeletePrivateSessionSlotView(LoginRequiredMixin, UserPassesTestMixin, Dele
         return context
 
 
-class CreateGroupSessionView(SessionForm):
+class CreateGroupSessionView(LoginRequiredMixin, CreateView):
     """View for instructors to create group sessions"""
     model = GroupSession
     fields = ['title', 'description', 'language', 'level', 'start_time', 
               'duration_minutes', 'max_students', 'price']
     success_url = reverse_lazy('content:instructor_dashboard')
+    template_name = 'session_form.html'
     
     def form_valid(self, form):
+        # Check if user has instructor profile
+        if not hasattr(self.request.user, 'instructor_profile'):
+            messages.error(self.request, "You need to create an instructor profile first.")
+            return redirect('content:create_instructor_profile')
+            
         # Set the instructor
         form.instance.instructor = self.request.user.instructor_profile
         
@@ -980,6 +1163,9 @@ class CreateGroupSessionView(SessionForm):
         
         # Calculate end_time based on duration
         form.instance.end_time = form.instance.start_time + timezone.timedelta(minutes=form.instance.duration_minutes)
+        
+        # Set success message
+        messages.success(self.request, "Group session created successfully!")
         
         return super().form_valid(form)
     
@@ -995,8 +1181,8 @@ class CreateGroupSessionView(SessionForm):
         context['is_private'] = False
         
         # Set active menu attributes
-        context['active_menu'] = 'content'
-        context['active_submenu'] = 'instructor_dashboard'
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'create-group-session'
         
         # Set the layout path using TemplateHelper
         context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
@@ -1004,23 +1190,21 @@ class CreateGroupSessionView(SessionForm):
         
         return context
 
-
-class UpdateGroupSessionView(SessionForm):
+class UpdateGroupSessionView(LoginRequiredMixin, UpdateView):
     """View for instructors to update group sessions"""
     model = GroupSession
     fields = ['title', 'description', 'language', 'level', 'start_time', 
               'duration_minutes', 'max_students', 'price']
+    template_name = 'session_form.html'
     pk_url_kwarg = 'session_id'
     success_url = reverse_lazy('content:instructor_dashboard')
     
-    def test_func(self):
-        result = super().test_func()
-        if not result:
-            return False
-        
-        # Check if the instructor owns this session
-        session = self.get_object()
-        return session.instructor.user == self.request.user
+    def get_queryset(self):
+        # Ensure instructors can only edit their own sessions
+        return GroupSession.objects.filter(
+            instructor=self.request.user.instructor_profile,
+            status='scheduled'  # Only allow editing scheduled sessions
+        )
     
     def form_valid(self, form):
         # Don't allow reducing max_students below current enrollment
@@ -1028,8 +1212,11 @@ class UpdateGroupSessionView(SessionForm):
             form.instance.max_students = self.object.students.count()
             messages.warning(self.request, "Maximum students cannot be less than current enrollment.")
         
-        # Recalculate end_time based on duration
+        # Calculate end_time based on duration
         form.instance.end_time = form.instance.start_time + timezone.timedelta(minutes=form.instance.duration_minutes)
+        
+        # Set success message
+        messages.success(self.request, "Group session updated successfully!")
         
         return super().form_valid(form)
     
@@ -1041,20 +1228,19 @@ class UpdateGroupSessionView(SessionForm):
         context['languages'] = Language.objects.filter(is_active=True)
         context['levels'] = LanguageLevel.objects.all()
         
-        context['title'] = 'Edit Group Session'
+        context['title'] = 'Update Group Session'
         context['is_private'] = False
+        context['is_update'] = True
         
         # Set active menu attributes
-        context['active_menu'] = 'content'
-        context['active_submenu'] = 'instructor_dashboard'
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'instructor-dashboard'
         
         # Set the layout path using TemplateHelper
         context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
         TemplateHelper.map_context(context)
         
         return context
-
-
 class RedirectToCourseListView(RedirectView):
     """Redirects from the old course list URL to the new instructor list"""
     
@@ -1086,4 +1272,701 @@ class RedirectToCourseDetailView(RedirectView):
             return reverse('content:group_session_detail', kwargs={'session_id': session.id})
         else:
             # Redirect to instructor detail
-            return reverse('content:instructor_detail', kwargs={'username': session.teacher.username})        
+            return reverse('content:instructor_detail', kwargs={'username': session.teacher.username})  
+
+
+
+class ResourceListView(LoginRequiredMixin, ListView):
+    """View to list educational resources with filtering options"""
+    model = Resource
+    context_object_name = 'resources'
+    template_name = 'resource_list.html'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        queryset = Resource.objects.all()
+        
+        # Filter by language
+        language_id = self.request.GET.get('language')
+        if language_id:
+            queryset = queryset.filter(language_id=language_id)
+        
+        # Filter by level
+        level_id = self.request.GET.get('level')
+        if level_id:
+            queryset = queryset.filter(level_id=level_id)
+        
+        # Filter by resource type
+        resource_type = self.request.GET.get('resource_type')
+        if resource_type:
+            queryset = queryset.filter(resource_type=resource_type)
+        
+        # Search by title or description
+        search_query = self.request.GET.get('q')
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) | 
+                Q(description__icontains=search_query)
+            )
+        
+        # Show only public resources to regular users
+        if not self.request.user.is_superuser and not self.request.user.is_teacher:
+            queryset = queryset.filter(is_public=True)
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Get languages and levels for filtering
+        context['languages'] = Language.objects.filter(is_active=True)
+        context['levels'] = LanguageLevel.objects.all()
+        
+        # Set filter form with initial values
+        context['filter_form'] = ResourceFilterForm(self.request.GET)
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'resources'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class CreateResourceView(LoginRequiredMixin, CreateView):
+    """View for creating educational resources"""
+    model = Resource
+    form_class = ResourceForm
+    template_name = 'resource_form.html'
+    success_url = reverse_lazy('content:resource_list')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        messages.success(self.request, "Resource created successfully!")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Create Educational Resource'
+        context['submit_text'] = 'Create Resource'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'resources'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class UpdateResourceView(LoginRequiredMixin, UpdateView):
+    """View for updating educational resources"""
+    model = Resource
+    form_class = ResourceForm
+    template_name = 'resource_form.html'
+    pk_url_kwarg = 'resource_id'
+    success_url = reverse_lazy('content:resource_list')
+    
+    def get_queryset(self):
+        # Users can only edit their own resources unless they're admins
+        if self.request.user.is_superuser:
+            return Resource.objects.all()
+        return Resource.objects.filter(created_by=self.request.user)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Resource updated successfully!")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Edit Educational Resource'
+        context['submit_text'] = 'Update Resource'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'resources'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class DeleteResourceView(LoginRequiredMixin, DeleteView):
+    """View for deleting educational resources"""
+    model = Resource
+    template_name = 'resource_confirm_delete.html'
+    pk_url_kwarg = 'resource_id'
+    success_url = reverse_lazy('content:resource_list')
+    
+    def get_queryset(self):
+        # Users can only delete their own resources unless they're admins
+        if self.request.user.is_superuser:
+            return Resource.objects.all()
+        return Resource.objects.filter(created_by=self.request.user)
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Resource deleted successfully.")
+        return super().delete(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Delete Educational Resource'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'content'
+        context['active_submenu'] = 'resources'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context     
+
+
+class CreateSessionFeedbackView(LoginRequiredMixin, CreateView):
+    """View for students to leave feedback after sessions"""
+    model = SessionFeedback
+    template_name = 'session_feedback_form.html'
+    fields = ['rating', 'comment', 'teaching_quality', 'technical_quality', 'content_relevance']
+    
+    def get_success_url(self):
+        if hasattr(self, 'private_session') and self.private_session:
+            return reverse('content:student_dashboard')
+        elif hasattr(self, 'group_session') and self.group_session:
+            return reverse('content:group_session_detail', kwargs={'session_id': self.group_session.id})
+        return reverse('content:student_dashboard')
+    
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        
+        session_type = kwargs.get('session_type')
+        session_id = kwargs.get('session_id')
+        
+        self.private_session = None
+        self.group_session = None
+        
+        if session_type == 'private':
+            self.private_session = get_object_or_404(
+                PrivateSessionSlot, 
+                id=session_id,
+                student=request.user
+            )
+            self.instructor = self.private_session.instructor
+        elif session_type == 'group':
+            self.group_session = get_object_or_404(
+                GroupSession,
+                id=session_id
+            )
+            # Verify the user is enrolled
+            if not self.group_session.students.filter(id=request.user.id).exists():
+                raise Http404("You are not enrolled in this session")
+            self.instructor = self.group_session.instructor
+    
+    def form_valid(self, form):
+        # Set the session information
+        form.instance.user = self.request.user
+        
+        if hasattr(self, 'private_session') and self.private_session:
+            form.instance.session_type = 'private'
+            form.instance.private_session = self.private_session
+        elif hasattr(self, 'group_session') and self.group_session:
+            form.instance.session_type = 'group'
+            form.instance.group_session = self.group_session
+        
+        messages.success(self.request, "Thank you for your feedback!")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Add session info to context
+        if hasattr(self, 'private_session') and self.private_session:
+            context['session'] = self.private_session
+            context['session_type'] = 'private'
+        elif hasattr(self, 'group_session') and self.group_session:
+            context['session'] = self.group_session
+            context['session_type'] = 'group'
+        
+        context['instructor'] = self.instructor
+        context['title'] = 'Session Feedback'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'booking'
+        context['active_submenu'] = 'student_dashboard'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class SessionFeedbackListView(LoginRequiredMixin, ListView):
+    """View for instructors to see feedback for their sessions"""
+    model = SessionFeedback
+    context_object_name = 'feedbacks'
+    template_name = 'session_feedback_list.html'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        # Only instructors can see their feedback
+        if not hasattr(self.request.user, 'instructor_profile'):
+            return SessionFeedback.objects.none()
+        
+        instructor = self.request.user.instructor_profile
+        
+        # Get feedback for both private and group sessions
+        return SessionFeedback.objects.filter(
+            Q(private_session__instructor=instructor) |
+            Q(group_session__instructor=instructor)
+        ).select_related('user', 'private_session', 'group_session').order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Calculate average ratings
+        ratings = self.get_queryset().values_list('rating', flat=True)
+        if ratings:
+            context['average_rating'] = sum(ratings) / len(ratings)
+            
+            # Rating distribution
+            context['rating_counts'] = {
+                i: ratings.filter(rating=i).count() for i in range(1, 6)
+            }
+            
+            total = len(ratings)
+            context['rating_percentages'] = {
+                i: (context['rating_counts'][i] / total) * 100 if total > 0 else 0 
+                for i in range(1, 6)
+            }
+        
+        context['title'] = 'My Session Feedback'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'feedback'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+    
+
+class CreateSessionReportView(LoginRequiredMixin, CreateView):
+    """View for instructors to create reports on sessions"""
+    model = SessionReport
+    template_name = 'session_report_form.html'
+    fields = ['summary', 'topics_covered', 'student_progress', 'recommendations', 
+              'materials_used', 'student_strengths', 'student_weaknesses']
+    
+    def get_success_url(self):
+        return reverse('content:instructor_dashboard')
+    
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        
+        # Verify the user is an instructor
+        if not hasattr(request.user, 'instructor_profile'):
+            raise Http404("Only instructors can create session reports")
+        
+        session_type = kwargs.get('session_type')
+        session_id = kwargs.get('session_id')
+        
+        self.private_session = None
+        self.group_session = None
+        
+        if session_type == 'private':
+            self.private_session = get_object_or_404(
+                PrivateSessionSlot, 
+                id=session_id,
+                instructor=request.user.instructor_profile
+            )
+        elif session_type == 'group':
+            self.group_session = get_object_or_404(
+                GroupSession,
+                id=session_id,
+                instructor=request.user.instructor_profile
+            )
+    
+    def form_valid(self, form):
+        # Set the session and instructor
+        form.instance.instructor = self.request.user.instructor_profile
+        
+        if hasattr(self, 'private_session') and self.private_session:
+            form.instance.session_type = 'private'
+            form.instance.private_session = self.private_session
+        elif hasattr(self, 'group_session') and self.group_session:
+            form.instance.session_type = 'group'
+            form.instance.group_session = self.group_session
+        
+        messages.success(self.request, "Session report created successfully!")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Add session info to context
+        if hasattr(self, 'private_session') and self.private_session:
+            context['session'] = self.private_session
+            context['session_type'] = 'private'
+            context['student'] = self.private_session.student
+        elif hasattr(self, 'group_session') and self.group_session:
+            context['session'] = self.group_session
+            context['session_type'] = 'group'
+            context['students'] = self.group_session.students.all()
+        
+        context['title'] = 'Create Session Report'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'reports'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class SessionReportListView(LoginRequiredMixin, ListView):
+    """View for instructors to see all their session reports"""
+    model = SessionReport
+    context_object_name = 'reports'
+    template_name = 'session_report_list.html'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        # Only instructors can see their reports
+        if not hasattr(self.request.user, 'instructor_profile'):
+            return SessionReport.objects.none()
+        
+        instructor = self.request.user.instructor_profile
+        return SessionReport.objects.filter(instructor=instructor).order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'My Session Reports'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'reports'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class SessionReportDetailView(LoginRequiredMixin, DetailView):
+    """View to display session report details"""
+    model = SessionReport
+    context_object_name = 'report'
+    template_name = 'session_report_detail.html'
+    pk_url_kwarg = 'report_id'
+    
+    def get_queryset(self):
+        # Instructors can see their own reports, students can see reports for their sessions
+        if hasattr(self.request.user, 'instructor_profile'):
+            return SessionReport.objects.filter(instructor=self.request.user.instructor_profile)
+        
+        # Students can see reports for sessions they were in
+        return SessionReport.objects.filter(
+            Q(private_session__student=self.request.user) |
+            Q(group_session__students=self.request.user)
+        ).distinct()
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        report = self.get_object()
+        context['title'] = f'Session Report: {report.get_session_display()}'
+        
+        # Determine if user is the instructor or a student
+        context['is_instructor'] = hasattr(self.request.user, 'instructor_profile') and report.instructor == self.request.user.instructor_profile
+        
+        # Set active menu based on user role
+        if context['is_instructor']:
+            context['active_menu'] = 'instructor'
+            context['active_submenu'] = 'reports'
+        else:
+            context['active_menu'] = 'booking'
+            context['active_submenu'] = 'student_dashboard'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+    
+
+class ManageSessionAttendanceView(LoginRequiredMixin, TemplateView):
+    """View for instructors to manage attendance for a group session"""
+    template_name = 'manage_attendance.html'
+    
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        
+        # Verify the user is an instructor
+        if not hasattr(request.user, 'instructor_profile'):
+            raise Http404("Only instructors can manage attendance")
+        
+        # Get the session
+        session_id = kwargs.get('session_id')
+        self.session = get_object_or_404(
+            GroupSession, 
+            id=session_id,
+            instructor=request.user.instructor_profile
+        )
+    
+    def post(self, request, *args, **kwargs):
+        # Process attendance form submission
+        for student_id, attendance_data in request.POST.items():
+            if student_id.startswith('student_'):
+                # Extract student ID from form field name
+                student_id = student_id.split('_')[1]
+                
+                try:
+                    student = User.objects.get(id=student_id)
+                    
+                    # Check if student is enrolled in this session
+                    if not self.session.students.filter(id=student.id).exists():
+                        continue
+                    
+                    # Get or create attendance record
+                    attendance, created = SessionAttendance.objects.get_or_create(
+                        session=self.session,
+                        student=student
+                    )
+                    
+                    # Update attendance status
+                    attendance_status = request.POST.get(f'student_{student_id}')
+                    if attendance_status == 'present':
+                        attendance.attended = True
+                        if not attendance.join_time:
+                            attendance.join_time = timezone.now()
+                    else:
+                        attendance.attended = False
+                    
+                    # Get notes if provided
+                    notes = request.POST.get(f'notes_{student_id}', '')
+                    if notes.strip():
+                        attendance.notes = notes
+                    
+                    attendance.save()
+                    
+                except User.DoesNotExist:
+                    continue
+        
+        messages.success(request, "Attendance has been recorded successfully!")
+        return redirect('content:group_session_detail', session_id=self.session.id)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        context['session'] = self.session
+        context['attendance_records'] = {}
+        
+        # Get enrolled students and their attendance records
+        for student in self.session.students.all():
+            attendance = SessionAttendance.objects.filter(
+                session=self.session,
+                student=student
+            ).first()
+            
+            context['attendance_records'][student.id] = attendance
+        
+        context['title'] = f'Manage Attendance: {self.session.title}'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'instructor_dashboard'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context  
+
+
+class LanguageListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """View to list and manage available languages"""
+    model = Language
+    context_object_name = 'languages'
+    template_name = 'language_list.html'
+    
+    def test_func(self):
+        # Only admin users can manage languages
+        return self.request.user.is_superuser or self.request.user.is_staff
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Language Management'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'admin'
+        context['active_submenu'] = 'languages'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class LanguageCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """View to create a new language"""
+    model = Language
+    fields = ['name', 'code', 'is_active', 'flag_icon']
+    template_name = 'language_form.html'
+    success_url = reverse_lazy('content:language_list')
+    
+    def test_func(self):
+        # Only admin users can create languages
+        return self.request.user.is_superuser or self.request.user.is_staff
+    
+    def form_valid(self, form):
+        messages.success(self.request, f"Language '{form.instance.name}' has been created successfully.")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Add New Language'
+        context['submit_text'] = 'Create Language'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'admin'
+        context['active_submenu'] = 'languages'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class LanguageUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """View to update an existing language"""
+    model = Language
+    fields = ['name', 'code', 'is_active', 'flag_icon']
+    template_name = 'language_form.html'
+    success_url = reverse_lazy('content:language_list')
+    pk_url_kwarg = 'language_id'
+    
+    def test_func(self):
+        # Only admin users can update languages
+        return self.request.user.is_superuser or self.request.user.is_staff
+    
+    def form_valid(self, form):
+        messages.success(self.request, f"Language '{form.instance.name}' has been updated successfully.")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Edit Language'
+        context['submit_text'] = 'Update Language'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'admin'
+        context['active_submenu'] = 'languages'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class LanguageLevelListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """View to list and manage available language proficiency levels"""
+    model = LanguageLevel
+    context_object_name = 'levels'
+    template_name = 'language_level_list.html'
+    
+    def test_func(self):
+        # Only admin users can manage language levels
+        return self.request.user.is_superuser or self.request.user.is_staff
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Language Level Management'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'admin'
+        context['active_submenu'] = 'language_levels'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class LanguageLevelCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """View to create a new language proficiency level"""
+    model = LanguageLevel
+    fields = ['code', 'name', 'description']
+    template_name = 'language_level_form.html'
+    success_url = reverse_lazy('content:language_level_list')
+    
+    def test_func(self):
+        # Only admin users can create language levels
+        return self.request.user.is_superuser or self.request.user.is_staff
+    
+    def form_valid(self, form):
+        messages.success(self.request, f"Language level '{form.instance.name}' has been created successfully.")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Add New Language Level'
+        context['submit_text'] = 'Create Level'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'admin'
+        context['active_submenu'] = 'language_levels'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+
+class LanguageLevelUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """View to update an existing language proficiency level"""
+    model = LanguageLevel
+    fields = ['code', 'name', 'description']
+    template_name = 'language_level_form.html'
+    success_url = reverse_lazy('content:language_level_list')
+    pk_url_kwarg = 'level_id'
+    
+    def test_func(self):
+        # Only admin users can update language levels
+        return self.request.user.is_superuser or self.request.user.is_staff
+    
+    def form_valid(self, form):
+        messages.success(self.request, f"Language level '{form.instance.name}' has been updated successfully.")
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        context['title'] = 'Edit Language Level'
+        context['submit_text'] = 'Update Level'
+        
+        # Set active menu attributes
+        context['active_menu'] = 'admin'
+        context['active_submenu'] = 'language_levels'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context        

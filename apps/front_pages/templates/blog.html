@@ -737,326 +737,1210 @@
 {% endblock page_js %}
 
 {% block content %}
-<!-- Blog Hero Section: Start -->
-<section class="blog-hero">
-  <div class="container">
+<!-- Blog Hero Section with Curved Shape -->
+<section class="blog-hero position-relative overflow-hidden">
+  <div class="hero-shape-top position-absolute"></div>
+  <div class="hero-shape-bottom position-absolute"></div>
+  <div class="container position-relative z-index-2">
     <div class="text-center" data-aos="fade-up">
-      <span class="badge bg-white text-primary py-2 px-3 mb-3">Language Teaching Blog</span>
-      <h1>Language Teaching Insights</h1>
-      <p>Expert articles, teaching strategies, and educational resources for language educators</p>
+      <div class="badge-blob">
+        <span class="badge bg-white text-primary py-2 px-3 mb-3">Language Teaching Blog</span>
+      </div>
+      <h1 class="display-4 text-white fw-bold mb-3">Innovative Language Teaching Insights</h1>
+      <p class="lead text-white-50 mb-4">Discover cutting-edge methodologies, research-based strategies, and educational resources for modern language educators</p>
+      <div class="hero-search-container">
+        <div class="input-group hero-search">
+          <input type="text" class="form-control form-control-lg" placeholder="Explore teaching strategies, resources, or methodologies...">
+          <button class="btn btn-primary btn-lg" type="button"><i class="ti ti-search me-1"></i> Search</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+  </div>
+</section>
+
+<!-- Featured Articles Carousel Section -->
+<section class="featured-articles-section position-relative">
+  <div class="container">
+    <div class="section-header text-center mb-5" data-aos="fade-up">
+      <span class="section-subtitle"><i class="ti ti-star text-warning me-2"></i>Featured Articles</span>
+      <h2 class="section-title">Trending in Language Education</h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="featured-articles-carousel" data-aos="fade-up" data-aos-delay="200">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <!-- Featured Article 1 -->
+          <div class="swiper-slide">
+            <div class="featured-card">
+              <div class="featured-card-img">
+                <img src="{% static 'img/front-pages/blog/effective-language-teaching.jpg' %}" alt="Effective Language Teaching">
+                <div class="featured-badge">Featured</div>
+              </div>
+              <div class="featured-card-body">
+                <div class="featured-card-tags">
+                  <span class="featured-tag"><i class="ti ti-bookmarks me-1"></i>Teaching Methods</span>
+                </div>
+                <h3 class="featured-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}">Seven Effective Strategies for Modern Language Teaching</a>
+                </h3>
+                <p class="featured-card-excerpt">Today's language classrooms require innovative approaches that engage digital natives and accelerate learning outcomes. Research consistently demonstrates that traditional methods are evolving.</p>
+                <div class="featured-card-meta">
+                  <div class="author">
+                    <img src="{% static 'img/avatars/8.png' %}" alt="Dr. Maria Rodriguez" class="author-img">
+                    <div class="author-info">
+                      <span class="author-name">Dr. Maria Rodriguez</span>
+                      <span class="post-date"><i class="ti ti-calendar-event me-1"></i>April 12, 2025</span>
+                    </div>
+                  </div>
+                  <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Featured Article 2 -->
+          <div class="swiper-slide">
+            <div class="featured-card">
+              <div class="featured-card-img">
+                <img src="{% static 'img/front-pages/blog/neuroscience-language.jpg' %}" alt="Neuroscience of Language Learning">
+                <div class="featured-badge">Featured</div>
+              </div>
+              <div class="featured-card-body">
+                <div class="featured-card-tags">
+                  <span class="featured-tag"><i class="ti ti-brain me-1"></i>Research</span>
+                </div>
+                <h3 class="featured-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='neuroscience-language-learning' %}">The Neuroscience Behind Multilingual Learning</a>
+                </h3>
+                <p class="featured-card-excerpt">Discover how the brain processes multiple languages and what this means for teaching strategies in multilingual classrooms. New research reveals fascinating insights.</p>
+                <div class="featured-card-meta">
+                  <div class="author">
+                    <img src="{% static 'img/avatars/14.png' %}" alt="Dr. Elena Kuznetsova" class="author-img">
+                    <div class="author-info">
+                      <span class="author-name">Dr. Elena Kuznetsova</span>
+                      <span class="post-date"><i class="ti ti-calendar-event me-1"></i>April 2, 2025</span>
+                    </div>
+                  </div>
+                  <a href="{% url 'front_pages:blog-post' slug='neuroscience-language-learning' %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Featured Article 3 -->
+          <div class="swiper-slide">
+            <div class="featured-card">
+              <div class="featured-card-img">
+                <img src="{% static 'img/front-pages/blog/technology-language-learning.jpg' %}" alt="Technology in Language Learning">
+                <div class="featured-badge">Featured</div>
+              </div>
+              <div class="featured-card-body">
+                <div class="featured-card-tags">
+                  <span class="featured-tag"><i class="ti ti-device-laptop me-1"></i>Technology</span>
+                </div>
+                <h3 class="featured-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='ai-tools-language-teachers' %}">10 AI-Powered Tools Transforming Language Education</a>
+                </h3>
+                <p class="featured-card-excerpt">Explore how artificial intelligence is revolutionizing language teaching with personalized learning paths, immersive experiences, and real-time feedback systems.</p>
+                <div class="featured-card-meta">
+                  <div class="author">
+                    <img src="{% static 'img/avatars/9.png' %}" alt="David Chen" class="author-img">
+                    <div class="author-info">
+                      <span class="author-name">David Chen</span>
+                      <span class="post-date"><i class="ti ti-calendar-event me-1"></i>April 10, 2025</span>
+                    </div>
+                  </div>
+                  <a href="{% url 'front_pages:blog-post' slug='ai-tools-language-teachers' %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Carousel Navigation -->
+        <div class="swiper-navigation">
+          <div class="swiper-button-prev"><i class="ti ti-chevron-left"></i></div>
+          <div class="swiper-button-next"><i class="ti ti-chevron-right"></i></div>
+        </div>
+        
+        <!-- Carousel Pagination -->
+        <div class="swiper-pagination"></div>
+      </div>
     </div>
   </div>
 </section>
-<!-- Blog Hero Section: End -->
 
-<!-- Blog Content: Start -->
-<div class="blog-container">
-  <div class="container">
-    <!-- Search Bar -->
-    <div class="blog-search" data-aos="fade-up" data-aos-delay="200">
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search for teaching topics, strategies, or resources..." aria-label="Search" aria-describedby="blog-search">
-        <span class="input-group-text" id="blog-search"><i class="ti ti-search"></i></span>
+<!-- Category Showcase with Hexagon Shape -->
+<section class="categories-showcase position-relative py-5">
+  <div class="category-shapes">
+    <div class="hexagon-bg"></div>
+  </div>
+  <div class="container position-relative z-index-2">
+    <div class="section-header text-center mb-5" data-aos="fade-up">
+      <span class="section-subtitle"><i class="ti ti-category text-primary me-2"></i>Explore Topics</span>
+      <h2 class="section-title">Browse by Category</h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="row" data-aos="fade-up" data-aos-delay="200">
+      <!-- Category 1 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="hexagon-category-card">
+          <div class="hexagon-shape">
+            <div class="hexagon-icon">
+              <i class="ti ti-chalkboard"></i>
+            </div>
+          </div>
+          <div class="hexagon-content">
+            <h4 class="hexagon-title">Teaching Methods</h4>
+            <p class="hexagon-text">Innovative approaches to language instruction that improve retention and fluency</p>
+            <div class="hexagon-meta">
+              <span class="hexagon-count">24 Articles</span>
+              <a href="#" class="hexagon-link">Explore <i class="ti ti-arrow-right ms-1"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Category 2 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="hexagon-category-card">
+          <div class="hexagon-shape">
+            <div class="hexagon-icon">
+              <i class="ti ti-device-laptop"></i>
+            </div>
+          </div>
+          <div class="hexagon-content">
+            <h4 class="hexagon-title">Technology Integration</h4>
+            <p class="hexagon-text">Digital tools and platforms that enhance the language learning experience</p>
+            <div class="hexagon-meta">
+              <span class="hexagon-count">31 Articles</span>
+              <a href="#" class="hexagon-link">Explore <i class="ti ti-arrow-right ms-1"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Category 3 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="hexagon-category-card">
+          <div class="hexagon-shape">
+            <div class="hexagon-icon">
+              <i class="ti ti-world"></i>
+            </div>
+          </div>
+          <div class="hexagon-content">
+            <h4 class="hexagon-title">Cultural Learning</h4>
+            <p class="hexagon-text">Integrating cultural context and authentic experiences into language education</p>
+            <div class="hexagon-meta">
+              <span class="hexagon-count">19 Articles</span>
+              <a href="#" class="hexagon-link">Explore <i class="ti ti-arrow-right ms-1"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Category 4 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="hexagon-category-card">
+          <div class="hexagon-shape">
+            <div class="hexagon-icon">
+              <i class="ti ti-chart-bar"></i>
+            </div>
+          </div>
+          <div class="hexagon-content">
+            <h4 class="hexagon-title">Assessment Strategies</h4>
+            <p class="hexagon-text">Modern approaches to evaluating language proficiency and progress</p>
+            <div class="hexagon-meta">
+              <span class="hexagon-count">16 Articles</span>
+              <a href="#" class="hexagon-link">Explore <i class="ti ti-arrow-right ms-1"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Category 5 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="hexagon-category-card">
+          <div class="hexagon-shape">
+            <div class="hexagon-icon">
+              <i class="ti ti-brain"></i>
+            </div>
+          </div>
+          <div class="hexagon-content">
+            <h4 class="hexagon-title">Research & Theories</h4>
+            <p class="hexagon-text">Latest studies and theoretical frameworks in language acquisition</p>
+            <div class="hexagon-meta">
+              <span class="hexagon-count">22 Articles</span>
+              <a href="#" class="hexagon-link">Explore <i class="ti ti-arrow-right ms-1"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Category 6 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="hexagon-category-card">
+          <div class="hexagon-shape">
+            <div class="hexagon-icon">
+              <i class="ti ti-bulb"></i>
+            </div>
+          </div>
+          <div class="hexagon-content">
+            <h4 class="hexagon-title">Teaching Tips</h4>
+            <p class="hexagon-text">Practical advice and classroom hacks from experienced educators</p>
+            <div class="hexagon-meta">
+              <span class="hexagon-count">28 Articles</span>
+              <a href="#" class="hexagon-link">Explore <i class="ti ti-arrow-right ms-1"></i></a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- Featured Post -->
-    <div class="row mb-5" data-aos="fade-up" data-aos-delay="300">
-      <div class="col-12">
-        <div class="featured-post">
-          <div class="row g-0">
-            <div class="col-md-6">
-              <img src="{% static 'img/front-pages/blog/effective-language-teaching.jpg' %}" alt="Effective Language Teaching" class="featured-post-img w-100">
-            </div>
-            <div class="col-md-6">
-              <div class="featured-content">
-                <div class="featured-badge">Featured</div>
-                <h2 class="featured-title">
-                  <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}">Seven Effective Strategies for Modern Language Teaching</a>
-                </h2>
-                <p class="featured-excerpt">Today's language classrooms require innovative approaches that engage digital natives and accelerate learning outcomes. Research consistently demonstrates that traditional grammar-translation methods are giving way to more interactive, communicative approaches.</p>
-                <div class="featured-meta">
-                  <img src="{% static 'img/avatars/8.png' %}" alt="Dr. Maria Rodriguez" class="featured-author-img">
-                  <span class="featured-author">Dr. Maria Rodriguez</span>
-                  <span class="featured-date"><i class="ti ti-calendar-event me-1"></i> April 12, 2025</span>
+<!-- Latest Articles with Blob Shapes -->
+<section class="latest-articles-section position-relative">
+  <div class="blob-shapes">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+  <div class="container position-relative z-index-2">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="section-header d-flex justify-content-between align-items-center flex-wrap mb-4" data-aos="fade-up">
+          <div>
+            <span class="section-subtitle"><i class="ti ti-article text-primary me-2"></i>Latest Updates</span>
+            <h2 class="section-title">Fresh Insights & Resources</h2>
+          </div>
+          <div class="section-filters d-flex align-items-center">
+            <select class="form-select form-select-sm border-0 bg-light me-2">
+              <option selected>All Categories</option>
+              <option>Teaching Methods</option>
+              <option>Technology</option>
+              <option>Cultural Learning</option>
+              <option>Assessment</option>
+              <option>Research</option>
+            </select>
+            <select class="form-select form-select-sm border-0 bg-light">
+              <option selected>Most Recent</option>
+              <option>Most Popular</option>
+              <option>Most Commented</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="articles-grid">
+          <!-- Article Card 1 -->
+          <div class="article-card-wavy" data-aos="fade-up" data-aos-delay="100">
+            <div class="article-card-inner">
+              <div class="article-card-img">
+                <img src="{% static 'img/front-pages/blog/technology-language-learning.jpg' %}" alt="AI Tools for Language Teachers">
+                <div class="article-card-category category-technology">Technology</div>
+              </div>
+              <div class="article-card-body">
+                <h3 class="article-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='ai-tools-language-teachers' %}">10 AI Tools Revolutionizing Language Teaching in 2025</a>
+                </h3>
+                <p class="article-card-excerpt">Discover how artificial intelligence is transforming language education with tools that personalize learning experiences and provide real-time feedback on pronunciation and grammar.</p>
+                <div class="article-card-meta">
+                  <div class="article-author">
+                    <img src="{% static 'img/avatars/9.png' %}" alt="David Chen" class="article-author-img">
+                    <span class="article-author-name">David Chen</span>
+                  </div>
+                  <div class="article-date">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 10, 2025</span>
+                  </div>
                 </div>
-                <a href="{% url 'front_pages:blog-post' slug='effective-language-teaching-strategies' %}" class="btn btn-primary">Read Article</a>
               </div>
             </div>
+          </div>
+          
+          <!-- Article Card 2 -->
+          <div class="article-card-wavy" data-aos="fade-up" data-aos-delay="200">
+            <div class="article-card-inner">
+              <div class="article-card-img">
+                <img src="{% static 'img/front-pages/blog/cultural-immersion.jpg' %}" alt="Cultural Immersion Techniques">
+                <div class="article-card-category category-cultural">Cultural Learning</div>
+              </div>
+              <div class="article-card-body">
+                <h3 class="article-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='cultural-immersion-techniques' %}">Virtual Cultural Immersion: Beyond the Traditional Classroom</a>
+                </h3>
+                <p class="article-card-excerpt">Innovative approaches for integrating authentic cultural experiences into online language instruction, including virtual reality field trips and collaborative international projects.</p>
+                <div class="article-card-meta">
+                  <div class="article-author">
+                    <img src="{% static 'img/avatars/12.png' %}" alt="Sophie Martin" class="article-author-img">
+                    <span class="article-author-name">Sophie Martin</span>
+                  </div>
+                  <div class="article-date">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 7, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Article Card 3 -->
+          <div class="article-card-wavy" data-aos="fade-up" data-aos-delay="300">
+            <div class="article-card-inner">
+              <div class="article-card-img">
+                <img src="{% static 'img/front-pages/blog/assessment-strategies.jpg' %}" alt="Rethinking Language Assessment">
+                <div class="article-card-category category-assessment">Assessment</div>
+              </div>
+              <div class="article-card-body">
+                <h3 class="article-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='rethinking-language-assessment' %}">Rethinking Language Assessment for the Digital Age</a>
+                </h3>
+                <p class="article-card-excerpt">Explore alternative assessment methodologies that better evaluate real-world language proficiency beyond traditional testing, with a focus on project-based and portfolio assessments.</p>
+                <div class="article-card-meta">
+                  <div class="article-author">
+                    <img src="{% static 'img/avatars/7.png' %}" alt="Dr. James Wilson" class="article-author-img">
+                    <span class="article-author-name">Dr. James Wilson</span>
+                  </div>
+                  <div class="article-date">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 5, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Article Card 4 -->
+          <div class="article-card-wavy" data-aos="fade-up" data-aos-delay="400">
+            <div class="article-card-inner">
+              <div class="article-card-img">
+                <img src="{% static 'img/front-pages/blog/neuroscience-language.jpg' %}" alt="Neuroscience of Language Learning">
+                <div class="article-card-category category-research">Research</div>
+              </div>
+              <div class="article-card-body">
+                <h3 class="article-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='neuroscience-language-learning' %}">The Neuroscience of Multilingual Brain Development</a>
+                </h3>
+                <p class="article-card-excerpt">Recent neuroscientific findings reveal how learning multiple languages impacts brain structure and function, with implications for teaching methodology and curriculum design.</p>
+                <div class="article-card-meta">
+                  <div class="article-author">
+                    <img src="{% static 'img/avatars/14.png' %}" alt="Dr. Elena Kuznetsova" class="article-author-img">
+                    <span class="article-author-name">Dr. Elena Kuznetsova</span>
+                  </div>
+                  <div class="article-date">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>April 2, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Article Card 5 - New -->
+          <div class="article-card-wavy" data-aos="fade-up" data-aos-delay="500">
+            <div class="article-card-inner">
+              <div class="article-card-img">
+                <img src="{% static 'img/front-pages/blog/inclusive-language-teaching.jpg' %}" alt="Inclusive Language Teaching">
+                <div class="article-card-category category-methods">Teaching Methods</div>
+              </div>
+              <div class="article-card-body">
+                <h3 class="article-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='inclusive-language-teaching' %}">Creating Inclusive Language Learning Environments</a>
+                </h3>
+                <p class="article-card-excerpt">Strategies for designing language instruction that accommodates diverse learning needs, cultural backgrounds, and cognitive styles in both physical and virtual classrooms.</p>
+                <div class="article-card-meta">
+                  <div class="article-author">
+                    <img src="{% static 'img/avatars/5.png' %}" alt="Dr. Amara Johnson" class="article-author-img">
+                    <span class="article-author-name">Dr. Amara Johnson</span>
+                  </div>
+                  <div class="article-date">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>March 28, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Article Card 6 - New -->
+          <div class="article-card-wavy" data-aos="fade-up" data-aos-delay="600">
+            <div class="article-card-inner">
+              <div class="article-card-img">
+                <img src="{% static 'img/front-pages/blog/language-gamification.jpg' %}" alt="Language Gamification">
+                <div class="article-card-category category-technology">Technology</div>
+              </div>
+              <div class="article-card-body">
+                <h3 class="article-card-title">
+                  <a href="{% url 'front_pages:blog-post' slug='gamification-language-teaching' %}">The Gamification Revolution in Language Acquisition</a>
+                </h3>
+                <p class="article-card-excerpt">How game mechanics and elements are being leveraged to boost motivation, engagement, and retention in language learning for students of all ages.</p>
+                <div class="article-card-meta">
+                  <div class="article-author">
+                    <img src="{% static 'img/avatars/10.png' %}" alt="Marco Rossi" class="article-author-img">
+                    <span class="article-author-name">Marco Rossi</span>
+                  </div>
+                  <div class="article-date">
+                    <i class="ti ti-calendar-event me-1"></i>
+                    <span>March 25, 2025</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Pagination with Curved Design -->
+        <div class="pagination-container" data-aos="fade-up">
+          <nav class="pagination-curved">
+            <ul class="pagination">
+              <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="Previous">
+                  <i class="ti ti-chevron-left"></i>
+                </a>
+              </li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                  <i class="ti ti-chevron-right"></i>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      
+      <!-- Sidebar with Curved Designs -->
+      <div class="col-lg-4">
+        <!-- New Sidebar Newsletter Widget -->
+        <div class="sidebar-widget newsletter-widget" data-aos="fade-up" data-aos-delay="100">
+          <div class="newsletter-wave-top"></div>
+          <div class="newsletter-widget-content">
+            <div class="newsletter-icon">
+              <i class="ti ti-mail-opened"></i>
+            </div>
+            <h4 class="newsletter-title">Subscribe to Our Newsletter</h4>
+            <p class="newsletter-description">Get weekly teaching resources and insights directly to your inbox</p>
+            <form class="newsletter-form">
+              <div class="form-group mb-3">
+                <input type="email" class="form-control" placeholder="Your email address">
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Subscribe Now</button>
+            </form>
+            <p class="newsletter-privacy">We respect your privacy. Unsubscribe at any time.</p>
+          </div>
+          <div class="newsletter-wave-bottom"></div>
+        </div>
+        
+        <!-- Categories Widget with Custom Design -->
+        <div class="sidebar-widget categories-widget" data-aos="fade-up" data-aos-delay="200">
+          <h4 class="sidebar-widget-title">
+            <i class="ti ti-category sidebar-widget-icon"></i>
+            Browse Categories
+          </h4>
+          <ul class="category-pill-list">
+            <li>
+              <a href="#" class="category-pill">
+                <i class="ti ti-chalkboard"></i>
+                <span>Teaching Methods</span>
+                <span class="category-count">24</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="category-pill">
+                <i class="ti ti-device-laptop"></i>
+                <span>Technology</span>
+                <span class="category-count">31</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="category-pill">
+                <i class="ti ti-world"></i>
+                <span>Cultural Learning</span>
+                <span class="category-count">19</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="category-pill">
+                <i class="ti ti-chart-bar"></i>
+                <span>Assessment</span>
+                <span class="category-count">16</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="category-pill">
+                <i class="ti ti-brain"></i>
+                <span>Research</span>
+                <span class="category-count">22</span>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="category-pill">
+                <i class="ti ti-bulb"></i>
+                <span>Teaching Tips</span>
+                <span class="category-count">28</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Popular Posts Widget -->
+        <div class="sidebar-widget popular-posts-widget" data-aos="fade-up" data-aos-delay="300">
+          <h4 class="sidebar-widget-title">
+            <i class="ti ti-trending-up sidebar-widget-icon"></i>
+            Popular Articles
+          </h4>
+          <div class="popular-posts">
+            <!-- Popular Post 1 -->
+            <div class="popular-post-card">
+              <div class="popular-post-img">
+                <img src="{% static 'img/front-pages/blog/effective-language-teaching.jpg' %}" alt="Effective Language Teaching">
+              </div>
+              <div class="popular-post-content">
+                <h5 class="popular-post-title">
+                  <a href="#">Seven Effective Strategies for Modern Language Teaching</a>
+                </h5>
+                <div class="popular-post-meta">
+                  <span class="popular-post-date">
+                    <i class="ti ti-calendar-event me-1"></i> April 12, 2025
+                  </span>
+                  <span class="popular-post-views">
+                    <i class="ti ti-eye me-1"></i> 3.4K views
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Popular Post 2 -->
+            <div class="popular-post-card">
+              <div class="popular-post-img">
+                <img src="{% static 'img/front-pages/blog/technology-language-learning.jpg' %}" alt="AI Tools">
+              </div>
+              <div class="popular-post-content">
+                <h5 class="popular-post-title">
+                  <a href="#">10 AI Tools for Language Teachers in 2025</a>
+                </h5>
+                <div class="popular-post-meta">
+                  <span class="popular-post-date">
+                    <i class="ti ti-calendar-event me-1"></i> April 10, 2025
+                  </span>
+                  <span class="popular-post-views">
+                    <i class="ti ti-eye me-1"></i> 2.9K views
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Popular Post 3 -->
+            <div class="popular-post-card">
+              <div class="popular-post-img">
+                <img src="{%
+                {% static 'img/front-pages/blog/neuroscience-language.jpg' %}" alt="Neuroscience of Language Learning">
+              </div>
+              <div class="popular-post-content">
+                <h5 class="popular-post-title">
+                  <a href="#">The Neuroscience of Multilingual Brain Development</a>
+                </h5>
+                <div class="popular-post-meta">
+                  <span class="popular-post-date">
+                    <i class="ti ti-calendar-event me-1"></i> April 2, 2025
+                  </span>
+                  <span class="popular-post-views">
+                    <i class="ti ti-eye me-1"></i> 2.7K views
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Popular Post 4 -->
+            <div class="popular-post-card">
+              <div class="popular-post-img">
+                <img src="{% static 'img/front-pages/blog/cultural-immersion.jpg' %}" alt="Cultural Immersion">
+              </div>
+              <div class="popular-post-content">
+                <h5 class="popular-post-title">
+                  <a href="#">Virtual Cultural Immersion: Beyond the Traditional Classroom</a>
+                </h5>
+                <div class="popular-post-meta">
+                  <span class="popular-post-date">
+                    <i class="ti ti-calendar-event me-1"></i> April 7, 2025
+                  </span>
+                  <span class="popular-post-views">
+                    <i class="ti ti-eye me-1"></i> 2.5K views
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tags Cloud Widget -->
+        <div class="sidebar-widget tags-widget" data-aos="fade-up" data-aos-delay="400">
+          <h4 class="sidebar-widget-title">
+            <i class="ti ti-tags sidebar-widget-icon"></i>
+            Popular Tags
+          </h4>
+          <div class="tags-cloud">
+            <a href="#" class="tag-cloud-link">language learning</a>
+            <a href="#" class="tag-cloud-link">ESL</a>
+            <a href="#" class="tag-cloud-link">technology</a>
+            <a href="#" class="tag-cloud-link">teaching tips</a>
+            <a href="#" class="tag-cloud-link">assessment</a>
+            <a href="#" class="tag-cloud-link">culture</a>
+            <a href="#" class="tag-cloud-link">AI</a>
+            <a href="#" class="tag-cloud-link">neuroscience</a>
+            <a href="#" class="tag-cloud-link">online learning</a>
+            <a href="#" class="tag-cloud-link">gamification</a>
+            <a href="#" class="tag-cloud-link">inclusive teaching</a>
+            <a href="#" class="tag-cloud-link">immersion</a>
+          </div>
+        </div>
+        
+        <!-- Events Calendar Widget -->
+        <div class="sidebar-widget calendar-widget" data-aos="fade-up" data-aos-delay="500">
+          <h4 class="sidebar-widget-title">
+            <i class="ti ti-calendar sidebar-widget-icon"></i>
+            Upcoming Events
+          </h4>
+          <div class="calendar-events">
+            <div class="calendar-event-card">
+              <div class="calendar-event-date">
+                <span class="event-day">15</span>
+                <span class="event-month">May</span>
+              </div>
+              <div class="calendar-event-details">
+                <h5 class="calendar-event-title">Virtual Language Teaching Conference</h5>
+                <p class="calendar-event-location"><i class="ti ti-map-pin me-1"></i> Online</p>
+                <a href="#" class="btn btn-sm btn-outline-primary">Register Now</a>
+              </div>
+            </div>
+            <div class="calendar-event-card">
+              <div class="calendar-event-date">
+                <span class="event-day">22</span>
+                <span class="event-month">May</span>
+              </div>
+              <div class="calendar-event-details">
+                <h5 class="calendar-event-title">Workshop: AI Tools for Language Teachers</h5>
+                <p class="calendar-event-location"><i class="ti ti-map-pin me-1"></i> San Francisco, CA</p>
+                <a href="#" class="btn btn-sm btn-outline-primary">Register Now</a>
+              </div>
+            </div>
+            <div class="calendar-event-card">
+              <div class="calendar-event-date">
+                <span class="event-day">05</span>
+                <span class="event-month">Jun</span>
+              </div>
+              <div class="calendar-event-details">
+                <h5 class="calendar-event-title">Summer Language Teaching Institute</h5>
+                <p class="calendar-event-location"><i class="ti ti-map-pin me-1"></i> Boston, MA</p>
+                <a href="#" class="btn btn-sm btn-outline-primary">Register Now</a>
+              </div>
+            </div>
+          </div>
+          <a href="#" class="btn btn-light btn-sm w-100 mt-2">View All Events</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Resources and Downloads Section -->
+<section class="resources-section py-5 bg-light position-relative">
+  <div class="resource-bg-shapes">
+    <div class="resource-shape-1"></div>
+    <div class="resource-shape-2"></div>
+  </div>
+  <div class="container position-relative z-index-2">
+    <div class="section-header text-center mb-5" data-aos="fade-up">
+      <span class="section-subtitle"><i class="ti ti-file-download text-primary me-2"></i>Free Downloads</span>
+      <h2 class="section-title">Teaching Resources & Materials</h2>
+      <div class="section-line"></div>
+      <p class="section-description">Download ready-to-use teaching materials, assessment tools, and classroom activities</p>
+    </div>
+    
+    <div class="row" data-aos="fade-up" data-aos-delay="200">
+      <!-- Resource Card 1 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="resource-card">
+          <div class="resource-card-header">
+            <div class="resource-icon">
+              <i class="ti ti-file-text"></i>
+            </div>
+            <div class="resource-badge">PDF Template</div>
+          </div>
+          <div class="resource-card-body">
+            <h4 class="resource-title">Comprehensive Assessment Rubric Package</h4>
+            <p class="resource-description">12 customizable rubrics for evaluating language skills at different proficiency levels</p>
+            <div class="resource-meta">
+              <span class="resource-downloads"><i class="ti ti-download me-1"></i>1,245 downloads</span>
+              <span class="resource-rating">
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-half text-warning"></i>
+                <span class="ms-1">4.5</span>
+              </span>
+            </div>
+          </div>
+          <div class="resource-card-footer">
+            <a href="#" class="btn btn-primary w-100"><i class="ti ti-download me-1"></i> Download Now</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Resource Card 2 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="resource-card">
+          <div class="resource-card-header">
+            <div class="resource-icon">
+              <i class="ti ti-presentation"></i>
+            </div>
+            <div class="resource-badge">PowerPoint</div>
+          </div>
+          <div class="resource-card-body">
+            <h4 class="resource-title">Cultural Context Slide Deck Series</h4>
+            <p class="resource-description">Visual presentations on cultural aspects of major language regions with teacher notes</p>
+            <div class="resource-meta">
+              <span class="resource-downloads"><i class="ti ti-download me-1"></i>983 downloads</span>
+              <span class="resource-rating">
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star text-warning"></i>
+                <span class="ms-1">4.0</span>
+              </span>
+            </div>
+          </div>
+          <div class="resource-card-footer">
+            <a href="#" class="btn btn-primary w-100"><i class="ti ti-download me-1"></i> Download Now</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Resource Card 3 -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="resource-card">
+          <div class="resource-card-header">
+            <div class="resource-icon">
+              <i class="ti ti-device-tablet"></i>
+            </div>
+            <div class="resource-badge">Digital Activity</div>
+          </div>
+          <div class="resource-card-body">
+            <h4 class="resource-title">Interactive Vocabulary Games Bundle</h4>
+            <p class="resource-description">10 ready-to-use digital vocabulary activities with customizable word lists</p>
+            <div class="resource-meta">
+              <span class="resource-downloads"><i class="ti ti-download me-1"></i>1,756 downloads</span>
+              <span class="resource-rating">
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <i class="ti ti-star-filled text-warning"></i>
+                <span class="ms-1">4.9</span>
+              </span>
+            </div>
+          </div>
+          <div class="resource-card-footer">
+            <a href="#" class="btn btn-primary w-100"><i class="ti ti-download me-1"></i> Download Now</a>
           </div>
         </div>
       </div>
     </div>
     
-    <div class="row g-4">
-      <div class="col-lg-9">
-        <!-- Filter Controls with Animations -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center p-4 bg-white rounded-3 shadow-sm mb-4" style="animation: fadeInUp 0.5s forwards;">
-          <div class="d-flex align-items-center">
-            <div class="category-icon bg-label-primary">
-              <i class="ti ti-article"></i>
-            </div>
-            <div>
-              <h5 class="mb-1">Latest Articles</h5>
-              <p class="text-muted mb-0">Updated regularly with fresh content</p>
+    <div class="text-center mt-3" data-aos="fade-up" data-aos-delay="400">
+      <a href="#" class="btn btn-outline-primary">Explore All Resources <i class="ti ti-arrow-right ms-1"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- Author Showcase Section -->
+<section class="authors-section py-5">
+  <div class="container">
+    <div class="section-header text-center mb-5" data-aos="fade-up">
+      <span class="section-subtitle"><i class="ti ti-users text-primary me-2"></i>Meet Our Contributors</span>
+      <h2 class="section-title">Expert Educators & Researchers</h2>
+      <div class="section-line"></div>
+      <p class="section-description">Learn from leading experts in language education from around the world</p>
+    </div>
+    
+    <div class="authors-carousel" data-aos="fade-up" data-aos-delay="200">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <!-- Author Card 1 -->
+          <div class="swiper-slide">
+            <div class="author-profile-card">
+              <div class="author-profile-img">
+                <img src="{% static 'img/avatars/8.png' %}" alt="Dr. Maria Rodriguez">
+                <div class="author-social">
+                  <a href="#" class="social-link"><i class="ti ti-brand-twitter"></i></a>
+                  <a href="#" class="social-link"><i class="ti ti-brand-linkedin"></i></a>
+                  <a href="#" class="social-link"><i class="ti ti-world"></i></a>
+                </div>
+              </div>
+              <div class="author-profile-content">
+                <h4 class="author-name">Dr. Maria Rodriguez</h4>
+                <p class="author-title">Professor of Applied Linguistics</p>
+                <p class="author-bio">Specializes in modern language teaching methodologies and multilingual education</p>
+                <div class="author-stats">
+                  <div class="stat-item">
+                    <span class="stat-value">24</span>
+                    <span class="stat-label">Articles</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-value">18</span>
+                    <span class="stat-label">Resources</span>
+                  </div>
+                </div>
+                <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
+              </div>
             </div>
           </div>
-          <div class="d-flex align-items-center gap-2">
-            <select class="form-select border-0 bg-light">
-              <option value="newest" selected>Newest</option>
-              <option value="popular">Most Popular</option>
-              <option value="trending">Trending</option>
-            </select>
-            <button class="btn btn-icon btn-primary">
-              <i class="ti ti-search"></i>
-            </button>
+          
+          <!-- Author Card 2 -->
+          <div class="swiper-slide">
+            <div class="author-profile-card">
+              <div class="author-profile-img">
+                <img src="{% static 'img/avatars/14.png' %}" alt="Dr. Elena Kuznetsova">
+                <div class="author-social">
+                  <a href="#" class="social-link"><i class="ti ti-brand-twitter"></i></a>
+                  <a href="#" class="social-link"><i class="ti ti-brand-linkedin"></i></a>
+                  <a href="#" class="social-link"><i class="ti ti-world"></i></a>
+                </div>
+              </div>
+              <div class="author-profile-content">
+                <h4 class="author-name">Dr. Elena Kuznetsova</h4>
+                <p class="author-title">Neurolinguistics Researcher</p>
+                <p class="author-bio">Studies the brain mechanisms behind language acquisition and multilingualism</p>
+                <div class="author-stats">
+                  <div class="stat-item">
+                    <span class="stat-value">19</span>
+                    <span class="stat-label">Articles</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-value">7</span>
+                    <span class="stat-label">Resources</span>
+                  </div>
+                </div>
+                <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Author Card 3 -->
+          <div class="swiper-slide">
+            <div class="author-profile-card">
+              <div class="author-profile-img">
+                <img src="{% static 'img/avatars/9.png' %}" alt="David Chen">
+                <div class="author-social">
+                  <a href="#" class="social-link"><i class="ti ti-brand-twitter"></i></a>
+                  <a href="#" class="social-link"><i class="ti ti-brand-linkedin"></i></a>
+                  <a href="#" class="social-link"><i class="ti ti-world"></i></a>
+                </div>
+              </div>
+              <div class="author-profile-content">
+                <h4 class="author-name">David Chen</h4>
+                <p class="author-title">EdTech Specialist</p>
+                <p class="author-bio">Focuses on integrating AI and advanced technologies into language education</p>
+                <div class="author-stats">
+                  <div class="stat-item">
+                    <span class="stat-value">31</span>
+                    <span class="stat-label">Articles</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-value">26</span>
+                    <span class="stat-label">Resources</span>
+                  </div>
+                </div>
+                <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Author Card 4 -->
+          <div class="swiper-slide">
+            <div class="author-profile-card">
+              <div class="author-profile-img">
+                <img src="{% static 'img/avatars/5.png' %}" alt="Dr. Amara Johnson">
+                <div class="author-social">
+                  <a href="#" class="social-link"><i class="ti ti-brand-twitter"></i></a>
+                  <a href="#" class="social-link"><i class="ti ti-brand-linkedin"></i></a>
+                  <a href="#" class="social-link"><i class="ti ti-world"></i></a>
+                </div>
+              </div>
+              <div class="author-profile-content">
+                <h4 class="author-name">Dr. Amara Johnson</h4>
+                <p class="author-title">Inclusive Education Expert</p>
+                <p class="author-bio">Specializes in designing inclusive language learning environments for diverse learners</p>
+                <div class="author-stats">
+                  <div class="stat-item">
+                    <span class="stat-value">17</span>
+                    <span class="stat-label">Articles</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-value">22</span>
+                    <span class="stat-label">Resources</span>
+                  </div>
+                </div>
+                <a href="#" class="btn btn-outline-primary btn-sm">View Profile</a>
+              </div>
+            </div>
           </div>
         </div>
         
-        <!-- Blog Posts Grid -->
-        <div class="row g-4 mb-5 article-grid">
-          <!-- Post 1 -->
-          <div class="col-md-6" style="animation: fadeInUp 0.6s forwards;">
-            <div class="card article-card h-100">
-              <div class="position-relative">
-                <img class="card-img-top" src="{% static 'img/front-pages/blog/technology-language-learning.jpg' %}" alt="Technology in Language Learning">
-                <div class="position-absolute top-0 end-0 m-3">
-                  <span class="badge bg-success">Technology</span>
+        <!-- Authors Carousel Navigation -->
+        <div class="swiper-navigation mt-4">
+          <div class="swiper-button-prev"><i class="ti ti-chevron-left"></i></div>
+          <div class="swiper-button-next"><i class="ti ti-chevron-right"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section py-5 bg-primary-subtle position-relative">
+  <div class="testimonial-shapes">
+    <div class="testimonial-shape-1"></div>
+    <div class="testimonial-shape-2"></div>
+  </div>
+  <div class="container position-relative z-index-2">
+    <div class="section-header text-center mb-5" data-aos="fade-up">
+      <span class="section-subtitle"><i class="ti ti-quote text-primary me-2"></i>Testimonials</span>
+      <h2 class="section-title">What Our Community Says</h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="testimonials-carousel" data-aos="fade-up" data-aos-delay="200">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <!-- Testimonial 1 -->
+          <div class="swiper-slide">
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <div class="testimonial-quote">"The resources and insights from this blog have transformed my language classroom. The AI tools article particularly helped me introduce technology that my students absolutely love."</div>
+                <div class="testimonial-rating">
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
                 </div>
               </div>
-              <div class="card-body">
-                <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='ai-tools-language-teachers' %}" class="text-heading">10 AI Tools for Language Teachers in 2025</a>
-                </h4>
-                <p class="card-text">Discover how artificial intelligence is revolutionizing language education with tools that personalize learning and provide immersive experiences.</p>
-                <div class="d-flex align-items-center mt-3">
-                  <img src="{% static 'img/avatars/9.png' %}" alt="David Chen" class="rounded-circle me-2" width="30">
-                  <div class="d-flex flex-column">
-                    <span class="fw-semibold">David Chen</span>
-                    <small class="text-muted">April 10, 2025</small>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Post 2 -->
-          <div class="col-md-6" style="animation: fadeInUp 0.7s forwards;">
-            <div class="card article-card h-100">
-              <div class="position-relative">
-                <img class="card-img-top" src="{% static 'img/front-pages/blog/cultural-immersion.jpg' %}" alt="Cultural Immersion">
-                <div class="position-absolute top-0 end-0 m-3">
-                  <span class="badge bg-info">Cultural Learning</span>
-                </div>
-              </div>
-              <div class="card-body">
-                <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='cultural-immersion-techniques' %}" class="text-heading">Cultural Immersion for Virtual Classrooms</a>
-                </h4>
-                <p class="card-text">Innovative approaches for integrating authentic cultural experiences into online language instruction, including virtual reality field trips.</p>
-                <div class="d-flex align-items-center mt-3">
-                  <img src="{% static 'img/avatars/12.png' %}" alt="Sophie Martin" class="rounded-circle me-2" width="30">
-                  <div class="d-flex flex-column">
-                    <span class="fw-semibold">Sophie Martin</span>
-                    <small class="text-muted">April 7, 2025</small>
-                  </div>
+              <div class="testimonial-author">
+                <img src="{% static 'img/avatars/11.png' %}" alt="Sarah Thompson" class="testimonial-avatar">
+                <div class="testimonial-info">
+                  <h5 class="testimonial-name">Sarah Thompson</h5>
+                  <p class="testimonial-position">ESL Teacher, Chicago Public Schools</p>
                 </div>
               </div>
             </div>
           </div>
           
-          <!-- Post 3 -->
-          <div class="col-md-6" style="animation: fadeInUp 0.8s forwards;">
-            <div class="card article-card h-100">
-              <div class="position-relative">
-                <img class="card-img-top" src="{% static 'img/front-pages/blog/assessment-strategies.jpg' %}" alt="Assessment Strategies">
-                <div class="position-absolute top-0 end-0 m-3">
-                  <span class="badge bg-warning">Assessment</span>
+          <!-- Testimonial 2 -->
+          <div class="swiper-slide">
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <div class="testimonial-quote">"As a university professor, I find the research articles particularly valuable. They provide cutting-edge insights that have informed my own research methodology and teaching practice."</div>
+                <div class="testimonial-rating">
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-half text-warning"></i>
                 </div>
               </div>
-              <div class="card-body">
-                <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='rethinking-language-assessment' %}" class="text-heading">Rethinking Language Assessment Methods</a>
-                </h4>
-                <p class="card-text">Explore alternative assessment methodologies that better evaluate real-world language proficiency beyond traditional testing.</p>
-                <div class="d-flex align-items-center mt-3">
-                  <img src="{% static 'img/avatars/7.png' %}" alt="Dr. James Wilson" class="rounded-circle me-2" width="30">
-                  <div class="d-flex flex-column">
-                    <span class="fw-semibold">Dr. James Wilson</span>
-                    <small class="text-muted">April 5, 2025</small>
-                  </div>
+              <div class="testimonial-author">
+                <img src="{% static 'img/avatars/3.png' %}" alt="Dr. Michael Lee" class="testimonial-avatar">
+                <div class="testimonial-info">
+                  <h5 class="testimonial-name">Dr. Michael Lee</h5>
+                  <p class="testimonial-position">Professor of Linguistics, UCLA</p>
                 </div>
               </div>
             </div>
           </div>
           
-          <!-- Post 4 -->
-          <div class="col-md-6" style="animation: fadeInUp 0.9s forwards;">
-            <div class="card article-card h-100">
-              <div class="position-relative">
-                <img class="card-img-top" src="{% static 'img/front-pages/blog/neuroscience-language.jpg' %}" alt="Neuroscience of Language Learning">
-                <div class="position-absolute top-0 end-0 m-3">
-                  <span class="badge bg-danger">Research</span>
+          <!-- Testimonial 3 -->
+          <div class="swiper-slide">
+            <div class="testimonial-card">
+              <div class="testimonial-content">
+                <div class="testimonial-quote">"The cultural immersion resources completely changed how I approach teaching French. My students are now more engaged with the language and culture than ever before!"</div>
+                <div class="testimonial-rating">
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
+                  <i class="ti ti-star-filled text-warning"></i>
                 </div>
               </div>
-              <div class="card-body">
-                <h4 class="card-title mb-3">
-                  <a href="{% url 'front_pages:blog-post' slug='neuroscience-language-learning' %}" class="text-heading">The Neuroscience of Language Learning</a>
-                </h4>
-                <p class="card-text">Bridge neuroscientific findings with practical classroom applications to optimize how students acquire language skills.</p>
-                <div class="d-flex align-items-center mt-3">
-                  <img src="{% static 'img/avatars/14.png' %}" alt="Dr. Elena Kuznetsova" class="rounded-circle me-2" width="30">
-                  <div class="d-flex flex-column">
-                    <span class="fw-semibold">Dr. Elena Kuznetsova</span>
-                    <small class="text-muted">April 2, 2025</small>
-                  </div>
+              <div class="testimonial-author">
+                <img src="{% static 'img/avatars/17.png' %}" alt="Claire Dubois" class="testimonial-avatar">
+                <div class="testimonial-info">
+                  <h5 class="testimonial-name">Claire Dubois</h5>
+                  <p class="testimonial-position">French Teacher, International School of Paris</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        <!-- Pagination -->
-        <nav aria-label="Page navigation">
-          <ul class="pagination justify-content-center">
-            <li class="page-item prev">
-              <a class="page-link" href="javascript:void(0);"><i class="ti ti-chevron-left ti-xs"></i></a>
-            </li>
-            <li class="page-item active">
-              <a class="page-link" href="javascript:void(0);">1</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="javascript:void(0);">2</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="javascript:void(0);">3</a>
-            </li>
-            <li class="page-item next">
-              <a class="page-link" href="javascript:void(0);"><i class="ti ti-chevron-right ti-xs"></i></a>
-            </li>
-          </ul>
-        </nav>
+        <!-- Testimonials Pagination -->
+        <div class="swiper-pagination mt-4"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section py-5 position-relative">
+  <div class="cta-wave-background"></div>
+  <div class="container position-relative z-index-2">
+    <div class="row align-items-center">
+      <div class="col-lg-8 mb-4 mb-lg-0" data-aos="fade-up">
+        <span class="cta-badge"><i class="ti ti-user-plus me-1"></i> Join Our Community</span>
+        <h2 class="cta-title">Become a Contributor</h2>
+        <p class="cta-description">Share your expertise, research findings, and teaching experiences with our growing community of language educators worldwide</p>
+      </div>
+      <div class="col-lg-4 text-lg-end" data-aos="fade-up" data-aos-delay="200">
+        <a href="#" class="btn btn-primary btn-lg"><i class="ti ti-pencil me-1"></i> Start Writing</a>
+        <p class="cta-small-text mt-2">Already have an account? <a href="#" class="cta-login-link">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section bg-primary py-5 position-relative">
+  <div class="newsletter-decoration">
+    <div class="newsletter-dot newsletter-dot-1"></div>
+    <div class="newsletter-dot newsletter-dot-2"></div>
+    <div class="newsletter-circle newsletter-circle-1"></div>
+    <div class="newsletter-circle newsletter-circle-2"></div>
+  </div>
+  <div class="container position-relative z-index-2">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center" data-aos="fade-up">
+        <h2 class="newsletter-title text-white">Get Weekly Teaching Insights</h2>
+        <p class="newsletter-description text-white-50 mb-4">Subscribe to our newsletter for curated resources, latest articles, and exclusive educational content</p>
+        <form class="newsletter-form">
+          <div class="input-group newsletter-input-group">
+            <input type="email" class="form-control form-control-lg" placeholder="Your email address">
+            <button class="btn btn-light btn-lg" type="submit">Subscribe <i class="ti ti-send ms-1"></i></button>
+          </div>
+          <p class="form-text text-white-50 mt-2">We respect your privacy and will never share your email</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer bg-dark text-white py-5">
+  <div class="container">
+    <div class="row">
+      <!-- Footer Logo and About -->
+      <div class="col-lg-4 mb-4 mb-lg-0">
+        <a href="#" class="footer-logo d-block mb-3">
+          <img src="{% static 'img/logo-white.png' %}" alt="Language Teaching Blog" height="38">
+        </a>
+        <p class="footer-about">Providing cutting-edge insights, resources, and community for language educators worldwide since 2020.</p>
+        <div class="footer-social">
+          <a href="#" class="social-icon"><i class="ti ti-brand-facebook"></i></a>
+          <a href="#" class="social-icon"><i class="ti ti-brand-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="ti ti-brand-instagram"></i></a>
+          <a href="#" class="social-icon"><i class="ti ti-brand-linkedin"></i></a>
+          <a href="#" class="social-icon"><i class="ti ti-brand-pinterest"></i></a>
+        </div>
       </div>
       
-      <!-- Sidebar -->
-      <div class="col-lg-3">
-        <!-- Categories with Icons -->
-        <div class="card mb-4 shadow-sm" style="animation: fadeInUp 0.7s forwards;">
-          <div class="card-body">
-            <h5 class="d-flex align-items-center mb-3">
-              <i class="ti ti-category me-2 text-primary"></i>Categories
-            </h5>
-            <ul class="list-unstyled mb-0">
-              <li class="mb-3">
-                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-chalkboard me-2 text-primary"></i>
-                    <span>Teaching Methods</span>
-                  </div>
-                  <span class="badge bg-label-primary ms-auto">14</span>
-                </a>
-              </li>
-              <li class="mb-3">
-                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-device-laptop me-2 text-primary"></i>
-                    <span>Technology</span>
-                  </div>
-                  <span class="badge bg-label-primary ms-auto">21</span>
-                </a>
-              </li>
-              <li class="mb-3">
-                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-chart-bar me-2 text-primary"></i>
-                    <span>Assessment</span>
-                  </div>
-                  <span class="badge bg-label-primary ms-auto">8</span>
-                </a>
-              </li>
-              <li class="mb-3">
-                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-world me-2 text-primary"></i>
-                    <span>Cultural Learning</span>
-                  </div>
-                  <span class="badge bg-label-primary ms-auto">12</span>
-                </a>
-              </li>
-              <li>
-                <a href="#" class="d-flex align-items-center p-2 rounded hover-bg-light">
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-bulb me-2 text-primary"></i>
-                    <span>Teaching Tips</span>
-                  </div>
-                  <span class="badge bg-label-primary ms-auto">18</span>
-                </a>
-              </li>
-            </ul>
-          </div>
+      <!-- Quick Links -->
+      <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
+        <h5 class="footer-heading">Quick Links</h5>
+        <ul class="footer-links">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Categories</a></li>
+          <li><a href="#">Authors</a></li>
+          <li><a href="#">Resources</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      
+      <!-- Categories -->
+      <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
+        <h5 class="footer-heading">Categories</h5>
+        <ul class="footer-links">
+          <li><a href="#">Teaching Methods</a></li>
+          <li><a href="#">Technology</a></li>
+          <li><a href="#">Cultural Learning</a></li>
+          <li><a href="#">Assessment</a></li>
+          <li><a href="#">Research</a></li>
+          <li><a href="#">Teaching Tips</a></li>
+        </ul>
+      </div>
+      
+      <!-- Support -->
+      <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
+        <h5 class="footer-heading">Support</h5>
+        <ul class="footer-links">
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Accessibility</a></li>
+        </ul>
+      </div>
+      
+      <!-- Contact Info -->
+      <div class="col-lg-2">
+        <h5 class="footer-heading">Contact Us</h5>
+        <ul class="footer-contact">
+          <li><i class="ti ti-mail me-2"></i> info@languageteaching.edu</li>
+          <li><i class="ti ti-phone me-2"></i> +1 (555) 123-4567</li>
+          <li><i class="ti ti-map-pin me-2"></i> 123 Education Ave, San Francisco, CA 94107</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Footer Bottom -->
+    <div class="footer-bottom mt-4 pt-4 border-top border-secondary">
+      <div class="row align-items-center">
+        <div class="col-md-6 mb-3 mb-md-0">
+          <p class="mb-0">&copy; 2025 Language Teaching Blog. All rights reserved.</p>
         </div>
-        
-        <!-- Subscribe with Animation -->
-        <div class="card bg-primary text-white mb-4 shadow-sm" style="animation: fadeInUp 0.8s forwards;">
-          <div class="card-body">
-            <div class="text-center mb-3">
-              <i class="ti ti-mail text-white" style="font-size: 2.5rem;"></i>
-            </div>
-            <h5 class="text-white text-center mb-3">Subscribe to Our Newsletter</h5>
-            <p class="mb-3 text-center">Get weekly teaching resources directly to your inbox.</p>
-            <form>
-              <div class="mb-3">
-                <input type="email" class="form-control" placeholder="Your email">
-              </div>
-              <button type="submit" class="btn btn-light w-100">
-                <i class="ti ti-send me-2"></i>Subscribe
-              </button>
-            </form>
-          </div>
-        </div>
-        
-        <!-- Tags with Animation -->
-        <div class="card shadow-sm" style="animation: fadeInUp 0.9s forwards;">
-          <div class="card-body">
-            <h5 class="d-flex align-items-center mb-3">
-              <i class="ti ti-tags me-2 text-primary"></i>Popular Tags
-            </h5>
-            <div class="d-flex flex-wrap gap-2">
-              <a href="#" class="badge bg-label-primary article-tag">Vocabulary</a>
-              <a href="#" class="badge bg-label-primary article-tag">Grammar</a>
-              <a href="#" class="badge bg-label-primary article-tag">Speaking</a>
-              <a href="#" class="badge bg-label-primary article-tag">Listening</a>
-              <a href="#" class="badge bg-label-primary article-tag">Technology</a>
-              <a href="#" class="badge bg-label-primary article-tag">Assessment</a>
-              <a href="#" class="badge bg-label-primary article-tag">Motivation</a>
-              <a href="#" class="badge bg-label-primary article-tag">Research</a>
-            </div>
+        <div class="col-md-6 text-md-end">
+          <div class="footer-bottom-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Cookies</a>
+            <a href="#">Sitemap</a>
           </div>
         </div>
       </div>
     </div>
   </div>
-</section>
-<!-- /Redesigned Blog Categories and Filter -->
+</footer>
 
-<!-- Curved CTA Section -->
-<section class="blog-cta py-5">
-  <div class="container py-4">
-    <div class="row justify-content-center align-items-center text-center">
-      <div class="col-lg-8 text-white mb-4 mb-lg-0">
-        <div class="mb-3">
-          <i class="ti ti-pencil text-white" style="font-size: 3rem;"></i>
-        </div>
-        <h3 class="text-white fw-bold mb-3">Want to contribute to our blog?</h3>
-        <p class="mb-0">Share your expertise with our growing community of language educators worldwide</p>
-      </div>
-      <div class="col-lg-4 text-center">
-        <a href="{% url 'front_pages:contact' %}" class="btn btn-lg btn-light">
-          <i class="ti ti-message-circle me-2"></i>Contact us
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- /Curved CTA Section -->
+<!-- Back to Top Button -->
+<a href="#" class="back-to-top" id="backToTop">
+  <i class="ti ti-chevron-up"></i>
+</a>
+
+<!-- JavaScript Files -->
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
+<script src="{% static 'vendor/aos/aos.js' %}"></script>
+<script src="{% static 'js/blog-main.js' %}"></script>
+{% endblock %}
 {% endblock %}

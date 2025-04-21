@@ -29,12 +29,12 @@
       "menu_header": "Learning Platform"
     },
     {
-      "name": "Instructor Dashboard",
+      "name": "Instructors",
       "icon": "menu-icon tf-icons ti ti-chalkboard",
       "slug": "instructor",
       "submenu": [
         {
-          "url": "/content/instructor-dashboard/",
+          "url": "/content/instructors/",
           "external": true,
           "name": "Overview",
           "slug": "instructor-dashboard"
@@ -42,13 +42,13 @@
         {
           "url": "/content/private-sessions/create/",
           "external": true,
-          "name": "Add Private Sessions",
+          "name": "Add Sessions",
           "slug": "create-private-slot"
         },
         {
-          "url": "/content/group-sessions/create/",
+          "url": "/content/instructor-dashboard/",
           "external": true,
-          "name": "Create Group Session",
+          "name": "My dashboard",
           "slug": "create-group-session"
         },
         {
@@ -56,7 +56,7 @@
           "external": true,
           "name": "My Profile",
           "slug": "instructor-profile"
-        }        
+        }
       ]
     },
     {
