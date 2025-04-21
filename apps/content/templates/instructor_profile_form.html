@@ -1,0 +1,242 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ title }} - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/quill/typography.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/tagify/tagify.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/quill/quill.js' %}"></script>
+<script src="{% static 'vendor/libs/tagify/tagify.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ title }}</h5>
+        <a href="{% url 'dashboards:dashboard-teacher' %}" class="btn btn-outline-primary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            <div class="alert-body">
+              Please correct the errors below:
+              <ul class="mb-0 mt-1">
+                {% for field in form %}
+                  {% if field.errors %}
+                    {% for error in field.errors %}
+                      <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="row g-4">
+            <!-- Profile Image -->
+            <div class="col-12 d-flex flex-column align-items-center mb-4">
+              <div class="d-flex mb-3">
+                {% if form.instance.profile_image %}
+                <img src="{{ form.instance.profile_image.url }}" alt="Profile Preview" id="profile-preview" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                <div id="profile-preview-placeholder" class="avatar avatar-xl">
+                  <div class="avatar-initial rounded-circle bg-label-primary">
+                    <i class="ti ti-user ti-lg"></i>
+                  </div>
+                </div>
+                <img src="" alt="Profile Preview" id="profile-preview" class="rounded-circle d-none" style="width: 120px; height: 120px; object-fit: cover;">
+                {% endif %}
+              </div>
+              
+              <div class="mb-3">
+                <label for="{{ form.profile_image.id_for_label }}" class="form-label">Profile Picture</label>
+                <div class="input-group">
+                  {{ form.profile_image }}
+                </div>
+                {% if form.profile_image.errors %}
+                <div class="invalid-feedback d-block">{{ form.profile_image.errors.0 }}</div>
+                {% endif %}
+                <small class="form-text text-muted">Recommended: Square image, at least 300x300 pixels</small>
+              </div>
+            </div>
+
+            <!-- Hourly Rate -->
+            <div class="col-md-6">
+              <label for="{{ form.hourly_rate.id_for_label }}" class="form-label">Hourly Rate ($)</label>
+              {{ form.hourly_rate }}
+              {% if form.hourly_rate.errors %}
+              <div class="invalid-feedback d-block">{{ form.hourly_rate.errors.0 }}</div>
+              {% endif %}
+              <small class="form-text text-muted">Your rate for private 1-on-1 sessions</small>
+            </div>
+
+            <!-- Is Available -->
+            {% if form.is_available %}
+            <div class="col-md-6">
+              <label class="form-label">Availability Status</label>
+              <div class="form-check form-switch mt-2">
+                {{ form.is_available }}
+                <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
+                  Available for booking
+                  <small class="d-block text-muted">Toggle off to temporarily hide your profile from searches</small>
+                </label>
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Language Selection -->
+            <div class="col-12">
+              <label class="form-label">Teaching Languages</label>
+              <select class="select2 form-select" multiple name="languages" id="languages">
+                {% for language in languages %}
+                <option value="{{ language.id }}" {% if language.id in selected_languages %}selected{% endif %}>{{ language.name }}</option>
+                {% endfor %}
+              </select>
+              <small class="form-text text-muted">Select all languages you can teach</small>
+            </div>
+
+            <!-- Specialties Selection -->
+            <div class="col-12">
+              <label class="form-label">Teaching Specialties</label>
+              <select class="select2 form-select" multiple name="specialties" id="specialties">
+                {% for specialty in specialties %}
+                <option value="{{ specialty.id }}" {% if specialty.id in selected_specialties %}selected{% endif %}>{{ specialty.name }}</option>
+                {% endfor %}
+              </select>
+              <small class="form-text text-muted">Select your teaching specialties and focus areas</small>
+            </div>
+
+            <!-- Bio -->
+            <div class="col-12">
+              <label for="bio-editor" class="form-label">Professional Bio</label>
+              <div id="bio-editor" style="min-height: 200px;"></div>
+              {{ form.bio }}
+              {% if form.bio.errors %}
+              <div class="invalid-feedback d-block">{{ form.bio.errors.0 }}</div>
+              {% endif %}
+              <small class="form-text text-muted">Introduce yourself, your background, and your qualifications</small>
+            </div>
+
+            <!-- Teaching Style -->
+            <div class="col-12">
+              <label for="teaching-style-editor" class="form-label">Teaching Style</label>
+              <div id="teaching-style-editor" style="min-height: 200px;"></div>
+              {{ form.teaching_style }}
+              {% if form.teaching_style.errors %}
+              <div class="invalid-feedback d-block">{{ form.teaching_style.errors.0 }}</div>
+              {% endif %}
+              <small class="form-text text-muted">Describe your teaching approach, methods, and philosophy</small>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="col-12 d-flex justify-content-end gap-2">
+              <a href="{% url 'dashboards:dashboard-teacher' %}" class="btn btn-outline-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">{{ submit_text|default:"Save Profile" }}</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2 for multi-select dropdowns
+    $('.select2').select2({
+      placeholder: "Select options",
+      allowClear: true
+    });
+
+    // Initialize Quill for rich text bio
+    const bioQuill = new Quill('#bio-editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          ['link'],
+          ['clean']
+        ]
+      }
+    });
+    
+    // Initialize Quill for teaching style
+    const teachingStyleQuill = new Quill('#teaching-style-editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          ['link'],
+          ['clean']
+        ]
+      }
+    });
+    
+    // Set initial content if available
+    const bioField = document.querySelector('#{{ form.bio.id_for_label }}');
+    if (bioField && bioField.value) {
+      bioQuill.root.innerHTML = bioField.value;
+    }
+    
+    const teachingStyleField = document.querySelector('#{{ form.teaching_style.id_for_label }}');
+    if (teachingStyleField && teachingStyleField.value) {
+      teachingStyleQuill.root.innerHTML = teachingStyleField.value;
+    }
+    
+    // When form is submitted, update hidden textarea with Quill content
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+      bioField.value = bioQuill.root.innerHTML;
+      teachingStyleField.value = teachingStyleQuill.root.innerHTML;
+    });
+    
+    // Image preview
+    const profileInput = document.getElementById('{{ form.profile_image.id_for_label }}');
+    const profilePreview = document.getElementById('profile-preview');
+    const profilePlaceholder = document.getElementById('profile-preview-placeholder');
+    
+    if (profileInput && profilePreview) {
+      profileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            profilePreview.setAttribute('src', e.target.result);
+            profilePreview.classList.remove('d-none');
+            if (profilePlaceholder) {
+              profilePlaceholder.classList.add('d-none');
+            }
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

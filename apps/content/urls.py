@@ -4,41 +4,46 @@ from . import views
 app_name = 'content'
 
 urlpatterns = [
-    # API endpoints
+    # Home page - now redirects to instructor listing
+    path('', views.InstructorListView.as_view(), name='home'),
+    
+    # API endpoints (for compatibility with old code)
     path('api/courses/<int:course_id>/lessons/', views.get_course_lessons, name='api_course_lessons'),
     path('api/lessons/<int:lesson_id>/complete/', views.mark_lesson_complete, name='mark_lesson_complete'),
     
-    # Course views
-    path('courses/', views.CourseListView.as_view(), name='course_list'),
-    path('courses/create/', views.CourseCreateView.as_view(), name='create_course'),
-    path('courses/<slug:slug>/', views.CourseDetailView.as_view(), name='course_detail'),
-    path('courses/<slug:slug>/edit/', views.CourseUpdateView.as_view(), name='edit_course'),
-    path('courses/<slug:slug>/delete/', views.CourseDeleteView.as_view(), name='delete_course'),
-    path('courses/<slug:slug>/enroll/', views.CourseEnrollView.as_view(), name='enroll_course'),
-    path('courses/<slug:slug>/unenroll/', views.CourseUnenrollView.as_view(), name='unenroll_course'),
+    # Instructor browsing views
+    path('instructors/', views.InstructorListView.as_view(), name='instructor_list'),
+    path('instructors/<str:username>/', views.InstructorDetailView.as_view(), name='instructor_detail'),
+    path('instructors/<str:username>/reviews/', views.InstructorReviewsView.as_view(), name='instructor_reviews'),
     
-    # Teacher & Student specific course views
-    path('my-courses/teaching/', views.TeacherCourseListView.as_view(), name='teacher_courses'),
-    path('my-courses/learning/', views.StudentCourseListView.as_view(), name='student_courses'),
+    # Instructor profile management
+    path('instructor-profile/create/', views.CreateInstructorProfileView.as_view(), name='create_instructor_profile'),
+    path('instructor-profile/update/', views.UpdateInstructorProfileView.as_view(), name='update_instructor_profile'),
+    path('instructor-dashboard/', views.InstructorDashboardView.as_view(), name='instructor_dashboard'),
     
-    # Modules
-    path('courses/<slug:course_slug>/modules/create/', views.ModuleCreateView.as_view(), name='create_module'),
-    path('modules/<int:module_id>/edit/', views.ModuleUpdateView.as_view(), name='edit_module'),
-    path('modules/<int:module_id>/delete/', views.ModuleDeleteView.as_view(), name='delete_module'),
+    # Private session management (for instructors)
+    path('private-sessions/create/', views.CreatePrivateSessionSlotView.as_view(), name='create_private_slot'),
+    #path('private-sessions/<int:slot_id>/edit/', views.UpdatePrivateSessionSlotView.as_view(), name='update_private_slot'),
+    path('private-sessions/<int:slot_id>/delete/', views.DeletePrivateSessionSlotView.as_view(), name='delete_private_slot'),
     
-    # Lessons
-    path('lessons/', views.LessonListView.as_view(), name='lesson_list'),
-    path('modules/<int:module_id>/lessons/create/', views.LessonCreateView.as_view(), name='create_lesson'),
-    path('courses/<slug:course_slug>/lessons/<slug:lesson_slug>/', views.LessonDetailView.as_view(), name='lesson_detail'),
-    path('lessons/<slug:lesson_slug>/edit/', views.LessonUpdateView.as_view(), name='edit_lesson'),
-    path('lessons/<slug:lesson_slug>/delete/', views.LessonDeleteView.as_view(), name='delete_lesson'),
+    # Group session management (for instructors)
+    path('group-sessions/create/', views.CreateGroupSessionView.as_view(), name='create_group_session'),
+    path('group-sessions/<int:session_id>/edit/', views.UpdateGroupSessionView.as_view(), name='update_group_session'),
+    path('group-sessions/<int:session_id>/delete/', views.DeleteGroupSessionView.as_view(), name='delete_group_session'),
     
-    # Resources
-    path('resources/', views.ResourceListView.as_view(), name='resource_list'),
-    path('resources/create/', views.ResourceCreateView.as_view(), name='create_resource'),
-    path('resources/<int:resource_id>/edit/', views.ResourceUpdateView.as_view(), name='edit_resource'),
-    path('resources/<int:resource_id>/delete/', views.ResourceDeleteView.as_view(), name='delete_resource'),
+    # Group session views (for students)
+    path('group-sessions/', views.GroupSessionListView.as_view(), name='group_session_list'),
+    path('group-sessions/<int:session_id>/', views.GroupSessionDetailView.as_view(), name='group_session_detail'),
     
-    # Language specific courses
-    path('languages/<str:language_code>/courses/', views.LanguageCoursesView.as_view(), name='language_courses'),
+    # Student dashboard
+    path('student-dashboard/', views.StudentDashboardView.as_view(), name='student_dashboard'),
+    
+    # Reviews
+    path('reviews/create/<int:instructor_id>/', views.CreateInstructorReviewView.as_view(), name='create_review'),
+    path('reviews/create/<int:instructor_id>/<str:session_type>/<int:session_id>/', 
+         views.CreateInstructorReviewView.as_view(), name='create_review_for_session'),
+         
+    # Legacy URLs - redirected to new views for backward compatibility
+    path('courses/', views.RedirectToCourseListView.as_view(), name='course_list'),
+    path('courses/<slug:slug>/', views.RedirectToCourseDetailView.as_view(), name='course_detail'),
 ]

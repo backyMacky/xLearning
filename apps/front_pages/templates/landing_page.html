@@ -26,7 +26,7 @@
   /* Promo Banner Section */
   .promo-banner {
     position: relative;
-    background: linear-gradient(135deg, rgba(107, 70, 193, 0.85) 0%, rgba(159, 122, 234, 0.85) 100%);
+    background: linear-gradient(135deg, rgba(170, 155, 209, 0.85) 0%, rgba(205, 156, 207, 0.85) 100%);
     overflow: hidden;
     padding: 100px 0;
   }
@@ -228,178 +228,365 @@
     background-color: white;
   }
   
-  /* Enhanced Hero Section */
-  .landing-hero {
+  /* Language Skills Section */
+  .language-skills {
     position: relative;
-    background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
+    padding: 120px 0 80px;
     overflow: hidden;
   }
   
-  .hero-shape-1 {
+  .wave-top {
     position: absolute;
-    top: -100px;
-    right: -100px;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    animation: float-1 8s ease-in-out infinite;
-  }
-  
-  .hero-shape-2 {
-    position: absolute;
-    bottom: -150px;
-    left: -100px;
-    width: 400px;
-    height: 400px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    animation: float-2 10s ease-in-out infinite;
-  }
-  
-  .hero-shape-3 {
-    position: absolute;
-    top: 30%;
-    left: 15%;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    animation: float-3 6s ease-in-out infinite;
-  }
-  
-  .hero-shape-4 {
-    position: absolute;
-    bottom: 20%;
-    right: 10%;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    animation: float-4 7s ease-in-out infinite;
-  }
-  
-  @keyframes float-1 {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-30px) rotate(5deg); }
-  }
-  
-  @keyframes float-2 {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(40px) rotate(-5deg); }
-  }
-  
-  @keyframes float-3 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(15px, -15px); }
-  }
-  
-  @keyframes float-4 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-20px, 20px); }
-  }
-  
-  .hero-text-box {
-    position: relative;
-    z-index: 10;
-  }
-  
-  .hero-title {
-    font-size: 3.5rem;
-    font-weight: 800;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(to right, #ffffff, #e2d8fd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: fadeInUp 0.8s ease forwards;
-  }
-  
-  .hero-sub-title {
-    font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 1.5rem;
-    animation: fadeInUp 0.8s ease 0.2s forwards;
-    opacity: 0;
-  }
-  
-  .hero-text-box p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-    max-width: 500px;
-    animation: fadeInUp 0.8s ease 0.4s forwards;
-    opacity: 0;
-  }
-  
-  .landing-hero-btn {
-    animation: fadeInUp 0.8s ease 0.6s forwards;
-    opacity: 0;
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .hero-image {
-    position: relative;
-    z-index: 10;
-  }
-  
-  .video-container {
-    transform: translateY(20px);
-    opacity: 0;
-    animation: fadeInVideo 1s ease 0.8s forwards;
-  }
-  
-  @keyframes fadeInVideo {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .play-button {
-    width: 80px;
+    top: -2px;
+    left: 0;
+    width: 100%;
     height: 80px;
-    transition: all 0.3s ease;
   }
   
-  .play-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  .wave-bottom {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 80px;
   }
   
-  /* Enhanced Feature Section */
-  .feature-icon-box {
-    width: 60px;
-    height: 60px;
-    background-color: rgba(115, 103, 240, 0.1);
-    border-radius: 12px;
+  .skills-container {
+    position: relative;
+    z-index: 10;
+  }
+  
+  .skill-icon-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+  }
+  
+  .skill-icon {
+    position: relative;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+  
+  .skill-icon i {
+    font-size: 3rem;
+    color: #7367f0;
     transition: all 0.3s ease;
   }
   
-  .card:hover .feature-icon-box {
-    background-color: #7367f0;
-    transform: rotateY(180deg);
+  .skill-card:hover .skill-icon {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   }
   
-  .card:hover .feature-icon-box i {
-    color: white !important;
-    transform: rotateY(180deg);
+  .connection-line {
+    position: absolute;
+    top: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #7367f0, transparent);
+    width: 100%;
+    z-index: 1;
+  }
+  
+  .skill-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #32364d;
+  }
+  
+  .skill-description {
+    color: #6c757d;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Methodology Section with Blob Shapes */
+  .methodology-section {
+    position: relative;
+    padding: 100px 0;
+    background-color: #f8f9fa;
+    overflow: hidden;
+  }
+  
+  .blob-shape-1 {
+    position: absolute;
+    top: -150px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, rgba(115, 103, 240, 0.1) 0%, rgba(166, 111, 240, 0.1) 100%);
+    border-radius: 69% 31% 61% 39% / 36% 51% 49% 64%;
+    z-index: 1;
+    animation: blob-morph-1 20s infinite alternate ease-in-out;
+  }
+  
+  .blob-shape-2 {
+    position: absolute;
+    bottom: -120px;
+    left: -80px;
+    width: 350px;
+    height: 350px;
+    background: linear-gradient(135deg, rgba(166, 111, 240, 0.1) 0%, rgba(115, 103, 240, 0.1) 100%);
+    border-radius: 38% 62% 43% 57% / 61% 32% 68% 39%;
+    z-index: 1;
+    animation: blob-morph-2 25s infinite alternate-reverse ease-in-out;
+  }
+  
+  @keyframes blob-morph-1 {
+    0% { border-radius: 69% 31% 61% 39% / 36% 51% 49% 64%; }
+    25% { border-radius: 46% 54% 38% 62% / 44% 48% 52% 56%; }
+    50% { border-radius: 54% 46% 52% 48% / 57% 43% 57% 43%; }
+    75% { border-radius: 61% 39% 55% 45% / 61% 38% 62% 39%; }
+    100% { border-radius: 35% 65% 31% 69% / 57% 32% 68% 43%; }
+  }
+  
+  @keyframes blob-morph-2 {
+    0% { border-radius: 38% 62% 43% 57% / 61% 32% 68% 39%; }
+    25% { border-radius: 45% 55% 65% 35% / 48% 52% 48% 52%; }
+    50% { border-radius: 52% 48% 53% 47% / 38% 62% 38% 62%; }
+    75% { border-radius: 59% 41% 38% 62% / 55% 45% 55% 45%; }
+    100% { border-radius: 31% 69% 58% 42% / 42% 58% 42% 58%; }
+  }
+  
+  .methodology-content {
+    position: relative;
+    z-index: 10;
+  }
+  
+  .method-step {
+    position: relative;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    border-left: 5px solid #7367f0;
+  }
+  
+  .method-step:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+  
+  .step-number {
+    position: absolute;
+    top: -15px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    background: #7367f0;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 0 5px 15px rgba(115, 103, 240, 0.3);
+  }
+  
+  .step-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    margin-top: 10px;
+    color: #32364d;
+  }
+  
+  /* Testimonials with Curved Section */
+  .testimonials-section {
+    position: relative;
+    padding: 120px 0 160px;
+    background: linear-gradient(135deg,rgb(209, 169, 225) 0%,rgb(190, 162, 227) 100%);
+    color: white;
+  }
+  
+  .testimonials-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: #ffffff;
+    border-bottom-left-radius: 50% 100%;
+    border-bottom-right-radius: 50% 100%;
+  }
+  
+  .testimonials-section::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: #f8f9fb;
+    border-top-left-radius: 50% 100%;
+    border-top-right-radius: 50% 100%;
+  }
+  
+  .testimonial-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    height: 100%;
+  }
+  
+  .testimonial-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  .quote-icon {
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 15px;
+  }
+  
+  .testimonial-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+  }
+  
+  .author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+  }
+  
+  .author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .author-info h5 {
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  
+  .author-info p {
+    margin: 0;
+    opacity: 0.7;
+    font-size: 0.9rem;
+  }
+
+  /* Interactive Demo Section */
+  .interactive-demo {
+    position: relative;
+    padding: 120px 0;
+    background-color: #f8f9fb;
+    overflow: hidden;
+  }
+  
+  .demo-container {
+    position: relative;
+    z-index: 10;
+  }
+  
+  .demo-device {
+    position: relative;
+    background: #ffffff;
+    border-radius: 40px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow: hidden;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .demo-screen {
+    border-radius: 24px;
+    overflow: hidden;
+    height: 400px;
+    background: #f5f5f5;
+    position: relative;
+  }
+  
+  .demo-screen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.5s ease;
+  }
+  
+  .demo-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .demo-dot {
+    width: 40px;
+    height: 8px;
+    margin: 0 5px;
+    border-radius: 10px;
+    background-color: rgba(115, 103, 240, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .demo-dot.active {
+    width: 60px;
+    background-color: #7367f0;
+  }
+  
+  .floating-element-1 {
+    position: absolute;
+    top: 20%;
+    left: 5%;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, rgba(115, 103, 240, 0.2) 0%, rgba(166, 111, 240, 0.2) 100%);
+    border-radius: 24px;
+    transform: rotate(-15deg);
+    animation: float-element-1 8s infinite alternate ease-in-out;
+  }
+  
+  .floating-element-2 {
+    position: absolute;
+    bottom: 15%;
+    right: 5%;
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(135deg, rgba(166, 111, 240, 0.15) 0%, rgba(115, 103, 240, 0.15) 100%);
+    border-radius: 30px;
+    transform: rotate(20deg);
+    animation: float-element-2 12s infinite alternate-reverse ease-in-out;
+  }
+  
+  @keyframes float-element-1 {
+    0% { transform: rotate(-15deg) translate(0, 0); }
+    100% { transform: rotate(-10deg) translate(20px, -20px); }
+  }
+  
+  @keyframes float-element-2 {
+    0% { transform: rotate(20deg) translate(0, 0); }
+    100% { transform: rotate(15deg) translate(-20px, 20px); }
   }
   
   /* Responsive adjustments */
@@ -417,8 +604,20 @@
       margin-bottom: 20px;
     }
     
-    .hero-title {
-      font-size: 2.5rem;
+    .connection-line {
+      display: none;
+    }
+    
+    .methodology-section {
+      padding: 80px 0;
+    }
+    
+    .testimonials-section {
+      padding: 80px 0 120px;
+    }
+    
+    .interactive-demo {
+      padding: 80px 0;
     }
   }
   
@@ -435,62 +634,31 @@
       font-size: 1.5rem;
     }
     
-    .hero-title {
+    .skill-icon-wrapper {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .skill-icon i {
       font-size: 2rem;
     }
     
-    .hero-sub-title {
-      font-size: 1.1rem;
+    .methodology-section {
+      padding: 60px 0;
+    }
+    
+    .testimonials-section {
+      padding: 60px 0 100px;
+    }
+    
+    .demo-screen {
+      height: 300px;
     }
   }
 </style>
 {% endblock page_css %}
 
-{% block page_js %}
-{{ block.super }}
-<script src="{% static 'js/front-page-landing.js' %}"></script>
-<script>
-  // Promo Carousel Functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const slides = document.querySelectorAll('.promo-slide');
-    const indicators = document.querySelectorAll('.promo-indicator');
-    let currentSlide = 0;
-    
-    function showSlide(index) {
-      // Hide all slides
-      slides.forEach(slide => {
-        slide.classList.remove('active');
-      });
-      
-      // Remove active class from all indicators
-      indicators.forEach(indicator => {
-        indicator.classList.remove('active');
-      });
-      
-      // Show the current slide and activate indicator
-      slides[index].classList.add('active');
-      indicators[index].classList.add('active');
-    }
-    
-    // Initial display
-    showSlide(currentSlide);
-    
-    // Auto-rotate slides
-    setInterval(() => {
-      currentSlide = (currentSlide + 1) % slides.length;
-      showSlide(currentSlide);
-    }, 5000);
-    
-    // Click on indicators
-    indicators.forEach((indicator, index) => {
-      indicator.addEventListener('click', () => {
-        currentSlide = index;
-        showSlide(currentSlide);
-      });
-    });
-  });
-</script>
-{% endblock page_js %}
+
 
 {% block content %}
 <div data-bs-spy="scroll" class="scrollspy-example">
@@ -577,284 +745,281 @@
   </section>
   <!-- Promo Banner Section: End -->
 
-  <!-- Hero: Start -->
-  <section id="hero-animation">
-    <div id="landingHero" class="section-py landing-hero position-relative">
-      <!-- Animated shapes -->
-      <div class="hero-shape-1"></div>
-      <div class="hero-shape-2"></div>
-      <div class="hero-shape-3"></div>
-      <div class="hero-shape-4"></div>
+  <!-- Language Skills Section: Start -->
+  <section class="language-skills" id="languageSkills">
+    <svg class="wave-top" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 80" preserveAspectRatio="none">
+      <path fill="#7367f0" fill-opacity="0.6" d="M0,64L80,58.7C160,53,320,43,480,42.7C640,43,800,53,960,58.7C1120,64,1280,64,1360,64L1440,64L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"></path>
+    </svg>
+    
+    <div class="container skills-container">
+      <div class="row text-center mb-5">
+        <div class="col-lg-8 mx-auto">
+          <h2 class="mb-3">Master All Language Skills</h2>
+          <p class="lead">Our integrated approach focuses on developing all essential language competencies through specialized tools and activities</p>
+        </div>
+      </div>
       
-      <img src="{% static 'img/front-pages/backgrounds/hero-bg.png' %}" alt="hero background" class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100" />
-      <div class="container">
-        <div id="xlearning-slideshow" class="position-relative">
-          <div class="hero-slide active">
-            <div class="row align-items-center">
-              <div class="col-lg-6">
-                <div class="hero-text-box text-center text-lg-start">
-                  <h1 class="hero-title">xLearning</h1>
-                  <h2 class="hero-sub-title">Transform Your Language Teaching Experience</h2>
-                  <p>The comprehensive platform designed specifically for language teachers to manage classes, track progress, and engage students effectively.</p>
-                  <div class="landing-hero-btn">
-                    <a href="{% url 'account:register' %}" class="btn btn-light btn-lg">Start Free Trial</a>
-                    <a href="#landingFeatures" class="btn btn-outline-light btn-lg ms-3">Learn More</a>
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <div class="connection-line"></div>
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="skill-card text-center">
+                <div class="skill-icon-wrapper">
+                  <div class="skill-icon">
+                    <i class="ti ti-microphone-2"></i>
                   </div>
                 </div>
+                <h4 class="skill-title">Speaking</h4>
+                <p class="skill-description">Build fluency and confidence with interactive speaking exercises, pronunciation practice, and real-time feedback on speech patterns.</p>
               </div>
-              <div class="col-lg-6">
-                <div class="hero-image text-center mt-5 mt-lg-0">
-                  <div class="video-container position-relative rounded shadow-lg overflow-hidden">
-                    <video class="img-fluid" autoplay loop muted playsinline>
-                      <source src="{% static 'img/front-pages/videos/hero-demo.mp4' %}" type="video/mp4">
-                      <img src="{% static 'img/front-pages/landing-page/hero-dashboard-light.png' %}" alt="xLearning dashboard" class="img-fluid" />
-                    </video>
-                    <div class="video-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                      <button class="btn btn-primary btn-lg rounded-circle play-button">
-                        <i class="ti ti-player-play-filled"></i>
-                      </button>
-                    </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="skill-card text-center">
+                <div class="skill-icon-wrapper">
+                  <div class="skill-icon">
+                    <i class="ti ti-ear"></i>
                   </div>
                 </div>
+                <h4 class="skill-title">Listening</h4>
+                <p class="skill-description">Develop active listening skills through authentic audio content, comprehension activities, and adaptive difficulty levels.</p>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="skill-card text-center">
+                <div class="skill-icon-wrapper">
+                  <div class="skill-icon">
+                    <i class="ti ti-pencil"></i>
+                  </div>
+                </div>
+                <h4 class="skill-title">Writing</h4>
+                <p class="skill-description">Improve written expression with guided writing tasks, automated feedback, and collaborative editing tools.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mt-4">
+            <div class="col-md-4 mb-4 offset-md-2">
+              <div class="skill-card text-center">
+                <div class="skill-icon-wrapper">
+                  <div class="skill-icon">
+                    <i class="ti ti-book"></i>
+                  </div>
+                </div>
+                <h4 class="skill-title">Reading</h4>
+                <p class="skill-description">Enhance comprehension with adaptive reading materials, interactive texts, and vocabulary building activities.</p>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="skill-card text-center">
+                <div class="skill-icon-wrapper">
+                  <div class="skill-icon">
+                    <i class="ti ti-vocabulary"></i>
+                  </div>
+                </div>
+                <h4 class="skill-title">Vocabulary</h4>
+                <p class="skill-description">Expand your lexicon through contextual learning, spaced repetition, and visual association techniques.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    
+    <svg class="wave-bottom" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 80" preserveAspectRatio="none">
+      <path fill="#f8f9fa" fill-opacity="1" d="M0,0L80,10.7C160,21,320,43,480,48C640,53,800,43,960,32C1120,21,1280,11,1360,5.3L1440,0L1440,80L1360,80C1280,80,1120,80,960,80C800,80,640,80,480,80C320,80,160,80,80,80L0,80Z"></path>
+    </svg>
   </section>
-  <!-- Hero: End -->
+  <!-- Language Skills Section: End -->
 
-  <!-- Features: Start -->
-  <section id="landingFeatures" class="section-py">
+  <!-- Methodology Section: Start -->
+  <section class="methodology-section" id="methodology">
+    <div class="blob-shape-1"></div>
+    <div class="blob-shape-2"></div>
+    
+    <div class="container methodology-content">
+      <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+          <h2 class="mb-3">Our Proven Methodology</h2>
+          <p class="lead">A step-by-step approach designed by language teaching experts to ensure effective learning outcomes</p>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <div class="method-step">
+            <div class="step-number">1</div>
+            <h4 class="step-title">Comprehensive Assessment</h4>
+            <p>Begin with a detailed evaluation of current language proficiency to identify strengths and areas for improvement across all skills.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+          <div class="method-step">
+            <div class="step-number">2</div>
+            <h4 class="step-title">Personalized Learning Path</h4>
+            <p>Create customized learning journeys based on individual goals, learning style, and performance data.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+          <div class="method-step">
+            <div class="step-number">3</div>
+            <h4 class="step-title">Immersive Practice</h4>
+            <p>Engage with interactive content that simulates real-world language use through authentic materials and practical scenarios.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+          <div class="method-step">
+            <div class="step-number">4</div>
+            <h4 class="step-title">Continuous Assessment</h4>
+            <p>Regular progress checks and adaptive feedback ensure constant improvement and mastery of language concepts.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+          <div class="method-step">
+            <div class="step-number">5</div>
+            <h4 class="step-title">Cultural Integration</h4>
+            <p>Learn language within cultural contexts to develop deeper understanding and more natural communication skills.</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+          <div class="method-step">
+            <div class="step-number">6</div>
+            <h4 class="step-title">Community Practice</h4>
+            <p>Collaborate with peers and native speakers through our virtual language community to apply skills in authentic exchanges.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Methodology Section: End -->
+
+  <!-- Testimonials Section: Start -->
+  <section class="testimonials-section" id="testimonials">
     <div class="container">
-      <div class="text-center mb-4">
-        <span class="badge bg-label-primary">Features</span>
+      <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+          <h2 class="mb-3 text-white">What Educators Say</h2>
+          <p class="lead text-white-50">Hear from language teachers who've transformed their classrooms with xLearning</p>
+        </div>
       </div>
-      <h4 class="text-center mb-1">
-        <span class="position-relative fw-extrabold z-1">Complete toolset
-          <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="section title icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
-        </span>
-        for language educators
-      </h4>
-      <p class="text-center pb-2 mb-5">Everything you need to manage your teaching practice and engage with students</p>
-
-      <div class="row gy-4 g-xl-5 mb-5">
-        <!-- Content Management Feature -->
-        <div class="col-lg-6 col-xl-4">
-          <div class="card h-100 border-0 shadow-xs">
-            <div class="card-body text-center text-lg-start p-4 p-lg-5">
-              <div class="feature-icon-wrapper d-flex align-items-center justify-content-center justify-content-lg-start mb-3">
-                <div class="feature-icon-box d-flex align-items-center justify-content-center me-4">
-                  <i class="ti ti-book ti-lg text-primary"></i>
-                </div>
-                <h5 class="mb-0">Content Management</h5>
+      
+      <div class="row">
+        <div class="col-lg-4 mb-4">
+          <div class="testimonial-card">
+            <div class="quote-icon">
+              <i class="ti ti-quote"></i>
+            </div>
+            <p class="testimonial-text">xLearning has revolutionized my Spanish classes. Students are more engaged than ever, and I can easily track their progress across all language skills.</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <img src="{% static 'img/avatars/2.png' %}" alt="Teacher Avatar">
               </div>
-              <p class="mb-3">Create, organize, and distribute teaching materials to your students in one centralized system.</p>
-              <a href="{% url 'front_pages:content-management' %}" class="btn btn-outline-primary btn-sm">Learn More</a>
+              <div class="author-info">
+                <h5>Maria Rodriguez</h5>
+                <p>Spanish Teacher, NYC</p>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Live Sessions Feature -->
-        <div class="col-lg-6 col-xl-4">
-          <div class="card h-100 border-0 shadow-xs">
-            <div class="card-body text-center text-lg-start p-4 p-lg-5">
-              <div class="feature-icon-wrapper d-flex align-items-center justify-content-center justify-content-lg-start mb-3">
-                <div class="feature-icon-box d-flex align-items-center justify-content-center me-4">
-                  <i class="ti ti-video ti-lg text-primary"></i>
-                </div>
-                <h5 class="mb-0">Live Sessions</h5>
+        
+        <div class="col-lg-4 mb-4">
+          <div class="testimonial-card">
+            <div class="quote-icon">
+              <i class="ti ti-quote"></i>
+            </div>
+            <p class="testimonial-text">The adaptive learning tools have made such a difference for my mixed-ability French classes. Each student progresses at their own pace while I can monitor everyone's development.</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <img src="{% static 'img/avatars/4.png' %}" alt="Teacher Avatar">
               </div>
-              <p class="mb-3">Schedule and manage online teaching sessions, with integrated video conferencing and recording.</p>
-              <a href="{% url 'front_pages:live-sessions' %}" class="btn btn-outline-primary btn-sm">Learn More</a>
+              <div class="author-info">
+                <h5>Pierre Dubois</h5>
+                <p>French Academy, Montreal</p>
+              </div>
             </div>
           </div>
         </div>
-
-        <!-- Assessment Tools Feature -->
-        <div class="col-lg-6 col-xl-4">
-          <div class="card h-100 border-0 shadow-xs">
-            <div class="card-body text-center text-lg-start p-4 p-lg-5">
-              <div class="feature-icon-wrapper d-flex align-items-center justify-content-center justify-content-lg-start mb-3">
-                <div class="feature-icon-box d-flex align-items-center justify-content-center me-4">
-                  <i class="ti ti-clipboard-check ti-lg text-primary"></i>
-                </div>
-                <h5 class="mb-0">Assessment Tools</h5>
-              </div>
-              <p class="mb-3">Create quizzes, tests, and assignments to track student progress and provide feedback.</p>
-              <a href="{% url 'front_pages:assessment-tools' %}" class="btn btn-outline-primary btn-sm">Learn More</a>
+        
+        <div class="col-lg-4 mb-4">
+          <div class="testimonial-card">
+            <div class="quote-icon">
+              <i class="ti ti-quote"></i>
             </div>
-          </div>
-        </div>
-
-        <!-- Student Management Feature -->
-        <div class="col-lg-6 col-xl-4">
-          <div class="card h-100 border-0 shadow-xs">
-            <div class="card-body text-center text-lg-start p-4 p-lg-5">
-              <div class="feature-icon-wrapper d-flex align-items-center justify-content-center justify-content-lg-start mb-3">
-                <div class="feature-icon-box d-flex align-items-center justify-content-center me-4">
-                  <i class="ti ti-users ti-lg text-primary"></i>
-                </div>
-                <h5 class="mb-0">Student Management</h5>
+            <p class="testimonial-text">As a Japanese language school owner, xLearning has helped us scale our offerings while maintaining quality. Our students consistently achieve proficiency faster than with traditional methods.</p>
+            <div class="testimonial-author">
+              <div class="author-avatar">
+                <img src="{% static 'img/avatars/3.png' %}" alt="Teacher Avatar">
               </div>
-              <p class="mb-3">Track student information, progress, and engagement in one comprehensive dashboard.</p>
-              <a href="{% url 'front_pages:student-management' %}" class="btn btn-outline-primary btn-sm">Learn More</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Booking & Payment Feature -->
-        <div class="col-lg-6 col-xl-4">
-          <div class="card h-100 border-0 shadow-xs">
-            <div class="card-body text-center text-lg-start p-4 p-lg-5">
-              <div class="feature-icon-wrapper d-flex align-items-center justify-content-center justify-content-lg-start mb-3">
-                <div class="feature-icon-box d-flex align-items-center justify-content-center me-4">
-                  <i class="ti ti-calendar ti-lg text-primary"></i>
-                </div>
-                <h5 class="mb-0">Booking & Payment</h5>
+              <div class="author-info">
+                <h5>Akiko Tanaka</h5>
+                <p>Tokyo Language Academy</p>
               </div>
-              <p class="mb-3">Manage your availability, allow students to book sessions, and handle payments seamlessly.</p>
-              <a href="{% url 'front_pages:booking-payment' %}" class="btn btn-outline-primary btn-sm">Learn More</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Analytics Feature -->
-        <div class="col-lg-6 col-xl-4">
-          <div class="card h-100 border-0 shadow-xs">
-            <div class="card-body text-center text-lg-start p-4 p-lg-5">
-              <div class="feature-icon-wrapper d-flex align-items-center justify-content-center justify-content-lg-start mb-3">
-                <div class="feature-icon-box d-flex align-items-center justify-content-center me-4">
-                  <i class="ti ti-chart-bar ti-lg text-primary"></i>
-                </div>
-                <h5 class="mb-0">Advanced Analytics</h5>
-              </div>
-              <p class="mb-3">Gain insights into student performance, teaching effectiveness, and business metrics.</p>
-              <a href="#" class="btn btn-outline-primary btn-sm">Learn More</a>
             </div>
           </div>
         </div>
       </div>
     </div>
   </section>
-  <!-- Features: End -->
+  <!-- Testimonials Section: End -->
 
-  <!-- Stats: Start -->
-  <section id="landingStats" class="section-py landing-stats bg-body">
-    <div class="container">
-      <div class="row gy-6">
-        <div class="col-sm-6 col-lg-3">
-          <div class="card border border-primary shadow-none">
-            <div class="card-body text-center">
-              <img src="{% static 'img/front-pages/icons/laptop.png' %}" alt="laptop" class="mb-4" />
-              <h3 class="mb-0">95%</h3>
-              <p class="fw-medium mb-0">
-                Reduction in<br />
-                Administrative Time
-              </p>
+  <!-- Interactive Demo Section: Start -->
+  <section class="interactive-demo" id="demo">
+    <div class="floating-element-1"></div>
+    <div class="floating-element-2"></div>
+    
+    <div class="container demo-container">
+      <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+          <h2 class="mb-3">See xLearning in Action</h2>
+          <p class="lead">Experience our intuitive interface and powerful teaching tools</p>
+        </div>
+      </div>
+      
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="demo-device">
+            <div class="demo-screen">
+              <img src="{% static 'img/front-pages/landing-page/app-screen-1.jpg' %}" alt="xLearning Dashboard" class="demo-image active" id="demoImage1">
+              <img src="{% static 'img/front-pages/landing-page/app-screen-2.jpg' %}" alt="Student Analytics" class="demo-image" id="demoImage2" style="display: none;">
+              <img src="{% static 'img/front-pages/landing-page/app-screen-3.jpg' %}" alt="Lesson Creator" class="demo-image" id="demoImage3" style="display: none;">
+            </div>
+            <div class="demo-controls">
+              <div class="demo-dot active" data-image="demoImage1"></div>
+              <div class="demo-dot" data-image="demoImage2"></div>
+              <div class="demo-dot" data-image="demoImage3"></div>
             </div>
           </div>
         </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card border border-success shadow-none">
-            <div class="card-body text-center">
-              <img src="{% static 'img/front-pages/icons/user-success.png' %}" alt="laptop" class="mb-4" />
-              <h3 class="mb-0">2,000+</h3>
-              <p class="fw-medium mb-0">
-                Teachers using<br />
-                xLearning
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card border border-info shadow-none">
-            <div class="card-body text-center">
-              <img src="{% static 'img/front-pages/icons/diamond-info.png' %}" alt="laptop" class="mb-4" />
-              <h3 class="mb-0">4.8/5</h3>
-              <p class="fw-medium mb-0">
-                Average Teacher<br />
-                Satisfaction
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-lg-3">
-          <div class="card border border-warning shadow-none">
-            <div class="card-body text-center">
-              <img src="{% static 'img/front-pages/icons/check-warning.png' %}" alt="laptop" class="mb-4" />
-              <h3 class="mb-0">14 days</h3>
-              <p class="fw-medium mb-0">
-                Free Trial<br />
-                Available
-              </p>
-            </div>
-          </div>
+      </div>
+      
+      <div class="row mt-5">
+        <div class="col-12 text-center">
+          <a href="#" class="btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#demoModal">
+            <i class="ti ti-player-play me-2"></i> Watch Full Demo
+          </a>
         </div>
       </div>
     </div>
   </section>
-  <!-- Stats: End -->
-
-  <!-- Testimonials: Start -->
-  <section id="landingTestimonials" class="section-py">
-    <div class="container">
-      <div class="text-center mb-4">
-        <span class="badge bg-label-primary">Testimonials</span>
-      </div>
-      <h4 class="text-center mb-1">
-        <span class="position-relative fw-extrabold z-1">Trusted by educators
-          <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="section title icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
-        </span>
-        worldwide
-      </h4>
-      <p class="text-center pb-2 mb-5">Hear what language teachers have to say about xLearning</p>
-
-      <div class="swiper testimonial-swiper">
-        <div class="swiper-wrapper">
-          <div class="swiper-slide">
-            <div class="card h-100">
-              <div class="card-body text-center text-lg-start p-4 p-lg-5">
-                <img src="{% static 'img/front-pages/icons/quote.png' %}" alt="quote" class="mb-4" />
-                <p class="mb-4">The student progress tracking features have been invaluable. I can pinpoint exactly where each student needs help and tailor my lessons accordingly.</p>
-                <div class="text-center text-lg-start">
-                  <h6 class="mb-1">John Chen</h6>
-                  <p class="mb-0">Mandarin Instructor, Toronto</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide">
-            <div class="card h-100">
-              <div class="card-body text-center text-lg-start p-4 p-lg-5">
-                <img src="{% static 'img/front-pages/icons/quote.png' %}" alt="quote" class="mb-4" />
-                <p class="mb-4">As the director of a language school with 15 teachers, xLearning has streamlined our entire operation. The multi-teacher support is excellent.</p>
-                <div class="text-center text-lg-start">
-                  <h6 class="mb-1">Sarah Johnson</h6>
-                  <p class="mb-0">Language School Director, London</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="swiper-pagination"></div>
-      </div>
-    </div>
-  </section>
-  <!-- Testimonials: End -->
+  <!-- Interactive Demo Section: End -->
  
   <!-- Pricing Preview: Start -->
   <section id="landingPricing" class="section-py">
     <div class="container">
-      <div class="text-center mb-4">
-        <span class="badge bg-label-primary">Pricing</span>
-      </div>
+ 
       <h4 class="text-center mb-1">
         <span class="position-relative fw-extrabold z-1">Flexible plans
           <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="section title icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
         </span>
-        for every teacher
+        for every Learner
       </h4>
       <p class="text-center pb-2 mb-5">Choose the plan that fits your teaching needs</p>
 
@@ -865,7 +1030,7 @@
             <div class="card-header">
               <div class="text-center">
                 <img src="{% static 'img/front-pages/icons/paper-airplane.png' %}" alt="paper airplane icon" class="mb-4 pb-2" />
-                <h4 class="mb-1">Solo Teacher</h4>
+                <h4 class="mb-1">Beginner</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <h1 class="text-primary mb-0 price-monthly">$19</h1>
                   <h1 class="text-primary mb-0 price-yearly d-none">$14</h1>
@@ -904,7 +1069,7 @@
             </div>
             <div class="card-body">
               <ul class="list-unstyled mb-4">
-                <li class="mb-2"><i class="ti ti-check text-primary me-2"></i> Everything in Solo Teacher</li>
+                <li class="mb-2"><i class="ti ti-check text-primary me-2"></i> Everything in Beginner</li>
                 <li class="mb-2"><i class="ti ti-check text-primary me-2"></i> Up to 30 students</li>
                 <li class="mb-2"><i class="ti ti-check text-primary me-2"></i> Advanced assessment tools</li>
                 <li class="mb-2"><i class="ti ti-check text-primary me-2"></i> Student communication portal</li>
@@ -950,13 +1115,112 @@
   </section>
   <!-- Pricing Preview: End -->
 
+  <!-- Features Grid Section: Start -->
+  <section id="featuresGrid" class="section-py bg-body">
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+          <h2 class="mb-3">Everything You Need to Teach Languages</h2>
+          <p class="lead">Comprehensive tools designed specifically for language education</p>
+        </div>
+      </div>
+      
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon-box">
+                  <i class="ti ti-bulb text-primary fs-3"></i>
+                </div>
+                <h5 class="ms-3 mb-0">Interactive Lessons</h5>
+              </div>
+              <p class="card-text">Create engaging multimedia lessons with audio, video, and interactive exercises to immerse students in language learning.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon-box">
+                  <i class="ti ti-chart-dots text-primary fs-3"></i>
+                </div>
+                <h5 class="ms-3 mb-0">Progress Analytics</h5>
+              </div>
+              <p class="card-text">Track individual and class performance with detailed analytics that highlight strengths and areas for improvement.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon-box">
+                  <i class="ti ti-calendar text-primary fs-3"></i>
+                </div>
+                <h5 class="ms-3 mb-0">Smart Scheduling</h5>
+              </div>
+              <p class="card-text">Organize classes, assign homework, and schedule assessments with our intuitive calendar system.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon-box">
+                  <i class="ti ti-file-text text-primary fs-3"></i>
+                </div>
+                <h5 class="ms-3 mb-0">Assessment Tools</h5>
+              </div>
+              <p class="card-text">Create and administer customized quizzes, tests, and assignments that automatically grade student responses.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon-box">
+                  <i class="ti ti-users text-primary fs-3"></i>
+                </div>
+                <h5 class="ms-3 mb-0">Collaborative Learning</h5>
+              </div>
+              <p class="card-text">Enable student interaction through discussion boards, group projects, and peer review exercises.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon-box">
+                  <i class="ti ti-device-laptop text-primary fs-3"></i>
+                </div>
+                <h5 class="ms-3 mb-0">Multi-Device Access</h5>
+              </div>
+              <p class="card-text">Students can learn anytime, anywhere with our responsive platform that works on computers, tablets, and smartphones.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Features Grid Section: End -->
+
   <!-- CTA: Start -->
   <section id="landingCTA" class="section-py landing-cta position-relative p-lg-0 pb-0">
     <img src="{% static 'img/front-pages/backgrounds/cta-bg-' %}{{ COOKIES.style|default:style }}.png" class="position-absolute bottom-0 end-0 scaleX-n1-rtl h-100 w-100 z-n1" alt="cta image" data-app-light-img="front-pages/backgrounds/cta-bg-light.png" data-app-dark-img="front-pages/backgrounds/cta-bg-dark.png" />
     <div class="container">
       <div class="row align-items-center gy-5">
         <div class="col-lg-6 text-start text-sm-center text-lg-start">
-          <h3 class="cta-title text-primary fw-bold mb-2">Ready to Transform Your Teaching?</h3>
+          <h3 class="cta-title text-primary fw-bold mb-2">Ready to Transform Your Learning?</h3>
           <h5 class="text-body mb-4">Start with a 14-day free trial. No credit card required.</h5>
           <a href="{% url 'account:register' %}" class="btn btn-lg btn-primary">Get Started</a>
         </div>
@@ -968,6 +1232,58 @@
   </section>
   <!-- CTA: End -->
 
+  <!-- Language Partners Section: Start -->
+  <section class="section-py bg-body">
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+          <h2 class="mb-3">Trusted by Language Schools Worldwide</h2>
+          <p class="lead">Join thousands of language institutions improving their teaching outcomes</p>
+        </div>
+      </div>
+      
+      <div class="row justify-content-center g-4">
+        <div class="col-lg-2 col-md-3 col-4">
+          <div class="card border-0 shadow-none">
+            <div class="card-body text-center p-3">
+              <img src="{% static 'img/front-pages/partners/partner-1.png' %}" alt="Partner Logo" class="img-fluid opacity-75 h-auto" style="max-height: 60px;">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-4">
+          <div class="card border-0 shadow-none">
+            <div class="card-body text-center p-3">
+              <img src="{% static 'img/front-pages/partners/partner-2.png' %}" alt="Partner Logo" class="img-fluid opacity-75 h-auto" style="max-height: 60px;">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-4">
+          <div class="card border-0 shadow-none">
+            <div class="card-body text-center p-3">
+              <img src="{% static 'img/front-pages/partners/partner-3.png' %}" alt="Partner Logo" class="img-fluid opacity-75 h-auto" style="max-height: 60px;">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-4">
+          <div class="card border-0 shadow-none">
+            <div class="card-body text-center p-3">
+              <img src="{% static 'img/front-pages/partners/partner-4.png' %}" alt="Partner Logo" class="img-fluid opacity-75 h-auto" style="max-height: 60px;">
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-3 col-4">
+          <div class="card border-0 shadow-none">
+            <div class="card-body text-center p-3">
+              <img src="{% static 'img/front-pages/partners/partner-5.png' %}" alt="Partner Logo" class="img-fluid opacity-75 h-auto" style="max-height: 60px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Language Partners Section: End -->
+
+  <!-- Final CTA with Curved Background: Start -->
   <section class="py-5 bg-gradient-primary position-relative">
     <div class="position-absolute top-0 start-0 w-100">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none" class="w-100" style="height: 60px;">
@@ -983,9 +1299,11 @@
                 <i class="ti ti-user-shield fs-2"></i>
               </div>
             </div>
-            <h2 class="display-6 text-white mt-4 pt-3 mb-3">Ready to Transform Your Teaching?</</h2>
-            <p class="lead text-white-50 mb-4">Gain insights into student performance, teaching effectiveness, and business metrics.
-               
+            <h2 class="display-6 text-white mt-4 pt-3 mb-3">Transform Your Language Teaching Today</h2>
+            <p class="lead text-white-50 mb-4">Join thousands of educators who've revolutionized their teaching with xLearning</p>
+            <div class="d-flex justify-content-center gap-3">
+              <a href="{% url 'account:register' %}" class="btn btn-lg btn-light">Start Free Trial</a>
+              <a href="{% url 'front_pages:contact' %}" class="btn btn-lg btn-outline-light">Contact Sales</a>
             </div>
           </div>
         </div>
@@ -997,6 +1315,82 @@
       </svg>
     </div>
   </section>
+  <!-- Final CTA with Curved Background: End -->
   
 {% endblock %}
                
+{% block page_js %}
+{{ block.super }}
+<script src="{% static 'js/front-page-landing.js' %}"></script>
+<script>
+  // Promo Carousel Functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const slides = document.querySelectorAll('.promo-slide');
+    const indicators = document.querySelectorAll('.promo-indicator');
+    let currentSlide = 0;
+    
+    function showSlide(index) {
+      // Hide all slides
+      slides.forEach(slide => {
+        slide.classList.remove('active');
+      });
+      
+      // Remove active class from all indicators
+      indicators.forEach(indicator => {
+        indicator.classList.remove('active');
+      });
+      
+      // Show the current slide and activate indicator
+      slides[index].classList.add('active');
+      indicators[index].classList.add('active');
+    }
+    
+    // Initial display
+    showSlide(currentSlide);
+    
+    // Auto-rotate slides
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }, 5000);
+    
+    // Click on indicators
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => {
+        currentSlide = index;
+        showSlide(currentSlide);
+      });
+    });
+    
+    // Interactive Demo Section Functionality
+    const demoImages = document.querySelectorAll('.demo-image');
+    const demoDots = document.querySelectorAll('.demo-dot');
+    
+    demoDots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        // Hide all images
+        demoImages.forEach(img => {
+          img.style.display = 'none';
+        });
+        
+        // Remove active class from all dots
+        demoDots.forEach(d => {
+          d.classList.remove('active');
+        });
+        
+        // Show the selected image and activate dot
+        const imageId = dot.getAttribute('data-image');
+        document.getElementById(imageId).style.display = 'block';
+        dot.classList.add('active');
+      });
+    });
+    
+    // Auto-rotate demo images
+    let currentDemo = 0;
+    setInterval(() => {
+      currentDemo = (currentDemo + 1) % demoDots.length;
+      demoDots[currentDemo].click();
+    }, 4000);
+  });
+</script>
+{% endblock page_js %}

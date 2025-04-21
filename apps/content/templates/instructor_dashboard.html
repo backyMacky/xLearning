@@ -1,0 +1,660 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Instructor Dashboard - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/fullcalendar/fullcalendar.css' %}" />
+
+<style>
+    /* Timeline styles */
+    .timeline-horizontal {
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    
+    .timeline-container {
+      display: flex;
+      flex-direction: column;
+      min-width: 100%;
+    }
+    
+    .timeline-item {
+      display: flex;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .timeline-item:last-child {
+      border-bottom: none;
+    }
+    
+    .timeline-badge {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+    
+    .timeline-badge i {
+      color: white;
+    }
+    
+    .timeline-content {
+      flex: 1;
+    }
+  </style>
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/fullcalendar/fullcalendar.js' %}"></script>
+<script src="{% static 'vendor/libs/moment/moment.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<!-- Information Alert for Non-Teachers -->
+{% if not is_teacher %}
+<div class="alert alert-info">
+  <div class="d-flex">
+    <i class="ti ti-info-circle me-2"></i>
+    <div>
+      <strong>Note:</strong> {{ non_teacher_message }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Profile Creation Prompt if Needed -->
+{% if not has_instructor_profile %}
+<div class="card mb-4">
+  <div class="card-body text-center py-5">
+    <div class="avatar avatar-lg mx-auto mb-3">
+      <span class="avatar-initial rounded-circle bg-label-primary">
+        <i class="ti ti-user-plus"></i>
+      </span>
+    </div>
+    <h4 class="mb-2">Become an Instructor</h4>
+    <p class="mb-4">Create your instructor profile to start teaching and hosting sessions on the platform.</p>
+    <a href="{{ create_profile_url }}" class="btn btn-primary">Create Instructor Profile</a>
+  </div>
+</div>
+
+{% else %}
+<!-- Instructor Dashboard Content -->
+<!-- Stats Overview Cards -->
+<div class="row">
+  <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="card-info">
+            <p class="card-text">Students</p>
+            <div class="d-flex align-items-end mb-2">
+              <h4 class="card-title mb-0 me-2">{{ total_students|default:"0" }}</h4>
+              <small class="text-success">+5%</small>
+            </div>
+            <small>Total students taught</small>
+          </div>
+          <div class="card-icon">
+            <span class="badge bg-label-primary rounded p-2">
+              <i class="ti ti-users ti-sm"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="card-info">
+            <p class="card-text">Private Sessions</p>
+            <div class="d-flex align-items-end mb-2">
+              <h4 class="card-title mb-0 me-2">{{ total_private_sessions|default:"0" }}</h4>
+              <small class="text-success">+12%</small>
+            </div>
+            <small>Total private sessions</small>
+          </div>
+          <div class="card-icon">
+            <span class="badge bg-label-info rounded p-2">
+              <i class="ti ti-user-check ti-sm"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="card-info">
+            <p class="card-text">Group Sessions</p>
+            <div class="d-flex align-items-end mb-2">
+              <h4 class="card-title mb-0 me-2">{{ total_group_sessions|default:"0" }}</h4>
+              <small class="text-success">+8%</small>
+            </div>
+            <small>Total group sessions</small>
+          </div>
+          <div class="card-icon">
+            <span class="badge bg-label-success rounded p-2">
+              <i class="ti ti-users-group ti-sm"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div class="card-info">
+            <p class="card-text">Rating</p>
+            <div class="d-flex align-items-end mb-2">
+              <h4 class="card-title mb-0 me-2">{{ rating|default:"0" }}/5</h4>
+              <div class="text-warning">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= rating %}
+                    <i class="ti ti-star-filled ti-xs"></i>
+                  {% else %}
+                    <i class="ti ti-star ti-xs"></i>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <small>Based on student reviews</small>
+          </div>
+          <div class="card-icon">
+            <span class="badge bg-label-warning rounded p-2">
+              <i class="ti ti-star ti-sm"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Row -->
+<div class="row">
+  <!-- Left Column -->
+  <div class="col-xl-8 col-lg-7 mb-4">
+    <!-- Upcoming Sessions Schedule -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Upcoming Sessions</h5>
+        <div>
+          <a href="{% url 'content:create_private_slot' %}" class="btn btn-primary btn-sm me-1">
+            <i class="ti ti-plus me-1"></i> Private Slot
+          </a>
+          <a href="{% url 'content:create_group_session' %}" class="btn btn-outline-primary btn-sm">
+            <i class="ti ti-plus me-1"></i> Group Session
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="instructor-calendar"></div>
+      </div>
+    </div>
+    
+    <!-- Available Session Slots -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Available Slots</h5>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="availableDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ti ti-plus me-1"></i> Add New
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="availableDropdown">
+            <li><a class="dropdown-item" href="{% url 'content:create_private_slot' %}">Private Session Slot</a></li>
+            <li><a class="dropdown-item" href="{% url 'content:create_group_session' %}">Group Session</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Date & Time</th>
+              <th>Duration</th>
+              <th>Language & Level</th>
+              <th>Price</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if booked_slots %}
+              {% for slot in booked_slots %}
+                <tr>
+                  <td>
+                    <span class="badge bg-label-primary">Private</span>
+                  </td>
+                  <td>{{ slot.start_time|date:"M d, Y" }} at {{ slot.start_time|time:"H:i" }}</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar avatar-sm me-2">
+                        {% if slot.student.profile.profile_image %}
+                          <img src="{{ slot.student.profile.profile_image.url }}" alt="{{ slot.student.username }}" class="rounded-circle">
+                        {% else %}
+                          <div class="avatar-initial rounded-circle bg-label-secondary">
+                            <i class="ti ti-user ti-xs"></i>
+                          </div>
+                        {% endif %}
+                      </div>
+                      <span>{{ slot.student.username }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-label-{% if slot.start_time|date:'U'|add:'0' < now|date:'U'|add:'0' %}secondary{% else %}success{% endif %}">
+                      {% if slot.start_time|date:'U'|add:'0' < now|date:'U'|add:'0' %}Past{% else %}Upcoming{% endif %}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      {% if slot.meeting_link and slot.start_time|date:'U'|add:'0' > now|date:'U'|add:'-3600' and slot.start_time|date:'U'|add:'0' < now|date:'U'|add:'7200' %}
+                        <a href="{{ slot.meeting_link }}" target="_blank" class="btn btn-sm btn-icon btn-primary" data-bs-toggle="tooltip" title="Join Meeting">
+                          <i class="ti ti-video"></i>
+                        </a>
+                      {% endif %}
+                      <a href="#" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="View Details">
+                        <i class="ti ti-eye"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% endif %}
+            
+            {% if upcoming_group_sessions %}
+              {% for session in upcoming_group_sessions %}
+                {% if session.students.count > 0 %}
+                <tr>
+                  <td>
+                    <span class="badge bg-label-success">Group</span>
+                  </td>
+                  <td>{{ session.start_time|date:"M d, Y" }} at {{ session.start_time|time:"H:i" }}</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="me-1">{{ session.students.count }} student{% if session.students.count > 1 %}s{% endif %}</span>
+                      <div class="avatar-group">
+                        {% for student in session.students.all|slice:":3" %}
+                          <div class="avatar avatar-xs">
+                            {% if student.profile.profile_image %}
+                              <img src="{{ student.profile.profile_image.url }}" alt="{{ student.username }}" class="rounded-circle">
+                            {% else %}
+                              <div class="avatar-initial rounded-circle bg-label-secondary">
+                                <i class="ti ti-user ti-xs"></i>
+                              </div>
+                            {% endif %}
+                          </div>
+                        {% endfor %}
+                        {% if session.students.count > 3 %}
+                          <div class="avatar avatar-xs">
+                            <div class="avatar-initial rounded-circle bg-label-secondary">
+                              <span>+{{ session.students.count|add:"-3" }}</span>
+                            </div>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-label-{% if session.start_time|date:'U'|add:'0' < now|date:'U'|add:'0' %}secondary{% else %}success{% endif %}">
+                      {% if session.start_time|date:'U'|add:'0' < now|date:'U'|add:'0' %}Past{% else %}Upcoming{% endif %}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      {% if session.meeting_link and session.start_time|date:'U'|add:'0' > now|date:'U'|add:'-3600' and session.start_time|date:'U'|add:'0' < now|date:'U'|add:'7200' %}
+                        <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-icon btn-primary" data-bs-toggle="tooltip" title="Join Meeting">
+                          <i class="ti ti-video"></i>
+                        </a>
+                      {% endif %}
+                      <a href="{% url 'content:group_session_detail' session_id=session.id %}" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="View Details">
+                        <i class="ti ti-eye"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+            
+            {% if not booked_slots and not upcoming_group_sessions or booked_slots.count == 0 and upcoming_group_sessions.count == 0 %}
+              <tr>
+                <td colspan="5" class="text-center py-3">
+                  <p class="mb-0">No bookings yet. Students will appear here once they book your sessions.</p>
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right Column -->
+  <div class="col-xl-4 col-lg-5">
+    <!-- Profile Overview Card -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="d-flex align-items-center flex-grow-1">
+            {% if instructor.profile_image %}
+              <img src="{{ instructor.profile_image.url }}" alt="{{ request.user.username }}" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+            {% else %}
+              <div class="avatar me-3">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-user"></i>
+                </div>
+              </div>
+            {% endif %}
+            <div>
+              <h5 class="mb-0">{{ request.user.username }}</h5>
+              <div class="d-flex align-items-center">
+                <div class="text-warning me-2">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= instructor.rating %}
+                      <i class="ti ti-star-filled ti-xs"></i>
+                    {% else %}
+                      <i class="ti ti-star ti-xs"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <small>{{ instructor.rating|default:"0" }}/5 ({{ instructor.review_count|default:"0" }} reviews)</small>
+              </div>
+            </div>
+          </div>
+          <a href="{% url 'content:update_instructor_profile' %}" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="Edit Profile">
+            <i class="ti ti-edit"></i>
+          </a>
+        </div>
+        
+        <div class="mt-3 mb-4 pb-2 border-bottom">
+          {% if instructor.teaching_languages.all %}
+            <div class="mb-2">
+              <span class="text-muted">Languages:</span>
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                {% for language in instructor.teaching_languages.all %}
+                  <span class="badge bg-label-primary">{{ language.name }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+          
+          {% if instructor.specialties.all %}
+            <div class="mb-2">
+              <span class="text-muted">Specialties:</span>
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                {% for specialty in instructor.specialties.all %}
+                  <span class="badge bg-label-info">{{ specialty.name }}</span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+          
+          <div class="mb-2">
+            <span class="text-muted">Hourly Rate:</span>
+            <span class="fw-semibold ms-1">${{ instructor.hourly_rate|default:"0" }}</span>
+          </div>
+          
+          <div class="mb-2">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="availabilityToggle" {% if instructor.is_available %}checked{% endif %}>
+              <label class="form-check-label" for="availabilityToggle">
+                Available for booking
+              </label>
+            </div>
+            <small class="text-muted">Last Updated: {{ instructor.updated_at|date:"M d, Y" }}</small>
+          </div>
+        </div>
+        
+        <div class="d-grid">
+          <a href="{% url 'content:instructor_detail' username=request.user.username %}" class="btn btn-primary" target="_blank">
+            <i class="ti ti-external-link me-1"></i> View Public Profile
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recent Student Reviews -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Recent Reviews</h5>
+        <a href="{% url 'content:instructor_reviews' username=request.user.username %}" class="btn btn-sm btn-outline-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if recent_reviews %}
+          {% for review in recent_reviews %}
+            <div class="d-flex mb-3 {% if not forloop.last %}pb-3 border-bottom{% endif %}">
+              <div class="flex-shrink-0 me-3">
+                {% if review.student.profile_image %}
+                  <img src="{{ review.student.profile_image.url }}" alt="{{ review.student.username }}" class="rounded-circle" width="38" height="38" style="object-fit: cover;">
+                {% else %}
+                  <div class="avatar">
+                    <div class="avatar-initial rounded-circle bg-label-{{ forloop.counter|divisibleby:5|add:1 }}">
+                      <i class="ti ti-user ti-xs"></i>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+              <div>
+                <div class="d-flex align-items-center mb-1">
+                  <h6 class="mb-0 me-2">{{ review.student.username }}</h6>
+                  <div class="text-warning">
+                    {% for i in "12345" %}
+                      {% if forloop.counter <= review.rating %}
+                        <i class="ti ti-star-filled ti-xs"></i>
+                      {% else %}
+                        <i class="ti ti-star ti-xs"></i>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                <p class="mb-1">{{ review.comment|truncatechars:120 }}</p>
+                <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="text-center py-4">
+            <div class="avatar avatar-md mb-3 mx-auto">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-message-circle-off"></i>
+              </div>
+            </div>
+            <h6 class="mb-1">No Reviews Yet</h6>
+            <p class="mb-0">Reviews from your students will appear here</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Student Activity Feed -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Student Activity</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="timeline-horizontal">
+          <div class="timeline-container">
+            <!-- This would be populated with real student activity data -->
+            <div class="timeline-item">
+              <div class="timeline-badge bg-primary">
+                <i class="ti ti-book"></i>
+              </div>
+              <div class="timeline-content">
+                <h6 class="mb-1">John Doe</h6>
+                <p class="mb-0 text-muted small">Completed a lesson</p>
+                <small>Just now</small>
+              </div>
+            </div>
+            
+            <div class="timeline-item">
+              <div class="timeline-badge bg-success">
+                <i class="ti ti-calendar-check"></i>
+              </div>
+              <div class="timeline-content">
+                <h6 class="mb-1">Emma Smith</h6>
+                <p class="mb-0 text-muted small">Booked a session</p>
+                <small>2 hours ago</small>
+              </div>
+            </div>
+            
+            <div class="timeline-item">
+              <div class="timeline-badge bg-info">
+                <i class="ti ti-message-circle"></i>
+              </div>
+              <div class="timeline-content">
+                <h6 class="mb-1">Michael Johnson</h6>
+                <p class="mb-0 text-muted small">Left a review</p>
+                <small>Yesterday</small>
+              </div>
+            </div>
+            
+            <div class="timeline-item">
+              <div class="timeline-badge bg-warning">
+                <i class="ti ti-file-check"></i>
+              </div>
+              <div class="timeline-content">
+                <h6 class="mb-1">Lisa Wang</h6>
+                <p class="mb-0 text-muted small">Submitted an assignment</p>
+                <small>2 days ago</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Availability toggle switch functionality
+    const availabilityToggle = document.getElementById('availabilityToggle');
+    if (availabilityToggle) {
+      availabilityToggle.addEventListener('change', function() {
+        // In a real implementation, this would send an AJAX request to update the instructor's availability
+        fetch('/api/instructor/update-availability/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify({
+            is_available: this.checked
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Show a success message
+          console.log('Availability updated');
+        })
+        .catch(error => {
+          console.error('Error updating availability:', error);
+          // Revert the toggle if there was an error
+          this.checked = !this.checked;
+        });
+      });
+    }
+    
+    {% if has_instructor_profile %}
+    // Initialize calendar
+    const calendarEl = document.getElementById('instructor-calendar');
+    if (calendarEl) {
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        height: 450,
+        events: [
+          {% for slot in available_slots %}
+          {
+            title: 'Available',
+            start: '{{ slot.start_time|date:"Y-m-d" }}T{{ slot.start_time|time:"H:i:s" }}',
+            end: '{{ slot.end_time|date:"Y-m-d" }}T{{ slot.end_time|time:"H:i:s" }}',
+            backgroundColor: '#E7F5FF',
+            borderColor: '#5897FB',
+            textColor: '#3A86FF',
+            extendedProps: {
+              type: 'private',
+              status: 'available'
+            }
+          },
+          {% endfor %}
+          
+          {% for slot in booked_slots %}
+          {
+            title: 'Booked - {{ slot.student.username }}',
+            start: '{{ slot.start_time|date:"Y-m-d" }}T{{ slot.start_time|time:"H:i:s" }}',
+            end: '{{ slot.end_time|date:"Y-m-d" }}T{{ slot.end_time|time:"H:i:s" }}',
+            backgroundColor: '#D1FAE5',
+            borderColor: '#10B981',
+            textColor: '#047857',
+            extendedProps: {
+              type: 'private',
+              status: 'booked'
+            }
+          },
+          {% endfor %}
+          
+          {% for session in upcoming_group_sessions %}
+          {
+            title: 'Group - {{ session.title }}',
+            start: '{{ session.start_time|date:"Y-m-d" }}T{{ session.start_time|time:"H:i:s" }}',
+            end: '{{ session.end_time|date:"Y-m-d" }}T{{ session.end_time|time:"H:i:s" }}',
+            backgroundColor: '#FEF3C7',
+            borderColor: '#F59E0B',
+            textColor: '#92400E',
+            extendedProps: {
+              type: 'group',
+              status: '{{ session.status }}',
+              students: {{ session.students.count }}
+            }
+          },
+          {% endfor %}
+        ],
+        eventClick: function(info) {
+          // Handle click on calendar events
+          const eventType = info.event.extendedProps.type;
+          const eventStatus = info.event.extendedProps.status;
+          
+          // In a real implementation, show a modal with event details
+          console.log('Event clicked:', eventType, eventStatus);
+        }
+      });
+      calendar.render();
+    }
+    {% endif %}
+  });
+</script>
+{% endblock %}

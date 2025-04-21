@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Course Catalog - Learning Platform{% endblock title %}
+{% block title %}Available Instructors - Learning Platform{% endblock title %}
 
 {% block vendor_css %}
 {{ block.super }}
@@ -16,292 +16,272 @@
 {% endblock vendor_js %}
 
 {% block content %}
-<!-- Quick Add Course Button - Fixed at the bottom right -->
-{% if request.user.is_authenticated %}
-<div class="fab-container" style="position: fixed; bottom: 30px; right: 30px; z-index: 999;">
-  <button type="button" class="btn btn-primary btn-lg rounded-circle shadow" data-bs-toggle="modal" data-bs-target="#addCourseModal">
-    <i class="ti ti-plus"></i>
-  </button>
-</div>
-{% endif %}
-
-<div class="card mb-4">
-  <div class="card-header border-bottom">
-    <div class="d-flex justify-content-between align-items-center row">
-      <div class="col-12 col-md-6 d-flex align-items-center">
-        <h5 class="card-title mb-0">Course Catalog</h5>
-        <span class="badge bg-label-primary ms-3">{{ courses.count }} courses</span>
-      </div>
-      <div class="col-12 col-md-6 d-flex justify-content-md-end justify-content-center mt-3 mt-md-0">
-        {% if request.user.is_authenticated %}
-        <a href="{% url 'content:create_course' %}" class="btn btn-primary">
-          <i class="ti ti-plus me-1"></i> Create Course
-        </a>
-        {% endif %}
-      </div>
-    </div>
+<!-- Session Type Toggle -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="mb-0">Find Your Perfect Instructor</h3>
+  
+  <div class="btn-group" role="group" aria-label="Session Type Toggle">
+    <input type="radio" class="btn-check" name="sessionType" id="privateSession" value="private" checked>
+    <label class="btn btn-outline-primary" for="privateSession">
+      <i class="ti ti-user me-1"></i> Private Sessions
+    </label>
+    
+    <input type="radio" class="btn-check" name="sessionType" id="groupSession" value="group">
+    <label class="btn btn-outline-primary" for="groupSession">
+      <i class="ti ti-users me-1"></i> Group Sessions
+    </label>
   </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card mb-4">
   <div class="card-body">
-    <!-- Filters -->
-    <form method="get" action="{% url 'content:course_list' %}" class="mb-4">
-      <div class="row g-3">
-        <div class="col-md-3">
-          <label for="{{ filter_form.language.id_for_label }}" class="form-label">Language</label>
-          {{ filter_form.language }}
-        </div>
-        <div class="col-md-3">
-          <label for="{{ filter_form.level.id_for_label }}" class="form-label">Level</label>
-          {{ filter_form.level }}
-        </div>
-        <div class="col-md-4">
-          <label for="{{ filter_form.q.id_for_label }}" class="form-label">Search</label>
-          {{ filter_form.q }}
-        </div>
-        <div class="col-md-2 d-flex align-items-end">
-          <button type="submit" class="btn btn-primary w-100">
-            <i class="ti ti-search me-1"></i> Filter
-          </button>
-        </div>
+    <form method="get" action="{% url 'content:instructor_list' %}" id="filterForm" class="row g-3">
+      <input type="hidden" name="session_type" id="sessionTypeInput" value="private">
+      
+      <div class="col-md-3">
+        <label for="language-filter" class="form-label">Language</label>
+        <select id="language-filter" name="language" class="form-select">
+          <option value="">All Languages</option>
+          {% for language in languages %}
+            <option value="{{ language.id }}" {% if selected_language == language.id %}selected{% endif %}>{{ language.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <label for="level-filter" class="form-label">Level</label>
+        <select id="level-filter" name="level" class="form-select">
+          <option value="">All Levels</option>
+          {% for level in levels %}
+            <option value="{{ level.id }}" {% if selected_level == level.id %}selected{% endif %}>{{ level.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-4">
+        <label for="keyword-filter" class="form-label">Search</label>
+        <input type="text" id="keyword-filter" name="q" class="form-control" placeholder="Search by name or keywords" value="{{ request.GET.q|default:'' }}">
+      </div>
+      
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="ti ti-search me-1"></i> Filter
+        </button>
       </div>
     </form>
-    
-    <!-- Course Cards -->
-    <div class="row g-4">
-      {% if courses %}
-        {% for course in courses %}
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                  <div class="d-flex flex-column">
-                    {% if course.image %}
-                      <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded img-fluid mb-3" style="max-height: 150px; width: auto;">
+  </div>
+</div>
+
+<!-- Instructor Cards (Private Sessions) -->
+<div id="privateSessionsContainer" class="mb-4">
+  <div class="row g-4">
+    {% if instructors %}
+      {% for instructor in instructors %}
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex flex-column align-items-center text-center mb-3">
+                {% if instructor.profile_image %}
+                  <img src="{{ instructor.profile_image.url }}" alt="{{ instructor.username }}" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
+                {% else %}
+                  <div class="avatar mb-2" style="width: 100px; height: 100px;">
+                    <div class="avatar-initial rounded-circle bg-label-{{ forloop.counter|divisibleby:3|yesno:"primary,success,info" }}">
+                      <i class="ti ti-user ti-lg"></i>
+                    </div>
+                  </div>
+                {% endif %}
+                <h5 class="card-title mb-0">{{ instructor.username }}</h5>
+                <p class="text-muted small">
+                  {% if instructor.profile.title %}{{ instructor.profile.title }}{% else %}Language Instructor{% endif %}
+                </p>
+                
+                <div class="d-flex align-items-center mb-2">
+                  {% for language in instructor.languages %}
+                    <span class="badge bg-label-primary me-1">{{ language.name }}</span>
+                  {% endfor %}
+                </div>
+                
+                <div class="rating mb-2">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= instructor.rating %}
+                      <i class="ti ti-star-filled text-warning"></i>
                     {% else %}
-                      <div class="rounded bg-label-primary p-3 mb-3">
-                        <i class="ti ti-book-2 ti-lg"></i>
-                      </div>
+                      <i class="ti ti-star text-muted"></i>
                     {% endif %}
-                    <h5 class="card-title mb-0">{{ course.title }}</h5>
-                    <div class="d-flex align-items-center mt-1">
-                      <span class="badge bg-label-primary me-2">{{ course.language.name }}</span>
-                      <span class="badge bg-label-info">{{ course.level.code }}</span>
-                    </div>
-                  </div>
-                  {% if course.is_featured %}
-                    <span class="badge bg-warning">Featured</span>
-                  {% endif %}
+                  {% endfor %}
+                  <span class="text-muted ms-1">({{ instructor.review_count }})</span>
                 </div>
-                
-                <p class="card-text mb-3">{{ course.description|truncatechars:120 }}</p>
-                
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar avatar-sm me-2">
-                      {% if course.teacher.profile.profile_image %}
-                        <img src="{{ course.teacher.profile.profile_image.url }}" alt="{{ course.teacher.username }}" class="rounded-circle">
-                      {% else %}
-                        <div class="avatar-initial rounded-circle bg-label-secondary">
-                          <i class="ti ti-user"></i>
-                        </div>
-                      {% endif %}
-                    </div>
-                    <small>{{ course.teacher.username }}</small>
-                  </div>
-                  <small class="text-muted">{{ course.duration_weeks }} week{{ course.duration_weeks|pluralize }}</small>
+              </div>
+              
+              <p class="card-text">{{ instructor.bio|truncatechars:120 }}</p>
+              
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                  <i class="ti ti-clock me-1"></i>
+                  <small>Session: 1 hour</small>
                 </div>
-                
-                <div class="d-grid gap-2">
-                  <a href="{% url 'content:course_detail' slug=course.slug %}" class="btn btn-primary">View Course</a>
+                <div>
+                  <small class="fw-bold">${{ instructor.hourly_rate }}/hour</small>
                 </div>
+              </div>
+
+              {% if instructor.next_available_slot %}
+                <div class="alert alert-light-primary text-center mb-3">
+                  <i class="ti ti-calendar-event me-1"></i> Next available:
+                  <strong>{{ instructor.next_available_slot|date:"M d" }} at {{ instructor.next_available_slot|time:"H:i" }}</strong>
+                </div>
+              {% endif %}
+              
+              <div class="d-grid gap-2">
+                <a href="{% url 'content:instructor_detail' username=instructor.username %}" class="btn btn-primary">View Profile</a>
+                {% if instructor.next_available_slot_id %}
+                  <a href="{% url 'booking:book_slot' slot_id=instructor.next_available_slot_id %}" class="btn btn-outline-primary">
+                    <i class="ti ti-calendar-plus me-1"></i> Book Session
+                  </a>
+                {% endif %}
               </div>
             </div>
           </div>
-        {% endfor %}
-      {% else %}
-        <div class="col-12 text-center py-5">
-          <div class="avatar avatar-md mb-3">
-            <div class="avatar-initial rounded-circle bg-label-primary">
-              <i class="ti ti-search ti-md"></i>
-            </div>
-          </div>
-          <h5>No courses found</h5>
-          <p>Try adjusting your search or filter criteria</p>
-          <a href="{% url 'content:course_list' %}" class="btn btn-primary">Clear Filters</a>
         </div>
-      {% endif %}
-    </div>
-    
-    <!-- Pagination -->
-    {% if is_paginated %}
-    <div class="d-flex justify-content-center mt-4">
-      <nav aria-label="Page navigation">
-        <ul class="pagination">
-          {% if page_obj.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
-                <i class="ti ti-chevrons-left"></i>
-              </a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
-                <i class="ti ti-chevron-left"></i>
-              </a>
-            </li>
-          {% endif %}
-
-          {% for num in paginator.page_range %}
-            {% if page_obj.number == num %}
-              <li class="page-item active">
-                <span class="page-link">{{ num }}</span>
-              </li>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
-              </li>
-            {% endif %}
-          {% endfor %}
-
-          {% if page_obj.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
-                <i class="ti ti-chevron-right"></i>
-              </a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
-                <i class="ti ti-chevrons-right"></i>
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-search ti-md"></i>
+              </div>
+            </div>
+            <h5>No instructors found</h5>
+            <p>Try adjusting your search or filter criteria</p>
+            <a href="{% url 'content:instructor_list' %}" class="btn btn-primary">Clear Filters</a>
+          </div>
+        </div>
+      </div>
     {% endif %}
   </div>
 </div>
 
-<!-- Quick Add Course Modal -->
-{% if request.user.is_authenticated %}
-<div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addCourseModalLabel">Create New Course</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form method="post" action="{% url 'content:create_course' %}" enctype="multipart/form-data" id="quickCourseForm">
-          {% csrf_token %}
-          
-          <div class="mb-3">
-            <label for="quick-course-title" class="form-label">Course Title</label>
-            <input type="text" class="form-control" id="quick-course-title" name="title" placeholder="Enter course title" required>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="quick-course-language" class="form-label">Language</label>
-              <select class="form-select" id="quick-course-language" name="language" required>
-                <option value="">Select language</option>
-                <!-- Hardcoded language options -->
-                <option value="1">English</option>
-                <option value="2">French</option>
-                <option value="3">Spanish</option>
-                <option value="4">Swahili</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label for="quick-course-level" class="form-label">Level</label>
-              <select class="form-select" id="quick-course-level" name="level" required>
-                <option value="">Select level</option>
-                <!-- Hardcoded level options -->
-                <option value="1">A1 - Beginner</option>
-                <option value="2">A2 - Elementary</option>
-                <option value="3">B1 - Intermediate</option>
-                <option value="4">B2 - Upper Intermediate</option>
-                <option value="5">C1 - Advanced</option>
-                <option value="6">C2 - Proficient</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label for="quick-course-description" class="form-label">Description</label>
-            <textarea class="form-control" id="quick-course-description" name="description" rows="4" placeholder="Enter course description" required></textarea>
-          </div>
-
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label for="quick-course-duration" class="form-label">Duration (weeks)</label>
-              <input type="number" class="form-control" id="quick-course-duration" name="duration_weeks" min="1" value="8">
-            </div>
-            <div class="col-md-6">
-              <label for="quick-course-image" class="form-label">Course Image (optional)</label>
-              <input type="file" class="form-control" id="quick-course-image" name="image">
-            </div>
-          </div>
-
-          <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" id="quick-course-published" name="is_published">
-            <label class="form-check-label" for="quick-course-published">Publish immediately</label>
-          </div>
-
-          <div class="form-check form-switch mb-3">
-            <input class="form-check-input" type="checkbox" id="quick-course-featured" name="is_featured">
-            <label class="form-check-label" for="quick-course-featured">Feature this course</label>
-          </div>
-          
-          <div class="alert alert-info">
-            <div class="d-flex">
-              <i class="ti ti-info-circle me-2"></i>
-              <div>
-                <p class="mb-0">After creating the course, you'll be able to add modules and lessons to structure your content.</p>
+<!-- Group Sessions Container (Initially Hidden) -->
+<div id="groupSessionsContainer" class="mb-4" style="display: none;">
+  <div class="row g-4">
+    {% if group_sessions %}
+      {% for session in group_sessions %}
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="avatar me-3">
+                  {% if session.teacher.profile_image %}
+                    <img src="{{ session.teacher.profile_image.url }}" alt="{{ session.teacher.username }}" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+                  {% else %}
+                    <div class="avatar-initial rounded-circle bg-label-{{ forloop.counter|divisibleby:3|yesno:"primary,success,info" }}">
+                      <i class="ti ti-users"></i>
+                    </div>
+                  {% endif %}
+                </div>
+                <div>
+                  <h5 class="card-title mb-0">{{ session.title }}</h5>
+                  <p class="text-muted mb-0">by {{ session.teacher.username }}</p>
+                </div>
+              </div>
+              
+              <div class="d-flex mb-2">
+                <span class="badge bg-label-primary me-1">{{ session.language.name }}</span>
+                <span class="badge bg-label-info me-1">{{ session.level.name }}</span>
+                <span class="badge bg-label-success">Group</span>
+              </div>
+              
+              <p class="card-text">{{ session.description|truncatechars:100 }}</p>
+              
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="small">
+                  <i class="ti ti-users me-1"></i> {{ session.students.count }} / {{ session.max_students }} enrolled
+                </div>
+                <div class="small">
+                  <i class="ti ti-clock me-1"></i> {{ session.duration_minutes }} minutes
+                </div>
+              </div>
+              
+              <div class="alert alert-light-primary text-center mb-3">
+                <i class="ti ti-calendar-event me-1"></i> 
+                <strong>{{ session.start_time|date:"M d" }} at {{ session.start_time|time:"H:i" }}</strong>
+              </div>
+              
+              <div class="d-grid gap-2">
+                <a href="{% url 'content:group_session_detail' session_id=session.id %}" class="btn btn-primary">View Details</a>
+                
+                {% if session.is_full %}
+                  <button disabled class="btn btn-outline-secondary">
+                    <i class="ti ti-users-off me-1"></i> Session Full
+                  </button>
+                {% elif session.is_enrolled %}
+                  <a href="{% url 'content:group_session_detail' session_id=session.id %}" class="btn btn-outline-success">
+                    <i class="ti ti-check me-1"></i> Enrolled
+                  </a>
+                {% else %}
+                  <a href="{% url 'booking:enroll_group_session' session_id=session.id %}" class="btn btn-outline-primary">
+                    <i class="ti ti-user-plus me-1"></i> Join Session
+                  </a>
+                {% endif %}
               </div>
             </div>
           </div>
-        </form>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body text-center py-5">
+            <div class="avatar avatar-md mb-3">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-users ti-md"></i>
+              </div>
+            </div>
+            <h5>No group sessions available</h5>
+            <p>Check back soon for upcoming group sessions</p>
+            <a href="{% url 'content:instructor_list' %}" class="btn btn-primary">
+              <i class="ti ti-user me-1"></i> Browse Private Sessions
+            </a>
+          </div>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="document.getElementById('quickCourseForm').submit();">Create Course</button>
-      </div>
-    </div>
+    {% endif %}
   </div>
 </div>
-{% endif %}
 
-<!-- Featured Courses -->
-{% if featured_courses %}
-<div class="card">
+<!-- Featured Instructors Section -->
+{% if featured_instructors %}
+<div class="card mt-4">
   <div class="card-header">
-    <h5 class="card-title">Featured Courses</h5>
+    <h5 class="card-title">Featured Instructors</h5>
   </div>
   <div class="card-body">
     <div class="row g-4">
-      {% for course in featured_courses %}
-        <div class="col-md-6 col-lg-4">
+      {% for instructor in featured_instructors %}
+        <div class="col-md-3">
           <div class="card h-100 shadow-sm">
-            <div class="card-body">
-              <div class="d-flex align-items-center mb-3">
-                {% if course.image %}
-                  <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded me-3" style="height: 60px; width: 60px; object-fit: cover;">
+            <div class="card-body text-center">
+              <div class="mb-3">
+                {% if instructor.profile_image %}
+                  <img src="{{ instructor.profile_image.url }}" alt="{{ instructor.username }}" class="rounded-circle" style="width: 70px; height: 70px; object-fit: cover;">
                 {% else %}
-                  <div class="avatar me-3">
-                    <div class="avatar-initial rounded bg-label-primary">
-                      <i class="ti ti-book-2"></i>
+                  <div class="avatar mx-auto">
+                    <div class="avatar-initial rounded-circle bg-label-{{ forloop.counter|divisibleby:3|yesno:"primary,success,info" }}">
+                      <i class="ti ti-user"></i>
                     </div>
                   </div>
                 {% endif %}
-                <div>
-                  <h6 class="mb-0">{{ course.title }}</h6>
-                  <small>{{ course.language.name }} - {{ course.level.code }}</small>
-                </div>
               </div>
-              <p class="card-text small mb-2">{{ course.description|truncatechars:80 }}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <small>By {{ course.teacher.username }}</small>
-                <a href="{% url 'content:course_detail' slug=course.slug %}" class="btn btn-sm btn-primary">View</a>
+              <h6 class="mb-1">{{ instructor.username }}</h6>
+              <div class="d-flex justify-content-center mb-2">
+                {% for language in instructor.languages|slice:":2" %}
+                  <span class="badge bg-label-primary me-1">{{ language.name }}</span>
+                {% endfor %}
               </div>
+              <a href="{% url 'content:instructor_detail' username=instructor.username %}" class="btn btn-sm btn-primary mt-2">View Profile</a>
             </div>
           </div>
         </div>
@@ -318,10 +298,44 @@
     // Initialize select2 for dropdowns
     $('.form-select').select2();
     
-    // Initialize select2 for modal dropdowns
-    $('#quick-course-language, #quick-course-level').select2({
-      dropdownParent: $('#addCourseModal')
+    // Handle session type toggle
+    const privateSessionsContainer = document.getElementById('privateSessionsContainer');
+    const groupSessionsContainer = document.getElementById('groupSessionsContainer');
+    const sessionTypeInput = document.getElementById('sessionTypeInput');
+    const privateSessionToggle = document.getElementById('privateSession');
+    const groupSessionToggle = document.getElementById('groupSession');
+    
+    privateSessionToggle.addEventListener('change', function() {
+      if (this.checked) {
+        privateSessionsContainer.style.display = 'block';
+        groupSessionsContainer.style.display = 'none';
+        sessionTypeInput.value = 'private';
+      }
     });
+    
+    groupSessionToggle.addEventListener('change', function() {
+      if (this.checked) {
+        privateSessionsContainer.style.display = 'none';
+        groupSessionsContainer.style.display = 'block';
+        sessionTypeInput.value = 'group';
+      }
+    });
+    
+    // Set initial state based on URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionType = urlParams.get('session_type');
+    
+    if (sessionType === 'group') {
+      groupSessionToggle.checked = true;
+      privateSessionsContainer.style.display = 'none';
+      groupSessionsContainer.style.display = 'block';
+      sessionTypeInput.value = 'group';
+    } else {
+      privateSessionToggle.checked = true;
+      privateSessionsContainer.style.display = 'block';
+      groupSessionsContainer.style.display = 'none';
+      sessionTypeInput.value = 'private';
+    }
   });
 </script>
 {% endblock %}

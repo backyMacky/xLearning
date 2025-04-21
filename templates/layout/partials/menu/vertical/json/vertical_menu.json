@@ -29,28 +29,34 @@
       "menu_header": "Learning Platform"
     },
     {
-      "name": "Courses",
-      "icon": "menu-icon tf-icons ti ti-book",
-      "slug": "content",
+      "name": "Instructor Dashboard",
+      "icon": "menu-icon tf-icons ti ti-chalkboard",
+      "slug": "instructor",
       "submenu": [
         {
-          "url": "/content/courses/",
+          "url": "/content/instructor-dashboard/",
           "external": true,
-          "name": "All Courses",
-          "slug": "content-courses"
+          "name": "Overview",
+          "slug": "instructor-dashboard"
         },
         {
-          "url": "/content/lessons/",
+          "url": "/content/private-sessions/create/",
           "external": true,
-          "name": "My Lessons",
-          "slug": "content-lessons"
+          "name": "Add Private Sessions",
+          "slug": "create-private-slot"
         },
         {
-          "url": "/content/resources/",
+          "url": "/content/group-sessions/create/",
           "external": true,
-          "name": "Resources",
-          "slug": "content-resources"
-        }
+          "name": "Create Group Session",
+          "slug": "create-group-session"
+        },
+        {
+          "url": "/content/instructors/{{ request.user.username }}/",
+          "external": true,
+          "name": "My Profile",
+          "slug": "instructor-profile"
+        }        
       ]
     },
     {
@@ -172,33 +178,33 @@
       ]
     },
     {
-      "name": "Booking",
-      "icon": "menu-icon tf-icons ti ti-clock",
+      "name": "Booking & Credits",
+      "icon": "menu-icon tf-icons ti ti-calendar-event",
       "slug": "booking",
       "submenu": [
         {
           "url": "/booking/",
           "external": true,
-          "name": "Dashboard",
+          "name": "Booking Dashboard",
           "slug": "booking-dashboard"
         },
         {
-          "url": "/booking/slots/create/",
+          "url": "/booking/my-sessions/",
           "external": true,
-          "name": "Create Slots",
-          "slug": "booking-create"
+          "name": "My Sessions",
+          "slug": "my-sessions"
         },
         {
           "url": "/booking/credits/purchase/",
           "external": true,
           "name": "Purchase Credits",
-          "slug": "booking-credits"
+          "slug": "purchase-credits"
         },
         {
           "url": "/booking/credits/history/",
           "external": true,
           "name": "Transaction History",
-          "slug": "booking-transactions"
+          "slug": "transaction-history"
         }
       ]
     },

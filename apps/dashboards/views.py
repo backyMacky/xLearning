@@ -6,12 +6,18 @@ from datetime import timedelta, datetime
 from django.db.models import Count, Sum, Avg, Q
 from web_project import TemplateLayout
 
+# Import User model and UserType from account app
+from django.contrib.auth.models import User
+from apps.account.models import UserType
+
 # Import models from different apps
 from apps.content.models import Course, Lesson
 from apps.repository.models import TeacherResource, StudentFile
 from apps.meetings.models import Meeting
-from apps.booking.models import BookingSlot, CreditTransaction
+# Fix: Update import to use the correct models from booking app
+from apps.booking.models import PrivateSessionSlot, GroupSession, CreditTransaction
 from apps.assessment.models import Quiz, Answer
+
 
 
 class DashboardOverviewView(LoginRequiredMixin, TemplateView):
@@ -519,7 +525,7 @@ class TeacherDashboardView(LoginRequiredMixin, TemplateView):
                 # Provide some sample data or fetch data for all teachers
                 try:
                     # Get teacher users
-                    teacher_users = User.objects.filter(is_teacher=True)
+                    teacher_users = User.objects.filter(user_type=UserType.TEACHER)
                     
                     if teacher_users.exists():
                         # Use the first teacher's data for demonstration
@@ -839,6 +845,7 @@ class TeacherDashboardView(LoginRequiredMixin, TemplateView):
             return 'Audio'
         else:
             return 'File'
+        
 
 class StudentDashboardView(LoginRequiredMixin, TemplateView):
     """Student-specific dashboard view"""
@@ -1149,19 +1156,22 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
         try:
             # Get available booking slots for the next 7 days
             next_week = now + timedelta(days=7)
-            booking_slots = BookingSlot.objects.filter(
+            # Use PrivateSessionSlot instead of BookingSlot
+            booking_slots = PrivateSessionSlot.objects.filter(
                 status='available',
                 start_time__gte=now,
                 start_time__lt=next_week
             ).order_by('start_time')[:5]
             
             for slot in booking_slots:
+                # Assuming 'teacher' should be the username of the instructor's user
+                instructor_username = slot.instructor.user.username if hasattr(slot.instructor, 'user') else "Unknown"
                 available_slots.append({
                     'id': slot.id,
-                    'teacher': slot.teacher.username,
+                    'teacher': instructor_username,
                     'date': slot.start_time.strftime('%b %d'),
                     'time': slot.start_time.strftime('%I:%M %p'),
-                    'duration': slot.duration,
+                    'duration': slot.duration_minutes,
                     'day_of_week': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][slot.start_time.weekday()]
                 })
         except:
@@ -1258,73 +1268,4 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
             pass
         
         context['recommended_courses'] = recommended_courses
-        
         return context
-    
-    def _get_time_ago(self, date_time):
-        """Helper method to format time ago from datetime"""
-        now = timezone.now()
-        
-        # Handle both datetime objects and IDs
-        if not isinstance(date_time, timezone.datetime):
-            # Just a placeholder for demo - in a real app you'd use the correct timestamp
-            import random
-            days_ago = random.randint(0, 14)
-            date_time = now - timedelta(days=days_ago, 
-                                      hours=random.randint(0, 23), 
-                                      minutes=random.randint(0, 59))
-        
-        diff = now - date_time
-        
-        if diff.days > 7:
-            return date_time.strftime('%b %d, %Y')
-        elif diff.days > 0:
-            return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
-        elif diff.seconds >= 3600:
-            hours = diff.seconds // 3600
-            return f"{hours} hour{'s' if hours > 1 else ''} ago"
-        elif diff.seconds >= 60:
-            minutes = diff.seconds // 60
-            return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
-        else:
-            return "Just now"
-
-    def _parse_time_ago(self, time_ago_str):
-        """Helper method to parse time ago string for sorting"""
-        if 'Just now' in time_ago_str:
-            return 0
-        elif 'minute' in time_ago_str:
-            return int(time_ago_str.split()[0]) * 60
-        elif 'hour' in time_ago_str:
-            return int(time_ago_str.split()[0]) * 3600
-        elif 'day' in time_ago_str:
-            return int(time_ago_str.split()[0]) * 86400
-        else:
-            # For dates in format "Feb 23, 2023"
-            try:
-                dt = datetime.strptime(time_ago_str, '%b %d, %Y')
-                now = timezone.now()
-                return (now - dt).total_seconds()
-            except:
-                return 999999999  # Very old
-                
-    def _get_file_type(self, filename):
-        """Helper method to get file type from filename"""
-        ext = filename.split('.')[-1].lower() if '.' in filename else ''
-        
-        if ext in ['pdf']:
-            return 'PDF'
-        elif ext in ['doc', 'docx']:
-            return 'Document'
-        elif ext in ['xls', 'xlsx']:
-            return 'Spreadsheet'
-        elif ext in ['ppt', 'pptx']:
-            return 'Presentation'
-        elif ext in ['jpg', 'jpeg', 'png', 'gif']:
-            return 'Image'
-        elif ext in ['mp4', 'avi', 'mov', 'webm']:
-            return 'Video'
-        elif ext in ['mp3', 'wav', 'ogg']:
-            return 'Audio'
-        else:
-            return 'File'

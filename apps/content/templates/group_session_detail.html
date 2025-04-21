@@ -1,0 +1,409 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ session.title }} - Group Session - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <!-- Session Details Card -->
+  <div class="col-xl-8 col-lg-7 mb-4">
+    <div class="card">
+      <div class="card-header border-bottom">
+        <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+          <div>
+            <a href="{% url 'content:group_session_list' %}" class="text-muted mb-2 d-inline-block">
+              <i class="ti ti-arrow-left me-1"></i> Back to Group Sessions
+            </a>
+            <h4 class="card-title mb-0 mt-1">{{ session.title }}</h4>
+          </div>
+          
+          <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+            <span class="badge bg-label-primary me-1">{{ session.language.name }}</span>
+            <span class="badge bg-label-info">{{ session.level.name }}</span>
+            
+            {% if session.start_time|date:"U"|add:"0" < now|date:"U"|add:"300" %}
+              <span class="badge bg-label-warning">Starting Soon</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-md-8">
+            <!-- Session description -->
+            <h5 class="mb-3">About This Session</h5>
+            <div class="mb-4">
+              {{ session.description|safe }}
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <!-- Session details -->
+            <div class="card bg-label-primary bg-opacity-10 border-0">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded bg-primary">
+                      <i class="ti ti-calendar-event text-white"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">{{ session.start_time|date:"l, F j" }}</h6>
+                    <span>{{ session.start_time|time:"g:i A" }}</span>
+                  </div>
+                </div>
+                
+                <div class="d-flex align-items-center mb-3">
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded bg-primary">
+                      <i class="ti ti-clock text-white"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">{{ session.duration_minutes }} minutes</h6>
+                    <span>Session duration</span>
+                  </div>
+                </div>
+                
+                <div class="d-flex align-items-center mb-3">
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded bg-primary">
+                      <i class="ti ti-users text-white"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">{{ session.students.count }}/{{ session.max_students }} enrolled</h6>
+                    <div class="progress mt-1" style="height: 6px; width: 100px;">
+                      <div class="progress-bar bg-primary" style="width: {{ session.enrollment_percentage }}%"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded bg-primary">
+                      <i class="ti ti-currency-dollar text-white"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">${{ session.price }}</h6>
+                    <span>Session price</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <!-- Learning Objectives -->
+        <h5 class="mb-3">What You'll Learn</h5>
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <ul class="ps-3">
+              <li class="mb-2">Practice {{ session.language.name }} in an interactive group setting</li>
+              <li class="mb-2">Improve your speaking skills with guidance from an expert instructor</li>
+              <li class="mb-2">Learn alongside peers at your same {{ session.level.name }} level</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <ul class="ps-3">
+              <li class="mb-2">Get personalized feedback on your language use</li>
+              <li class="mb-2">Build confidence in real-world communication scenarios</li>
+              <li class="mb-2">Connect with fellow language learners</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Session Structure -->
+        <h5 class="mb-3">Session Structure</h5>
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card shadow-none border mb-3">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center">
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded-circle bg-label-primary">
+                      <span>1</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Introduction & Warm-up (10 min)</h6>
+                    <p class="mb-0 text-muted small">Meet your instructor and fellow learners, and participate in a quick warm-up activity</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card shadow-none border mb-3">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center">
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded-circle bg-label-primary">
+                      <span>2</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Core Session Content (30-40 min)</h6>
+                    <p class="mb-0 text-muted small">Interactive activities focused on this session's learning objectives</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card shadow-none border">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center">
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded-circle bg-label-primary">
+                      <span>3</span>
+                    </div>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Practice & Feedback (10-15 min)</h6>
+                    <p class="mb-0 text-muted small">Apply what you've learned with personalized feedback from the instructor</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Prerequisites -->
+        <h5 class="mb-3">Prerequisites</h5>
+        <p>This session is designed for {{ session.level.name }} level learners of {{ session.language.name }}. You should be comfortable with basic conversation in {{ session.language.name }} and have some familiarity with the language fundamentals.</p>
+        
+        <!-- Action Button for Mobile -->
+        <div class="d-md-none mt-4">
+          {% if is_enrolled %}
+            <div class="alert alert-success d-flex align-items-center mb-3">
+              <i class="ti ti-check-circle me-2"></i>
+              <div>You are enrolled in this session</div>
+            </div>
+            {% if session.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" %}
+              <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-primary btn-lg w-100">
+                <i class="ti ti-video me-1"></i> Join Session Now
+              </a>
+            {% else %}
+              <a href="{% url 'booking:my_bookings' %}" class="btn btn-outline-primary btn-lg w-100">
+                <i class="ti ti-calendar me-1"></i> View My Bookings
+              </a>
+            {% endif %}
+          {% elif session.is_full %}
+            <button disabled class="btn btn-secondary btn-lg w-100">
+              <i class="ti ti-users-off me-1"></i> Session Full
+            </button>
+          {% else %}
+            <a href="{% url 'booking:enroll_group_session' session_id=session.id %}" class="btn btn-primary btn-lg w-100">
+              <i class="ti ti-user-plus me-1"></i> Join This Session
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sidebar -->
+  <div class="col-xl-4 col-lg-5 mb-4">
+    <!-- Enrollment Card -->
+    <div class="card mb-4 d-none d-md-block sticky-md-top" style="top: 80px; z-index: 1;">
+      <div class="card-body">
+        <h5 class="card-title">Session Enrollment</h5>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="text-primary mb-0">${{ session.price }}</h4>
+          </div>
+          <div>
+            <span class="badge bg-label-{{ session.is_full|yesno:"danger,success" }}">
+              {{ available_slots }} slot{{ available_slots|pluralize }} available
+            </span>
+          </div>
+        </div>
+        
+        <div class="alert alert-light-primary mb-3">
+                        <div class="d-flex">
+            <i class="ti ti-calendar-event me-2"></i>
+            <div>
+              <div><strong>{{ session.start_time|date:"l, F j" }}</strong></div>
+              <div>{{ session.start_time|time:"g:i A" }} - {{ session.duration_minutes }} minutes</div>
+            </div>
+          </div>
+        </div>
+        
+        {% if is_enrolled %}
+          <div class="alert alert-success d-flex align-items-center mb-3">
+            <i class="ti ti-check-circle me-2"></i>
+            <div>You are enrolled in this session</div>
+          </div>
+          {% if session.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" %}
+            <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-primary btn-lg w-100">
+              <i class="ti ti-video me-1"></i> Join Session Now
+            </a>
+          {% else %}
+            <a href="{% url 'booking:my_bookings' %}" class="btn btn-outline-primary btn-lg w-100">
+              <i class="ti ti-calendar me-1"></i> View My Bookings
+            </a>
+          {% endif %}
+        {% elif session.is_full %}
+          <button disabled class="btn btn-secondary btn-lg w-100">
+            <i class="ti ti-users-off me-1"></i> Session Full
+          </button>
+        {% else %}
+          <a href="{% url 'booking:enroll_group_session' session_id=session.id %}" class="btn btn-primary btn-lg w-100">
+            <i class="ti ti-user-plus me-1"></i> Join This Session
+          </a>
+          
+          {% if not request.user.is_authenticated %}
+            <div class="text-center mt-2">
+              <small class="text-muted">You'll need to <a href="{% url 'account:login' %}?next={{ request.path }}">log in</a> to join</small>
+            </div>
+          {% endif %}
+        {% endif %}
+        
+        <div class="mt-4">
+          <div class="d-flex justify-content-between mb-1">
+            <span>Enrollment</span>
+            <span>{{ session.students.count }}/{{ session.max_students }}</span>
+          </div>
+          <div class="progress mb-3" style="height: 6px;">
+            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ session.enrollment_percentage }}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Instructor Card -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">About the Instructor</h5>
+        
+        <div class="d-flex mb-3">
+          <div class="flex-shrink-0 me-3">
+            {% if instructor.profile_image %}
+              <img src="{{ instructor.profile_image.url }}" alt="{{ instructor.user.username }}" class="rounded-circle" width="60" height="60" style="object-fit: cover;">
+            {% else %}
+              <div class="avatar">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-user"></i>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div>
+            <h6 class="mb-0">{{ instructor.user.username }}</h6>
+            <div class="d-flex align-items-center">
+              <div class="rating me-2">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= instructor.rating %}
+                    <i class="ti ti-star-filled text-warning ti-xs"></i>
+                  {% else %}
+                    <i class="ti ti-star text-muted ti-xs"></i>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <span class="small">({{ instructor.review_count }})</span>
+            </div>
+            <div class="mt-1">
+              <span class="badge bg-label-primary">{{ session.language.name }} Teacher</span>
+            </div>
+          </div>
+        </div>
+        
+        <p class="instructor-bio">{{ instructor.bio|truncatechars:150 }}</p>
+        
+        <a href="{% url 'content:instructor_detail' username=instructor.user.username %}" class="btn btn-outline-primary btn-sm w-100">
+          <i class="ti ti-user-circle me-1"></i> View Instructor Profile
+        </a>
+      </div>
+    </div>
+    
+    <!-- Enrolled Students -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title">Enrolled Students ({{ enrolled_students.count }})</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if enrolled_students %}
+          <ul class="list-group list-group-flush">
+            {% for student in enrolled_students|slice:":5" %}
+              <li class="list-group-item">
+                <div class="d-flex align-items-center">
+                  <div class="avatar me-3">
+                    {% if student.profile.profile_image %}
+                      <img src="{{ student.profile.profile_image.url }}" alt="{{ student.username }}" class="rounded-circle">
+                    {% else %}
+                      <div class="avatar-initial rounded-circle bg-label-{{ forloop.counter|divisibleby:5|add:1 }}">
+                        <i class="ti ti-user ti-sm"></i>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div>
+                    <h6 class="mb-0">{{ student.username }}</h6>
+                    <small class="text-muted">Joined {{ student.date_joined|date:"M Y" }}</small>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+            
+            {% if enrolled_students.count > 5 %}
+              <li class="list-group-item text-center">
+                <span class="text-muted">And {{ enrolled_students.count|add:"-5" }} more students</span>
+              </li>
+            {% endif %}
+          </ul>
+        {% else %}
+          <div class="p-4 text-center">
+            <p class="mb-0">No students enrolled yet. Be the first to join!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Related Sessions -->
+{% if related_sessions %}
+<div class="card mt-2">
+  <div class="card-header">
+    <h5 class="card-title">Similar Group Sessions</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      {% for related in related_sessions %}
+        <div class="col-md-4">
+          <div class="card shadow-none border h-100">
+            <div class="card-body">
+              <h6 class="card-title">{{ related.title }}</h6>
+              <div class="d-flex mb-2">
+                <span class="badge bg-label-primary me-1">{{ related.language.name }}</span>
+                <span class="badge bg-label-info">{{ related.level.name }}</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="small text-muted">
+                  <i class="ti ti-calendar-event me-1"></i>
+                  {{ related.start_time|date:"M d" }}
+                </div>
+                <div class="small text-muted">
+                  <i class="ti ti-clock me-1"></i>
+                  {{ related.start_time|time:"H:i" }}
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="fw-semibold">${{ related.price }}</div>
+                <a href="{% url 'content:group_session_detail' session_id=related.id %}" class="btn btn-sm btn-primary">
+                  View
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

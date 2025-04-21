@@ -4,12 +4,19 @@ from . import views
 app_name = 'booking'
 
 urlpatterns = [
-    path('', views.BookingDashboardView.as_view(), name='dashboard'),
-    path('slots/create/', views.CreateBookingSlotView.as_view(), name='create_slot'),
-    path('slots/<int:slot_id>/book/', views.BookSlotView.as_view(), name='book_slot'),
-    path('slots/<int:slot_id>/cancel/', views.CancelBookingView.as_view(), name='cancel_booking'),
+    # Private session booking
+    path('private-sessions/book/<int:slot_id>/', views.BookPrivateSessionView.as_view(), name='book_private_session'),
+    path('private-sessions/cancel/<int:slot_id>/', views.CancelPrivateSessionView.as_view(), name='cancel_private_session'),
+    
+    # Group session booking
+    path('group-sessions/enroll/<int:session_id>/', views.EnrollGroupSessionView.as_view(), name='enroll_group_session'),
+    path('group-sessions/unenroll/<int:session_id>/', views.UnenrollGroupSessionView.as_view(), name='unenroll_group_session'),
+    
+    # Credit management
     path('credits/purchase/', views.PurchaseCreditsView.as_view(), name='purchase_credits'),
     path('credits/history/', views.TransactionHistoryView.as_view(), name='transaction_history'),
-    path('credits/insufficient/', views.InsufficientCreditsView.as_view(), name='insufficient_credits'),
-    path('slots/<int:slot_id>/late-cancellation/', views.LateCancellationView.as_view(), name='late_cancellation'),
+    
+    # Booking dashboard
+    path('', views.BookingDashboardView.as_view(), name='dashboard'),
+    path('my-sessions/', views.MySessionsView.as_view(), name='my_sessions'),
 ]

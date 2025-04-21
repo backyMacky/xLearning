@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %} - Learning Platform{% endblock title %}
+{% block title %}{% if course %}Edit Session: {{ course.title }}{% else %}Create New Session{% endif %} - Learning Platform{% endblock title %}
 
 {% block vendor_css %}
 {{ block.super }}
@@ -28,7 +28,7 @@
     </a>
   </div>
   <div class="card-body">
-    <form method="post" enctype="multipart/form-data" id="courseForm">
+    <form method="post" enctype="multipart/form-data" id="sessionForm">
       {% csrf_token %}
       
       <!-- Form errors -->
@@ -53,24 +53,23 @@
       {% endif %}
       
       <div class="row g-4">
-        <!-- Course Title -->
+        <!-- Session Title -->
         <div class="col-12">
-          <label for="{{ form.title.id_for_label }}" class="form-label">Course Title</label>
+          <label for="{{ form.title.id_for_label }}" class="form-label">Session Title</label>
           {{ form.title }}
           {% if form.title.help_text %}
           <small class="form-text text-muted">{{ form.title.help_text }}</small>
           {% endif %}
         </div>
         
-        <!-- Course Language and Level -->
+        <!-- Session Language and Level -->
         <div class="col-md-6">
           <label for="{{ form.language.id_for_label }}" class="form-label">Language</label>
           <select name="language" id="{{ form.language.id_for_label }}" class="form-select" required>
             <option value="">Select language</option>
-            <option value="1" {% if form.instance.language.id == 1 %}selected{% endif %}>English</option>
-            <option value="2" {% if form.instance.language.id == 2 %}selected{% endif %}>French</option>
-            <option value="3" {% if form.instance.language.id == 3 %}selected{% endif %}>Spanish</option>
-            <option value="4" {% if form.instance.language.id == 4 %}selected{% endif %}>Swahili</option>
+            {% for language in languages %}
+              <option value="{{ language.id }}" {% if form.instance.language.id == language.id %}selected{% endif %}>{{ language.name }}</option>
+            {% endfor %}
           </select>
           {% if form.language.help_text %}
           <small class="form-text text-muted">{{ form.language.help_text }}</small>
@@ -80,36 +79,49 @@
           <label for="{{ form.level.id_for_label }}" class="form-label">Level</label>
           <select name="level" id="{{ form.level.id_for_label }}" class="form-select" required>
             <option value="">Select level</option>
-            <option value="1" {% if form.instance.level.id == 1 %}selected{% endif %}>A1 - Beginner</option>
-            <option value="2" {% if form.instance.level.id == 2 %}selected{% endif %}>A2 - Elementary</option>
-            <option value="3" {% if form.instance.level.id == 3 %}selected{% endif %}>B1 - Intermediate</option>
-            <option value="4" {% if form.instance.level.id == 4 %}selected{% endif %}>B2 - Upper Intermediate</option>
-            <option value="5" {% if form.instance.level.id == 5 %}selected{% endif %}>C1 - Advanced</option>
-            <option value="6" {% if form.instance.level.id == 6 %}selected{% endif %}>C2 - Proficient</option>
+            {% for level in levels %}
+              <option value="{{ level.id }}" {% if form.instance.level.id == level.id %}selected{% endif %}>{{ level.code }} - {{ level.name }}</option>
+            {% endfor %}
           </select>
           {% if form.level.help_text %}
           <small class="form-text text-muted">{{ form.level.help_text }}</small>
           {% endif %}
         </div>
         
-        <!-- Course Duration -->
+        <!-- Session Duration -->
         <div class="col-md-6">
-          <label for="{{ form.duration_weeks.id_for_label }}" class="form-label">Duration (weeks)</label>
-          {{ form.duration_weeks }}
-          {% if form.duration_weeks.help_text %}
-          <small class="form-text text-muted">{{ form.duration_weeks.help_text }}</small>
-          {% endif %}
+          <label for="session_duration" class="form-label">Duration</label>
+          <div class="row">
+            <div class="col-6">
+              <select name="duration_hours" id="duration_hours" class="form-select">
+                <option value="0" {% if duration_hours == 0 %}selected{% endif %}>0 hours</option>
+                <option value="1" {% if duration_hours == 1 %}selected{% endif %}>1 hour</option>
+                <option value="2" {% if duration_hours == 2 %}selected{% endif %}>2 hours</option>
+                <option value="3" {% if duration_hours == 3 %}selected{% endif %}>3 hours</option>
+                <option value="4" {% if duration_hours == 4 %}selected{% endif %}>4 hours</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <select name="duration_minutes" id="duration_minutes" class="form-select">
+                <option value="0" {% if duration_minutes == 0 %}selected{% endif %}>0 minutes</option>
+                <option value="15" {% if duration_minutes == 15 %}selected{% endif %}>15 minutes</option>
+                <option value="30" {% if duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
+                <option value="45" {% if duration_minutes == 45 %}selected{% endif %}>45 minutes</option>
+              </select>
+            </div>
+          </div>
+          <small class="form-text text-muted">Total session duration</small>
+          
+          <input type="hidden" name="duration_weeks" id="duration_weeks" value="1">
         </div>
         
-        <!-- Course Image -->
+        <!-- Instructor Image -->
         <div class="col-md-6">
-          <label for="{{ form.image.id_for_label }}" class="form-label">Course Image</label>
+          <label for="{{ form.image.id_for_label }}" class="form-label">Instructor Image</label>
           <div class="input-group">
             {{ form.image }}
           </div>
-          {% if form.image.help_text %}
-          <small class="form-text text-muted">{{ form.image.help_text }}</small>
-          {% endif %}
+          <small class="form-text text-muted">Upload your profile image or a session-relevant image</small>
           
           {% if course and course.image %}
           <div class="mt-2">
@@ -119,7 +131,7 @@
           {% endif %}
         </div>
         
-        <!-- Course Description -->
+        <!-- Session Description -->
         <div class="col-12">
           <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
           {{ form.description }}
@@ -128,16 +140,16 @@
           {% endif %}
         </div>
         
-        <!-- Course Settings -->
+        <!-- Session Settings -->
         <div class="col-12">
-          <h6 class="fw-semibold">Course Settings</h6>
+          <h6 class="fw-semibold">Session Settings</h6>
           <div class="row">
             <div class="col-md-6">
               <div class="form-check form-switch mb-2">
                 {{ form.is_published }}
                 <label class="form-check-label" for="{{ form.is_published.id_for_label }}">
                   Published
-                  <small class="d-block text-muted">Make this course visible to students</small>
+                  <small class="d-block text-muted">Make this session visible to students</small>
                 </label>
               </div>
             </div>
@@ -146,7 +158,7 @@
                 {{ form.is_featured }}
                 <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
                   Featured
-                  <small class="d-block text-muted">Highlight this course on the platform</small>
+                  <small class="d-block text-muted">Highlight this session on the platform</small>
                 </label>
               </div>
             </div>
@@ -164,12 +176,12 @@
 </div>
 
 {% if course %}
-<!-- Module Management Section -->
+<!-- Scheduled Sessions Section -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="card-title mb-0">Course Modules</h5>
-    <a href="{% url 'content:create_module' course_slug=course.slug %}" class="btn btn-primary btn-sm">
-      <i class="ti ti-plus me-1"></i> Add Module
+    <h5 class="card-title mb-0">Scheduled Sessions</h5>
+    <a href="{% url 'booking:create_slot' %}?session_id={{ course.id }}" class="btn btn-primary btn-sm">
+      <i class="ti ti-plus me-1"></i> Schedule New Session
     </a>
   </div>
   <div class="card-body">
@@ -177,45 +189,60 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th style="width: 50px;">Order</th>
-            <th>Title</th>
-            <th>Lessons</th>
+            <th>Date & Time</th>
+            <th>Duration</th>
+            <th>Status</th>
             <th style="width: 150px;">Actions</th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
-          {% for module in course.modules.all|dictsort:"order" %}
-          <tr>
-            <td>{{ module.order }}</td>
-            <td>
-              <strong>{{ module.title }}</strong>
-              {% if module.description %}
-              <p class="text-muted mb-0 small">{{ module.description|truncatechars:60 }}</p>
-              {% endif %}
-            </td>
-            <td>{{ module.lessons.count }}</td>
-            <td>
-              <div class="d-flex gap-2">
-                <a href="{% url 'content:create_lesson' module_id=module.id %}" class="btn btn-sm btn-icon btn-primary" data-bs-toggle="tooltip" title="Add Lesson">
-                  <i class="ti ti-plus"></i>
-                </a>
-                <a href="{% url 'content:edit_module' module_id=module.id %}" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="Edit Module">
-                  <i class="ti ti-edit"></i>
-                </a>
-                <a href="{% url 'content:delete_module' module_id=module.id %}" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="Delete Module">
-                  <i class="ti ti-trash"></i>
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="4" class="text-center py-4">
-              <p class="mb-2">No modules have been created for this course yet.</p>
-              <a href="{% url 'content:create_module' course_slug=course.slug %}" class="btn btn-primary btn-sm">Add First Module</a>
-            </td>
-          </tr>
-          {% endfor %}
+          {% if session_slots %}
+            {% for slot in session_slots %}
+            <tr>
+              <td>{{ slot.start_time|date:"M d, Y" }} at {{ slot.start_time|time:"H:i" }}</td>
+              <td>{{ slot.duration }} minutes</td>
+              <td>
+                <span class="badge bg-label-{% if slot.status == 'available' %}primary{% elif slot.status == 'booked' %}success{% elif slot.status == 'completed' %}info{% else %}secondary{% endif %}">
+                  {{ slot.status|title }}
+                </span>
+                {% if slot.status == 'booked' and slot.student %}
+                  <small class="d-block">{{ slot.student.username }}</small>
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex gap-2">
+                  {% if slot.status == 'available' %}
+                    <a href="{% url 'booking:edit_slot' slot_id=slot.id %}" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="Edit">
+                      <i class="ti ti-edit"></i>
+                    </a>
+                    <form method="post" action="{% url 'booking:delete_slot' slot_id=slot.id %}" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this slot?')">
+                        <i class="ti ti-trash"></i>
+                      </button>
+                    </form>
+                  {% elif slot.status == 'booked' %}
+                    <a href="{% url 'booking:view_booking' slot_id=slot.id %}" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="View">
+                      <i class="ti ti-eye"></i>
+                    </a>
+                    {% if slot.meeting %}
+                      <a href="{{ slot.meeting.meeting_link }}" class="btn btn-sm btn-icon btn-outline-success" data-bs-toggle="tooltip" title="Join Meeting">
+                        <i class="ti ti-video"></i>
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="4" class="text-center py-4">
+                <p class="mb-2">No sessions have been scheduled yet.</p>
+                <a href="{% url 'booking:create_slot' %}?session_id={{ course.id }}" class="btn btn-primary btn-sm">Schedule First Session</a>
+              </td>
+            </tr>
+          {% endif %}
         </tbody>
       </table>
     </div>
@@ -246,10 +273,24 @@
     });
     
     // Sync Quill editor with hidden textarea for form submission
-    var form = document.getElementById('courseForm');
+    var form = document.getElementById('sessionForm');
     form.addEventListener('submit', function() {
       var descriptionInput = document.querySelector('textarea[name="description"]');
       descriptionInput.value = quill.root.innerHTML;
+      
+      // Calculate total minutes for duration_minutes field
+      var hours = parseInt(document.getElementById('duration_hours').value) || 0;
+      var minutes = parseInt(document.getElementById('duration_minutes').value) || 0;
+      var totalMinutes = (hours * 60) + minutes;
+      
+      // Make sure we have at least 15 minutes
+      if (totalMinutes < 15) {
+        alert('Session duration must be at least 15 minutes');
+        return false;
+      }
+      
+      // Set the value to the hidden duration_minutes field
+      document.getElementById('duration_weeks').value = Math.ceil(totalMinutes / (7 * 24 * 60));
     });
     
     // Initialize tooltips

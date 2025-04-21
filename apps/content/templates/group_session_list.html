@@ -1,0 +1,316 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Group Sessions - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<!-- Header Banner -->
+<div class="card bg-primary text-white mb-4">
+  <div class="d-flex flex-column flex-md-row align-items-center p-4">
+    <div class="text-center text-md-start mb-3 mb-md-0">
+      <h3 class="text-white mb-1">Group Learning Sessions</h3>
+      <p class="mb-0">
+        Join interactive group sessions with expert instructors and fellow learners
+      </p>
+    </div>
+    <div class="ms-md-auto">
+      {% if request.user.is_authenticated %}
+        {% if request.user.is_teacher %}
+          <a href="{% url 'content:create_group_session' %}" class="btn btn-light">
+            <i class="ti ti-plus me-1"></i> Create Group Session
+          </a>
+        {% endif %}
+      {% else %}
+        <a href="{% url 'account:login' %}?next={{ request.path }}" class="btn btn-light">
+          <i class="ti ti-login me-1"></i> Login to Join Sessions
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" action="{% url 'content:group_session_list' %}" class="row g-3">
+      <div class="col-md-3">
+        <label for="{{ filter_form.language.id_for_label }}" class="form-label">Language</label>
+        {{ filter_form.language }}
+      </div>
+      
+      <div class="col-md-3">
+        <label for="{{ filter_form.level.id_for_label }}" class="form-label">Level</label>
+        {{ filter_form.level }}
+      </div>
+      
+      <div class="col-md-2">
+        <label for="date-filter" class="form-label">Date</label>
+        <input type="text" id="date-filter" name="date" class="form-control flatpickr" placeholder="Select date" value="{{ request.GET.date|default:'' }}">
+      </div>
+      
+      <div class="col-md-2">
+        <label for="{{ filter_form.q.id_for_label }}" class="form-label">Search</label>
+        {{ filter_form.q }}
+      </div>
+      
+      <div class="col-md-2 d-flex align-items-end">
+        <div class="d-grid w-100">
+          <button type="submit" class="btn btn-primary">
+            <i class="ti ti-search me-1"></i> Filter
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Session Cards -->
+<div class="row g-4">
+  {% if group_sessions %}
+    {% for session in group_sessions %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="d-flex align-items-center">
+                {% if session.instructor.profile_image %}
+                  <img src="{{ session.instructor.profile_image.url }}" alt="{{ session.instructor.user.username }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                {% else %}
+                  <div class="avatar me-2">
+                    <div class="avatar-initial rounded-circle bg-label-primary">
+                      <i class="ti ti-user"></i>
+                    </div>
+                  </div>
+                {% endif %}
+                <div>
+                  <h6 class="mb-0">{{ session.title }}</h6>
+                  <small class="text-muted">by {{ session.instructor.user.username }}</small>
+                </div>
+              </div>
+              {% if session.is_full %}
+                <span class="badge bg-label-secondary">Full</span>
+              {% elif session.start_time|date:"U"|add:"0" < now|date:"U"|add:"300" %}
+                <span class="badge bg-label-warning">Starting Soon</span>
+              {% endif %}
+            </div>
+            
+            <div class="d-flex mb-3">
+              <span class="badge bg-label-primary me-1">{{ session.language.name }}</span>
+              <span class="badge bg-label-info me-1">{{ session.level.name }}</span>
+            </div>
+            
+            <p class="card-text mb-3">{{ session.description|truncatechars:100 }}</p>
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="text-muted small">
+                <i class="ti ti-calendar-event me-1"></i>
+                {{ session.start_time|date:"D, M d" }}
+              </div>
+              <div class="text-muted small">
+                <i class="ti ti-clock me-1"></i>
+                {{ session.start_time|time:"H:i" }} ({{ session.duration_minutes }} min)
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1 small">
+                <span>{{ session.students.count }}/{{ session.max_students }} students</span>
+                <span>{{ session.enrollment_percentage }}% full</span>
+              </div>
+              <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ session.enrollment_percentage }}%"></div>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="fw-semibold">${{ session.price }}</div>
+              <div>
+                {% if session.is_full %}
+                  <button disabled class="btn btn-outline-secondary">
+                    <i class="ti ti-users-off me-1"></i> Full
+                  </button>
+                {% elif session.is_enrolled %}
+                  <a href="{% url 'content:group_session_detail' session_id=session.id %}" class="btn btn-success">
+                    <i class="ti ti-check me-1"></i> Enrolled
+                  </a>
+                {% else %}
+                  <a href="{% url 'content:group_session_detail' session_id=session.id %}" class="btn btn-primary">
+                    <i class="ti ti-info-circle me-1"></i> View Details
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <div class="avatar avatar-lg mb-3 mx-auto">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-calendar-off ti-lg"></i>
+            </div>
+          </div>
+          <h5 class="mb-1">No Group Sessions Found</h5>
+          <p class="text-muted mb-4">
+            {% if request.GET %}
+              No sessions match your current filters. Try adjusting your search criteria.
+            {% else %}
+              There are no upcoming group sessions scheduled at the moment.
+            {% endif %}
+          </p>
+          {% if request.GET %}
+            <a href="{% url 'content:group_session_list' %}" class="btn btn-primary">
+              <i class="ti ti-filter-off me-1"></i> Clear Filters
+            </a>
+          {% else %}
+            <a href="{% url 'content:instructor_list' %}" class="btn btn-primary">
+              <i class="ti ti-user me-1"></i> Browse Instructors
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="d-flex justify-content-center mt-4">
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+            <i class="ti ti-chevrons-left"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+            <i class="ti ti-chevron-left"></i>
+          </a>
+        </li>
+      {% endif %}
+
+      {% for num in paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active">
+            <span class="page-link">{{ num }}</span>
+          </li>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+            <i class="ti ti-chevron-right"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+            <i class="ti ti-chevrons-right"></i>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endif %}
+
+<!-- Session Benefits -->
+<div class="card mt-4">
+  <div class="card-header">
+    <h5 class="card-title">Why Join Group Sessions?</h5>
+  </div>
+  <div class="card-body">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="d-flex">
+          <div class="flex-shrink-0 me-3">
+            <div class="avatar">
+              <div class="avatar-initial rounded bg-label-primary">
+                <i class="ti ti-users"></i>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h6>Learn with Others</h6>
+            <p class="mb-0">Practice in a supportive group environment and build connections with fellow learners</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="d-flex">
+          <div class="flex-shrink-0 me-3">
+            <div class="avatar">
+              <div class="avatar-initial rounded bg-label-success">
+                <i class="ti ti-wallet"></i>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h6>Cost-Effective Learning</h6>
+            <p class="mb-0">Group sessions are more affordable than private lessons while still providing expert instruction</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="d-flex">
+          <div class="flex-shrink-0 me-3">
+            <div class="avatar">
+              <div class="avatar-initial rounded bg-label-info">
+                <i class="ti ti-target"></i>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h6>Focused Topics</h6>
+            <p class="mb-0">Each session covers specific themes or skills to help you achieve targeted learning goals</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize select2 for dropdowns
+    $('.form-select').select2({
+      placeholder: "Select an option"
+    });
+    
+    // Initialize flatpickr for date picker
+    flatpickr(".flatpickr", {
+      altInput: true,
+      altFormat: "F j, Y",
+      dateFormat: "Y-m-d",
+      minDate: "today"
+    });
+  });
+</script>
+{% endblock %}

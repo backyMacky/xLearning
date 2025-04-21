@@ -1,0 +1,314 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Reviews for {{ instructor.user.username }} - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <!-- Instructor Summary Card -->
+  <div class="col-12 mb-4">
+    <div class="card bg-light">
+      <div class="card-body">
+        <div class="d-flex flex-column flex-md-row align-items-center">
+          <div class="me-md-4 mb-3 mb-md-0 text-center">
+            {% if instructor.profile_image %}
+              <img src="{{ instructor.profile_image.url }}" alt="{{ instructor.user.username }}" class="rounded-circle img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+            {% else %}
+              <div class="avatar avatar-xl">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-user ti-lg"></i>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          
+          <div class="flex-grow-1 text-center text-md-start">
+            <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-2">
+              <h4 class="mb-1">{{ instructor.user.username }}</h4>
+              <div>
+                <a href="{% url 'content:instructor_detail' username=instructor.user.username %}" class="btn btn-outline-primary btn-sm">
+                  <i class="ti ti-arrow-left me-1"></i> Back to Profile
+                </a>
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'content:create_review' instructor_id=instructor.id %}" class="btn btn-primary btn-sm ms-2">
+                  <i class="ti ti-star me-1"></i> Write a Review
+                </a>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="d-flex flex-wrap align-items-center mb-2 gap-3">
+              <div class="d-flex align-items-center">
+                <div class="me-2">
+                  <span class="badge rounded-pill bg-warning fs-5 px-3">{{ instructor.rating }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= instructor.rating %}
+                      <i class="ti ti-star-filled text-warning me-1"></i>
+                    {% else %}
+                      <i class="ti ti-star text-muted me-1"></i>
+                    {% endif %}
+                  {% endfor %}
+                  <span class="ms-1">({{ reviews.count }} reviews)</span>
+                </div>
+              </div>
+              
+              <div class="d-flex">
+                {% for language in instructor.teaching_languages.all %}
+                  <span class="badge bg-label-primary me-1">{{ language.name }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            
+            <div class="text-muted d-flex flex-wrap gap-3">
+              <div>
+                <i class="ti ti-clock me-1"></i>
+                <span>{{ instructor.sessions_completed|default:"0" }} sessions completed</span>
+              </div>
+              
+              <div>
+                <i class="ti ti-users me-1"></i>
+                <span>{{ instructor.student_count|default:"0" }} students taught</span>
+              </div>
+              
+              <div>
+                <i class="ti ti-calendar me-1"></i>
+                <span>Member since {{ instructor.user.date_joined|date:"M Y" }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Reviews Section -->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">All Reviews ({{ reviews.count }})</h5>
+        
+        <div class="dropdown">
+          <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="reviewSortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ti ti-sort-descending me-1"></i> Sort by
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="reviewSortDropdown">
+            <li><a class="dropdown-item active" href="?sort=newest">Newest First</a></li>
+            <li><a class="dropdown-item" href="?sort=oldest">Oldest First</a></li>
+            <li><a class="dropdown-item" href="?sort=highest">Highest Rating</a></li>
+            <li><a class="dropdown-item" href="?sort=lowest">Lowest Rating</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <!-- Review Statistics -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="d-flex align-items-center mb-3">
+              <div class="rating-breakdown flex-grow-1 me-3">
+                <div class="d-flex align-items-center mb-1">
+                  <span class="me-2">5 <i class="ti ti-star-filled text-warning"></i></span>
+                  <div class="progress flex-grow-1" style="height: 8px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ rating_percentages.5|default:0 }}%"></div>
+                  </div>
+                  <span class="ms-2">{{ rating_counts.5|default:0 }}</span>
+                </div>
+                <div class="d-flex align-items-center mb-1">
+                  <span class="me-2">4 <i class="ti ti-star-filled text-warning"></i></span>
+                  <div class="progress flex-grow-1" style="height: 8px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ rating_percentages.4|default:0 }}%"></div>
+                  </div>
+                  <span class="ms-2">{{ rating_counts.4|default:0 }}</span>
+                </div>
+                <div class="d-flex align-items-center mb-1">
+                  <span class="me-2">3 <i class="ti ti-star-filled text-warning"></i></span>
+                  <div class="progress flex-grow-1" style="height: 8px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ rating_percentages.3|default:0 }}%"></div>
+                  </div>
+                  <span class="ms-2">{{ rating_counts.3|default:0 }}</span>
+                </div>
+                <div class="d-flex align-items-center mb-1">
+                  <span class="me-2">2 <i class="ti ti-star-filled text-warning"></i></span>
+                  <div class="progress flex-grow-1" style="height: 8px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ rating_percentages.2|default:0 }}%"></div>
+                  </div>
+                  <span class="ms-2">{{ rating_counts.2|default:0 }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="me-2">1 <i class="ti ti-star-filled text-warning"></i></span>
+                  <div class="progress flex-grow-1" style="height: 8px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ rating_percentages.1|default:0 }}%"></div>
+                  </div>
+                  <span class="ms-2">{{ rating_counts.1|default:0 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="row text-center">
+              <div class="col-4">
+                <div class="card shadow-none bg-label-primary h-100">
+                  <div class="card-body">
+                    <h3 class="mb-1">{{ average_rating|floatformat:1 }}</h3>
+                    <span>Average Rating</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="card shadow-none bg-label-success h-100">
+                  <div class="card-body">
+                    <h3 class="mb-1">{{ positive_percentage|default:0 }}%</h3>
+                    <span>Positive Reviews</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="card shadow-none bg-label-info h-100">
+                  <div class="card-body">
+                    <h3 class="mb-1">{{ reviews.count }}</h3>
+                    <span>Total Reviews</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <!-- Reviews List -->
+        {% if reviews %}
+          {% for review in reviews %}
+            <div class="d-flex mb-4 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
+              <div class="flex-shrink-0 me-3">
+                {% if review.student.profile_image %}
+                  <img src="{{ review.student.profile_image.url }}" alt="{{ review.student.username }}" class="rounded-circle" width="48" height="48" style="object-fit: cover;">
+                {% else %}
+                  <div class="avatar">
+                    <div class="avatar-initial rounded-circle bg-label-{{ forloop.counter|divisibleby:5|add:1 }}">
+                      <i class="ti ti-user"></i>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <h6 class="mb-0">{{ review.student.username }}</h6>
+                    <div class="d-flex align-items-center">
+                      <div class="rating me-2">
+                        {% for i in "12345" %}
+                          {% if forloop.counter <= review.rating %}
+                            <i class="ti ti-star-filled text-warning ti-xs"></i>
+                          {% else %}
+                            <i class="ti ti-star text-muted ti-xs"></i>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                      <span class="text-muted small">{{ review.created_at|date:"M d, Y" }}</span>
+                    </div>
+                  </div>
+                  
+                  {% if review.private_session or review.group_session %}
+                  <div>
+                    <span class="badge bg-label-{% if review.private_session %}primary{% else %}info{% endif %}">
+                      {% if review.private_session %}Private Session{% else %}Group Session{% endif %}
+                    </span>
+                  </div>
+                  {% endif %}
+                </div>
+                
+                <p class="mb-2">{{ review.comment }}</p>
+                
+                {% if review.private_session %}
+                <div class="bg-light rounded p-2 small">
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-2 text-primary"></i>
+                    <span>Private session on {{ review.private_session.start_time|date:"M d, Y" }}</span>
+                  </div>
+                </div>
+                {% elif review.group_session %}
+                <div class="bg-light rounded p-2 small">
+                  <div class="d-flex align-items-center">
+                    <i class="ti ti-users me-2 text-info"></i>
+                    <span>Group session: {{ review.group_session.title }} on {{ review.group_session.start_time|date:"M d, Y" }}</span>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+          
+          <!-- Pagination -->
+          {% if page_obj %}
+          <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Reviews pagination">
+              <ul class="pagination">
+                {% if page_obj.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="First">
+                      <i class="ti ti-chevrons-left"></i>
+                    </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
+                      <i class="ti ti-chevron-left"></i>
+                    </a>
+                  </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                  {% if page_obj.number == num %}
+                    <li class="page-item active">
+                      <span class="page-link">{{ num }}</span>
+                    </li>
+                  {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ num }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
+                      <i class="ti ti-chevron-right"></i>
+                    </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Last">
+                      <i class="ti ti-chevrons-right"></i>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+          {% endif %}
+        {% else %}
+          <div class="text-center py-5">
+            <div class="avatar avatar-lg mb-3 mx-auto">
+              <div class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-message-circle-off ti-lg"></i>
+              </div>
+            </div>
+            <h5 class="mb-1">No Reviews Yet</h5>
+            <p class="text-muted">This instructor hasn't received any reviews yet.</p>
+            {% if request.user.is_authenticated and request.user != instructor.user %}
+            <a href="{% url 'content:create_review' instructor_id=instructor.id %}" class="btn btn-primary">
+              <i class="ti ti-star me-1"></i> Be the First to Write a Review
+            </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
