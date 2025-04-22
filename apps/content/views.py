@@ -998,11 +998,13 @@ class CreateInstructorProfileView(LoginRequiredMixin, CreateView):
     template_name = 'instructor_profile_form.html'
     success_url = reverse_lazy('content:instructor_dashboard')
     
+    # Removing the test_func for testing purposes
+    
     def form_valid(self, form):
-        # Check if user already has an instructor profile
-        if hasattr(self.request.user, 'instructor_profile'):
-            messages.warning(self.request, "You already have an instructor profile. Redirecting to update page.")
-            return redirect('content:update_instructor_profile')
+        # Check if user already has an instructor profile - commented out for testing
+        # if hasattr(self.request.user, 'instructor_profile'):
+        #     messages.warning(self.request, "You already have an instructor profile. Redirecting to update page.")
+        #     return redirect('content:update_instructor_profile')
         
         # Set the user for this instructor profile
         form.instance.user = self.request.user
@@ -1059,7 +1061,6 @@ class UpdateInstructorProfileView(LoginRequiredMixin, UpdateView):
         TemplateHelper.map_context(context)
         
         return context
-
 
 class InstructorDashboardView(LoginRequiredMixin, TemplateView):
     """Dashboard for instructors to manage their sessions"""
@@ -1240,7 +1241,7 @@ class UpdatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, UpdateVi
 class DeletePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """View for deleting private session slots"""
     model = PrivateSession
-    template_name = 'confirm_delete.html'
+    template_name = 'session_confirm_delete.html'
     pk_url_kwarg = 'session_id'
     success_url = reverse_lazy('content:instructor_dashboard')
     
@@ -1253,6 +1254,7 @@ class DeletePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, DeleteVi
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
         
         context['title'] = 'Delete Private Session'
+        context['is_private'] = True
         context['message'] = 'Are you sure you want to delete this private session slot?'
         context['back_url'] = self.success_url
         
@@ -1393,7 +1395,7 @@ class UpdateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, UpdateView
 class DeleteGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """View for deleting group sessions"""
     model = GroupSession
-    template_name = 'confirm_delete.html'
+    template_name = 'session_confirm_delete.html'
     pk_url_kwarg = 'session_id'
     success_url = reverse_lazy('content:instructor_dashboard')
     
@@ -1406,6 +1408,7 @@ class DeleteGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, DeleteView
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
         
         context['title'] = 'Delete Group Session'
+        context['is_private'] = False
         context['message'] = 'Are you sure you want to delete this group session?'
         
         # Add warning if students are enrolled

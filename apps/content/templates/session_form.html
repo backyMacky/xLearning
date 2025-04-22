@@ -90,16 +90,24 @@
                 </div>
                 {% endif %}
                 
-                <!-- Language and Level Selections -->
+                <!-- Language and Level Selections with hardcoded options -->
                 <div class="col-md-6">
                   <label for="id_language" class="form-label">Teaching Language</label>
                   <select id="id_language" name="language" class="form-select select2" required>
                     <option value="">Select language</option>
-                    {% for language in languages %}
-                      <option value="{{ language.id }}" {% if form.language.value == language.id or form.instance.language.id == language.id %}selected{% endif %}>
-                        {{ language.name }}
-                      </option>
-                    {% endfor %}
+                    <option value="en" {% if form.language.value == 'en' or form.instance.language == 'en' %}selected{% endif %}>English</option>
+                    <option value="fr" {% if form.language.value == 'fr' or form.instance.language == 'fr' %}selected{% endif %}>French</option>
+                    <option value="es" {% if form.language.value == 'es' or form.instance.language == 'es' %}selected{% endif %}>Spanish</option>
+                    <option value="de" {% if form.language.value == 'de' or form.instance.language == 'de' %}selected{% endif %}>German</option>
+                    <option value="it" {% if form.language.value == 'it' or form.instance.language == 'it' %}selected{% endif %}>Italian</option>
+                    <option value="pt" {% if form.language.value == 'pt' or form.instance.language == 'pt' %}selected{% endif %}>Portuguese</option>
+                    <option value="ru" {% if form.language.value == 'ru' or form.instance.language == 'ru' %}selected{% endif %}>Russian</option>
+                    <option value="zh" {% if form.language.value == 'zh' or form.instance.language == 'zh' %}selected{% endif %}>Chinese</option>
+                    <option value="ja" {% if form.language.value == 'ja' or form.instance.language == 'ja' %}selected{% endif %}>Japanese</option>
+                    <option value="ko" {% if form.language.value == 'ko' or form.instance.language == 'ko' %}selected{% endif %}>Korean</option>
+                    <option value="ar" {% if form.language.value == 'ar' or form.instance.language == 'ar' %}selected{% endif %}>Arabic</option>
+                    <option value="hi" {% if form.language.value == 'hi' or form.instance.language == 'hi' %}selected{% endif %}>Hindi</option>
+                    <option value="sw" {% if form.language.value == 'sw' or form.instance.language == 'sw' %}selected{% endif %}>Swahili</option>
                   </select>
                 </div>
                 
@@ -107,36 +115,41 @@
                   <label for="id_level" class="form-label">Proficiency Level</label>
                   <select id="id_level" name="level" class="form-select select2" required>
                     <option value="">Select level</option>
-                    {% for level in levels %}
-                      <option value="{{ level.id }}" {% if form.level.value == level.id or form.instance.level.id == level.id %}selected{% endif %}>
-                        {{ level.code }} - {{ level.name }}
-                      </option>
-                    {% endfor %}
+                    <option value="A1" {% if form.level.value == 'A1' or form.instance.level == 'A1' %}selected{% endif %}>A1 - Beginner</option>
+                    <option value="A2" {% if form.level.value == 'A2' or form.instance.level == 'A2' %}selected{% endif %}>A2 - Elementary</option>
+                    <option value="B1" {% if form.level.value == 'B1' or form.instance.level == 'B1' %}selected{% endif %}>B1 - Intermediate</option>
+                    <option value="B2" {% if form.level.value == 'B2' or form.instance.level == 'B2' %}selected{% endif %}>B2 - Upper Intermediate</option>
+                    <option value="C1" {% if form.level.value == 'C1' or form.instance.level == 'C1' %}selected{% endif %}>C1 - Advanced</option>
+                    <option value="C2" {% if form.level.value == 'C2' or form.instance.level == 'C2' %}selected{% endif %}>C2 - Proficient</option>
                   </select>
                 </div>
                 
-                <!-- Date & Time Picker -->
+                <!-- Enhanced Date & Time Pickers -->
                 <div class="col-md-6">
                   <label for="session_date" class="form-label">Session Date</label>
-                  <div class="input-group input-group-merge">
+                  <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-calendar"></i></span>
                     <input type="text" id="session_date" name="session_date" class="form-control flatpickr-date" placeholder="Select date"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|date:'Y-m-d' }}"
+                      {% else %}
+                      value=""
                       {% endif %}
-                      readonly required>
+                      required>
                   </div>
                 </div>
                 
                 <div class="col-md-6">
                   <label for="session_time" class="form-label">Session Time</label>
-                  <div class="input-group input-group-merge">
+                  <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-clock"></i></span>
                     <input type="text" id="session_time" name="session_time" class="form-control flatpickr-time" placeholder="Select time"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|time:'H:i' }}"
+                      {% else %}
+                      value=""
                       {% endif %}
-                      readonly required>
+                      required>
                   </div>
                 </div>
                 
@@ -193,16 +206,24 @@
                   <small class="text-muted">Describe what students will learn in this session</small>
                 </div>
                 
-                <!-- Group Language and Level Selections -->
+                <!-- Group Language and Level Selections with hardcoded options -->
                 <div class="col-md-6">
                   <label for="id_group_language" class="form-label">Teaching Language</label>
                   <select id="id_group_language" name="language" class="form-select select2" required>
                     <option value="">Select language</option>
-                    {% for language in languages %}
-                      <option value="{{ language.id }}" {% if form.language.value == language.id or form.instance.language.id == language.id %}selected{% endif %}>
-                        {{ language.name }}
-                      </option>
-                    {% endfor %}
+                    <option value="en" {% if form.language.value == 'en' or form.instance.language == 'en' %}selected{% endif %}>English</option>
+                    <option value="fr" {% if form.language.value == 'fr' or form.instance.language == 'fr' %}selected{% endif %}>French</option>
+                    <option value="es" {% if form.language.value == 'es' or form.instance.language == 'es' %}selected{% endif %}>Spanish</option>
+                    <option value="de" {% if form.language.value == 'de' or form.instance.language == 'de' %}selected{% endif %}>German</option>
+                    <option value="it" {% if form.language.value == 'it' or form.instance.language == 'it' %}selected{% endif %}>Italian</option>
+                    <option value="pt" {% if form.language.value == 'pt' or form.instance.language == 'pt' %}selected{% endif %}>Portuguese</option>
+                    <option value="ru" {% if form.language.value == 'ru' or form.instance.language == 'ru' %}selected{% endif %}>Russian</option>
+                    <option value="zh" {% if form.language.value == 'zh' or form.instance.language == 'zh' %}selected{% endif %}>Chinese</option>
+                    <option value="ja" {% if form.language.value == 'ja' or form.instance.language == 'ja' %}selected{% endif %}>Japanese</option>
+                    <option value="ko" {% if form.language.value == 'ko' or form.instance.language == 'ko' %}selected{% endif %}>Korean</option>
+                    <option value="ar" {% if form.language.value == 'ar' or form.instance.language == 'ar' %}selected{% endif %}>Arabic</option>
+                    <option value="hi" {% if form.language.value == 'hi' or form.instance.language == 'hi' %}selected{% endif %}>Hindi</option>
+                    <option value="sw" {% if form.language.value == 'sw' or form.instance.language == 'sw' %}selected{% endif %}>Swahili</option>
                   </select>
                 </div>
                 
@@ -210,36 +231,37 @@
                   <label for="id_group_level" class="form-label">Proficiency Level</label>
                   <select id="id_group_level" name="level" class="form-select select2" required>
                     <option value="">Select level</option>
-                    {% for level in levels %}
-                      <option value="{{ level.id }}" {% if form.level.value == level.id or form.instance.level.id == level.id %}selected{% endif %}>
-                        {{ level.code }} - {{ level.name }}
-                      </option>
-                    {% endfor %}
+                    <option value="A1" {% if form.level.value == 'A1' or form.instance.level == 'A1' %}selected{% endif %}>A1 - Beginner</option>
+                    <option value="A2" {% if form.level.value == 'A2' or form.instance.level == 'A2' %}selected{% endif %}>A2 - Elementary</option>
+                    <option value="B1" {% if form.level.value == 'B1' or form.instance.level == 'B1' %}selected{% endif %}>B1 - Intermediate</option>
+                    <option value="B2" {% if form.level.value == 'B2' or form.instance.level == 'B2' %}selected{% endif %}>B2 - Upper Intermediate</option>
+                    <option value="C1" {% if form.level.value == 'C1' or form.instance.level == 'C1' %}selected{% endif %}>C1 - Advanced</option>
+                    <option value="C2" {% if form.level.value == 'C2' or form.instance.level == 'C2' %}selected{% endif %}>C2 - Proficient</option>
                   </select>
                 </div>
                 
-                <!-- Group Date & Time Picker -->
+                <!-- Enhanced Group Date & Time Pickers -->
                 <div class="col-md-6">
                   <label for="group_session_date" class="form-label">Session Date</label>
-                  <div class="input-group input-group-merge">
+                  <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-calendar"></i></span>
                     <input type="text" id="group_session_date" name="session_date" class="form-control flatpickr-date" placeholder="Select date"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|date:'Y-m-d' }}"
                       {% endif %}
-                      readonly required>
+                      required>
                   </div>
                 </div>
                 
                 <div class="col-md-6">
                   <label for="group_session_time" class="form-label">Session Time</label>
-                  <div class="input-group input-group-merge">
+                  <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-clock"></i></span>
                     <input type="text" id="group_session_time" name="session_time" class="form-control flatpickr-time" placeholder="Select time"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|time:'H:i' }}"
                       {% endif %}
-                      readonly required>
+                      required>
                   </div>
                 </div>
                 
@@ -276,56 +298,13 @@
                     <option value="5" {% if form.min_students.value == 5 or form.instance.min_students == 5 %}selected{% endif %}>5 students</option>
                   </select>
                 </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Session Preview -->
-          <div class="col-12 mt-4">
-            <div class="card bg-light border">
-              <div class="card-header bg-transparent">
-                <h6 class="card-title mb-0">Session Preview</h6>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6">
-                    <dl class="row mb-0">
-                      <dt class="col-5">Session Type:</dt>
-                      <dd class="col-7" id="preview_type">
-                        {% if is_private %}Private 1-on-1{% else %}Group{% endif %}
-                      </dd>
-                      
-                      <dt class="col-5">Language:</dt>
-                      <dd class="col-7" id="preview_language">
-                        {% if form.instance.language %}{{ form.instance.language.name }}{% else %}---{% endif %}
-                      </dd>
-                      
-                      <dt class="col-5">Level:</dt>
-                      <dd class="col-7" id="preview_level">
-                        {% if form.instance.level %}{{ form.instance.level.name }}{% else %}---{% endif %}
-                      </dd>
-                    </dl>
-                  </div>
-                  <div class="col-md-6">
-                    <dl class="row mb-0">
-                      <dt class="col-5">Date & Time:</dt>
-                      <dd class="col-7" id="preview_datetime">
-                        {% if form.instance.start_time %}{{ form.instance.start_time|date:"M d, Y" }} at {{ form.instance.start_time|time:"H:i" }}{% else %}---{% endif %}
-                      </dd>
-                      
-                      <dt class="col-5">Duration:</dt>
-                      <dd class="col-7" id="preview_duration">
-                        {% if form.instance.duration_minutes %}{{ form.instance.duration_minutes }} minutes{% else %}---{% endif %}
-                      </dd>
-                      
-                      <dt class="col-5">Status:</dt>
-                      <dd class="col-7">
-                        <span class="badge bg-label-{% if is_update %}primary{% else %}warning{% endif %}">
-                          {% if is_update %}Active{% else %}Draft{% endif %}
-                        </span>
-                      </dd>
-                    </dl>
-                  </div>
+                
+                <!-- Tags for Group Session -->
+                <div class="col-md-6">
+                  <label for="id_tags" class="form-label">Tags (optional)</label>
+                  <input type="text" id="id_tags" name="tags" class="form-control" placeholder="e.g. conversation, grammar, business"
+                    value="{% if form.tags.value %}{{ form.tags.value }}{% elif form.instance.tags %}{{ form.instance.tags }}{% endif %}">
+                  <small class="text-muted">Comma-separated tags to help students find your session</small>
                 </div>
               </div>
             </div>
@@ -367,151 +346,102 @@
       allowClear: true,
       width: '100%'
     });
-    
-    // Initialize Flatpickr date pickers with better options
-    const datePickers = flatpickr('.flatpickr-date', {
-      enableTime: false,
-      dateFormat: "Y-m-d",
-      minDate: "today",
-      altInput: true,
-      altFormat: "F j, Y",
-      animate: true,
-      allowInput: false,
-      clickOpens: true,
-      disableMobile: true
-    });
-    
-    // Initialize Flatpickr time pickers with better options
-    const timePickers = flatpickr('.flatpickr-time', {
-      enableTime: true,
-      noCalendar: true,
-      dateFormat: "H:i",
-      time_24hr: true,
-      minuteIncrement: 15,
-      altInput: true,
-      altFormat: "h:i K",
-      animate: true,
-      allowInput: false,
-      clickOpens: true,
-      disableMobile: true
-    });
-    
+
+    // Ensure Flatpickr is available before attempting to use it
+    if (typeof flatpickr === 'function') {
+      // Initialize Flatpickr date pickers
+      const datePickers = document.querySelectorAll('.flatpickr-date');
+      datePickers.forEach(function(picker) {
+        flatpickr(picker, {
+          enableTime: false,
+          dateFormat: "Y-m-d",
+          minDate: "today",
+          altInput: true,
+          altFormat: "F j, Y",
+          animate: true,
+          allowInput: true,
+          clickOpens: true,
+          disableMobile: false
+        });
+      });
+
+      // Initialize Flatpickr time pickers
+      const timePickers = document.querySelectorAll('.flatpickr-time');
+      timePickers.forEach(function(picker) {
+        flatpickr(picker, {
+          enableTime: true,
+          noCalendar: true,
+          dateFormat: "H:i",
+          time_24hr: true,
+          minuteIncrement: 15,
+          altInput: true,
+          altFormat: "h:i K",
+          animate: true,
+          allowInput: true,
+          clickOpens: true,
+          disableMobile: false
+        });
+      });
+    } else {
+      console.error('Flatpickr library not loaded!');
+    }
+
     // Handle session type tab switching
     const sessionTypeTabs = document.querySelectorAll('#session-type-tabs .nav-link');
     const sessionTypeInput = document.getElementById('session_type_input');
-    
-    if (sessionTypeTabs.length > 0) {
-      sessionTypeTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          const type = this.id === 'private-tab' ? 'private' : 'group';
-          sessionTypeInput.value = type;
-          
-          // Update preview
-          document.getElementById('preview_type').textContent = type === 'private' ? 'Private 1-on-1' : 'Group';
-          updatePreview();
-        });
+
+    sessionTypeTabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        const type = this.id === 'private-tab' ? 'private' : 'group';
+        sessionTypeInput.value = type;
       });
-    }
-    
-    // Live preview updates
-    function updatePreview() {
-      // Determine which tab is active
-      const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
-                            document.getElementById('private-content')?.classList.contains('show');
-      
-      // Get values based on active tab
-      const languageSelect = document.getElementById(isPrivateActive ? 'id_language' : 'id_group_language');
-      const levelSelect = document.getElementById(isPrivateActive ? 'id_level' : 'id_group_level');
-      const dateField = document.getElementById(isPrivateActive ? 'session_date' : 'group_session_date');
-      const timeField = document.getElementById(isPrivateActive ? 'session_time' : 'group_session_time');
-      const durationSelect = document.getElementById(isPrivateActive ? 'id_duration_minutes' : 'id_group_duration_minutes');
-      
-      // Update language preview
-      if (languageSelect && languageSelect.selectedIndex > 0) {
-        document.getElementById('preview_language').textContent = 
-          languageSelect.options[languageSelect.selectedIndex].text;
-      }
-      
-      // Update level preview
-      if (levelSelect && levelSelect.selectedIndex > 0) {
-        document.getElementById('preview_level').textContent = 
-          levelSelect.options[levelSelect.selectedIndex].text;
-      }
-      
-      // Update date/time preview
-      if (dateField && timeField && dateField.value && timeField.value) {
-        try {
-          const dateObj = new Date(dateField.value + 'T' + timeField.value);
-          const options = { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          };
-          document.getElementById('preview_datetime').textContent = 
-            dateObj.toLocaleDateString('en-US', options);
-        } catch (e) {
-          console.error('Invalid date/time format', e);
-        }
-      }
-      
-      // Update duration preview
-      if (durationSelect && durationSelect.selectedIndex > -1) {
-        let durationText = durationSelect.options[durationSelect.selectedIndex].text;
-        document.getElementById('preview_duration').textContent = durationText;
-      }
-    }
-    
-    // Attach change event listeners to update preview automatically
-    const formFields = [
-      'id_language', 'id_level', 'id_duration_minutes', 'session_date', 'session_time',
-      'id_group_language', 'id_group_level', 'id_group_duration_minutes', 'group_session_date', 'group_session_time'
-    ];
-    
-    formFields.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.addEventListener('change', updatePreview);
-        // Also update for Select2 events
-        if (field.tagName === 'SELECT') {
-          $(field).on('select2:select', updatePreview);
-        }
-      }
     });
-    
+
     // Validate form before submission
     const sessionForm = document.getElementById('sessionForm');
     sessionForm.addEventListener('submit', function(e) {
-      // Determine which tab is active
       const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
-                            document.getElementById('private-content')?.classList.contains('show');
-      
-      // Set specific field validations based on active tab
+                              document.getElementById('private-content')?.classList.contains('show');
+
+      let dateInput, timeInput;
+
+      if (isPrivateActive) {
+        dateInput = document.getElementById('session_date');
+        timeInput = document.getElementById('session_time');
+      } else {
+        dateInput = document.getElementById('group_session_date');
+        timeInput = document.getElementById('group_session_time');
+      }
+
+      if (!dateInput.value) {
+        e.preventDefault();
+        alert('Please select a date for your session.');
+        return false;
+      }
+
+      if (!timeInput.value) {
+        e.preventDefault();
+        alert('Please select a time for your session.');
+        return false;
+      }
+
       if (!isPrivateActive) {
-        // For group sessions, ensure title and description are filled
         const title = document.getElementById('id_title')?.value;
         const description = document.getElementById('id_description')?.value;
-        
+
         if (!title || title.trim() === '') {
           e.preventDefault();
           alert('Please provide a title for your group session');
           return false;
         }
-        
+
         if (!description || description.trim() === '') {
           e.preventDefault();
           alert('Please provide a description for your group session');
           return false;
         }
       }
-      
-      // Initial preview update (in case fields already have values)
-      updatePreview();
     });
-    
-    // Run initial preview update
-    updatePreview();
   });
 </script>
 {% endblock %}

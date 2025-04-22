@@ -328,10 +328,35 @@ class PrivateSession(models.Model):
         ('no-show', 'No Show'),
     ]
     
-    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='private_sessions')
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('fr', 'French'),
+        ('es', 'Spanish'),
+        ('de', 'German'),
+        ('it', 'Italian'),
+        ('pt', 'Portuguese'),
+        ('ru', 'Russian'),
+        ('zh', 'Chinese'),
+        ('ja', 'Japanese'),
+        ('ko', 'Korean'),
+        ('ar', 'Arabic'),
+        ('hi', 'Hindi'),
+        ('sw', 'Swahili'),
+    ]
+    
+    LEVEL_CHOICES = [
+        ('A1', 'Beginner'),
+        ('A2', 'Elementary'),
+        ('B1', 'Intermediate'),
+        ('B2', 'Upper Intermediate'),
+        ('C1', 'Advanced'),
+        ('C2', 'Proficient'),
+    ]
+    
+    instructor = models.ForeignKey('Instructor', on_delete=models.CASCADE, related_name='private_sessions')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='private_sessions', null=True, blank=True)
-    language = models.CharField(max_length=10, choices=Course.LANGUAGE_CHOICES)
-    level = models.CharField(max_length=2, choices=Course.LEVEL_CHOICES)
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES)
+    level = models.CharField(max_length=2, choices=LEVEL_CHOICES)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     duration_minutes = models.PositiveIntegerField(default=60)
@@ -405,11 +430,36 @@ class GroupSession(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     
-    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='group_sessions')
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('fr', 'French'),
+        ('es', 'Spanish'),
+        ('de', 'German'),
+        ('it', 'Italian'),
+        ('pt', 'Portuguese'),
+        ('ru', 'Russian'),
+        ('zh', 'Chinese'),
+        ('ja', 'Japanese'),
+        ('ko', 'Korean'),
+        ('ar', 'Arabic'),
+        ('hi', 'Hindi'),
+        ('sw', 'Swahili'),
+    ]
+    
+    LEVEL_CHOICES = [
+        ('A1', 'Beginner'),
+        ('A2', 'Elementary'),
+        ('B1', 'Intermediate'),
+        ('B2', 'Upper Intermediate'),
+        ('C1', 'Advanced'),
+        ('C2', 'Proficient'),
+    ]
+    
+    instructor = models.ForeignKey('Instructor', on_delete=models.CASCADE, related_name='group_sessions')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    language = models.CharField(max_length=10, choices=Course.LANGUAGE_CHOICES)
-    level = models.CharField(max_length=2, choices=Course.LEVEL_CHOICES)
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES)
+    level = models.CharField(max_length=2, choices=LEVEL_CHOICES)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     duration_minutes = models.PositiveIntegerField(default=60)

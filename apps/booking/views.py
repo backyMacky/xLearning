@@ -386,7 +386,7 @@ class TransactionHistoryView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 class BookingDashboardView(LoginRequiredMixin, TemplateView):
     """Dashboard for booking system showing upcoming sessions and available credits"""
-    template_name = 'booking_dashboard.html'
+    template_name = 'dashboard.html'
     
     def get_context_data(self, **kwargs):
         # Initialize the template layout from the base class

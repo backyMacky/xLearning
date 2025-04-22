@@ -216,12 +216,12 @@ class InstructorProfileForm(forms.ModelForm):
         widgets = {
             'bio': forms.Textarea(attrs={
                 'class': 'form-control',
-                'rows': 5,
+                'rows': 2,
                 'placeholder': 'Briefly introduce yourself and your qualifications'
             }),
             'teaching_style': forms.Textarea(attrs={
                 'class': 'form-control',
-                'rows': 5,
+                'rows': 3,
                 'placeholder': 'Describe your teaching approach'
             }),
             'profile_image': forms.FileInput(attrs={
@@ -243,7 +243,18 @@ class InstructorProfileForm(forms.ModelForm):
                 'class': 'form-check-input'
             })
         }
-
+    
+    def __init__(self, *args, **kwargs):
+        super(InstructorProfileForm, self).__init__(*args, **kwargs)
+        # Make hourly_rate optional by setting required=False
+        self.fields['hourly_rate'].required = False
+        
+    def clean_hourly_rate(self):
+        """Set default value for hourly_rate if not provided"""
+        hourly_rate = self.cleaned_data.get('hourly_rate')
+        if hourly_rate is None or hourly_rate == '':
+            return 25.00  # Default value from the model
+        return hourly_rate
 
 class PrivateSessionForm(forms.ModelForm):
     """Form for creating private session slots"""
@@ -264,16 +275,17 @@ class PrivateSessionForm(forms.ModelForm):
     # Add extra fields for date and time
     session_date = forms.DateField(
         widget=forms.DateInput(attrs={
-            'class': 'form-control',
-            'type': 'date',
-            'min': timezone.now().date().isoformat()
+            'class': 'form-control flatpickr-date',
+            'placeholder': 'Select date',
+            'required': 'true'
         })
     )
     
     session_time = forms.TimeField(
         widget=forms.TimeInput(attrs={
-            'class': 'form-control',
-            'type': 'time'
+            'class': 'form-control flatpickr-time',
+            'placeholder': 'Select time',
+            'required': 'true'
         })
     )
     
@@ -332,17 +344,20 @@ class GroupSessionForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter a descriptive title for your session'
+                'placeholder': 'Enter a descriptive title for your session',
+                'required': 'true'
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Describe what students will learn in this session'
+                'placeholder': 'Describe what students will learn in this session',
+                'required': 'true'
             }),
             'language': forms.Select(attrs={'class': 'form-select'}),
             'level': forms.Select(attrs={'class': 'form-select'}),
             'duration_minutes': forms.Select(attrs={
-                'class': 'form-select'
+                'class': 'form-select',
+                'required': 'true'
             }, choices=[(30, '30 minutes'), (45, '45 minutes'), (60, '1 hour'), (90, '1.5 hours'), (120, '2 hours')]),
             'max_students': forms.Select(attrs={
                 'class': 'form-select'
@@ -357,23 +372,24 @@ class GroupSessionForm(forms.ModelForm):
             }),
             'tags': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Comma-separated tags'
+                'placeholder': 'e.g. conversation, grammar, business'
             })
         }
     
     # Add extra fields for date and time
     session_date = forms.DateField(
         widget=forms.DateInput(attrs={
-            'class': 'form-control',
-            'type': 'date',
-            'min': timezone.now().date().isoformat()
+            'class': 'form-control flatpickr-date',
+            'placeholder': 'Select date',
+            'required': 'true'
         })
     )
     
     session_time = forms.TimeField(
         widget=forms.TimeInput(attrs={
-            'class': 'form-control',
-            'type': 'time'
+            'class': 'form-control flatpickr-time',
+            'placeholder': 'Select time',
+            'required': 'true'
         })
     )
     
@@ -423,7 +439,7 @@ class GroupSessionForm(forms.ModelForm):
             instance.save()
         
         return instance
-
+    
 
 class SessionFeedbackForm(forms.ModelForm):
     """Form for students to provide feedback after a session"""

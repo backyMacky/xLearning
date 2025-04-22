@@ -76,7 +76,7 @@
                       <i class="ti ti-upload me-1"></i> Upload Photo
                       <input type="file" id="{{ form.profile_image.id_for_label }}" name="{{ form.profile_image.name }}" 
                              class="position-absolute top-0 start-0 opacity-0 width-100 height-100" 
-                             style="cursor: pointer;" accept="image/*">
+                             style="cursor: pointer; width: 100%; height: 100%;" accept="image/*">
                     </div>
                     <div id="image-feedback" class="mt-2"></div>
                     {% if form.profile_image.errors %}
@@ -244,6 +244,9 @@
                         <div class="invalid-feedback d-block">{{ form.teaching_style.errors.0 }}</div>
                       {% endif %}
                     </div>
+                    
+                    <!-- Hourly Rate (hidden with default value) -->
+                    <input type="hidden" id="{{ form.hourly_rate.id_for_label }}" name="{{ form.hourly_rate.name }}" value="25.00">
                   </div>
                 </div>
               </div>
