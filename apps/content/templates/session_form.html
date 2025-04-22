@@ -120,11 +120,11 @@
                   <label for="session_date" class="form-label">Session Date</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="ti ti-calendar"></i></span>
-                    <input type="text" id="session_date" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                    <input type="text" id="session_date" name="session_date" class="form-control flatpickr-date" placeholder="Select date"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|date:'Y-m-d' }}"
                       {% endif %}
-                      required>
+                      readonly required>
                   </div>
                 </div>
                 
@@ -132,20 +132,13 @@
                   <label for="session_time" class="form-label">Session Time</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="ti ti-clock"></i></span>
-                    <input type="text" id="session_time" class="form-control flatpickr-time" placeholder="HH:MM"
+                    <input type="text" id="session_time" name="session_time" class="form-control flatpickr-time" placeholder="Select time"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|time:'H:i' }}"
                       {% endif %}
-                      required>
+                      readonly required>
                   </div>
                 </div>
-                
-                <!-- Hidden field for combined datetime -->
-                <input type="hidden" id="start_time_input" name="start_time" 
-                  {% if form.instance.start_time %}
-                  value="{{ form.instance.start_time|date:'Y-m-d H:i' }}"
-                  {% endif %}
-                  required>
                 
                 <!-- Duration Selection -->
                 <div class="col-md-6">
@@ -159,65 +152,13 @@
                   </select>
                 </div>
                 
-                <!-- Repeat Options -->
+                <!-- Trial Session Checkbox -->
                 <div class="col-md-6">
-                  <label class="form-label">Repeat Schedule (Optional)</label>
-                  <select id="repeat_schedule" class="form-select">
-                    <option value="none">No repeat</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="biweekly">Bi-weekly</option>
-                  </select>
-                  <small class="text-muted">Create multiple slots with this schedule</small>
-                </div>
-                
-                <div id="repeat_options" class="col-12 mt-2 d-none">
-                  <div class="card bg-light-primary border">
-                    <div class="card-body">
-                      <div class="row g-3">
-                        <div class="col-md-6">
-                          <label class="form-label">Repeat Until</label>
-                          <div class="input-group input-group-merge">
-                            <span class="input-group-text"><i class="ti ti-calendar-event"></i></span>
-                            <input type="text" id="repeat_until" class="form-control flatpickr-date" placeholder="End date for repetition">
-                          </div>
-                        </div>
-                        <div class="col-md-6">
-                          <label class="form-label">Days to Create</label>
-                          <div class="day-selector d-flex flex-wrap gap-2">
-                            <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="checkbox" id="day_mon" value="mon">
-                              <label class="form-check-label" for="day_mon">Mon</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="checkbox" id="day_tue" value="tue">
-                              <label class="form-check-label" for="day_tue">Tue</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="checkbox" id="day_wed" value="wed">
-                              <label class="form-check-label" for="day_wed">Wed</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="checkbox" id="day_thu" value="thu">
-                              <label class="form-check-label" for="day_thu">Thu</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="checkbox" id="day_fri" value="fri">
-                              <label class="form-check-label" for="day_fri">Fri</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="checkbox" id="day_sat" value="sat">
-                              <label class="form-check-label" for="day_sat">Sat</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <input class="form-check-input" type="checkbox" id="day_sun" value="sun">
-                              <label class="form-check-label" for="day_sun">Sun</label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <div class="form-check form-switch mt-4">
+                    <input type="checkbox" class="form-check-input" id="id_is_trial" name="is_trial" {% if form.is_trial.value %}checked{% endif %}>
+                    <label class="form-check-label" for="id_is_trial">Trial Session</label>
                   </div>
+                  <small class="text-muted">Mark as a trial session for new students</small>
                 </div>
               </div>
             </div>
@@ -247,11 +188,8 @@
                 </div>
                 
                 <div class="col-12">
-                  <label for="description_editor" class="form-label">Session Description</label>
-                  <div id="description_editor" style="height: 150px;">
-                    {% if form.description.value %}{{ form.description.value|safe }}{% elif form.instance.description %}{{ form.instance.description|safe }}{% endif %}
-                  </div>
-                  <input type="hidden" name="description" id="description_input">
+                  <label for="id_description" class="form-label">Session Description</label>
+                  <textarea id="id_description" name="description" class="form-control" rows="3" placeholder="Describe what students will learn in this session" required>{% if form.description.value %}{{ form.description.value }}{% elif form.instance.description %}{{ form.instance.description }}{% endif %}</textarea>
                   <small class="text-muted">Describe what students will learn in this session</small>
                 </div>
                 
@@ -285,11 +223,11 @@
                   <label for="group_session_date" class="form-label">Session Date</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="ti ti-calendar"></i></span>
-                    <input type="text" id="group_session_date" class="form-control flatpickr-date" placeholder="YYYY-MM-DD"
+                    <input type="text" id="group_session_date" name="session_date" class="form-control flatpickr-date" placeholder="Select date"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|date:'Y-m-d' }}"
                       {% endif %}
-                      required>
+                      readonly required>
                   </div>
                 </div>
                 
@@ -297,23 +235,16 @@
                   <label for="group_session_time" class="form-label">Session Time</label>
                   <div class="input-group input-group-merge">
                     <span class="input-group-text"><i class="ti ti-clock"></i></span>
-                    <input type="text" id="group_session_time" class="form-control flatpickr-time" placeholder="HH:MM"
+                    <input type="text" id="group_session_time" name="session_time" class="form-control flatpickr-time" placeholder="Select time"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|time:'H:i' }}"
                       {% endif %}
-                      required>
+                      readonly required>
                   </div>
                 </div>
                 
-                <!-- Hidden field for combined datetime -->
-                <input type="hidden" id="group_start_time_input" name="start_time" 
-                  {% if form.instance.start_time %}
-                  value="{{ form.instance.start_time|date:'Y-m-d H:i' }}"
-                  {% endif %}
-                  required>
-                
                 <!-- Group Duration and Capacity -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <label for="id_group_duration_minutes" class="form-label">Session Duration</label>
                   <select id="id_group_duration_minutes" name="duration_minutes" class="form-select" required>
                     <option value="30" {% if form.duration_minutes.value == 30 or form.instance.duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
@@ -324,7 +255,7 @@
                   </select>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <label for="id_max_students" class="form-label">Maximum Students</label>
                   <select id="id_max_students" name="max_students" class="form-select">
                     <option value="5" {% if form.max_students.value == 5 or form.instance.max_students == 5 %}selected{% endif %}>5 students</option>
@@ -335,15 +266,15 @@
                   </select>
                 </div>
                 
-                <!-- Session Price -->
-                <div class="col-md-4">
-                  <label for="id_price" class="form-label">Session Price ($)</label>
-                  <div class="input-group input-group-merge">
-                    <span class="input-group-text"><i class="ti ti-currency-dollar"></i></span>
-                    <input type="number" id="id_price" name="price" class="form-control" step="0.01" min="0" 
-                      value="{% if form.price.value %}{{ form.price.value }}{% elif form.instance.price %}{{ form.instance.price }}{% else %}0.00{% endif %}" required>
-                  </div>
-                  <small class="text-muted">Set to 0 for free sessions</small>
+                <!-- Minimum Students -->
+                <div class="col-md-6">
+                  <label for="id_min_students" class="form-label">Minimum Students</label>
+                  <select id="id_min_students" name="min_students" class="form-select">
+                    <option value="1" {% if form.min_students.value == 1 or form.instance.min_students == 1 %}selected{% endif %}>1 student (no minimum)</option>
+                    <option value="2" {% if form.min_students.value == 2 or form.instance.min_students == 2 or not form.instance.min_students %}selected{% endif %}>2 students</option>
+                    <option value="3" {% if form.min_students.value == 3 or form.instance.min_students == 3 %}selected{% endif %}>3 students</option>
+                    <option value="5" {% if form.min_students.value == 5 or form.instance.min_students == 5 %}selected{% endif %}>5 students</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -444,7 +375,10 @@
       minDate: "today",
       altInput: true,
       altFormat: "F j, Y",
-      animate: true
+      animate: true,
+      allowInput: false,
+      clickOpens: true,
+      disableMobile: true
     });
     
     // Initialize Flatpickr time pickers with better options
@@ -456,51 +390,11 @@
       minuteIncrement: 15,
       altInput: true,
       altFormat: "h:i K",
-      animate: true
+      animate: true,
+      allowInput: false,
+      clickOpens: true,
+      disableMobile: true
     });
-    
-    // Initialize Rich Text Editor for group session description
-    const descriptionEditor = new Quill('#description_editor', {
-      theme: 'snow',
-      modules: {
-        toolbar: [
-          ['bold', 'italic', 'underline'],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          ['link'],
-          ['clean']
-        ]
-      }
-    });
-    
-    // Function to update hidden datetime field for private sessions
-    function updatePrivateDatetime() {
-      const dateEl = document.getElementById('session_date');
-      const timeEl = document.getElementById('session_time');
-      const combinedEl = document.getElementById('start_time_input');
-      
-      if (dateEl.value && timeEl.value) {
-        combinedEl.value = dateEl.value + ' ' + timeEl.value;
-        updatePreview();
-      }
-    }
-    
-    // Function to update hidden datetime field for group sessions
-    function updateGroupDatetime() {
-      const dateEl = document.getElementById('group_session_date');
-      const timeEl = document.getElementById('group_session_time');
-      const combinedEl = document.getElementById('group_start_time_input');
-      
-      if (dateEl.value && timeEl.value) {
-        combinedEl.value = dateEl.value + ' ' + timeEl.value;
-        updatePreview();
-      }
-    }
-    
-    // Update hidden fields when date or time changes
-    document.getElementById('session_date').addEventListener('change', updatePrivateDatetime);
-    document.getElementById('session_time').addEventListener('change', updatePrivateDatetime);
-    document.getElementById('group_session_date').addEventListener('change', updateGroupDatetime);
-    document.getElementById('group_session_time').addEventListener('change', updateGroupDatetime);
     
     // Handle session type tab switching
     const sessionTypeTabs = document.querySelectorAll('#session-type-tabs .nav-link');
@@ -514,32 +408,8 @@
           
           // Update preview
           document.getElementById('preview_type').textContent = type === 'private' ? 'Private 1-on-1' : 'Group';
+          updatePreview();
         });
-      });
-    }
-    
-    // Handle repeat schedule options
-    const repeatSelect = document.getElementById('repeat_schedule');
-    const repeatOptions = document.getElementById('repeat_options');
-    
-    if (repeatSelect) {
-      repeatSelect.addEventListener('change', function() {
-        if (this.value === 'none') {
-          repeatOptions.classList.add('d-none');
-        } else {
-          repeatOptions.classList.remove('d-none');
-        }
-      });
-    }
-    
-    // Initialize repeat until date picker
-    if (document.getElementById('repeat_until')) {
-      flatpickr('#repeat_until', {
-        enableTime: false,
-        dateFormat: "Y-m-d",
-        minDate: "today",
-        altInput: true,
-        altFormat: "F j, Y"
       });
     }
     
@@ -550,154 +420,98 @@
                             document.getElementById('private-content')?.classList.contains('show');
       
       // Get values based on active tab
-      const prefix = isPrivateActive ? '' : 'group_';
+      const languageSelect = document.getElementById(isPrivateActive ? 'id_language' : 'id_group_language');
+      const levelSelect = document.getElementById(isPrivateActive ? 'id_level' : 'id_group_level');
+      const dateField = document.getElementById(isPrivateActive ? 'session_date' : 'group_session_date');
+      const timeField = document.getElementById(isPrivateActive ? 'session_time' : 'group_session_time');
+      const durationSelect = document.getElementById(isPrivateActive ? 'id_duration_minutes' : 'id_group_duration_minutes');
       
       // Update language preview
-      const languageSelect = document.getElementById(isPrivateActive ? 'id_language' : 'id_group_language');
       if (languageSelect && languageSelect.selectedIndex > 0) {
         document.getElementById('preview_language').textContent = 
           languageSelect.options[languageSelect.selectedIndex].text;
       }
       
       // Update level preview
-      const levelSelect = document.getElementById(isPrivateActive ? 'id_level' : 'id_group_level');
       if (levelSelect && levelSelect.selectedIndex > 0) {
         document.getElementById('preview_level').textContent = 
           levelSelect.options[levelSelect.selectedIndex].text;
       }
       
       // Update date/time preview
-      const dateValue = document.getElementById(prefix + (isPrivateActive ? 'session_date' : 'session_date')).value;
-      const timeValue = document.getElementById(prefix + (isPrivateActive ? 'session_time' : 'session_time')).value;
-      
-      if (dateValue && timeValue) {
-        const dateObj = new Date(dateValue + 'T' + timeValue);
-        const options = { 
-          year: 'numeric', 
-          month: 'short', 
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        };
-        document.getElementById('preview_datetime').textContent = 
-          dateObj.toLocaleDateString('en-US', options);
+      if (dateField && timeField && dateField.value && timeField.value) {
+        try {
+          const dateObj = new Date(dateField.value + 'T' + timeField.value);
+          const options = { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          };
+          document.getElementById('preview_datetime').textContent = 
+            dateObj.toLocaleDateString('en-US', options);
+        } catch (e) {
+          console.error('Invalid date/time format', e);
+        }
       }
       
       // Update duration preview
-      const durationSelect = document.getElementById(isPrivateActive ? 'id_duration_minutes' : 'id_group_duration_minutes');
       if (durationSelect && durationSelect.selectedIndex > -1) {
-        const durationText = durationSelect.options[durationSelect.selectedIndex].text;
+        let durationText = durationSelect.options[durationSelect.selectedIndex].text;
         document.getElementById('preview_duration').textContent = durationText;
       }
     }
     
-    // Attach change listeners to all relevant form fields
-    const previewFields = [
-      'id_language', 'id_level', 'id_duration_minutes',
-      'id_group_language', 'id_group_level', 'id_group_duration_minutes'
+    // Attach change event listeners to update preview automatically
+    const formFields = [
+      'id_language', 'id_level', 'id_duration_minutes', 'session_date', 'session_time',
+      'id_group_language', 'id_group_level', 'id_group_duration_minutes', 'group_session_date', 'group_session_time'
     ];
     
-    previewFields.forEach(fieldId => {
+    formFields.forEach(fieldId => {
       const field = document.getElementById(fieldId);
       if (field) {
         field.addEventListener('change', updatePreview);
+        // Also update for Select2 events
+        if (field.tagName === 'SELECT') {
+          $(field).on('select2:select', updatePreview);
+        }
       }
     });
     
-    // Update the description hidden input when form submits
+    // Validate form before submission
     const sessionForm = document.getElementById('sessionForm');
     sessionForm.addEventListener('submit', function(e) {
-      // For group sessions, sync Quill editor content with hidden field
-      const editorContent = descriptionEditor.root.innerHTML;
-      document.getElementById('description_input').value = editorContent;
-      
       // Determine which tab is active
       const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
                             document.getElementById('private-content')?.classList.contains('show');
       
-      // Validate required fields based on active tab
-      if (isPrivateActive) {
-        // Validate private session fields
-        if (!document.getElementById('session_date').value) {
+      // Set specific field validations based on active tab
+      if (!isPrivateActive) {
+        // For group sessions, ensure title and description are filled
+        const title = document.getElementById('id_title')?.value;
+        const description = document.getElementById('id_description')?.value;
+        
+        if (!title || title.trim() === '') {
           e.preventDefault();
-          alert('Please select a session date');
+          alert('Please provide a title for your group session');
           return false;
         }
-        if (!document.getElementById('session_time').value) {
+        
+        if (!description || description.trim() === '') {
           e.preventDefault();
-          alert('Please select a session time');
-          return false;
-        }
-      } else {
-        // Validate group session fields
-        if (!document.getElementById('id_title').value) {
-          e.preventDefault();
-          alert('Please enter a session title');
-          return false;
-        }
-        if (!document.getElementById('group_session_date').value) {
-          e.preventDefault();
-          alert('Please select a session date');
-          return false;
-        }
-        if (!document.getElementById('group_session_time').value) {
-          e.preventDefault();
-          alert('Please select a session time');
+          alert('Please provide a description for your group session');
           return false;
         }
       }
+      
+      // Initial preview update (in case fields already have values)
+      updatePreview();
     });
     
     // Run initial preview update
     updatePreview();
-    
-    // Form validation
-    document.getElementById('sessionForm').addEventListener('submit', function(e) {
-      // Determine which tab is active
-      const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
-                            document.getElementById('private-content')?.classList.contains('show');
-      
-      const prefix = isPrivateActive ? '' : 'group_';
-      
-      // Check if date and time are filled
-      const dateValue = document.getElementById(prefix + 'datepicker')?.value;
-      const timeValue = document.getElementById(prefix + 'timepicker')?.value;
-      
-      if (!dateValue || !timeValue) {
-        e.preventDefault();
-        alert('Please select both a date and time for the session.');
-        return false;
-      }
-      
-      // For group sessions, ensure title is filled
-      if (!isPrivateActive) {
-        const titleValue = document.getElementById('id_title')?.value;
-        if (!titleValue || titleValue.trim() === '') {
-          e.preventDefault();
-          alert('Please provide a title for your group session.');
-          return false;
-        }
-      }
-      
-      // Check if language and level are selected
-      const langId = isPrivateActive ? 'id_language' : 'id_group_language';
-      const levelId = isPrivateActive ? 'id_level' : 'id_group_level';
-      
-      if (document.getElementById(langId).selectedIndex <= 0) {
-        e.preventDefault();
-        alert('Please select a language for the session.');
-        return false;
-      }
-      
-      if (document.getElementById(levelId).selectedIndex <= 0) {
-        e.preventDefault();
-        alert('Please select a proficiency level for the session.');
-        return false;
-      }
-      
-      // All validations passed
-      return true;
-    });
   });
 </script>
 {% endblock %}

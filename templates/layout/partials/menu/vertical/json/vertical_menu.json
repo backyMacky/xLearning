@@ -28,37 +28,37 @@
     {
       "menu_header": "Learning Platform"
     },
-    {
-      "name": "Instructors",
-      "icon": "menu-icon tf-icons ti ti-chalkboard",
-      "slug": "instructor",
-      "submenu": [
         {
-          "url": "/content/instructors/",
-          "external": true,
-          "name": "Overview",
-          "slug": "instructor-dashboard"
-        },
-        {
-          "url": "/content/private-sessions/create/",
-          "external": true,
-          "name": "Add Sessions",
-          "slug": "create-private-slot"
-        },
-        {
-          "url": "/content/instructor-dashboard/",
-          "external": true,
-          "name": "My dashboard",
-          "slug": "create-group-session"
-        },
-        {
-          "url": "/content/instructors/{{ request.user.username }}/",
-          "external": true,
-          "name": "My Profile",
-          "slug": "instructor-profile"
-        }
-      ]
-    },
+          "name": "Instructors",
+          "icon": "menu-icon tf-icons ti ti-chalkboard",
+          "slug": "instructor",
+          "submenu": [
+            {
+              "url": "content/instructors/",
+              "external": true,
+              "name": "Browse Instructors",
+              "slug": "instructor-list"
+            },
+            {
+              "url": "/content/instructor_dashboard/",
+              "external": true,
+              "name": "My Dashboard",
+              "slug": "instructor-dashboard"
+            },
+            {
+              "url": "/content/create_private_session/",
+              "external": true,
+              "name": "Create Session",
+              "slug": "create-session"
+            },
+            {
+              "url": "/content/instructor_detail' username=request.user.username/",
+              "external": true,
+              "name": "My Profile",
+              "slug": "instructor-profile"
+            }
+          ]
+        }, 
     {
       "name": "Assessments",
       "icon": "menu-icon tf-icons ti ti-file-text",

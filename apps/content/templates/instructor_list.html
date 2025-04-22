@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Find Your Perfect Instructor - Learning Platform{% endblock title %}
+{% block title %}Available Instructors - Learning Platform{% endblock title %}
 
 {% block vendor_css %}
 {{ block.super }}
@@ -192,7 +192,7 @@
             <div class="card-body">
               <div class="d-flex flex-column align-items-center text-center mb-3">
                 {% if instructor.profile_image %}
-                  <img src="{{ instructor.profile_image.url }}" alt="{{ instructor.username }}" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
+                  <img src="{{ instructor.profile_image.url }}" alt="{{ instructor.user.username }}" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover;">
                 {% else %}
                   <div class="avatar mb-2" style="width: 100px; height: 100px;">
                     <div class="avatar-initial rounded-circle bg-label-{{ forloop.counter|divisibleby:3|yesno:"primary,success,info" }}">
@@ -213,13 +213,13 @@
                 
                 <div class="rating mb-2">
                   {% for i in "12345" %}
-                    {% if forloop.counter <= instructor.rating %}
+                    {% if forloop.counter <= instructor.rating_value %}
                       <i class="ti ti-star-filled text-warning"></i>
                     {% else %}
                       <i class="ti ti-star text-muted"></i>
                     {% endif %}
                   {% endfor %}
-                  <span class="text-muted ms-1">({{ instructor.review_count }})</span>
+                  <span class="text-muted ms-1">({{ instructor.review_count_value }})</span>
                 </div>
               </div>
               
@@ -229,9 +229,6 @@
                 <div>
                   <i class="ti ti-clock me-1"></i>
                   <small>Session: 1 hour</small>
-                </div>
-                <div>
-                  <span class="badge bg-label-primary">${{ instructor.hourly_rate }}/hour</span>
                 </div>
               </div>
 

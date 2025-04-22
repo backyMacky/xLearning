@@ -15,9 +15,6 @@ from .models import (
     InstructorReview, CreditTransaction
 )
 
-# Import models from content app
-from apps.content.models import Language, LanguageLevel
-
 # For the credit purchase form
 from django import forms
 
@@ -584,4 +581,4 @@ class MySessionsView(LoginRequiredMixin, TemplateView):
         context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
         TemplateHelper.map_context(context)
         
-        return context
+        return context 

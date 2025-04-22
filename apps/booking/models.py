@@ -6,11 +6,12 @@ from apps.meetings.models import Meeting
 
 class Instructor(models.Model):
     """Extended model for instructors"""
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='instructor_profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='booking_instructor_profile')
     bio = models.TextField(blank=True, null=True)
     profile_image = models.ImageField(upload_to='instructor_images/', blank=True, null=True)
-    teaching_languages = models.ManyToManyField('content.Language', related_name='instructors')
-    specialties = models.ManyToManyField('InstructorSpecialty', related_name='instructors', blank=True)
+    # Changed from ManyToManyField to MultiSelectField or CharField
+    teaching_languages = models.CharField(max_length=100, blank=True, help_text="Comma-separated language codes")
+    specialties = models.ManyToManyField('InstructorSpecialty', related_name='booking_instructors', blank=True)
     hourly_rate = models.DecimalField(max_digits=6, decimal_places=2, default=25.00)
     teaching_style = models.TextField(blank=True, null=True)
     is_featured = models.BooleanField(default=False)
@@ -41,18 +42,17 @@ class Instructor(models.Model):
             status='completed'
         ).count()
 
-
 class InstructorSpecialty(models.Model):
     """Model for instructor specialties (e.g., Business English, Grammar, etc.)"""
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)  # Added this field
     
     def __str__(self):
         return self.name
     
     class Meta:
         verbose_name_plural = "Instructor specialties"
-
 
 class InstructorQualification(models.Model):
     """Model for instructor qualifications and certifications"""
@@ -80,16 +80,39 @@ class InstructorExperience(models.Model):
 
 class PrivateSessionSlot(models.Model):
     """Model for managing private one-on-one session slots"""
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('fr', 'French'),
+        ('es', 'Spanish'),
+        ('de', 'German'),
+        ('it', 'Italian'),
+        ('pt', 'Portuguese'),
+        ('ru', 'Russian'),
+        ('zh', 'Chinese'),
+        ('ja', 'Japanese'),
+        ('ko', 'Korean'),
+        ('ar', 'Arabic'),
+        ('hi', 'Hindi'),
+        ('sw', 'Swahili'),
+    ]
+    
+    LEVEL_CHOICES = [
+        ('A1', 'Beginner'),
+        ('A2', 'Elementary'),
+        ('B1', 'Intermediate'),
+        ('B2', 'Upper Intermediate'),
+        ('C1', 'Advanced'),
+        ('C2', 'Proficient'),
+    ]
+    
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='private_slots')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='booked_private_slots', 
                                 null=True, blank=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     duration_minutes = models.IntegerField(default=60)
-    language = models.ForeignKey('content.Language', on_delete=models.SET_NULL, 
-                                 related_name='private_sessions', null=True)
-    level = models.ForeignKey('content.LanguageLevel', on_delete=models.SET_NULL, 
-                              related_name='private_sessions', null=True)
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES, null=True)
+    level = models.CharField(max_length=2, choices=LEVEL_CHOICES, null=True)
     status = models.CharField(max_length=20, choices=[
         ('available', 'Available'),
         ('booked', 'Booked'),
@@ -181,10 +204,35 @@ class PrivateSessionSlot(models.Model):
 
 class GroupSession(models.Model):
     """Model for group language sessions"""
+    LANGUAGE_CHOICES = [
+        ('en', 'English'),
+        ('fr', 'French'),
+        ('es', 'Spanish'),
+        ('de', 'German'),
+        ('it', 'Italian'),
+        ('pt', 'Portuguese'),
+        ('ru', 'Russian'),
+        ('zh', 'Chinese'),
+        ('ja', 'Japanese'),
+        ('ko', 'Korean'),
+        ('ar', 'Arabic'),
+        ('hi', 'Hindi'),
+        ('sw', 'Swahili'),
+    ]
+    
+    LEVEL_CHOICES = [
+        ('A1', 'Beginner'),
+        ('A2', 'Elementary'),
+        ('B1', 'Intermediate'),
+        ('B2', 'Upper Intermediate'),
+        ('C1', 'Advanced'),
+        ('C2', 'Proficient'),
+    ]
+    
     title = models.CharField(max_length=255)
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='group_sessions')
-    language = models.ForeignKey('content.Language', on_delete=models.CASCADE, related_name='group_sessions')
-    level = models.ForeignKey('content.LanguageLevel', on_delete=models.CASCADE, related_name='group_sessions')
+    language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES)
+    level = models.CharField(max_length=2, choices=LEVEL_CHOICES)
     description = models.TextField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
