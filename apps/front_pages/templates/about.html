@@ -23,8 +23,8 @@
     background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
     padding: 120px 0 80px;
     position: relative;
-    overflow: hidden;
     color: #fff;
+    overflow: hidden;
   }
   
   .about-hero::before {
@@ -34,8 +34,9 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('{% static "img/front-pages/landing-page/about.png" %}');
-    background-repeat: repeat;
+    background-image: url('{% static "img/front-pages/landing-page/about-bg.png" %}');
+    background-size: cover;
+    background-position: center;
     opacity: 0.1;
     z-index: 0;
   }
@@ -43,6 +44,7 @@
   .about-hero-content {
     position: relative;
     z-index: 1;
+    text-align: center;
   }
   
   .about-hero h1 {
@@ -55,7 +57,7 @@
     font-size: 1.25rem;
     color: rgba(255, 255, 255, 0.9);
     max-width: 600px;
-    margin-bottom: 2rem;
+    margin: 0 auto 2rem;
   }
   
   .about-vision {
@@ -63,34 +65,15 @@
     padding: 80px 0;
     background-color: #f8f7fa;
     overflow: hidden;
+    border-top-left-radius: 80px;
+    border-top-right-radius: 80px;
   }
-  
-  .about-vision::after {
-    content: "";
-    position: absolute;
-    bottom: -100px;
-    right: -100px;
-    width: 300px;
-    height: 300px;
-    background: rgba(115, 103, 240, 0.1);
-    border-radius: 50%;
-    z-index: 0;
-    animation: pulse 10s infinite alternate;
-  }
-  
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      opacity: 0.1;
-    }
-    50% {
-      transform: scale(1.2);
-      opacity: 0.15;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 0.1;
-    }
+
+  .about-vision h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    color: #5e5873;
   }
   
   .about-vision-card {
@@ -108,7 +91,7 @@
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.1);
   }
-  
+
   .about-vision-icon {
     width: 70px;
     height: 70px;
@@ -117,31 +100,9 @@
     justify-content: center;
     border-radius: 50%;
     margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
+    background-color: rgba(115, 103, 240, 0.2);
   }
-  
-  .about-vision-icon::after {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: rgba(255, 255, 255, 0.2);
-    transform: rotate(45deg);
-    animation: shimmer 3s infinite;
-  }
-  
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-150%) rotate(45deg);
-    }
-    100% {
-      transform: translateX(150%) rotate(45deg);
-    }
-  }
-  
+
   .about-vision-card h3 {
     font-size: 1.75rem;
     margin-bottom: 20px;
@@ -153,75 +114,41 @@
     font-size: 1.1rem;
     line-height: 1.6;
   }
-  
-  .counter-wrapper {
-    position: relative;
-    overflow: hidden;
+
+  .team-section {
+    padding: 80px 0;
+    background-color: #ffffff;
   }
-  
-  .counter-wrapper::before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    bottom: 0;
-    left: 0;
-    background: linear-gradient(to right, transparent, rgba(115, 103, 240, 0.3), transparent);
-  }
-  
-  .about-counter {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #7367f0;
-    margin-bottom: 10px;
-    display: inline-block;
-    position: relative;
-  }
-  
-  .about-counter-title {
-    font-size: 1.2rem;
+
+  .team-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
     color: #5e5873;
-    font-weight: 600;
   }
-  
-  .about-counter-text {
-    color: #6e6b7b;
-    font-size: 0.95rem;
-  }
-  
+
   .team-card {
-    border: none;
-    border-radius: 10px;
-    overflow: hidden;
     transition: all 0.3s ease;
     position: relative;
   }
-  
+
   .team-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.1);
   }
-  
-  .team-card .card-body {
-    padding: 1.5rem;
-  }
-  
-  .team-card .card-img-top {
+
+  .team-card img {
+    border-radius: 10px;
     height: 250px;
     object-fit: cover;
-    transition: transform 0.5s ease;
   }
-  
-  .team-card:hover .card-img-top {
-    transform: scale(1.05);
-  }
-  
+
   .team-card .social-icons {
     display: flex;
     gap: 10px;
     margin-top: 15px;
   }
-  
+
   .team-card .social-icons a {
     width: 36px;
     height: 36px;
@@ -232,356 +159,55 @@
     background-color: #f8f8f8;
     color: #7367f0;
     transition: all 0.3s ease;
-    transform: translateY(0);
   }
-  
+
   .team-card .social-icons a:hover {
     background-color: #7367f0;
     color: #fff;
-    transform: translateY(-3px);
-  }
-  
-  .timeline-item {
-    position: relative;
-    padding-left: 50px;
-    margin-bottom: 50px;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  
-  .timeline-item.aos-animate {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  .timeline-item::before {
-    content: "";
-    position: absolute;
-    left: 15px;
-    top: 0;
-    height: 100%;
-    width: 2px;
-    background-color: #7367f0;
-  }
-  
-  .timeline-item:last-child::before {
-    height: 20px;
-  }
-  
-  .timeline-badge {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: #7367f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    z-index: 1;
-    transition: all 0.3s ease;
-  }
-  
-  .timeline-item:hover .timeline-badge {
-    transform: scale(1.2);
-    box-shadow: 0 0 15px rgba(115, 103, 240, 0.5);
-  }
-  
-  .timeline-date {
-    font-size: 1rem;
-    color: #7367f0;
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
-  
-  .timeline-content {
-    background-color: #f8f8f8;
-    border-radius: 10px;
-    padding: 20px;
-    transition: all 0.3s ease;
-  }
-  
-  .timeline-item:hover .timeline-content {
-    transform: translateX(10px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  }
-  
-  .timeline-content h4 {
-    margin-bottom: 10px;
-    color: #5e5873;
-  }
-  
-  .timeline-content p {
-    color: #6e6b7b;
-    margin-bottom: 0;
-  }
-  
-  .values-card {
-    border: none;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    overflow: hidden;
-    height: 100%;
-  }
-  
-  .values-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(115, 103, 240, 0.15);
-  }
-  
-  .values-card .card-body {
-    padding: 2rem;
-  }
-  
-  .values-icon {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    transition: transform 0.3s ease;
-  }
-  
-  .values-card:hover .values-icon {
-    transform: rotate(10deg);
-  }
-  
-  .partner-logo {
-    transition: all 0.3s ease;
-    filter: grayscale(100%);
-    opacity: 0.7;
-  }
-  
-  .partner-logo:hover {
-    filter: grayscale(0%);
-    opacity: 1;
-    transform: scale(1.1);
-  }
-  
-  /* Floating animation */
-  @keyframes float {
-    0% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-    100% {
-      transform: translateY(0px);
-    }
-  }
-  
-  .float-animation {
-    animation: float 4s ease-in-out infinite;
-  }
-  
-  /* Animated background element */
-  .animated-bg-circle {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(115, 103, 240, 0.1);
-    z-index: 0;
-  }
-  
-  .circle-1 {
-    width: 300px;
-    height: 300px;
-    top: -150px;
-    left: -50px;
-    animation: moveCircle 15s infinite alternate;
-  }
-  
-  .circle-2 {
-    width: 200px;
-    height: 200px;
-    bottom: 50px;
-    right: 100px;
-    animation: moveCircle 20s infinite alternate-reverse;
-  }
-  
-  @keyframes moveCircle {
-    0% {
-      transform: translate(0, 0);
-    }
-    100% {
-      transform: translate(50px, 50px);
-    }
-  }
-  
-  /* Count up animation */
-  .countup {
-    display: inline-block;
   }
 </style>
 {% endblock page_css %}
 
 {% block content %}
-<!-- About Hero Section: Start -->
+<!-- About Hero Section -->
 <section class="about-hero">
-  <div class="animated-bg-circle circle-1"></div>
-  <div class="animated-bg-circle circle-2"></div>
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6 about-hero-content" data-aos="fade-right" data-aos-duration="1000">
-        <span class="badge bg-white text-primary mb-3">Our Story</span>
+        
         <h1>Transforming Language Education</h1>
         <p>At xLearning, we're dedicated to empowering language teachers with innovative tools that transform how languages are taught and learned around the world.</p>
         <a href="#our-mission" class="btn btn-light btn-lg">Discover Our Mission</a>
       </div>
       <div class="col-lg-6 d-none d-lg-block" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-        <img src="{% static 'img/front-pages/landing-page/about.png' %}" alt="xLearning Team" class="img-fluid rounded-3 shadow-lg float-animation">
+        <img src="{% static 'img/front-pages/landing-page/about.png' %}" alt="xLearning Team" class="img-fluid rounded-3 shadow-lg">
       </div>
     </div>
   </div>
 </section>
-<!-- About Hero Section: End -->
 
-<!-- Vision Section: Start -->
+<!-- Vision Section -->
 <section id="our-mission" class="about-vision">
   <div class="container">
-    <div class="row mb-5">
-      <div class="col-12 text-center" data-aos="fade-up" data-aos-duration="800">
-        <h2 class="fw-bold mb-4">Our Vision & Mission</h2>
-        <p class="text-muted mx-auto" style="max-width: 700px;">We believe that language education should be accessible, engaging, and effective. Our platform is built to solve the real challenges language teachers face every day.</p>
-      </div>
-    </div>
-    
+    <h2>Our Vision & Mission</h2>
     <div class="row g-4">
       <div class="col-md-6" data-aos="fade-right" data-aos-duration="1000">
         <div class="about-vision-card">
-          <div class="about-vision-icon bg-label-primary">
+          <div class="about-vision-icon">
             <i class="ti ti-eye text-primary ti-xl"></i>
           </div>
           <h3>Our Vision</h3>
           <p>To create a world where language learning is boundless, where teachers are empowered with cutting-edge tools, and where students can explore new cultures and connect with people across the globe.</p>
-          <p>We envision a platform that not only facilitates teaching but transforms how languages are learned, making the process more intuitive, personalized, and effective.</p>
         </div>
       </div>
       
       <div class="col-md-6" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
         <div class="about-vision-card">
-          <div class="about-vision-icon bg-label-success">
+          <div class="about-vision-icon">
             <i class="ti ti-target text-success ti-xl"></i>
           </div>
           <h3>Our Mission</h3>
           <p>To revolutionize language education by providing teachers with a comprehensive platform that streamlines administrative tasks, enhances student engagement, and improves learning outcomes.</p>
-          <p>We're committed to continuously innovating our tools based on educator feedback, learning sciences research, and technological advancements.</p>
-        </div>
-      </div>
-    </div>
-    
-    <div class="row mt-5">
-      <div class="col-md-3 text-center mb-4 mb-md-0 counter-wrapper" data-aos="fade-up" data-aos-duration="800" data-aos-delay="0">
-        <div class="about-counter countup" data-count="2000">0</div><span class="about-counter">+</span>
-        <div class="about-counter-title">Active Teachers</div>
-        <p class="about-counter-text">Across 50+ countries</p>
-      </div>
-      
-      <div class="col-md-3 text-center mb-4 mb-md-0 counter-wrapper" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
-        <div class="about-counter countup" data-count="35000">0</div><span class="about-counter">+</span>
-        <div class="about-counter-title">Students</div>
-        <p class="about-counter-text">Learning with our platform</p>
-      </div>
-      
-      <div class="col-md-3 text-center mb-4 mb-md-0 counter-wrapper" data-aos="fade-up" data-aos-duration="800" data-aos-delay="400">
-        <div class="about-counter countup" data-count="15">0</div>
-        <div class="about-counter-title">Languages</div>
-        <p class="about-counter-text">Supported on our platform</p>
-      </div>
-      
-      <div class="col-md-3 text-center counter-wrapper" data-aos="fade-up" data-aos-duration="800" data-aos-delay="600">
-        <div class="about-counter countup" data-count="5">0</div>
-        <div class="about-counter-title">Years Experience</div>
-        <p class="about-counter-text">Of innovation in EdTech</p>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- Vision Section: End -->
-
-<!-- Values Section -->
-<section class="section-py bg-body">
-  <div class="container">
-    <div class="text-center mb-4">
-      <span class="badge bg-label-primary">Our Values</span>
-    </div>
-    <h3 class="text-center mb-2">
-      <span class="position-relative fw-extrabold z-1">What We Stand For
-        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="values icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
-      </span>
-    </h3>
-    <p class="text-center mb-5">Our core values guide everything we do at xLearning</p>
-    
-    <div class="row g-4">
-      <div class="col-lg-4 col-sm-6">
-        <div class="values-card card h-100">
-          <div class="card-body text-center">
-            <div class="values-icon bg-label-primary mx-auto">
-              <i class="ti ti-heart ti-lg text-primary"></i>
-            </div>
-            <h5 class="mb-2">Passion for Education</h5>
-            <p class="mb-0">We're driven by a deep commitment to improving language education through technology and creating tools that make a real difference in classrooms around the world.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="values-card card h-100">
-          <div class="card-body text-center">
-            <div class="values-icon bg-label-primary mx-auto">
-              <i class="ti ti-bulb ti-lg text-primary"></i>
-            </div>
-            <h5 class="mb-2">Innovation</h5>
-            <p class="mb-0">We continuously push the boundaries of what's possible in language education technology, always looking for new ways to improve the teaching and learning experience.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="values-card card h-100">
-          <div class="card-body text-center">
-            <div class="values-icon bg-label-primary mx-auto">
-              <i class="ti ti-users ti-lg text-primary"></i>
-            </div>
-            <h5 class="mb-2">Community</h5>
-            <p class="mb-0">We foster a supportive community where teachers can connect, share resources, and learn from each other, creating a global network of language education professionals.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="values-card card h-100">
-          <div class="card-body text-center">
-            <div class="values-icon bg-label-primary mx-auto">
-              <i class="ti ti-arrow-bar-up ti-lg text-primary"></i>
-            </div>
-            <h5 class="mb-2">Excellence</h5>
-            <p class="mb-0">We strive for excellence in everything we do, from the technical performance of our platform to the quality of support we provide to our users.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="values-card card h-100">
-          <div class="card-body text-center">
-            <div class="values-icon bg-label-primary mx-auto">
-              <i class="ti ti-ear ti-lg text-primary"></i>
-            </div>
-            <h5 class="mb-2">Teacher-Centered</h5>
-            <p class="mb-0">We listen to teachers and develop our platform based on their real needs and feedback, ensuring our tools solve the actual challenges educators face.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-sm-6">
-        <div class="values-card card h-100">
-          <div class="card-body text-center">
-            <div class="values-icon bg-label-primary mx-auto">
-              <i class="ti ti-world ti-lg text-primary"></i>
-            </div>
-            <h5 class="mb-2">Global Perspective</h5>
-            <p class="mb-0">We embrace cultural diversity and develop our platform with a global mindset, supporting multiple languages and teaching approaches from around the world.</p>
-          </div>
         </div>
       </div>
     </div>
@@ -589,17 +215,9 @@
 </section>
 
 <!-- Team Section -->
-<section class="section-py bg-body">
-  <div class="text-center mb-4">
-    <span class="badge bg-label-primary">Our Team</span>
-  </div>
-  <h3 class="text-center mb-2">
-    <span class="position-relative fw-extrabold z-1">Meet the Team
-      <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="team icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
-    </span>
-  </h3>
-  <p class="text-center mb-5">A diverse team of educators, developers, and language enthusiasts working together to transform language education.</p>
+<section class="team-section">
   <div class="container">
+    <h2>Meet Our Team</h2>
     <div class="row g-4">
       <div class="col-lg-3 col-sm-6">
         <div class="team-card card">
@@ -608,11 +226,6 @@
             <h5 class="mb-1">Sophie Gilbert</h5>
             <p class="text-muted mb-2">Founder & CEO</p>
             <p class="small text-muted mb-3">Former language teacher with 15 years of experience and a passion for educational technology.</p>
-            <div class="social-icons d-flex justify-content-center">
-              <a href="#"><i class="ti ti-brand-linkedin ti-sm"></i></a>
-              <a href="#"><i class="ti ti-brand-twitter ti-sm"></i></a>
-              <a href="#"><i class="ti ti-mail ti-sm"></i></a>
-            </div>
           </div>
         </div>
       </div>
@@ -623,11 +236,6 @@
             <h5 class="mb-1">Paul Miles</h5>
             <p class="text-muted mb-2">Head of Product</p>
             <p class="small text-muted mb-3">Product leader with expertise in building educational technologies that teachers love.</p>
-            <div class="social-icons d-flex justify-content-center">
-              <a href="#"><i class="ti ti-brand-linkedin ti-sm"></i></a>
-              <a href="#"><i class="ti ti-brand-twitter ti-sm"></i></a>
-              <a href="#"><i class="ti ti-mail ti-sm"></i></a>
-            </div>
           </div>
         </div>
       </div>
@@ -638,11 +246,6 @@
             <h5 class="mb-1">Nannie Ford</h5>
             <p class="text-muted mb-2">Education Director</p>
             <p class="small text-muted mb-3">Former university language department chair with a doctorate in language acquisition.</p>
-            <div class="social-icons d-flex justify-content-center">
-              <a href="#"><i class="ti ti-brand-linkedin ti-sm"></i></a>
-              <a href="#"><i class="ti ti-brand-twitter ti-sm"></i></a>
-              <a href="#"><i class="ti ti-mail ti-sm"></i></a>
-            </div>
           </div>
         </div>
       </div>
@@ -653,106 +256,9 @@
             <h5 class="mb-1">Chris Watkins</h5>
             <p class="text-muted mb-2">Technical Lead</p>
             <p class="small text-muted mb-3">Software engineer with extensive experience in educational technology and AI applications.</p>
-            <div class="social-icons d-flex justify-content-center">
-              <a href="#"><i class="ti ti-brand-linkedin ti-sm"></i></a>
-              <a href="#"><i class="ti ti-brand-twitter ti-sm"></i></a>
-              <a href="#"><i class="ti ti-mail ti-sm"></i></a>
-            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- Mission Section -->
-<section class="section-py">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6">
-        <div class="pe-lg-5">
-          <h3 class="mb-4">Our Philosophy</h3>
-          <p class="mb-4">At xLearning, we believe that effective language teaching is the key to building bridges between cultures and fostering global understanding. Our platform is built on this foundational belief.</p>
-          <p class="mb-4">We understand that language teachers need specialized tools that address the unique challenges of language instruction – from pronunciation practice to cultural context, from vocabulary retention to real-world application.</p>
-          <div class="d-flex align-items-center mb-4">
-            <div class="badge bg-label-primary rounded p-2 me-3">
-              <i class="ti ti-check ti-lg"></i>
-            </div>
-            <div>
-              <h6 class="mb-0">Teacher-First Approach</h6>
-              <p class="mb-0">Every feature is designed with language teachers' real needs in mind</p>
-            </div>
-          </div>
-          <div class="d-flex align-items-center mb-4">
-            <div class="badge bg-label-primary rounded p-2 me-3">
-              <i class="ti ti-check ti-lg"></i>
-            </div>
-            <div>
-              <h6 class="mb-0">Research-Based Methodology</h6>
-              <p class="mb-0">Our tools are informed by the latest research in language acquisition</p>
-            </div>
-          </div>
-          <div class="d-flex align-items-center">
-            <div class="badge bg-label-primary rounded p-2 me-3">
-              <i class="ti ti-check ti-lg"></i>
-            </div>
-            <div>
-              <h6 class="mb-0">Continuous Improvement</h6>
-              <p class="mb-0">We constantly evolve our platform based on teacher feedback</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6 mt-5 mt-lg-0">
-        <img src="{% static 'img/front-pages/landing-page/learning.jpg' %}" alt="Language Learning" class="img-fluid rounded shadow-lg" />
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Partners Section -->
-<section class="section-py bg-body">
-  <div class="container">
-    <div class="text-center mb-4">
-      <span class="badge bg-label-primary">Our Partners</span>
-    </div>
-    <h3 class="text-center mb-2">
-      <span class="position-relative fw-extrabold z-1">Organizations We Work With
-        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="partners icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
-      </span>
-    </h3>
-    <p class="text-center mb-5">We collaborate with leading educational institutions and organizations worldwide</p>
-    
-    <div class="row g-4 justify-content-center">
-      <div class="col-md-2 col-sm-4 col-6 text-center">
-        <img src="{% static 'img/front-pages/logos/partner-1.png' %}" alt="Partner 1" class="img-fluid opacity-75 partner-logo" style="max-height: 60px;">
-      </div>
-      <div class="col-md-2 col-sm-4 col-6 text-center">
-        <img src="{% static 'img/front-pages/logos/partner-2.png' %}" alt="Partner 2" class="img-fluid opacity-75 partner-logo" style="max-height: 60px;">
-      </div>
-      <div class="col-md-2 col-sm-4 col-6 text-center">
-        <img src="{% static 'img/front-pages/logos/partner-3.png' %}" alt="Partner 3" class="img-fluid opacity-75 partner-logo" style="max-height: 60px;">
-      </div>
-      <div class="col-md-2 col-sm-4 col-6 text-center">
-        <img src="{% static 'img/front-pages/logos/partner-4.png' %}" alt="Partner 4" class="img-fluid opacity-75 partner-logo" style="max-height: 60px;">
-      </div>
-      <div class="col-md-2 col-sm-4 col-6 text-center">
-        <img src="{% static 'img/front-pages/logos/partner-5.png' %}" alt="Partner 5" class="img-fluid opacity-75 partner-logo" style="max-height: 60px;">
-      </div>
-      <div class="col-md-2 col-sm-4 col-6 text-center">
-        <img src="{% static 'img/front-pages/logos/partner-6.png' %}" alt="Partner 6" class="img-fluid opacity-75 partner-logo" style="max-height: 60px;">
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA Section -->
-<section class="section-py bg-primary">
-  <div class="container">
-    <div class="text-center">
-      <h3 class="text-white mb-4">Ready to Transform Your Language Teaching?</h3>
-      <p class="text-white mb-5">Join thousands of language teachers who are already using xLearning to enhance their teaching.</p>
-      <a href="{% url 'account:register' %}" class="btn btn-light btn-lg">Start Free Trial</a>
     </div>
   </div>
 </section>

@@ -35,7 +35,7 @@ class RepositoryBaseView(LoginRequiredMixin):
 
 class RepositoryDashboardView(RepositoryBaseView, TemplateView):
     """Dashboard showing user's files and resources"""
-    template_name = 'dashboard.html'
+    template_name = 'repostory_dashboard.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

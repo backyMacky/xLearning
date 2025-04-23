@@ -393,8 +393,8 @@
                 <tr>
                   <th>Type</th>
                   <th>Date & Time</th>
-                  <th>Outcome</th>
-                  <th>Student(s)</th>
+                  <th>Details</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -403,8 +403,8 @@
                   {% for session in past_sessions %}
                     <tr>
                       <td>
-                        <span class="badge bg-label-{% if session.is_private %}primary{% else %}info{% endif %}">
-                          {% if session.is_private %}Private{% else %}Group{% endif %}
+                        <span class="badge bg-label-{% if session.type == 'private' %}primary{% else %}info{% endif %}">
+                          {{ session.type|title }}
                         </span>
                       </td>
                       <td>
@@ -414,15 +414,10 @@
                         </div>
                       </td>
                       <td>
-                        <span class="badge bg-label-{% if session.status == 'completed' %}success{% elif session.status == 'cancelled' %}danger{% elif session.status == 'no-show' %}warning{% else %}secondary{% endif %}">
-                          {{ session.status|title }}
-                        </span>
-                      </td>
-                      <td>
-                        {% if session.is_private %}
+                        {% if session.type == 'private' %}
                           <div class="d-flex align-items-center">
                             {% if session.student %}
-                              <div class="avatar avatar-xs me-2">
+                              <div class="avatar me-2">
                                 {% if session.student.profile.profile_image %}
                                   <img src="{{ session.student.profile.profile_image.url }}" alt="{{ session.student.username }}" class="rounded-circle">
                                 {% else %}
@@ -437,14 +432,19 @@
                             {% endif %}
                           </div>
                         {% else %}
-                          <span>{{ session.students_count }} students</span>
+                          <div class="d-flex flex-column">
+                            <span>{{ session.title }}</span>
+                            <small class="text-muted">{{ session.students.count }} students</small>
+                          </div>
                         {% endif %}
                       </td>
                       <td>
+                        <span class="badge bg-label-{{ session.status|lower|slugify }}">
+                          {{ session.status|title }}
+                        </span>
+                      </td>
+                      <td>
                         <div class="d-flex gap-2">
-                          <a href="#" class="btn btn-sm btn-icon btn-outline-primary" data-bs-toggle="tooltip" title="View Details">
-                            <i class="ti ti-eye"></i>
-                          </a>
                           {% if session.recording_url %}
                             <a href="{{ session.recording_url }}" target="_blank" class="btn btn-sm btn-icon btn-outline-info" data-bs-toggle="tooltip" title="View Recording">
                               <i class="ti ti-player-play"></i>

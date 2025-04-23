@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from apps.meetings.models import Meeting
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Instructor(models.Model):
@@ -343,7 +345,6 @@ class InstructorReview(models.Model):
 
 
 class CreditTransaction(models.Model):
-    """Model for tracking credit transactions"""
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='credit_transactions')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
@@ -353,29 +354,277 @@ class CreditTransaction(models.Model):
         ('deduction', 'Deduction'),
         ('bonus', 'Bonus'),
     ])
-    private_session = models.ForeignKey(PrivateSessionSlot, on_delete=models.SET_NULL, 
+    private_session = models.ForeignKey('PrivateSessionSlot', on_delete=models.SET_NULL, 
                                        null=True, blank=True, related_name='transactions')
-    group_session = models.ForeignKey(GroupSession, on_delete=models.SET_NULL, 
+    group_session = models.ForeignKey('GroupSession', on_delete=models.SET_NULL, 
                                      null=True, blank=True, related_name='transactions')
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.student.username} - {self.transaction_type} - {self.amount}"
-    
+
     def get_balance(self):
         """Calculate the current credit balance for the student"""
-        transactions = CreditTransaction.objects.filter(student=self.student)
-        
-        # Sum up all credits (purchases, refunds, bonuses)
-        credits = transactions.filter(
+        # Sum credits from purchases, refunds, and bonuses
+        credits = self.__class__.objects.filter(
+            student=self.student,
             transaction_type__in=['purchase', 'refund', 'bonus']
         ).aggregate(total=models.Sum('amount'))['total'] or 0
         
-        # Sum up all debits (deductions)
-        debits = transactions.filter(
+        # Subtract deductions
+        debits = self.__class__.objects.filter(
+            student=self.student,
             transaction_type='deduction'
         ).aggregate(total=models.Sum('amount'))['total'] or 0
         
-        # Calculate balance
-        balance = credits - debits
-        return balance
+        return credits - debits
+
+
+# Define the missing function for syncing from PrivateSession to PrivateSessionSlot
+def sync_private_session_to_booking(sender, instance, created, **kwargs):
+    """Sync content private session changes to booking app"""
+    try:
+        # Get booking instructor
+        instructor = None
+        if hasattr(instance.instructor.user, 'booking_instructor_profile'):
+            instructor = instance.instructor.user.booking_instructor_profile
+        else:
+            return
+            
+        # Try to find matching booking slot
+        try:
+            booking_slot = PrivateSessionSlot.objects.get(
+                instructor=instructor,
+                start_time=instance.start_time
+            )
+            
+            # Update booking slot with new values
+            booking_slot.end_time = instance.end_time
+            booking_slot.duration_minutes = instance.duration_minutes
+            booking_slot.language = instance.language
+            booking_slot.level = instance.level
+            booking_slot.status = instance.status
+            
+            # Update student if booked
+            if instance.status == 'booked' and instance.student:
+                booking_slot.student = instance.student
+            
+            # Skip signal to avoid infinite loop
+            post_save.disconnect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+            booking_slot.save()
+            post_save.connect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+            
+        except PrivateSessionSlot.DoesNotExist:
+            # Create new booking slot
+            booking_slot = PrivateSessionSlot(
+                instructor=instructor,
+                start_time=instance.start_time,
+                end_time=instance.end_time,
+                duration_minutes=instance.duration_minutes,
+                language=instance.language,
+                level=instance.level,
+                status=instance.status,
+                student=instance.student if instance.status == 'booked' else None
+            )
+            
+            # Skip signal to avoid infinite loop
+            post_save.disconnect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+            booking_slot.save()
+            post_save.connect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+    
+    except (ImportError, AttributeError):
+        # Booking app not available or models not compatible
+        pass
+
+
+# Define the missing function for syncing from GroupSession to BookingGroupSession
+def sync_group_session_to_booking(sender, instance, created, **kwargs):
+    """Sync content group session changes to booking app"""
+    try:
+        # Get booking instructor
+        instructor = None
+        if hasattr(instance.instructor.user, 'booking_instructor_profile'):
+            instructor = instance.instructor.user.booking_instructor_profile
+        else:
+            return
+            
+        # Try to find matching booking session
+        try:
+            booking_session = GroupSession.objects.get(
+                instructor=instructor,
+                start_time=instance.start_time,
+                title=instance.title
+            )
+            
+            # Update booking session with new values
+            booking_session.end_time = instance.end_time
+            booking_session.duration_minutes = instance.duration_minutes
+            booking_session.language = instance.language
+            booking_session.level = instance.level
+            booking_session.description = instance.description
+            booking_session.max_students = instance.max_students
+            booking_session.status = instance.status
+            
+            # Skip signal to avoid infinite loop
+            post_save.disconnect(sync_booking_to_group_session, sender=GroupSession)
+            booking_session.save()
+            post_save.connect(sync_booking_to_group_session, sender=GroupSession)
+            
+            # Sync students
+            booking_session.students.set(instance.students.all())
+            
+        except GroupSession.DoesNotExist:
+            # Create new booking session
+            booking_session = GroupSession(
+                title=instance.title,
+                instructor=instructor,
+                language=instance.language,
+                level=instance.level,
+                description=instance.description,
+                start_time=instance.start_time,
+                end_time=instance.end_time,
+                duration_minutes=instance.duration_minutes,
+                max_students=instance.max_students,
+                status=instance.status,
+                price=instance.price if hasattr(instance, 'price') else 15.00  # Default price
+            )
+            
+            # Skip signal to avoid infinite loop
+            post_save.disconnect(sync_booking_to_group_session, sender=GroupSession)
+            booking_session.save()
+            post_save.connect(sync_booking_to_group_session, sender=GroupSession)
+            
+            # Sync students
+            booking_session.students.set(instance.students.all())
+    
+    except (ImportError, AttributeError):
+        # Booking app not available or models not compatible
+        pass
+
+
+@receiver(post_save, sender=PrivateSessionSlot)
+def sync_booking_to_private_session(sender, instance, created, **kwargs):
+    """Sync booking slot changes to content app"""
+    try:
+        from apps.content.models import PrivateSession, Instructor as ContentInstructor
+        
+        # Skip if there's no corresponding content instructor
+        if not hasattr(instance.instructor.user, 'instructor_profile'):
+            return
+            
+        content_instructor = instance.instructor.user.instructor_profile
+        
+        # For existing slots, find the corresponding content session
+        try:
+            content_session = PrivateSession.objects.get(
+                instructor=content_instructor,
+                start_time=instance.start_time
+            )
+            
+            # Update the content session with new values
+            content_session.end_time = instance.end_time
+            content_session.duration_minutes = instance.duration_minutes
+            content_session.language = instance.language
+            content_session.level = instance.level
+            content_session.status = instance.status
+            
+            # Update student if booked
+            if instance.status == 'booked' and instance.student:
+                content_session.student = instance.student
+            
+            # Skip signal to avoid infinite loop
+            post_save.disconnect(sync_private_session_to_booking, sender=PrivateSession)
+            content_session.save()
+            post_save.connect(sync_private_session_to_booking, sender=PrivateSession)
+            
+        except PrivateSession.DoesNotExist:
+            # Session doesn't exist in content app, create it
+            content_session = PrivateSession(
+                instructor=content_instructor,
+                start_time=instance.start_time,
+                end_time=instance.end_time,
+                duration_minutes=instance.duration_minutes,
+                language=instance.language,
+                level=instance.level,
+                status=instance.status,
+                student=instance.student if instance.status == 'booked' else None
+            )
+            
+            # Skip signal to avoid infinite loop
+            post_save.disconnect(sync_private_session_to_booking, sender=PrivateSession)
+            content_session.save()
+            post_save.connect(sync_private_session_to_booking, sender=PrivateSession)
+    except (ImportError, AttributeError):
+        # Content app not available or models not compatible
+        pass
+
+
+@receiver(post_save, sender=GroupSession)
+def sync_booking_to_group_session(sender, instance, created, **kwargs):
+    """Sync booking group session changes to content app"""
+    try:
+        from apps.content.models import GroupSession as ContentGroupSession
+        
+        # Skip if there's no corresponding content instructor
+        if not hasattr(instance.instructor.user, 'instructor_profile'):
+            return
+            
+        content_instructor = instance.instructor.user.instructor_profile
+        
+        # For existing sessions, find the corresponding content session
+        try:
+            content_session = ContentGroupSession.objects.get(
+                instructor=content_instructor,
+                start_time=instance.start_time,
+                title=instance.title
+            )
+            
+            # Update the content session with new values
+            content_session.end_time = instance.end_time
+            content_session.duration_minutes = instance.duration_minutes
+            content_session.language = instance.language
+            content_session.level = instance.level
+            content_session.description = instance.description
+            content_session.max_students = instance.max_students
+            content_session.status = instance.status
+            
+            # Skip signal to avoid infinite loop
+            post_save.disconnect(sync_group_session_to_booking, sender=ContentGroupSession)
+            content_session.save()
+            post_save.connect(sync_group_session_to_booking, sender=ContentGroupSession)
+            
+            # Sync students
+            content_session.students.set(instance.students.all())
+            
+        except ContentGroupSession.DoesNotExist:
+            # Session doesn't exist in content app, create it
+            content_session = ContentGroupSession(
+                title=instance.title,
+                instructor=content_instructor,
+                language=instance.language,
+                level=instance.level,
+                description=instance.description,
+                start_time=instance.start_time,
+                end_time=instance.end_time,
+                duration_minutes=instance.duration_minutes,
+                max_students=instance.max_students,
+                status=instance.status
+            )
+            
+            # Skip signal to avoid infinite loop
+            post_save.disconnect(sync_group_session_to_booking, sender=ContentGroupSession)
+            content_session.save()
+            post_save.connect(sync_group_session_to_booking, sender=ContentGroupSession)
+            
+            # Sync students
+            content_session.students.set(instance.students.all())
+    except (ImportError, AttributeError):
+        # Content app not available or models not compatible
+        pass
+
+
+# Connect the signals for content app if available
+try:
+    from apps.content.models import PrivateSession, GroupSession as ContentGroupSession
+    post_save.connect(sync_private_session_to_booking, sender=PrivateSession)
+    post_save.connect(sync_group_session_to_booking, sender=ContentGroupSession)
+except ImportError:
+    # Content app not available
+    pass

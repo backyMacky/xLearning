@@ -138,7 +138,7 @@ class DashboardOverviewView(LoginRequiredMixin, TemplateView):
         else:
             context['quick_links'] = [
                 {'name': 'Browse Courses', 'url': '/content/courses/', 'icon': 'books'},
-                {'name': 'Book Session', 'url': '/booking/slots/', 'icon': 'calendar-event'},
+                {'name': 'Book Session', 'url': '/booking/', 'icon': 'calendar-event'},
                 {'name': 'My Resources', 'url': '/repository/files/', 'icon': 'folder'},
                 {'name': 'Take Quiz', 'url': '/assessment/quizzes/', 'icon': 'writing'}
             ]

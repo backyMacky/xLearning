@@ -54,7 +54,7 @@
           </div>
           {% endif %}
           
-          <!-- Session Type Tabs (for first-time creation only) -->
+          <!-- Session Type Tabs -->
           {% if not is_update %}
           <div class="mb-4">
             <ul class="nav nav-tabs nav-fill" id="session-type-tabs" role="tablist">
@@ -75,7 +75,6 @@
           
           <div class="tab-content">
             <div class="tab-pane fade {% if is_private or not is_update %}show active{% endif %}" id="private-content" role="tabpanel" aria-labelledby="private-tab">
-              <!-- Private Session Content -->
               <div class="row g-3">
                 {% if not is_private and not is_update %}
                 <div class="col-12">
@@ -90,7 +89,7 @@
                 </div>
                 {% endif %}
                 
-                <!-- Language and Level Selections with hardcoded options -->
+                <!-- Language and Level Selections -->
                 <div class="col-md-6">
                   <label for="id_language" class="form-label">Teaching Language</label>
                   <select id="id_language" name="language" class="form-select select2" required>
@@ -124,34 +123,35 @@
                   </select>
                 </div>
                 
-                <!-- Enhanced Date & Time Pickers -->
+                <!-- Date Input -->
                 <div class="col-md-6">
                   <label for="session_date" class="form-label">Session Date</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-calendar"></i></span>
-                    <input type="text" id="session_date" name="session_date" class="form-control flatpickr-date" placeholder="Select date"
+                    <input type="date" id="session_date" name="session_date" class="form-control flatpickr-date" 
+                      placeholder="YYYY-MM-DD" 
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|date:'Y-m-d' }}"
-                      {% else %}
-                      value=""
                       {% endif %}
                       required>
+                  </div>
+                </div>
+
+                <!-- Time Input -->
+                <div class="col-md-6">
+                  <label for="session_time" class="form-label">Session Time</label>
+                  <div class="input-group rounded">
+                    <span class="input-group-text rounded-end"><i class="ti ti-clock"></i></span>
+                    <input type="text" id="session_time" name="session_time" 
+                           class="form-control py-5 flatpickr-time rounded-end"
+                           placeholder="HH:MM" 
+                           {% if form.instance.start_time %}
+                           value="{{ form.instance.start_time|time:'H:i' }}"
+                           {% endif %}
+                           required>
                   </div>
                 </div>
                 
-                <div class="col-md-6">
-                  <label for="session_time" class="form-label">Session Time</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-clock"></i></span>
-                    <input type="text" id="session_time" name="session_time" class="form-control flatpickr-time" placeholder="Select time"
-                      {% if form.instance.start_time %}
-                      value="{{ form.instance.start_time|time:'H:i' }}"
-                      {% else %}
-                      value=""
-                      {% endif %}
-                      required>
-                  </div>
-                </div>
                 
                 <!-- Duration Selection -->
                 <div class="col-md-6">
@@ -177,7 +177,6 @@
             </div>
             
             <div class="tab-pane fade {% if not is_private and not is_update %}show active{% endif %}" id="group-content" role="tabpanel" aria-labelledby="group-tab">
-              <!-- Group Session Content -->
               <div class="row g-3">
                 {% if is_private and not is_update %}
                 <div class="col-12">
@@ -206,7 +205,7 @@
                   <small class="text-muted">Describe what students will learn in this session</small>
                 </div>
                 
-                <!-- Group Language and Level Selections with hardcoded options -->
+                <!-- Group Language and Level Selections -->
                 <div class="col-md-6">
                   <label for="id_group_language" class="form-label">Teaching Language</label>
                   <select id="id_group_language" name="language" class="form-select select2" required>
@@ -240,12 +239,13 @@
                   </select>
                 </div>
                 
-                <!-- Enhanced Group Date & Time Pickers -->
+                <!-- Group Date Input -->
                 <div class="col-md-6">
                   <label for="group_session_date" class="form-label">Session Date</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-calendar"></i></span>
-                    <input type="text" id="group_session_date" name="session_date" class="form-control flatpickr-date" placeholder="Select date"
+                    <input type="date" id="group_session_date" name="session_date" class="form-control flatpickr-date" 
+                      placeholder="YYYY-MM-DD"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|date:'Y-m-d' }}"
                       {% endif %}
@@ -253,11 +253,13 @@
                   </div>
                 </div>
                 
+                <!-- Group Time Input -->
                 <div class="col-md-6">
                   <label for="group_session_time" class="form-label">Session Time</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-clock"></i></span>
-                    <input type="text" id="group_session_time" name="session_time" class="form-control flatpickr-time" placeholder="Select time"
+                    <input type="text" id="group_session_time" name="session_time" class="form-control py-5 flatpickr-time" 
+                      placeholder="HH:MM"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|time:'H:i' }}"
                       {% endif %}
@@ -346,65 +348,51 @@
       allowClear: true,
       width: '100%'
     });
-
-    // Ensure Flatpickr is available before attempting to use it
-    if (typeof flatpickr === 'function') {
-      // Initialize Flatpickr date pickers
-      const datePickers = document.querySelectorAll('.flatpickr-date');
-      datePickers.forEach(function(picker) {
-        flatpickr(picker, {
-          enableTime: false,
-          dateFormat: "Y-m-d",
-          minDate: "today",
-          altInput: true,
-          altFormat: "F j, Y",
-          animate: true,
-          allowInput: true,
-          clickOpens: true,
-          disableMobile: false
-        });
+  
+    // Initialize Flatpickr date pickers
+    const datePickers = document.querySelectorAll('.flatpickr-date');
+    datePickers.forEach(function(picker) {
+      flatpickr(picker, {
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        altInput: true,
+        altFormat: "F j, Y"
       });
-
-      // Initialize Flatpickr time pickers
-      const timePickers = document.querySelectorAll('.flatpickr-time');
-      timePickers.forEach(function(picker) {
-        flatpickr(picker, {
-          enableTime: true,
-          noCalendar: true,
-          dateFormat: "H:i",
-          time_24hr: true,
-          minuteIncrement: 15,
-          altInput: true,
-          altFormat: "h:i K",
-          animate: true,
-          allowInput: true,
-          clickOpens: true,
-          disableMobile: false
-        });
+    });
+  
+    // Initialize Flatpickr time pickers
+    const timePickers = document.querySelectorAll('.flatpickr-time');
+    timePickers.forEach(function(picker) {
+      flatpickr(picker, {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        minuteIncrement: 15,
+        altInput: true,
+        altFormat: "h:i K"
       });
-    } else {
-      console.error('Flatpickr library not loaded!');
-    }
-
+    });
+  
     // Handle session type tab switching
     const sessionTypeTabs = document.querySelectorAll('#session-type-tabs .nav-link');
     const sessionTypeInput = document.getElementById('session_type_input');
-
+  
     sessionTypeTabs.forEach(tab => {
       tab.addEventListener('click', function() {
         const type = this.id === 'private-tab' ? 'private' : 'group';
         sessionTypeInput.value = type;
       });
     });
-
+  
     // Validate form before submission
     const sessionForm = document.getElementById('sessionForm');
     sessionForm.addEventListener('submit', function(e) {
       const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
-                              document.getElementById('private-content')?.classList.contains('show');
-
+                             document.getElementById('private-content')?.classList.contains('show');
+  
       let dateInput, timeInput;
-
+  
       if (isPrivateActive) {
         dateInput = document.getElementById('session_date');
         timeInput = document.getElementById('session_time');
@@ -412,29 +400,29 @@
         dateInput = document.getElementById('group_session_date');
         timeInput = document.getElementById('group_session_time');
       }
-
+  
       if (!dateInput.value) {
         e.preventDefault();
         alert('Please select a date for your session.');
         return false;
       }
-
+  
       if (!timeInput.value) {
         e.preventDefault();
         alert('Please select a time for your session.');
         return false;
       }
-
+  
       if (!isPrivateActive) {
         const title = document.getElementById('id_title')?.value;
         const description = document.getElementById('id_description')?.value;
-
+  
         if (!title || title.trim() === '') {
           e.preventDefault();
           alert('Please provide a title for your group session');
           return false;
         }
-
+  
         if (!description || description.trim() === '') {
           e.preventDefault();
           alert('Please provide a description for your group session');

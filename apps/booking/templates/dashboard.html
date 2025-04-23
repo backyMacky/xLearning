@@ -119,7 +119,7 @@
           <div class="dropdown">
             <button class="btn btn-sm p-0" type="button" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
             <div class="dropdown-menu dropdown-menu-end">
-              <a href=" " class="dropdown-item">View Available Slots</a>
+              <a href="#availableSlots" class="dropdown-item">View Available Slots</a>
             </div>
           </div>
         </div>
@@ -218,7 +218,7 @@
                   <tr>
                     <td>{{ slot.start_time|date:"M d, Y" }}</td>
                     <td>{{ slot.start_time|date:"h:i A" }}</td>
-                    <td>{{ slot.duration }} minutes</td>
+                    <td>{{ slot.duration_minutes }} minutes</td>
                     <td>
                       <span class="badge bg-label-success">Available</span>
                     </td>
@@ -273,7 +273,7 @@
                   <tr>
                     <td>{{ slot.start_time|date:"M d, Y" }}</td>
                     <td>{{ slot.start_time|date:"h:i A" }}</td>
-                    <td>{{ slot.duration }} minutes</td>
+                    <td>{{ slot.duration_minutes }} minutes</td>
                     <td>{{ slot.student.username }}</td>
                     <td>
                       <span class="badge bg-label-primary">Booked</span>
@@ -330,7 +330,7 @@
                   <tr>
                     <td>{{ slot.start_time|date:"M d, Y h:i A" }}</td>
                     <td>{{ slot.student.username }}</td>
-                    <td>{{ slot.duration }} minutes</td>
+                    <td>{{ slot.duration_minutes }} minutes</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -370,7 +370,7 @@
                   <tr>
                     <td>{{ slot.start_time|date:"M d, Y h:i A" }}</td>
                     <td>{{ slot.student.username|default:"N/A" }}</td>
-                    <td>{{ slot.duration }} minutes</td>
+                    <td>{{ slot.duration_minutes }} minutes</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -424,8 +424,8 @@
                   <tr>
                     <td>{{ slot.start_time|date:"M d, Y" }}</td>
                     <td>{{ slot.start_time|date:"h:i A" }}</td>
-                    <td>{{ slot.teacher.username }}</td>
-                    <td>{{ slot.duration }} minutes</td>
+                    <td>{{ slot.instructor.user.username }}</td>
+                    <td>{{ slot.duration_minutes }} minutes</td>
                     <td>
                       <span class="badge bg-label-{{ slot.status|lower|slugify }}">
                         {{ slot.status|title }}
@@ -460,65 +460,291 @@
             </div>
             <h6 class="mb-1">No bookings yet</h6>
             <p class="mb-3">You haven't booked any sessions yet.</p>
-            <a href="" class="btn btn-primary">Browse Available Slots</a>
+            <a href="#availableSlots" class="btn btn-primary">Browse Available Slots</a>
           </div>
         {% endif %}
       </div>
     </div>
   </div>
   
-  <!-- Available Slots -->
-  <div class="col-12 mb-4" id="availableSlots">
+  <!-- Session Types Selector -->
+  <div class="col-12 mb-3" id="availableSlots">
     <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Available Booking Slots</h5>
-      </div>
       <div class="card-body">
-        {% if available_slots %}
-          <div class="table-responsive">
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Teacher</th>
-                  <th>Duration</th>
-                  <th>Price</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for slot in available_slots %}
-                  <tr>
-                    <td>{{ slot.start_time|date:"M d, Y" }}</td>
-                    <td>{{ slot.start_time|date:"h:i A" }}</td>
-                    <td>{{ slot.teacher.username }}</td>
-                    <td>{{ slot.duration }} minutes</td>
-                    <td>1 credit</td>
-                    <td>
-                      <div class="d-flex">
-                        <a href="{% url 'booking:book_slot' slot_id=slot.id %}" class="btn btn-sm btn-primary">
-                          <i class="ti ti-calendar-plus me-1"></i> Book Session
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <div class="text-center py-5">
-            <div class="mb-3">
-              <i class="ti ti-calendar-off ti-3x text-muted"></i>
-            </div>
-            <h6 class="mb-1">No available slots</h6>
-            <p class="mb-0">There are no available booking slots at the moment.</p>
-          </div>
-        {% endif %}
+        <h5 class="card-title mb-3">Available Sessions</h5>
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button type="button" class="nav-link active" id="private-sessions-tab" data-bs-toggle="tab" data-bs-target="#private-sessions" role="tab" aria-controls="private-sessions" aria-selected="true">
+              <i class="ti ti-user me-1"></i> Private Sessions
+              <small class="d-block text-muted">(Requires 2 credits)</small>
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button type="button" class="nav-link" id="group-sessions-tab" data-bs-toggle="tab" data-bs-target="#group-sessions" role="tab" aria-controls="group-sessions" aria-selected="false">
+              <i class="ti ti-users me-1"></i> Group Sessions
+              <small class="d-block text-muted">(Requires 1 credit)</small>
+            </button>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
+  
+  <!-- Available Sessions Tabs -->
+  <div class="col-12 mb-4">
+    <div class="tab-content">
+      <!-- Private Sessions Tab -->
+      <div class="tab-pane fade show active" id="private-sessions" role="tabpanel" aria-labelledby="private-sessions-tab">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Available Private Sessions</h5>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti ti-filter me-1"></i> Filter
+              </button>
+              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                <a class="dropdown-item" href="?session_type=private&language=en">English</a>
+                <a class="dropdown-item" href="?session_type=private&language=fr">French</a>
+                <a class="dropdown-item" href="?session_type=private&language=es">Spanish</a>
+                <a class="dropdown-item" href="?session_type=private&language=de">German</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="?session_type=private">Clear Filters</a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            {% if available_private_slots %}
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Instructor</th>
+                      <th>Language</th>
+                      <th>Duration</th>
+                      <th>Price</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for slot in available_private_slots %}
+                      <tr>
+                        <td>{{ slot.start_time|date:"M d, Y" }}</td>
+                        <td>{{ slot.start_time|date:"h:i A" }}</td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            {% if slot.instructor.profile_image %}
+                              <img src="{{ slot.instructor.profile_image.url }}" alt="{{ slot.instructor.user.username }}" class="rounded-circle me-2" width="30" height="30">
+                            {% else %}
+                              <div class="avatar avatar-sm me-2">
+                                <div class="avatar-initial rounded-circle bg-label-primary">
+                                  <i class="ti ti-user"></i>
+                                </div>
+                              </div>
+                            {% endif %}
+                            <span>{{ slot.instructor.user.username }}</span>
+                          </div>
+                        </td>
+                        <td><span class="badge bg-label-primary">{{ slot.get_language_display }}</span></td>
+                        <td>{{ slot.duration_minutes }} minutes</td>
+                        <td>2 credits</td>
+                        <td>
+                          <div class="d-flex">
+                            {% if credit_balance >= 2 %}
+                              <a href="{% url 'booking:book_private_session' slot_id=slot.id %}" class="btn btn-sm btn-primary">
+                                <i class="ti ti-calendar-plus me-1"></i> Book
+                              </a>
+                            {% else %}
+                              <a href="{% url 'booking:purchase_credits' %}" class="btn btn-sm btn-warning">
+                                <i class="ti ti-credit-card me-1"></i> Need Credits
+                              </a>
+                            {% endif %}
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="text-center py-5">
+                <div class="mb-3">
+                  <i class="ti ti-calendar-off ti-3x text-muted"></i>
+                </div>
+                <h6 class="mb-1">No available private sessions</h6>
+                <p class="mb-0">There are no available private session slots at the moment.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Group Sessions Tab -->
+      <div class="tab-pane fade" id="group-sessions" role="tabpanel" aria-labelledby="group-sessions-tab">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Available Group Sessions</h5>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="filterGroupDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ti ti-filter me-1"></i> Filter
+              </button>
+              <div class="dropdown-menu dropdown-menu-end" aria-labelledby="filterGroupDropdown">
+                <a class="dropdown-item" href="?session_type=group&language=en">English</a>
+                <a class="dropdown-item" href="?session_type=group&language=fr">French</a>
+                <a class="dropdown-item" href="?session_type=group&language=es">Spanish</a>
+                <a class="dropdown-item" href="?session_type=group&language=de">German</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="?session_type=group">Clear Filters</a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            {% if available_group_sessions %}
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Session</th>
+                      <th>Date & Time</th>
+                      <th>Instructor</th>
+                      <th>Duration</th>
+                      <th>Enrollment</th>
+                      <th>Price</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for session in available_group_sessions %}
+                      <tr>
+                        <td>
+                          <div class="d-flex flex-column">
+                            <span class="fw-semibold mb-1">{{ session.title }}</span>
+                            <div>
+                              <span class="badge bg-label-primary me-1">{{ session.get_language_display }}</span>
+                              <span class="badge bg-label-info">{{ session.get_level_display }}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex flex-column">
+                            <span>{{ session.start_time|date:"M d, Y" }}</span>
+                            <span class="text-muted">{{ session.start_time|date:"h:i A" }}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            {% if session.instructor.profile_image %}
+                              <img src="{{ session.instructor.profile_image.url }}" alt="{{ session.instructor.user.username }}" class="rounded-circle me-2" width="30" height="30">
+                            {% else %}
+                              <div class="avatar avatar-sm me-2">
+                                <div class="avatar-initial rounded-circle bg-label-primary">
+                                  <i class="ti ti-user"></i>
+                                </div>
+                              </div>
+                            {% endif %}
+                            <span>{{ session.instructor.user.username }}</span>
+                          </div>
+                        </td>
+                        <td>{{ session.duration_minutes }} minutes</td>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <div class="progress flex-grow-1" style="height: 6px;">
+                              <div class="progress-bar bg-primary" role="progressbar" 
+                                  style="width: {{ session.enrollment_percentage }}%" 
+                                  aria-valuenow="{{ session.enrollment_percentage }}" 
+                                  aria-valuemin="0" 
+                                  aria-valuemax="100"></div>
+                            </div>
+                            <span class="ms-2">{{ session.students.count }}/{{ session.max_students }}</span>
+                          </div>
+                        </td>
+                        <td>1 credit</td>
+                        <td>
+                          <div class="d-flex">
+                            {% if session.is_full %}
+                              <button disabled class="btn btn-sm btn-outline-secondary">
+                                <i class="ti ti-users-off me-1"></i> Full
+                              </button>
+                            {% elif credit_balance >= 1 %}
+                              <a href="{% url 'booking:enroll_group_session' session_id=session.id %}" class="btn btn-sm btn-primary">
+                                <i class="ti ti-user-plus me-1"></i> Join
+                              </a>
+                            {% else %}
+                              <a href="{% url 'booking:purchase_credits' %}" class="btn btn-sm btn-warning">
+                                <i class="ti ti-credit-card me-1"></i> Need Credits
+                              </a>
+                            {% endif %}
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="text-center py-5">
+                <div class="mb-3">
+                  <i class="ti ti-users-off ti-3x text-muted"></i>
+                </div>
+                <h6 class="mb-1">No available group sessions</h6>
+                <p class="mb-0">There are no available group sessions at the moment.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+  
+  <!-- Featured Instructors -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Featured Instructors</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% if available_instructors %}
+            {% for instructor in available_instructors %}
+              <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card border shadow-none h-100">
+                  <div class="card-body text-center">
+                    <div class="avatar avatar-md mx-auto mb-3">
+                      {% if instructor.profile_image %}
+                        <img src="{{ instructor.profile_image.url }}" alt="{{ instructor.user.username }}" class="rounded-circle">
+                      {% else %}
+                        <div class="avatar-initial rounded-circle bg-label-primary">
+                          <i class="ti ti-user"></i>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <h6 class="card-title mb-1">{{ instructor.user.username }}</h6>
+                    <div class="d-flex justify-content-center mb-2">
+                      {% for i in "12345" %}
+                        {% if forloop.counter <= instructor.rating %}
+                          <i class="ti ti-star-filled text-warning ti-xs"></i>
+                        {% else %}
+                          <i class="ti ti-star text-muted ti-xs"></i>
+                        {% endif %}
+                      {% endfor %}
+                      <span class="ms-1 text-muted">({{ instructor.review_count }})</span>
+                    </div>
+                    <a href="{% url 'content:instructor_detail' username=instructor.user.username %}" class="btn btn-sm btn-primary">
+                      <i class="ti ti-eye me-1"></i> View Profile
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="col-12 text-center py-4">
+              <p class="mb-0">No featured instructors available at the moment.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endif %}
 
 {% endblock %}
@@ -538,6 +764,14 @@
         search: ''
       }
     });
+    
+    // Keep the active tab after page refresh
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionType = urlParams.get('session_type');
+    
+    if (sessionType === 'group') {
+      document.getElementById('group-sessions-tab').click();
+    }
   });
 </script>
 {% endblock %}

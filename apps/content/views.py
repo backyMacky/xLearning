@@ -4,13 +4,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.http import Http404, JsonResponse
 from django.contrib import messages
-from django.db.models import Q, Count, Avg, Max
+from django.db import models
+from django.db.models import Q, Count, Avg, Max, Value, CharField
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-
-# Assuming you have a template layout system
-from apps.account import models
 from web_project import TemplateLayout
 from web_project.template_helpers.theme import TemplateHelper
 
@@ -1068,66 +1066,94 @@ class InstructorDashboardView(LoginRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
-        
+
         user = self.request.user
-        
+
         # Check if the user has an instructor profile
         has_instructor_profile = hasattr(user, 'instructor_profile')
         context['has_instructor_profile'] = has_instructor_profile
-        
+
         if has_instructor_profile:
             instructor = user.instructor_profile
             context['instructor'] = instructor
-            
+
             # Current time
             now = timezone.now()
-            
-            # Get upcoming sessions
-            context['upcoming_private_sessions'] = PrivateSession.objects.filter(
-                instructor=instructor,
+
+            # Get all private sessions/slots
+            private_sessions = PrivateSession.objects.filter(
+                instructor=instructor
+            ).order_by('start_time')
+
+            # Split into different categories
+            context['upcoming_private_sessions'] = private_sessions.filter(
                 start_time__gt=now,
                 status__in=['available', 'booked']
+            )
+
+            context['private_slots'] = private_sessions.filter(
+                status='available'
+            )
+
+            # Get all group sessions
+            group_sessions = GroupSession.objects.filter(
+                instructor=instructor
             ).order_by('start_time')
-            
-            context['upcoming_group_sessions'] = GroupSession.objects.filter(
-                instructor=instructor,
+
+            context['upcoming_group_sessions'] = group_sessions.filter(
                 start_time__gt=now,
                 status='scheduled'
-            ).order_by('start_time')
-            
+            )
+
+            context['group_sessions'] = group_sessions.filter(
+                status='scheduled'
+            )
+
             # Get active sessions (currently happening)
-            context['active_private_sessions'] = PrivateSession.objects.filter(
-                instructor=instructor,
+            context['active_private_sessions'] = private_sessions.filter(
                 start_time__lte=now,
                 end_time__gte=now,
                 status__in=['booked', 'active']
             )
-            
-            context['active_group_sessions'] = GroupSession.objects.filter(
-                instructor=instructor,
+
+            context['active_group_sessions'] = group_sessions.filter(
                 start_time__lte=now,
                 end_time__gte=now,
                 status__in=['scheduled', 'active']
             )
-            
+
+            # Past sessions (combine private and group)
+            past_private_sessions = private_sessions.filter(
+                start_time__lt=now
+            ).annotate(type=models.Value('private', output_field=models.CharField()))
+
+            past_group_sessions = group_sessions.filter(
+                start_time__lt=now
+            ).annotate(type=models.Value('group', output_field=models.CharField()))
+
+            # Combine and sort past sessions
+            context['past_sessions'] = list(past_private_sessions) + list(past_group_sessions)
+            context['past_sessions'].sort(key=lambda x: x.start_time, reverse=True)
+            context['past_sessions'] = context['past_sessions'][:10]  # Limit to 10 most recent
+
             # Get recent reviews
             context['recent_reviews'] = InstructorReview.objects.filter(
                 instructor=instructor
             ).order_by('-created_at')[:5]
-            
+
             # Get courses taught by this instructor
             context['taught_courses'] = Course.objects.filter(
                 teacher=user
             ).order_by('-created_at')
-        
+
         # Set active menu attributes
         context['active_menu'] = 'instructor'
         context['active_submenu'] = 'instructor_dashboard'
-        
+
         # Set the layout path
         context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
         TemplateHelper.map_context(context)
-        
+
         return context
 
 
@@ -1145,10 +1171,10 @@ class CreatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
     def form_valid(self, form):
         # Set the instructor to current user's profile
         instructor = self.request.user.instructor_profile
-        
+
         # Save and get the instance
         instance = form.save(commit=False, instructor=instructor)
-        
+
         # Set status based on action
         action = self.request.POST.get('action', 'publish')
         if action == 'publish':
@@ -1158,8 +1184,37 @@ class CreatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
         else:
             instance.status = 'draft'
             messages.success(self.request, "Private session slot saved as draft!")
-        
+
         instance.save()
+    
+        # Create corresponding entry in the booking app if available
+        try:
+            from apps.booking.models import PrivateSessionSlot, Instructor
+            # Get or create instructor profile in booking app
+            booking_instructor, created = Instructor.objects.get_or_create(
+                user=self.request.user,
+                defaults={
+                    'bio': instructor.bio if hasattr(instructor, 'bio') else '',
+                    'profile_image': instructor.profile_image if hasattr(instructor, 'profile_image') else None,
+                    'teaching_languages': ','.join(instructor.teaching_languages.all().values_list('code', flat=True)) if hasattr(instructor, 'teaching_languages') else '',
+                    'hourly_rate': instructor.hourly_rate if hasattr(instructor, 'hourly_rate') else 25.00
+                }
+            )
+
+            # Create private session slot in booking app
+            PrivateSessionSlot.objects.create(
+                instructor=booking_instructor,
+                start_time=instance.start_time,
+                end_time=instance.end_time,
+                duration_minutes=instance.duration_minutes,
+                language=instance.language,
+                level=instance.level,
+                status='available' if instance.status == 'available' else 'draft'
+            )
+        except (ImportError, AttributeError):
+            # Booking app not available or models not compatible
+            pass
+        
         return redirect(self.success_url)
     
     def get_context_data(self, **kwargs):
@@ -1294,10 +1349,10 @@ class CreateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView
     def form_valid(self, form):
         # Set the instructor to current user's profile
         instructor = self.request.user.instructor_profile
-        
+
         # Save and get the instance
         instance = form.save(commit=False, instructor=instructor)
-        
+
         # Set status based on action
         action = self.request.POST.get('action', 'publish')
         if action == 'publish':
@@ -1307,8 +1362,41 @@ class CreateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView
         else:
             instance.status = 'draft'
             messages.success(self.request, "Group session saved as draft!")
-        
+
         instance.save()
+
+        # Create corresponding entry in the booking app if available
+        try:
+            from apps.booking.models import GroupSession, Instructor
+            # Get or create instructor profile in booking app
+            booking_instructor, created = Instructor.objects.get_or_create(
+                user=self.request.user,
+                defaults={
+                    'bio': instructor.bio if hasattr(instructor, 'bio') else '',
+                    'profile_image': instructor.profile_image if hasattr(instructor, 'profile_image') else None,
+                    'teaching_languages': ','.join(instructor.teaching_languages.all().values_list('code', flat=True)) if hasattr(instructor, 'teaching_languages') else '',
+                    'hourly_rate': instructor.hourly_rate if hasattr(instructor, 'hourly_rate') else 25.00
+                }
+            )
+
+            # Create group session in booking app
+            GroupSession.objects.create(
+                title=instance.title,
+                instructor=booking_instructor,
+                language=instance.language,
+                level=instance.level,
+                description=instance.description,
+                start_time=instance.start_time,
+                end_time=instance.end_time,
+                duration_minutes=instance.duration_minutes,
+                max_students=instance.max_students,
+                price=instance.price if hasattr(instance, 'price') else 1.00,
+                status='scheduled'
+            )
+        except (ImportError, AttributeError):
+            # Booking app not available or models not compatible
+            pass
+        
         return redirect(self.success_url)
     
     def get_context_data(self, **kwargs):

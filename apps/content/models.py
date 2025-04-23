@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.urls import reverse
 from multiselectfield import MultiSelectField
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Course(models.Model):
     """Model for language learning courses"""
@@ -577,3 +578,99 @@ class SessionFeedback(models.Model):
                 name='feedback_has_session'
             ),
         ]
+
+@receiver(post_save, sender=PrivateSession)
+def sync_private_session_to_booking(sender, instance, created, **kwargs):
+    """Sync private session changes to booking app"""
+    try:
+        from apps.booking.models import PrivateSessionSlot, Instructor
+        
+        # If it's a new session, the creation is handled in the view
+        if not created:
+            # For existing sessions, find the corresponding booking slot
+            try:
+                booking_instructor = Instructor.objects.get(user=instance.instructor.user)
+                booking_slot = PrivateSessionSlot.objects.get(
+                    instructor=booking_instructor,
+                    start_time=instance.start_time
+                )
+                
+                # Update the booking slot with new values
+                booking_slot.end_time = instance.end_time
+                booking_slot.duration_minutes = instance.duration_minutes
+                booking_slot.language = instance.language
+                booking_slot.level = instance.level
+                booking_slot.status = instance.status
+                
+                # Update student if booked
+                if instance.status == 'booked' and instance.student:
+                    booking_slot.student = instance.student
+                
+                booking_slot.save()
+            except PrivateSessionSlot.DoesNotExist:
+                # Slot doesn't exist in booking app, create it
+                PrivateSessionSlot.objects.create(
+                    instructor=booking_instructor,
+                    start_time=instance.start_time,
+                    end_time=instance.end_time,
+                    duration_minutes=instance.duration_minutes,
+                    language=instance.language,
+                    level=instance.level,
+                    status=instance.status,
+                    student=instance.student if instance.status == 'booked' else None
+                )
+    except (ImportError, AttributeError):
+        # Booking app not available or models not compatible
+        pass
+
+@receiver(post_save, sender=GroupSession)
+def sync_group_session_to_booking(sender, instance, created, **kwargs):
+    """Sync group session changes to booking app"""
+    try:
+        from apps.booking.models import GroupSession as BookingGroupSession, Instructor
+        
+        # If it's a new session, the creation is handled in the view
+        if not created:
+            # For existing sessions, find the corresponding booking session
+            try:
+                booking_instructor = Instructor.objects.get(user=instance.instructor.user)
+                booking_session = BookingGroupSession.objects.get(
+                    instructor=booking_instructor,
+                    start_time=instance.start_time,
+                    title=instance.title
+                )
+                
+                # Update the booking session with new values
+                booking_session.end_time = instance.end_time
+                booking_session.duration_minutes = instance.duration_minutes
+                booking_session.language = instance.language
+                booking_session.level = instance.level
+                booking_session.description = instance.description
+                booking_session.max_students = instance.max_students
+                booking_session.status = instance.status
+                
+                booking_session.save()
+                
+                # Sync students
+                booking_session.students.set(instance.students.all())
+            except BookingGroupSession.DoesNotExist:
+                # Session doesn't exist in booking app, create it
+                booking_session = BookingGroupSession.objects.create(
+                    title=instance.title,
+                    instructor=booking_instructor,
+                    language=instance.language,
+                    level=instance.level,
+                    description=instance.description,
+                    start_time=instance.start_time,
+                    end_time=instance.end_time,
+                    duration_minutes=instance.duration_minutes,
+                    max_students=instance.max_students,
+                    price=instance.price if hasattr(instance, 'price') else 1.00,
+                    status=instance.status
+                )
+                
+                # Sync students
+                booking_session.students.set(instance.students.all())
+    except (ImportError, AttributeError):
+        # Booking app not available or models not compatible
+        pass        
