@@ -30,6 +30,7 @@
         </a>
       </div>
       <div class="card-body">
+        <!-- Form with fixed action -->
         <form method="post" id="sessionForm">
           {% csrf_token %}
           
@@ -54,7 +55,7 @@
           </div>
           {% endif %}
           
-          <!-- Session Type Tabs -->
+          <!-- Session Type Tabs - Only show if not updating -->
           {% if not is_update %}
           <div class="mb-4">
             <ul class="nav nav-tabs nav-fill" id="session-type-tabs" role="tablist">
@@ -74,7 +75,8 @@
           {% endif %}
           
           <div class="tab-content">
-            <div class="tab-pane fade {% if is_private or not is_update %}show active{% endif %}" id="private-content" role="tabpanel" aria-labelledby="private-tab">
+            <!-- Private Session Form Fields -->
+            <div class="tab-pane fade {% if is_private or is_update and is_private %}show active{% endif %}" id="private-content" role="tabpanel" aria-labelledby="private-tab">
               <div class="row g-3">
                 {% if not is_private and not is_update %}
                 <div class="col-12">
@@ -140,10 +142,10 @@
                 <!-- Time Input -->
                 <div class="col-md-6">
                   <label for="session_time" class="form-label">Session Time</label>
-                  <div class="input-group rounded">
-                    <span class="input-group-text rounded-end"><i class="ti ti-clock"></i></span>
-                    <input type="text" id="session_time" name="session_time" 
-                           class="form-control py-5 flatpickr-time rounded-end"
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="ti ti-clock"></i></span>
+                    <input type="text" id="session_time" name="session_time" class="form-control p-4 flatpickr-time" 
+                           class="form-control flatpickr-time"
                            placeholder="HH:MM" 
                            {% if form.instance.start_time %}
                            value="{{ form.instance.start_time|time:'H:i' }}"
@@ -152,14 +154,13 @@
                   </div>
                 </div>
                 
-                
                 <!-- Duration Selection -->
                 <div class="col-md-6">
                   <label for="id_duration_minutes" class="form-label">Session Duration</label>
                   <select id="id_duration_minutes" name="duration_minutes" class="form-select" required>
                     <option value="30" {% if form.duration_minutes.value == 30 or form.instance.duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
                     <option value="45" {% if form.duration_minutes.value == 45 or form.instance.duration_minutes == 45 %}selected{% endif %}>45 minutes</option>
-                    <option value="60" {% if form.duration_minutes.value == 60 or form.instance.duration_minutes == 60 %}selected{% endif %}>1 hour</option>
+                    <option value="60" {% if form.duration_minutes.value == 60 or form.instance.duration_minutes == 60 or not form.instance.duration_minutes %}selected{% endif %}>1 hour</option>
                     <option value="90" {% if form.duration_minutes.value == 90 or form.instance.duration_minutes == 90 %}selected{% endif %}>1.5 hours</option>
                     <option value="120" {% if form.duration_minutes.value == 120 or form.instance.duration_minutes == 120 %}selected{% endif %}>2 hours</option>
                   </select>
@@ -176,7 +177,8 @@
               </div>
             </div>
             
-            <div class="tab-pane fade {% if not is_private and not is_update %}show active{% endif %}" id="group-content" role="tabpanel" aria-labelledby="group-tab">
+            <!-- Group Session Form Fields -->
+            <div class="tab-pane fade {% if not is_private or is_update and not is_private %}show active{% endif %}" id="group-content" role="tabpanel" aria-labelledby="group-tab">
               <div class="row g-3">
                 {% if is_private and not is_update %}
                 <div class="col-12">
@@ -258,7 +260,7 @@
                   <label for="group_session_time" class="form-label">Session Time</label>
                   <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-clock"></i></span>
-                    <input type="text" id="group_session_time" name="session_time" class="form-control py-5 flatpickr-time" 
+                    <input type="text" id="group_session_time" name="session_time" class="form-control p-4 flatpickr-time" 
                       placeholder="HH:MM"
                       {% if form.instance.start_time %}
                       value="{{ form.instance.start_time|time:'H:i' }}"
@@ -374,62 +376,211 @@
       });
     });
   
-    // Handle session type tab switching
+    // Handle session type tab switching and dynamic form action
     const sessionTypeTabs = document.querySelectorAll('#session-type-tabs .nav-link');
     const sessionTypeInput = document.getElementById('session_type_input');
+    const sessionForm = document.getElementById('sessionForm');
   
-    sessionTypeTabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        const type = this.id === 'private-tab' ? 'private' : 'group';
-        sessionTypeInput.value = type;
-      });
+    // Private tab selected
+    document.getElementById('private-tab')?.addEventListener('click', function() {
+      sessionTypeInput.value = 'private';
+      sessionForm.action = "{% url 'content:create_private_session' %}";
+      
+      // Enable private fields and disable group fields
+      enablePrivateFields();
+      disableGroupFields();
     });
+    
+    // Group tab selected
+    document.getElementById('group-tab')?.addEventListener('click', function() {
+      sessionTypeInput.value = 'group';
+      sessionForm.action = "{% url 'content:create_group_session' %}";
+      
+      // Enable group fields and disable private fields
+      enableGroupFields();
+      disablePrivateFields();
+    });
+    
+    // Set initial form action based on active tab
+    if (document.querySelector('#private-tab.active')) {
+      sessionForm.action = "{% url 'content:create_private_session' %}";
+      enablePrivateFields();
+      disableGroupFields();
+    } else if (document.querySelector('#group-tab.active')) {
+      sessionForm.action = "{% url 'content:create_group_session' %}";
+      enableGroupFields();
+      disablePrivateFields();
+    }
+    
+    // Helper functions to enable/disable fields
+    function enablePrivateFields() {
+      document.getElementById('id_language').disabled = false;
+      document.getElementById('id_level').disabled = false;
+      document.getElementById('session_date').disabled = false;
+      document.getElementById('session_time').disabled = false;
+      document.getElementById('id_duration_minutes').disabled = false;
+      document.getElementById('id_is_trial').disabled = false;
+    }
+    
+    function disablePrivateFields() {
+      document.getElementById('id_language').disabled = true;
+      document.getElementById('id_level').disabled = true;
+      document.getElementById('session_date').disabled = true;
+      document.getElementById('session_time').disabled = true;
+      document.getElementById('id_duration_minutes').disabled = true;
+      document.getElementById('id_is_trial').disabled = true; 
+    }
+    
+    function enableGroupFields() {
+      document.getElementById('id_title').disabled = false;
+      document.getElementById('id_description').disabled = false;
+      document.getElementById('id_group_language').disabled = false;
+      document.getElementById('id_group_level').disabled = false;
+      document.getElementById('group_session_date').disabled = false;
+      document.getElementById('group_session_time').disabled = false;
+      document.getElementById('id_group_duration_minutes').disabled = false;
+      document.getElementById('id_max_students').disabled = false;
+      document.getElementById('id_min_students').disabled = false;
+      document.getElementById('id_tags').disabled = false;
+    }
+    
+    function disableGroupFields() {
+      document.getElementById('id_title').disabled = true;
+      document.getElementById('id_description').disabled = true;
+      document.getElementById('id_group_language').disabled = true;
+      document.getElementById('id_group_level').disabled = true;
+      document.getElementById('group_session_date').disabled = true;
+      document.getElementById('group_session_time').disabled = true;
+      document.getElementById('id_group_duration_minutes').disabled = true;
+      document.getElementById('id_max_students').disabled = true;
+      document.getElementById('id_min_students').disabled = true;
+      document.getElementById('id_tags').disabled = true;
+    }
   
     // Validate form before submission
-    const sessionForm = document.getElementById('sessionForm');
     sessionForm.addEventListener('submit', function(e) {
-      const isPrivateActive = document.querySelector('#private-tab')?.classList.contains('active') || 
-                             document.getElementById('private-content')?.classList.contains('show');
-  
-      let dateInput, timeInput;
-  
+      const isPrivateActive = document.querySelector('#private-tab.active') || 
+                             document.querySelector('#private-content.show.active');
+      
+      // Form submission logic based on active tab
       if (isPrivateActive) {
-        dateInput = document.getElementById('session_date');
-        timeInput = document.getElementById('session_time');
+        // Private session validation
+        const dateInput = document.getElementById('session_date');
+        const timeInput = document.getElementById('session_time');
+        const languageInput = document.getElementById('id_language');
+        const levelInput = document.getElementById('id_level');
+        
+        if (!languageInput.value) {
+          e.preventDefault();
+          alert('Please select a language for your session.');
+          return false;
+        }
+        
+        if (!levelInput.value) {
+          e.preventDefault();
+          alert('Please select a proficiency level for your session.');
+          return false;
+        }
+        
+        if (!dateInput.value) {
+          e.preventDefault();
+          alert('Please select a date for your session.');
+          return false;
+        }
+        
+        if (!timeInput.value) {
+          e.preventDefault();
+          alert('Please select a time for your session.');
+          return false;
+        }
+        
+        // Enable only the private session fields for submission
+        enablePrivateFields();
+        disableGroupFields();
+        
       } else {
-        dateInput = document.getElementById('group_session_date');
-        timeInput = document.getElementById('group_session_time');
-      }
-  
-      if (!dateInput.value) {
-        e.preventDefault();
-        alert('Please select a date for your session.');
-        return false;
-      }
-  
-      if (!timeInput.value) {
-        e.preventDefault();
-        alert('Please select a time for your session.');
-        return false;
-      }
-  
-      if (!isPrivateActive) {
-        const title = document.getElementById('id_title')?.value;
-        const description = document.getElementById('id_description')?.value;
-  
-        if (!title || title.trim() === '') {
+        // Group session validation
+        const title = document.getElementById('id_title');
+        const description = document.getElementById('id_description');
+        const languageInput = document.getElementById('id_group_language');
+        const levelInput = document.getElementById('id_group_level');
+        const dateInput = document.getElementById('group_session_date');
+        const timeInput = document.getElementById('group_session_time');
+        
+        if (!title.value || title.value.trim() === '') {
           e.preventDefault();
           alert('Please provide a title for your group session');
           return false;
         }
-  
-        if (!description || description.trim() === '') {
+        
+        if (!description.value || description.value.trim() === '') {
           e.preventDefault();
           alert('Please provide a description for your group session');
           return false;
         }
+        
+        if (!languageInput.value) {
+          e.preventDefault();
+          alert('Please select a language for your group session.');
+          return false;
+        }
+        
+        if (!levelInput.value) {
+          e.preventDefault();
+          alert('Please select a proficiency level for your group session.');
+          return false;
+        }
+        
+        if (!dateInput.value) {
+          e.preventDefault();
+          alert('Please select a date for your group session.');
+          return false;
+        }
+        
+        if (!timeInput.value) {
+          e.preventDefault();
+          alert('Please select a time for your group session.');
+          return false;
+        }
+        
+        // Enable only the group session fields for submission
+        enableGroupFields();
+        disablePrivateFields();
       }
+      
+      // Final validation to ensure we're submitting to the right URL
+      if (isPrivateActive && sessionForm.action !== "{% url 'content:create_private_session' %}") {
+        sessionForm.action = "{% url 'content:create_private_session' %}";
+      } else if (!isPrivateActive && sessionForm.action !== "{% url 'content:create_group_session' %}") {
+        sessionForm.action = "{% url 'content:create_group_session' %}";
+      }
+      
+      // Create backup for redirect in case the form succeeds but doesn't redirect
+      localStorage.setItem('last_form_submission', Date.now());
+      localStorage.setItem('form_redirect_url', "{% url 'content:instructor_dashboard' %}");
+      
+      // Allow the form to submit if validation passes
+      return true;
     });
+    
+    // Check for redirect issues - if we've recently submitted a form but are still on the form page
+    const lastSubmission = localStorage.getItem('last_form_submission');
+    const redirectUrl = localStorage.getItem('form_redirect_url');
+    
+    if (lastSubmission && redirectUrl) {
+      const currentTime = Date.now();
+      const submissionTime = parseInt(lastSubmission);
+      
+      // If we submitted less than 5 seconds ago and we're still on the form page, force redirect
+      if ((currentTime - submissionTime) < 5000 && window.location.href.includes('/create/') || window.location.href.includes('/update/')) {
+        console.log('Form submission detected without redirect. Redirecting to dashboard...');
+        window.location.href = redirectUrl;
+      }
+      
+      // Clear storage after checking
+      localStorage.removeItem('last_form_submission');
+      localStorage.removeItem('form_redirect_url');
+    }
   });
 </script>
 {% endblock %}

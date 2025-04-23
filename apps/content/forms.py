@@ -339,7 +339,7 @@ class GroupSessionForm(forms.ModelForm):
         fields = [
             'title', 'description', 'language', 'level', 
             'duration_minutes', 'max_students', 'min_students',
-            'price', 'tags'
+            'tags'
         ]
         widgets = {
             'title': forms.TextInput(attrs={
@@ -365,11 +365,6 @@ class GroupSessionForm(forms.ModelForm):
             'min_students': forms.Select(attrs={
                 'class': 'form-select'
             }, choices=[(1, '1 student (no minimum)'), (2, '2 students'), (3, '3 students'), (5, '5 students')]),
-            'price': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': '5',
-                'step': '0.01'
-            }),
             'tags': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'e.g. conversation, grammar, business'
@@ -430,6 +425,10 @@ class GroupSessionForm(forms.ModelForm):
         # Set start and end time from form data
         instance.start_time = self.cleaned_data['start_time']
         instance.end_time = self.cleaned_data['end_time']
+        
+        # Set a default price if not provided 
+        if not hasattr(instance, 'price') or not instance.price:
+            instance.price = 15.00
         
         # Set instructor if provided
         if instructor:

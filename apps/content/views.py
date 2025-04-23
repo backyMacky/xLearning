@@ -2,7 +2,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.db import models
 from django.db.models import Q, Count, Avg, Max, Value, CharField
@@ -1168,6 +1168,23 @@ class CreatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
         """Only users with instructor profiles can create sessions"""
         return hasattr(self.request.user, 'instructor_profile')
     
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        context['title'] = 'Create Private Session Slot'
+        context['is_private'] = True
+        context['is_update'] = False
+        
+        # Set active menu attributes
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'sessions'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+    
     def form_valid(self, form):
         # Set the instructor to current user's profile
         instructor = self.request.user.instructor_profile
@@ -1190,13 +1207,14 @@ class CreatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
         # Create corresponding entry in the booking app if available
         try:
             from apps.booking.models import PrivateSessionSlot, Instructor
+            
             # Get or create instructor profile in booking app
             booking_instructor, created = Instructor.objects.get_or_create(
                 user=self.request.user,
                 defaults={
                     'bio': instructor.bio if hasattr(instructor, 'bio') else '',
                     'profile_image': instructor.profile_image if hasattr(instructor, 'profile_image') else None,
-                    'teaching_languages': ','.join(instructor.teaching_languages.all().values_list('code', flat=True)) if hasattr(instructor, 'teaching_languages') else '',
+                    'teaching_languages': ','.join(instructor.teaching_languages.split(',')) if hasattr(instructor, 'teaching_languages') and instructor.teaching_languages else '',
                     'hourly_rate': instructor.hourly_rate if hasattr(instructor, 'hourly_rate') else 25.00
                 }
             )
@@ -1211,29 +1229,12 @@ class CreatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
                 level=instance.level,
                 status='available' if instance.status == 'available' else 'draft'
             )
-        except (ImportError, AttributeError):
+        except (ImportError, AttributeError) as e:
             # Booking app not available or models not compatible
+            print(f"Error syncing with booking app: {e}")
             pass
-        
-        return redirect(self.success_url)
-    
-    def get_context_data(self, **kwargs):
-        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
-        
-        context['title'] = 'Create Private Session Slot'
-        context['is_private'] = True
-        context['is_update'] = False
-        
-        # Set active menu attributes
-        context['active_menu'] = 'instructor'
-        context['active_submenu'] = 'sessions'
-        
-        # Set the layout path
-        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
-        TemplateHelper.map_context(context)
-        
-        return context
 
+        return HttpResponseRedirect(self.get_success_url())
 
 class UpdatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View for updating private session slots"""
@@ -1346,6 +1347,23 @@ class CreateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView
         """Only users with instructor profiles can create sessions"""
         return hasattr(self.request.user, 'instructor_profile')
     
+    def get_context_data(self, **kwargs):
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        context['title'] = 'Create Group Session'
+        context['is_private'] = False
+        context['is_update'] = False
+        
+        # Set active menu attributes
+        context['active_menu'] = 'instructor'
+        context['active_submenu'] = 'sessions'
+        
+        # Set the layout path
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return context
+    
     def form_valid(self, form):
         # Set the instructor to current user's profile
         instructor = self.request.user.instructor_profile
@@ -1367,20 +1385,21 @@ class CreateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView
 
         # Create corresponding entry in the booking app if available
         try:
-            from apps.booking.models import GroupSession, Instructor
+            from apps.booking.models import GroupSession as BookingGroupSession, Instructor
+            
             # Get or create instructor profile in booking app
             booking_instructor, created = Instructor.objects.get_or_create(
                 user=self.request.user,
                 defaults={
                     'bio': instructor.bio if hasattr(instructor, 'bio') else '',
                     'profile_image': instructor.profile_image if hasattr(instructor, 'profile_image') else None,
-                    'teaching_languages': ','.join(instructor.teaching_languages.all().values_list('code', flat=True)) if hasattr(instructor, 'teaching_languages') else '',
+                    'teaching_languages': ','.join(instructor.teaching_languages.split(',')) if hasattr(instructor, 'teaching_languages') and instructor.teaching_languages else '',
                     'hourly_rate': instructor.hourly_rate if hasattr(instructor, 'hourly_rate') else 25.00
                 }
             )
 
             # Create group session in booking app
-            GroupSession.objects.create(
+            BookingGroupSession.objects.create(
                 title=instance.title,
                 instructor=booking_instructor,
                 language=instance.language,
@@ -1390,32 +1409,15 @@ class CreateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView
                 end_time=instance.end_time,
                 duration_minutes=instance.duration_minutes,
                 max_students=instance.max_students,
-                price=instance.price if hasattr(instance, 'price') else 1.00,
+                price=instance.price if hasattr(instance, 'price') else 15.00,
                 status='scheduled'
             )
-        except (ImportError, AttributeError):
+        except (ImportError, AttributeError) as e:
             # Booking app not available or models not compatible
+            print(f"Error syncing with booking app: {e}")
             pass
         
-        return redirect(self.success_url)
-    
-    def get_context_data(self, **kwargs):
-        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
-        
-        context['title'] = 'Create Group Session'
-        context['is_private'] = False
-        context['is_update'] = False
-        
-        # Set active menu attributes
-        context['active_menu'] = 'instructor'
-        context['active_submenu'] = 'sessions'
-        
-        # Set the layout path
-        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
-        TemplateHelper.map_context(context)
-        
-        return context
-
+        return HttpResponseRedirect(self.get_success_url())
 
 class UpdateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View for updating group sessions"""
