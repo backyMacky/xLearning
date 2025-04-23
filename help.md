@@ -173,3 +173,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Contributing
 
 Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
+
+
+
+
+# Running celery
+Run celery and celery beat alongside your application:
+
+celery -A web_project worker -l info
+celery -A web_project beat -l info

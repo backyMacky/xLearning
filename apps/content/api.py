@@ -1,7 +1,9 @@
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from .models import Course, Lesson
+
+from apps.booking.models import GroupSession
+from .models import Course, Lesson, PrivateSession
 
 @login_required
 def get_course_lessons(request, course_id):
@@ -64,3 +66,85 @@ def mark_lesson_complete(request, lesson_id):
             lesson=lesson
         ).delete()
         return JsonResponse({'status': 'success', 'completed': False})
+    
+
+@login_required
+def get_meeting_link(request, session_type, session_id):
+    """API endpoint to get or generate meeting link for a session"""
+    try:
+        if session_type == 'private':
+            session = get_object_or_404(PrivateSession, id=session_id)
+            
+            # Check permissions
+            if not request.user.is_superuser:
+                if request.user != session.instructor.user and request.user != session.student:
+                    return JsonResponse({'error': 'Permission denied'}, status=403)
+                    
+            # Get or create meeting
+            if session.meeting:
+                meeting_link = session.meeting.meeting_link
+            else:
+                # Create a meeting
+                import uuid
+                meeting_code = str(uuid.uuid4()).replace('-', '')[:10]
+                meeting_link = f"https://meet.google.com/{meeting_code}"
+                
+                # Create a Meeting instance
+                from apps.meetings.models import Meeting
+                meeting = Meeting.objects.create(
+                    title=f"Private Session: {session.instructor.user.username} and {session.student.username}",
+                    teacher=session.instructor.user,
+                    start_time=session.start_time,
+                    duration=session.duration_minutes,
+                    meeting_link=meeting_link
+                )
+                meeting.students.add(session.student)
+                
+                # Link meeting to session
+                session.meeting = meeting
+                session.save()
+            
+            return JsonResponse({'meeting_link': meeting_link, 'status': 'success'})
+            
+        elif session_type == 'group':
+            session = get_object_or_404(GroupSession, id=session_id)
+            
+            # Check permissions
+            if not request.user.is_superuser:
+                if request.user != session.instructor.user and request.user not in session.students.all():
+                    return JsonResponse({'error': 'Permission denied'}, status=403)
+                    
+            # Get or create meeting
+            if session.meeting:
+                meeting_link = session.meeting.meeting_link
+            else:
+                # Create a meeting
+                import uuid
+                meeting_code = str(uuid.uuid4()).replace('-', '')[:10]
+                meeting_link = f"https://meet.google.com/{meeting_code}"
+                
+                # Create a Meeting instance
+                from apps.meetings.models import Meeting
+                meeting = Meeting.objects.create(
+                    title=f"Group Session: {session.title}",
+                    teacher=session.instructor.user,
+                    start_time=session.start_time,
+                    duration=session.duration_minutes,
+                    meeting_link=meeting_link
+                )
+                
+                # Add all students to the meeting
+                for student in session.students.all():
+                    meeting.students.add(student)
+                
+                # Link meeting to session
+                session.meeting = meeting
+                session.save()
+            
+            return JsonResponse({'meeting_link': meeting_link, 'status': 'success'})
+            
+        else:
+            return JsonResponse({'error': 'Invalid session type'}, status=400)
+            
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)    

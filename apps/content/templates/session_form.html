@@ -30,7 +30,7 @@
         </a>
       </div>
       <div class="card-body">
-        <!-- Form with fixed action -->
+        <!-- Form with dynamic action -->
         <form method="post" id="sessionForm">
           {% csrf_token %}
           
@@ -145,7 +145,6 @@
                   <div class="input-group">
                     <span class="input-group-text"><i class="ti ti-clock"></i></span>
                     <input type="text" id="session_time" name="session_time" class="form-control p-4 flatpickr-time" 
-                           class="form-control flatpickr-time"
                            placeholder="HH:MM" 
                            {% if form.instance.start_time %}
                            value="{{ form.instance.start_time|time:'H:i' }}"

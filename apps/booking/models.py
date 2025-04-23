@@ -4,6 +4,7 @@ from django.utils import timezone
 from apps.meetings.models import Meeting
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import uuid
 
 
 class Instructor(models.Model):
@@ -140,24 +141,29 @@ class PrivateSessionSlot(models.Model):
         """Book a private session slot for a student"""
         if self.status != 'available' or self.student is not None:
             return False, "This slot is no longer available"
-            
+
         self.student = student
         self.status = 'booked'
+    
+        # Generate a proper Google Meet link
         
+        meeting_code = str(uuid.uuid4()).replace('-', '')[:10]  # Generate random code
+        meeting_link = f"https://meet.google.com/{meeting_code}"
+
         # Create a meeting for this session
         meeting = Meeting.objects.create(
             title=f"Private Session: {self.instructor.user.username} and {self.student.username}",
             teacher=self.instructor.user,
             start_time=self.start_time,
             duration=self.duration_minutes,
-            meeting_link=f"https://meet.google.com/private-{self.instructor.user.username}-{self.student.username}-{timezone.now().strftime('%Y%m%d%H%M')}"
+            meeting_link=meeting_link
         )
         meeting.students.add(self.student)
-        
+
         # Link meeting to session
         self.meeting = meeting
         self.save()
-        
+
         return True, "Session booked successfully"
     
     def cancel(self, user):
@@ -277,30 +283,34 @@ class GroupSession(models.Model):
         """Enroll a student in the group session"""
         if self.is_full:
             return False, "This session is full"
-            
+
         if student in self.students.all():
             return False, "You are already enrolled in this session"
-            
+
         if self.start_time < timezone.now():
             return False, "Cannot enroll in a past session"
-            
+
         self.students.add(student)
-        
+
         # Create meeting if it doesn't exist yet
         if not self.meeting:
+            import uuid
+            meeting_code = str(uuid.uuid4()).replace('-', '')[:10]  # Generate random code
+            meeting_link = f"https://meet.google.com/{meeting_code}"
+
             meeting = Meeting.objects.create(
                 title=f"Group Session: {self.title}",
                 teacher=self.instructor.user,
                 start_time=self.start_time,
                 duration=self.duration_minutes,
-                meeting_link=f"https://meet.google.com/group-{self.instructor.user.username}-{self.id}-{timezone.now().strftime('%Y%m%d')}"
+                meeting_link=meeting_link
             )
             self.meeting = meeting
             self.save()
-        
+
         # Add student to meeting participants
         self.meeting.students.add(student)
-        
+
         return True, "Successfully enrolled in the group session"
     
     def unenroll_student(self, student):
@@ -379,7 +389,11 @@ class CreditTransaction(models.Model):
 
 # Define the missing function for syncing from PrivateSession to PrivateSessionSlot
 def sync_private_session_to_booking(sender, instance, created, **kwargs):
-    """Sync content private session changes to booking app"""
+    """Sync content private session changes to booking app with recursion prevention"""
+    # Skip if this was triggered by a sync from booking app
+    if getattr(instance, '_syncing_from_booking', False):
+        return
+        
     try:
         # Get booking instructor
         instructor = None
@@ -395,6 +409,9 @@ def sync_private_session_to_booking(sender, instance, created, **kwargs):
                 start_time=instance.start_time
             )
             
+            # Set flag to prevent recursion
+            booking_slot._syncing_from_content = True
+            
             # Update booking slot with new values
             booking_slot.end_time = instance.end_time
             booking_slot.duration_minutes = instance.duration_minutes
@@ -405,11 +422,11 @@ def sync_private_session_to_booking(sender, instance, created, **kwargs):
             # Update student if booked
             if instance.status == 'booked' and instance.student:
                 booking_slot.student = instance.student
+            else:
+                booking_slot.student = None
             
-            # Skip signal to avoid infinite loop
-            post_save.disconnect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+            # Save without triggering the reverse signal
             booking_slot.save()
-            post_save.connect(sync_booking_to_private_session, sender=PrivateSessionSlot)
             
         except PrivateSessionSlot.DoesNotExist:
             # Create new booking slot
@@ -424,10 +441,9 @@ def sync_private_session_to_booking(sender, instance, created, **kwargs):
                 student=instance.student if instance.status == 'booked' else None
             )
             
-            # Skip signal to avoid infinite loop
-            post_save.disconnect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+            # Set flag to prevent recursion
+            booking_slot._syncing_from_content = True
             booking_slot.save()
-            post_save.connect(sync_booking_to_private_session, sender=PrivateSessionSlot)
     
     except (ImportError, AttributeError):
         # Booking app not available or models not compatible
@@ -501,7 +517,11 @@ def sync_group_session_to_booking(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=PrivateSessionSlot)
 def sync_booking_to_private_session(sender, instance, created, **kwargs):
-    """Sync booking slot changes to content app"""
+    """Sync booking slot changes to content app with recursion prevention"""
+    # Skip if this was triggered by a sync from content app
+    if getattr(instance, '_syncing_from_content', False):
+        return
+        
     try:
         from apps.content.models import PrivateSession, Instructor as ContentInstructor
         
@@ -518,6 +538,9 @@ def sync_booking_to_private_session(sender, instance, created, **kwargs):
                 start_time=instance.start_time
             )
             
+            # Set flag to prevent recursion
+            content_session._syncing_from_booking = True
+            
             # Update the content session with new values
             content_session.end_time = instance.end_time
             content_session.duration_minutes = instance.duration_minutes
@@ -528,11 +551,11 @@ def sync_booking_to_private_session(sender, instance, created, **kwargs):
             # Update student if booked
             if instance.status == 'booked' and instance.student:
                 content_session.student = instance.student
+            else:
+                content_session.student = None
             
-            # Skip signal to avoid infinite loop
-            post_save.disconnect(sync_private_session_to_booking, sender=PrivateSession)
+            # Save without triggering the reverse signal
             content_session.save()
-            post_save.connect(sync_private_session_to_booking, sender=PrivateSession)
             
         except PrivateSession.DoesNotExist:
             # Session doesn't exist in content app, create it
@@ -547,14 +570,13 @@ def sync_booking_to_private_session(sender, instance, created, **kwargs):
                 student=instance.student if instance.status == 'booked' else None
             )
             
-            # Skip signal to avoid infinite loop
-            post_save.disconnect(sync_private_session_to_booking, sender=PrivateSession)
+            # Set flag to prevent recursion
+            content_session._syncing_from_booking = True
             content_session.save()
-            post_save.connect(sync_private_session_to_booking, sender=PrivateSession)
+            
     except (ImportError, AttributeError):
         # Content app not available or models not compatible
         pass
-
 
 @receiver(post_save, sender=GroupSession)
 def sync_booking_to_group_session(sender, instance, created, **kwargs):

@@ -2016,4 +2016,70 @@ def session_preview_data(request):
         
         return JsonResponse(data)
     
-    return JsonResponse({'error': 'Only POST requests are supported'}, status=400)        
+    return JsonResponse({'error': 'Only POST requests are supported'}, status=400)  
+
+
+def get_meeting_link(request, session_type, session_id):
+    """API endpoint to get or generate meeting link for a session"""
+    if session_type == 'private':
+        session = get_object_or_404(PrivateSession, id=session_id)
+        
+        # Check permissions
+        if not request.user.is_superuser:
+            if request.user != session.instructor.user and request.user != session.student:
+                return JsonResponse({'error': 'Permission denied'}, status=403)
+                
+        # Get or create meeting
+        if not session.meeting:
+            from apps.meetings.models import Meeting
+            meeting = Meeting.objects.create(
+                title=f"Private Session: {session.instructor.user.username} and {session.student.username}",
+                teacher=session.instructor.user,
+                start_time=session.start_time,
+                duration=session.duration_minutes
+            )
+            if session.student:
+                meeting.students.add(session.student)
+            
+            # Link meeting to session
+            session.meeting = meeting
+            session.save()
+        
+        return JsonResponse({
+            'meeting_link': session.meeting.meeting_link, 
+            'status': 'success'
+        })
+        
+    elif session_type == 'group':
+        session = get_object_or_404(GroupSession, id=session_id)
+        
+        # Check permissions
+        if not request.user.is_superuser:
+            if request.user != session.instructor.user and request.user not in session.students.all():
+                return JsonResponse({'error': 'Permission denied'}, status=403)
+                
+        # Get or create meeting
+        if not session.meeting:
+            from apps.meetings.models import Meeting
+            meeting = Meeting.objects.create(
+                title=f"Group Session: {session.title}",
+                teacher=session.instructor.user,
+                start_time=session.start_time,
+                duration=session.duration_minutes
+            )
+            
+            # Add all students to the meeting
+            for student in session.students.all():
+                meeting.students.add(student)
+            
+            # Link meeting to session
+            session.meeting = meeting
+            session.save()
+        
+        return JsonResponse({
+            'meeting_link': session.meeting.meeting_link, 
+            'status': 'success'
+        })
+        
+    else:
+        return JsonResponse({'error': 'Invalid session type'}, status=400) 

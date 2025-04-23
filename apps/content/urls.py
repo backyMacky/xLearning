@@ -66,4 +66,5 @@ urlpatterns = [
     # API endpoints
     path('api/courses/<int:course_id>/lessons/', views.get_course_lessons, name='api_course_lessons'),
     path('api/session-preview/', views.session_preview_data, name='session_preview_data'),
+    path('api/meeting-link/<str:session_type>/<int:session_id>/', views.get_meeting_link, name='get_meeting_link'),
 ]

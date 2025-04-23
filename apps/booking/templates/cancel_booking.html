@@ -5,6 +5,17 @@
 
 {% block title %}Cancel Booking - Learning Platform{% endblock title %}
 
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/fullcalendar/fullcalendar.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/fullcalendar/fullcalendar.js' %}"></script>
+<script src="{% static 'vendor/libs/moment/moment.js' %}"></script>
+{% endblock vendor_js %}
+
 {% block content %}
 <div class="row">
   <div class="col-md-8 col-lg-6 mx-auto">

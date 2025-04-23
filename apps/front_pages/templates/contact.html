@@ -332,14 +332,7 @@
           </div>
           
           <div class="contact-form-body">
-            {% if messages %}
-              {% for message in messages %}
-                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-warning{% endif %} mb-4" role="alert">
-                  {{ message }}
-                </div>
-              {% endfor %}
-            {% endif %}
-            
+          
             <form id="contactForm" method="post" class="row g-3">
               {% csrf_token %}
               

@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Session Reminder</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #ff9800; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0;">
+            <h1 style="margin: 0; font-size: 24px;">Reminder: Your Session is Starting Soon!</h1>
+        </div>
+        <div style="padding: 20px; background-color: #f9f9f9;">
+            <p style="margin-top: 0;">Hello {{ user.first_name|default:user.username }},</p>
+            
+            <p style="font-weight: bold; font-size: 18px; color: #ff9800;">Your language learning session will begin in 1 hour.</p>
+            
+            <div style="background-color: white; border-radius: 5px; padding: 15px; margin-bottom: 20px; border-left: 4px solid #ff9800;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; width: 30%;">Instructor:</td>
+                        <td style="padding: 8px;">{{ instructor }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; width: 30%;">Date:</td>
+                        <td style="padding: 8px;">{{ session_date }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; width: 30%;">Time:</td>
+                        <td style="padding: 8px;">{{ session_time }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; width: 30%;">Duration:</td>
+                        <td style="padding: 8px;">{{ session_duration }} minutes</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div style="background-color: #fff3e0; border-radius: 5px; padding: 15px; margin-bottom: 20px;">
+                <h3 style="margin-top: 0; color: #e65100;">Before Your Session</h3>
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    <li style="margin-bottom: 8px;">Test your camera and microphone</li>
+                    <li style="margin-bottom: 8px;">Find a quiet space with good internet connection</li>
+                    <li style="margin-bottom: 8px;">Have your learning materials ready</li>
+                    <li style="margin-bottom: 0;">Join 5 minutes early to ensure everything is working properly</li>
+                </ul>
+            </div>
+            
+            <p style="text-align: center; margin-bottom: 25px;">
+                <a href="{{ meeting_link }}" style="display: inline-block; background-color: #ff9800; color: white; text-decoration: none; padding: 15px 30px; border-radius: 5px; font-weight: bold; font-size: 16px;">Join Session</a>
+            </p>
+            
+            <p style="font-style: italic; color: #666; font-size: 14px;">If you need to cancel, please do so as soon as possible to allow your instructor to adjust their schedule.</p>
+            
+            <p style="margin-bottom: 0;">We look forward to your session!</p>
+            <p style="font-weight: bold; color: #696cff;">Learning Platform Team</p>
+        </div>
+        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
+            <p style="margin-bottom: 5px;">&copy; 2025 Learning Platform. All rights reserved.</p>
+            <p style="margin-top: 0;">This email was sent to {{ user.email }} regarding your upcoming learning session.</p>
+        </div>
+    </div>
+</body>
+</html>

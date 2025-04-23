@@ -272,10 +272,15 @@ class AvailabilityListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'availability_list.html'
     context_object_name = 'availability_slots'
     
+    """
     def test_func(self):
         # Only teachers can manage their availability
         return hasattr(self.request.user, 'is_teacher') and self.request.user.is_teacher
-    
+    """
+    def test_func(self):
+        # Allow all users to access
+        return True
+
     def get_queryset(self):
         return TeacherAvailability.objects.filter(teacher=self.request.user).order_by('day_of_week', 'start_time')
     
@@ -300,10 +305,16 @@ class CreateAvailabilityView(LoginRequiredMixin, UserPassesTestMixin, CreateView
     template_name = 'create_availability.html'
     fields = ['day_of_week', 'start_time', 'end_time']
     
+    """
     def test_func(self):
         # Only teachers can create availability slots
         return hasattr(self.request.user, 'is_teacher') and self.request.user.is_teacher
+    """
     
+    def test_func(self):
+        # Allow all users to access
+        return True
+
     def get_success_url(self):
         return reverse('meetings:availability_list')
     

@@ -441,9 +441,9 @@
                           {% endif %}
                           
                           {% if slot.start_time|date:"U"|add:"0" > now|date:"U"|add:"86400" %}
-                            <a href="" class="btn btn-sm btn-outline-danger">
-                              <i class="ti ti-x me-1"></i> Cancel
-                            </a>
+                          <a href="{% url 'booking:cancel_private_session' slot_id=slot.id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="ti ti-x me-1"></i> Cancel
+                          </a>                          
                           {% endif %}
                         {% endif %}
                       </div>

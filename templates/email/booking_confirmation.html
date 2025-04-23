@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Booking Confirmation</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #696cff; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0; font-size: 24px;">Your Session is Confirmed!</h1>
+        </div>
+        <div style="padding: 20px; background-color: #f9f9f9;">
+            <p style="margin-top: 0;">Hello {{ user.first_name|default:user.username }},</p>
+            
+            <p>Your language learning session has been successfully booked. Here are the details:</p>
+            
+            <div style="background-color: white; border-radius: 5px; padding: 15px; margin-bottom: 20px; border-left: 4px solid #696cff;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; width: 30%;">Instructor:</td>
+                        <td style="padding: 8px;">{{ instructor }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; width: 30%;">Date:</td>
+                        <td style="padding: 8px;">{{ session_date }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; width: 30%;">Time:</td>
+                        <td style="padding: 8px;">{{ session_time }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight: bold; width: 30%;">Duration:</td>
+                        <td style="padding: 8px;">{{ session_duration }} minutes</td>
+                    </tr>
+                </table>
+            </div>
+            
+            {% if meeting_link %}
+            <p>You can join your session using the link below:</p>
+            <p style="text-align: center;">
+                <a href="{{ meeting_link }}" style="display: inline-block; background-color: #696cff; color: white; text-decoration: none; padding: 12px 24px; border-radius: 5px; font-weight: bold; margin: 10px 0;">Join Meeting</a>
+            </p>
+            {% else %}
+            <p>A meeting link will be provided closer to the session time.</p>
+            {% endif %}
+            
+            <p>Add this session to your calendar:</p>
+            <p style="text-align: center;">
+                <a href="{{ google_calendar_link }}" style="display: inline-block; background-color: #4CAF50; color: white; text-decoration: none; padding: 12px 24px; border-radius: 5px; font-weight: bold; margin: 10px 0;" target="_blank">Add to Google Calendar</a>
+            </p>
+            
+            <p>Please note:</p>
+            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                <li style="margin-bottom: 8px;">Join the session 5 minutes early to ensure your audio and video are working properly.</li>
+                <li style="margin-bottom: 8px;">Have a notebook and any relevant learning materials ready.</li>
+                <li style="margin-bottom: 8px;">If you need to cancel, please do so at least 24 hours in advance to receive a credit refund.</li>
+            </ul>
+            
+            <p>If you have any questions or issues, please contact us at <a href="mailto:support@learningplatform.com" style="color: #696cff; text-decoration: underline;">support@learningplatform.com</a>.</p>
+            
+            <p style="margin-bottom: 0;">Happy learning!</p>
+            <p style="font-weight: bold; color: #696cff;">Learning Platform Team</p>
+        </div>
+        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
+            <p style="margin-bottom: 5px;">&copy; 2025 Learning Platform. All rights reserved.</p>
+            <p style="margin-top: 0;">This email was sent to {{ user.email }} because you booked a session on our platform.</p>
+        </div>
+    </div>
+</body>
+</html>
