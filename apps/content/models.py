@@ -579,9 +579,22 @@ class SessionFeedback(models.Model):
             ),
         ]
 
+
+
+# Flag to prevent recursive signal calls
+_SYNCING_PRIVATE_SESSION = False
+_SYNCING_GROUP_SESSION = False
+
 @receiver(post_save, sender=PrivateSession)
 def sync_private_session_to_booking(sender, instance, created, **kwargs):
     """Sync private session changes to booking app"""
+    global _SYNCING_PRIVATE_SESSION
+    
+    # Prevent recursion
+    if _SYNCING_PRIVATE_SESSION:
+        return
+    
+    _SYNCING_PRIVATE_SESSION = True
     try:
         from apps.booking.models import PrivateSessionSlot, Instructor
         
@@ -590,42 +603,66 @@ def sync_private_session_to_booking(sender, instance, created, **kwargs):
             # For existing sessions, find the corresponding booking slot
             try:
                 booking_instructor = Instructor.objects.get(user=instance.instructor.user)
-                booking_slot = PrivateSessionSlot.objects.get(
+                
+                # Find all matching slots
+                booking_slots = PrivateSessionSlot.objects.filter(
                     instructor=booking_instructor,
                     start_time=instance.start_time
                 )
                 
-                # Update the booking slot with new values
-                booking_slot.end_time = instance.end_time
-                booking_slot.duration_minutes = instance.duration_minutes
-                booking_slot.language = instance.language
-                booking_slot.level = instance.level
-                booking_slot.status = instance.status
-                
-                # Update student if booked
-                if instance.status == 'booked' and instance.student:
-                    booking_slot.student = instance.student
-                
-                booking_slot.save()
-            except PrivateSessionSlot.DoesNotExist:
-                # Slot doesn't exist in booking app, create it
-                PrivateSessionSlot.objects.create(
-                    instructor=booking_instructor,
-                    start_time=instance.start_time,
-                    end_time=instance.end_time,
-                    duration_minutes=instance.duration_minutes,
-                    language=instance.language,
-                    level=instance.level,
-                    status=instance.status,
-                    student=instance.student if instance.status == 'booked' else None
-                )
+                if booking_slots.exists():
+                    # Update the first slot with new values
+                    booking_slot = booking_slots.first()
+                    
+                    # Update the booking slot with new values
+                    booking_slot.end_time = instance.end_time
+                    booking_slot.duration_minutes = instance.duration_minutes
+                    booking_slot.language = instance.language
+                    booking_slot.level = instance.level
+                    booking_slot.status = instance.status
+                    
+                    # Update student if booked
+                    if instance.status == 'booked' and instance.student:
+                        booking_slot.student = instance.student
+                    
+                    booking_slot.save()
+                    
+                    # Delete any duplicate slots beyond the first one
+                    if booking_slots.count() > 1:
+                        for slot in booking_slots[1:]:
+                            slot.delete()
+                else:
+                    # Slot doesn't exist in booking app, create it
+                    PrivateSessionSlot.objects.create(
+                        instructor=booking_instructor,
+                        start_time=instance.start_time,
+                        end_time=instance.end_time,
+                        duration_minutes=instance.duration_minutes,
+                        language=instance.language,
+                        level=instance.level,
+                        status=instance.status,
+                        student=instance.student if instance.status == 'booked' else None
+                    )
+            except Instructor.DoesNotExist:
+                # Instructor doesn't exist in booking app
+                pass
     except (ImportError, AttributeError):
         # Booking app not available or models not compatible
         pass
+    finally:
+        _SYNCING_PRIVATE_SESSION = False
+
 
 @receiver(post_save, sender=GroupSession)
 def sync_group_session_to_booking(sender, instance, created, **kwargs):
     """Sync group session changes to booking app"""
+    global _SYNCING_GROUP_SESSION
+    
+    # Prevent recursion
+    if _SYNCING_GROUP_SESSION:
+        return
+    
+    _SYNCING_GROUP_SESSION = True
     try:
         from apps.booking.models import GroupSession as BookingGroupSession, Instructor
         
@@ -634,43 +671,59 @@ def sync_group_session_to_booking(sender, instance, created, **kwargs):
             # For existing sessions, find the corresponding booking session
             try:
                 booking_instructor = Instructor.objects.get(user=instance.instructor.user)
-                booking_session = BookingGroupSession.objects.get(
+                
+                # Find all matching sessions
+                booking_sessions = BookingGroupSession.objects.filter(
                     instructor=booking_instructor,
                     start_time=instance.start_time,
                     title=instance.title
                 )
                 
-                # Update the booking session with new values
-                booking_session.end_time = instance.end_time
-                booking_session.duration_minutes = instance.duration_minutes
-                booking_session.language = instance.language
-                booking_session.level = instance.level
-                booking_session.description = instance.description
-                booking_session.max_students = instance.max_students
-                booking_session.status = instance.status
-                
-                booking_session.save()
-                
-                # Sync students
-                booking_session.students.set(instance.students.all())
-            except BookingGroupSession.DoesNotExist:
-                # Session doesn't exist in booking app, create it
-                booking_session = BookingGroupSession.objects.create(
-                    title=instance.title,
-                    instructor=booking_instructor,
-                    language=instance.language,
-                    level=instance.level,
-                    description=instance.description,
-                    start_time=instance.start_time,
-                    end_time=instance.end_time,
-                    duration_minutes=instance.duration_minutes,
-                    max_students=instance.max_students,
-                    price=instance.price if hasattr(instance, 'price') else 1.00,
-                    status=instance.status
-                )
-                
-                # Sync students
-                booking_session.students.set(instance.students.all())
+                if booking_sessions.exists():
+                    # Update the first session with new values
+                    booking_session = booking_sessions.first()
+                    
+                    # Update the booking session with new values
+                    booking_session.end_time = instance.end_time
+                    booking_session.duration_minutes = instance.duration_minutes
+                    booking_session.language = instance.language
+                    booking_session.level = instance.level
+                    booking_session.description = instance.description
+                    booking_session.max_students = instance.max_students
+                    booking_session.status = instance.status
+                    
+                    booking_session.save()
+                    
+                    # Sync students
+                    booking_session.students.set(instance.students.all())
+                    
+                    # Delete any duplicate sessions beyond the first one
+                    if booking_sessions.count() > 1:
+                        for session in booking_sessions[1:]:
+                            session.delete()
+                else:
+                    # Session doesn't exist in booking app, create it
+                    booking_session = BookingGroupSession.objects.create(
+                        title=instance.title,
+                        instructor=booking_instructor,
+                        language=instance.language,
+                        level=instance.level,
+                        description=instance.description,
+                        start_time=instance.start_time,
+                        end_time=instance.end_time,
+                        duration_minutes=instance.duration_minutes,
+                        max_students=instance.max_students,
+                        price=instance.price if hasattr(instance, 'price') else 15.00,
+                        status=instance.status
+                    )
+                    
+                    # Sync students
+                    booking_session.students.set(instance.students.all())
+            except Instructor.DoesNotExist:
+                # Instructor doesn't exist in booking app
+                pass
     except (ImportError, AttributeError):
         # Booking app not available or models not compatible
-        pass        
+        pass
+    finally:
+        _SYNCING_GROUP_SESSION = False

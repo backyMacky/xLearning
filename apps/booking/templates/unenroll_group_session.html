@@ -1,0 +1,120 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Leave Group Session - Learning Platform{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-lg-6 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Leave Group Session</h5>
+        <a href="{% url 'booking:my_sessions' %}" class="btn btn-secondary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to My Sessions
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <div class="alert alert-warning">
+            <div class="d-flex">
+              <i class="ti ti-alert-triangle me-2 mt-1"></i>
+              <div>
+                <h6 class="alert-heading mb-1">Cancellation Confirmation</h6>
+                <p class="mb-0">
+                  You are about to leave the group session "<strong>{{ session.title }}</strong>".
+                  {% if session.start_time|date:"U"|add:"0" > now|date:"U"|add:"86400" %}
+                    Since you're cancelling more than 24 hours in advance, you'll receive a refund of 1 credit.
+                  {% else %}
+                    Since you're cancelling less than 24 hours before the session, you will NOT receive a refund.
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <div class="card shadow-none border">
+            <div class="card-body">
+              <h6 class="mb-3">{{ session.title }}</h6>
+              <div class="d-flex mb-3">
+                <span class="badge bg-label-primary me-1">{{ session.get_language_display }}</span>
+                <span class="badge bg-label-info">{{ session.get_level_display }}</span>
+              </div>
+              
+              <div class="table-responsive">
+                <table class="table table-borderless">
+                  <tbody>
+                    <tr>
+                      <th class="ps-0" width="30%">Date:</th>
+                      <td>{{ session.start_time|date:"l, F j, Y" }}</td>
+                    </tr>
+                    <tr>
+                      <th class="ps-0">Time:</th>
+                      <td>{{ session.start_time|date:"h:i A" }}</td>
+                    </tr>
+                    <tr>
+                      <th class="ps-0">Instructor:</th>
+                      <td>{{ session.instructor.user.username }}</td>
+                    </tr>
+                    <tr>
+                      <th class="ps-0">Duration:</th>
+                      <td>{{ session.duration_minutes }} minutes</td>
+                    </tr>
+                    <tr>
+                      <th class="ps-0">Enrollment:</th>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="progress flex-grow-1 me-2" style="height: 6px; max-width: 100px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                style="width: {{ session.enrollment_percentage }}%" 
+                                aria-valuenow="{{ session.enrollment_percentage }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100"></div>
+                          </div>
+                          <span>{{ session.students.count }}/{{ session.max_students }} students</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-4">
+            <div class="card bg-label-warning bg-opacity-10 border-0">
+              <div class="card-body">
+                <h6 class="d-flex align-items-center mb-2">
+                  <i class="ti ti-info-circle me-2"></i>
+                  Cancellation Policy
+                </h6>
+                <ul class="mb-0">
+                  <li>Cancellations more than 24 hours before the session start time will receive a full refund (1 credit).</li>
+                  <li>Cancellations less than 24 hours before the session start time will not be refunded.</li>
+                  <li>Your spot will be made available to other students.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'booking:my_sessions' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i> Keep My Spot
+            </a>
+            <button type="submit" class="btn btn-danger">
+              <i class="ti ti-user-minus me-1"></i> Leave Session
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

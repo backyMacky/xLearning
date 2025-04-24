@@ -46,6 +46,12 @@
           "slug": "create-private-slot"
         },
         {
+          "url": "/content/group-sessions/create/",
+          "external": true,
+          "name": "Create Group Session",
+          "slug": "create-group-session"
+        },
+        {
           "url": "/content/instructor-dashboard/",
           "external": true,
           "name": "My dashboard",

@@ -1,0 +1,291 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Create Group Session - Learning Platform{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+<script src="{% static 'vendor/libs/quill/quill.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-9 col-md-10 mx-auto">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ title|default:"Create Group Session" }}</h5>
+        <a href="{% url 'content:instructor_dashboard' %}" class="btn btn-outline-primary btn-sm">
+          <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+      <div class="card-body">
+        <!-- Form for group session -->
+        <form method="post" id="groupSessionForm" action="{% if is_update %}{% url 'content:update_group_session' session_id=form.instance.id %}{% else %}{% url 'content:create_group_session' %}{% endif %}">
+          {% csrf_token %}
+          
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            <div class="alert-body">
+              <i class="ti ti-alert-circle me-2"></i>
+              Please correct the errors below:
+              <ul class="mb-0 mt-1">
+                {% for field in form %}
+                  {% if field.errors %}
+                    {% for error in field.errors %}
+                      <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="row g-3">
+            <!-- Group Session Title and Description -->
+            <div class="col-12">
+              <label for="id_title" class="form-label">Session Title</label>
+              <input type="text" id="id_title" name="title" class="form-control" placeholder="Enter a descriptive title for your session" 
+                value="{% if form.title.value %}{{ form.title.value }}{% elif form.instance.title %}{{ form.instance.title }}{% endif %}" 
+                required>
+            </div>
+            
+            <div class="col-12">
+              <label for="id_description" class="form-label">Session Description</label>
+              <textarea id="id_description" name="description" class="form-control" rows="3" placeholder="Describe what students will learn in this session" required>{% if form.description.value %}{{ form.description.value }}{% elif form.instance.description %}{{ form.instance.description }}{% endif %}</textarea>
+              <small class="text-muted">Describe what students will learn in this session</small>
+            </div>
+            
+            <!-- Group Language and Level Selections -->
+            <div class="col-md-6">
+              <label for="id_language" class="form-label">Teaching Language</label>
+              <select id="id_language" name="language" class="form-select select2" required>
+                <option value="">Select language</option>
+                <option value="en" {% if form.language.value == 'en' or form.instance.language == 'en' %}selected{% endif %}>English</option>
+                <option value="fr" {% if form.language.value == 'fr' or form.instance.language == 'fr' %}selected{% endif %}>French</option>
+                <option value="es" {% if form.language.value == 'es' or form.instance.language == 'es' %}selected{% endif %}>Spanish</option>
+                <option value="de" {% if form.language.value == 'de' or form.instance.language == 'de' %}selected{% endif %}>German</option>
+                <option value="it" {% if form.language.value == 'it' or form.instance.language == 'it' %}selected{% endif %}>Italian</option>
+                <option value="pt" {% if form.language.value == 'pt' or form.instance.language == 'pt' %}selected{% endif %}>Portuguese</option>
+                <option value="ru" {% if form.language.value == 'ru' or form.instance.language == 'ru' %}selected{% endif %}>Russian</option>
+                <option value="zh" {% if form.language.value == 'zh' or form.instance.language == 'zh' %}selected{% endif %}>Chinese</option>
+                <option value="ja" {% if form.language.value == 'ja' or form.instance.language == 'ja' %}selected{% endif %}>Japanese</option>
+                <option value="ko" {% if form.language.value == 'ko' or form.instance.language == 'ko' %}selected{% endif %}>Korean</option>
+                <option value="ar" {% if form.language.value == 'ar' or form.instance.language == 'ar' %}selected{% endif %}>Arabic</option>
+                <option value="hi" {% if form.language.value == 'hi' or form.instance.language == 'hi' %}selected{% endif %}>Hindi</option>
+                <option value="sw" {% if form.language.value == 'sw' or form.instance.language == 'sw' %}selected{% endif %}>Swahili</option>
+              </select>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="id_level" class="form-label">Proficiency Level</label>
+              <select id="id_level" name="level" class="form-select select2" required>
+                <option value="">Select level</option>
+                <option value="A1" {% if form.level.value == 'A1' or form.instance.level == 'A1' %}selected{% endif %}>A1 - Beginner</option>
+                <option value="A2" {% if form.level.value == 'A2' or form.instance.level == 'A2' %}selected{% endif %}>A2 - Elementary</option>
+                <option value="B1" {% if form.level.value == 'B1' or form.instance.level == 'B1' %}selected{% endif %}>B1 - Intermediate</option>
+                <option value="B2" {% if form.level.value == 'B2' or form.instance.level == 'B2' %}selected{% endif %}>B2 - Upper Intermediate</option>
+                <option value="C1" {% if form.level.value == 'C1' or form.instance.level == 'C1' %}selected{% endif %}>C1 - Advanced</option>
+                <option value="C2" {% if form.level.value == 'C2' or form.instance.level == 'C2' %}selected{% endif %}>C2 - Proficient</option>
+              </select>
+            </div>
+            
+            <!-- Group Date Input -->
+            <div class="col-md-6">
+              <label for="session_date" class="form-label">Session Date</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="ti ti-calendar"></i></span>
+                <input type="date" id="session_date" name="session_date" class="form-control flatpickr-date" 
+                  placeholder="YYYY-MM-DD"
+                  {% if form.instance.start_time %}
+                  value="{{ form.instance.start_time|date:'Y-m-d' }}"
+                  {% endif %}
+                  required>
+              </div>
+            </div>
+            
+            <!-- Group Time Input -->
+            <div class="col-md-6">
+              <label for="session_time" class="form-label">Session Time</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="ti ti-clock"></i></span>
+                <input type="text" id="session_time" name="session_time" class="form-control p-4 flatpickr-time" 
+                  placeholder="HH:MM"
+                  {% if form.instance.start_time %}
+                  value="{{ form.instance.start_time|time:'H:i' }}"
+                  {% endif %}
+                  required>
+              </div>
+            </div>
+            
+            <!-- Group Duration and Capacity -->
+            <div class="col-md-6">
+              <label for="id_duration_minutes" class="form-label">Session Duration</label>
+              <select id="id_duration_minutes" name="duration_minutes" class="form-select" required>
+                <option value="30" {% if form.duration_minutes.value == 30 or form.instance.duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
+                <option value="45" {% if form.duration_minutes.value == 45 or form.instance.duration_minutes == 45 %}selected{% endif %}>45 minutes</option>
+                <option value="60" {% if form.duration_minutes.value == 60 or form.instance.duration_minutes == 60 or not form.instance.duration_minutes %}selected{% endif %}>1 hour</option>
+                <option value="90" {% if form.duration_minutes.value == 90 or form.instance.duration_minutes == 90 %}selected{% endif %}>1.5 hours</option>
+                <option value="120" {% if form.duration_minutes.value == 120 or form.instance.duration_minutes == 120 %}selected{% endif %}>2 hours</option>
+              </select>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="id_max_students" class="form-label">Maximum Students</label>
+              <select id="id_max_students" name="max_students" class="form-select">
+                <option value="5" {% if form.max_students.value == 5 or form.instance.max_students == 5 %}selected{% endif %}>5 students</option>
+                <option value="10" {% if form.max_students.value == 10 or form.instance.max_students == 10 %}selected{% endif %}>10 students</option>
+                <option value="15" {% if form.max_students.value == 15 or form.instance.max_students == 15 %}selected{% endif %}>15 students</option>
+                <option value="20" {% if form.max_students.value == 20 or form.instance.max_students == 20 %}selected{% endif %}>20 students</option>
+                <option value="30" {% if form.max_students.value == 30 or form.instance.max_students == 30 %}selected{% endif %}>30 students</option>
+              </select>
+            </div>
+            
+            <!-- Minimum Students -->
+            <div class="col-md-6">
+              <label for="id_min_students" class="form-label">Minimum Students</label>
+              <select id="id_min_students" name="min_students" class="form-select">
+                <option value="1" {% if form.min_students.value == 1 or form.instance.min_students == 1 %}selected{% endif %}>1 student (no minimum)</option>
+                <option value="2" {% if form.min_students.value == 2 or form.instance.min_students == 2 or not form.instance.min_students %}selected{% endif %}>2 students</option>
+                <option value="3" {% if form.min_students.value == 3 or form.instance.min_students == 3 %}selected{% endif %}>3 students</option>
+                <option value="5" {% if form.min_students.value == 5 or form.instance.min_students == 5 %}selected{% endif %}>5 students</option>
+              </select>
+            </div>
+            
+            <!-- Tags for Group Session -->
+            <div class="col-md-6">
+              <label for="id_tags" class="form-label">Tags (optional)</label>
+              <input type="text" id="id_tags" name="tags" class="form-control" placeholder="e.g. conversation, grammar, business"
+                value="{% if form.tags.value %}{{ form.tags.value }}{% elif form.instance.tags %}{{ form.instance.tags }}{% endif %}">
+              <small class="text-muted">Comma-separated tags to help students find your session</small>
+            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'content:instructor_dashboard' %}" class="btn btn-outline-secondary">
+              <i class="ti ti-x me-1"></i> Cancel
+            </a>
+            <div>
+              {% if is_update %}
+                <button type="submit" name="action" value="save" class="btn btn-primary">
+                  <i class="ti ti-device-floppy me-1"></i> Update Session
+                </button>
+              {% else %}
+                <button type="submit" name="action" value="draft" class="btn btn-outline-primary me-2">
+                  <i class="ti ti-draft me-1"></i> Save as Draft
+                </button>
+                <button type="submit" name="action" value="publish" class="btn btn-primary">
+                  <i class="ti ti-calendar-plus me-1"></i> Create & Publish
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2 for dropdowns
+    $('.select2').select2({
+      placeholder: "Select an option",
+      allowClear: true,
+      width: '100%'
+    });
+  
+    // Initialize Flatpickr date pickers
+    const datePickers = document.querySelectorAll('.flatpickr-date');
+    datePickers.forEach(function(picker) {
+      flatpickr(picker, {
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        altInput: true,
+        altFormat: "F j, Y"
+      });
+    });
+  
+    // Initialize Flatpickr time pickers
+    const timePickers = document.querySelectorAll('.flatpickr-time');
+    timePickers.forEach(function(picker) {
+      flatpickr(picker, {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        minuteIncrement: 15,
+        altInput: true,
+        altFormat: "h:i K"
+      });
+    });
+  
+    // Validate form before submission
+    const sessionForm = document.getElementById('groupSessionForm');
+    sessionForm.addEventListener('submit', function(e) {
+      const title = document.getElementById('id_title');
+      const description = document.getElementById('id_description');
+      const languageInput = document.getElementById('id_language');
+      const levelInput = document.getElementById('id_level');
+      const dateInput = document.getElementById('session_date');
+      const timeInput = document.getElementById('session_time');
+      
+      if (!title.value || title.value.trim() === '') {
+        e.preventDefault();
+        alert('Please provide a title for your group session');
+        return false;
+      }
+      
+      if (!description.value || description.value.trim() === '') {
+        e.preventDefault();
+        alert('Please provide a description for your group session');
+        return false;
+      }
+      
+      if (!languageInput.value) {
+        e.preventDefault();
+        alert('Please select a language for your group session.');
+        return false;
+      }
+      
+      if (!levelInput.value) {
+        e.preventDefault();
+        alert('Please select a proficiency level for your group session.');
+        return false;
+      }
+      
+      if (!dateInput.value) {
+        e.preventDefault();
+        alert('Please select a date for your group session.');
+        return false;
+      }
+      
+      if (!timeInput.value) {
+        e.preventDefault();
+        alert('Please select a time for your group session.');
+        return false;
+      }
+      
+      // Allow the form to submit if validation passes
+      return true;
+    });
+  });
+</script>
+{% endblock %}

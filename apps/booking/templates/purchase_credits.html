@@ -7,225 +7,219 @@
 
 {% block vendor_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'vendor/libs/node-waves/node-waves.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
 {{ block.super }}
-<script src="{% static 'vendor/libs/node-waves/node-waves.js' %}"></script>
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
 {% endblock vendor_js %}
 
 {% block content %}
 <div class="row">
-  <div class="col-md-8 col-lg-6 mx-auto">
-    <div class="card mb-4">
+  <!-- Credit Balance Card -->
+  <div class="col-md-4 order-md-2 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Credit Balance</h5>
+      </div>
+      <div class="card-body text-center">
+        <div class="mb-4">
+          <div class="avatar avatar-lg mb-3 mx-auto">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-coins"></i>
+            </div>
+          </div>
+          <h3 class="mb-0">{{ credit_balance }}</h3>
+          <p class="text-muted">Credits Available</p>
+        </div>
+        
+        <div class="card bg-label-primary bg-opacity-10 border-0 mb-3">
+          <div class="card-body">
+            <h6 class="card-title">Credit Pricing</h6>
+            <p class="mb-0">1 Credit = $3.00 USD</p>
+            <small class="text-muted">
+              Private Session: 2 Credits ($6.00)<br>
+              Group Session: 1 Credit ($3.00)
+            </small>
+          </div>
+        </div>
+        
+        <a href="{% url 'booking:transaction_history' %}" class="btn btn-outline-primary btn-sm">
+          <i class="ti ti-history me-1"></i> Transaction History
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Purchase Form -->
+  <div class="col-md-8 order-md-1 mb-4">
+    <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Purchase Credits</h5>
-        <a href="{% url 'booking:dashboard' %}" class="btn btn-secondary btn-sm">
+        <h5 class="card-title mb-0">Purchase Credits</h5>
+        <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-primary btn-sm">
           <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
         </a>
       </div>
       <div class="card-body">
-        <div class="mb-4">
-          <div class="alert alert-info">
-            <div class="d-flex">
-              <i class="ti ti-info-circle me-2 mt-1"></i>
-              <div>
-                <h6 class="alert-heading mb-1">About Credits</h6>
-                <p class="mb-0">
-                  Credits are used to book sessions with teachers. 1 credit = 1 session.
-                  Choose a package below to purchase credits for your account.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <form method="post" id="purchase-form">
+        <form method="post">
           {% csrf_token %}
-          <input type="hidden" name="amount" id="selected-amount" value="" />
           
           <div class="mb-4">
-            <label class="form-label">Choose Credit Package</label>
-            <div class="row g-3">
-              {% for option in credit_options %}
-                <div class="col-md-6">
-                  <div class="card shadow-none border mb-3 h-100">
-                    <div class="card-body p-3">
-                      <div class="form-check">
-                        <input 
-                          type="radio" 
-                          name="credit-option" 
-                          class="form-check-input" 
-                          id="credit-option-{{ option }}" 
-                          value="{{ option }}"
-                          data-amount="{{ option }}"
-                          {% if forloop.first %}checked{% endif %}
-                        />
-                        <label class="form-check-label" for="credit-option-{{ option }}">
-                          <h6 class="mb-1">{{ option }} Credits</h6>
-                          <p class="mb-0 small">
-                            <span class="text-primary fw-semibold">${{ option|floatformat:2 }}</span>
-                            {% if option > 5 %}
-                              <span class="badge bg-label-success ms-1">Best Value</span>
-                            {% endif %}
-                          </p>
-                        </label>
-                      </div>
+            <label class="form-label">{{ form.credit_package.label }}</label>
+            
+            <div class="row row-cols-1 row-cols-md-2 g-3">
+              {% for value, text in form.credit_package.field.choices %}
+                <div class="col">
+                  <div class="card border h-100">
+                    <div class="form-check card-body">
+                      <input class="form-check-input" type="radio" name="{{ form.credit_package.name }}" id="credit_package_{{ value }}" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
+                      <label class="form-check-label w-100" for="credit_package_{{ value }}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <h6 class="mb-0">{{ value }} Credits</h6>
+                          <span class="badge bg-label-primary">${{ value|multiply:3 }}</span>
+                        </div>
+                        <p class="mb-0 text-muted small">
+                          {% if value == 5 %}
+                            Great for getting started
+                          {% elif value == 10 %}
+                            Most popular option
+                          {% elif value == 20 %}
+                            Best value for regular users
+                          {% elif value == 50 %}
+                            Perfect for intensive learning
+                          {% endif %}
+                        </p>
+                      </label>
                     </div>
                   </div>
                 </div>
               {% endfor %}
             </div>
+            
+            {% if form.credit_package.errors %}
+              <div class="invalid-feedback d-block mt-1">{{ form.credit_package.errors.0 }}</div>
+            {% endif %}
           </div>
           
-          <div class="row g-3 mb-4">
-            <div class="col-md-12">
-              <label class="form-label">Payment Method</label>
-              <div class="card shadow-none border h-100">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-check form-check-inline mb-3">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="credit-card" value="credit-card" checked />
-                        <label class="form-check-label" for="credit-card">Credit Card</label>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal" />
-                        <label class="form-check-label" for="paypal">PayPal</label>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div id="credit-card-form">
-                    <div class="row g-3">
-                      <div class="col-md-12">
-                        <label for="card-number" class="form-label">Card Number</label>
-                        <input type="text" class="form-control" id="card-number" placeholder="1234 5678 9012 3456" />
-                      </div>
-                      
-                      <div class="col-md-6">
-                        <label for="expiry-date" class="form-label">Expiry Date</label>
-                        <input type="text" class="form-control" id="expiry-date" placeholder="MM/YY" />
-                      </div>
-                      
-                      <div class="col-md-6">
-                        <label for="cvv" class="form-label">CVV</label>
-                        <input type="text" class="form-control" id="cvv" placeholder="123" />
-                      </div>
-                      
-                      <div class="col-md-12">
-                        <label for="name-on-card" class="form-label">Name on Card</label>
-                        <input type="text" class="form-control" id="name-on-card" placeholder="John Doe" />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div id="paypal-form" style="display: none;">
-                    <div class="alert alert-info mt-3">
-                      You will be redirected to PayPal to complete your purchase.
-                    </div>
-                  </div>
+          <div class="mb-4">
+            <label class="form-label">{{ form.payment_method.label }}</label>
+            
+            <div class="d-flex gap-3">
+              {% for value, text in form.payment_method.field.choices %}
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="{{ form.payment_method.name }}" id="payment_method_{{ value }}" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
+                  <label class="form-check-label" for="payment_method_{{ value }}">
+                    {{ text }}
+                  </label>
                 </div>
-              </div>
+              {% endfor %}
             </div>
+            
+            {% if form.payment_method.errors %}
+              <div class="invalid-feedback d-block mt-1">{{ form.payment_method.errors.0 }}</div>
+            {% endif %}
           </div>
           
-          <div class="card shadow-none border mb-4">
-            <div class="card-body p-3">
-              <h6 class="mb-3">Order Summary</h6>
-              <div class="d-flex justify-content-between mb-1">
-                <span>Credit Package:</span>
-                <span id="summary-credits">5 Credits</span>
-              </div>
-              <div class="d-flex justify-content-between">
-                <span>Price:</span>
-                <span id="summary-price">$5.00</span>
-              </div>
-              <hr />
-              <div class="d-flex justify-content-between fw-semibold">
-                <span>Total:</span>
-                <span id="summary-total" class="text-primary">$5.00</span>
-              </div>
+          <!-- This would be where payment details would go in a real app -->
+          <div class="card bg-label-warning bg-opacity-10 border-0 mb-4">
+            <div class="card-body">
+              <h6 class="d-flex align-items-center mb-2">
+                <i class="ti ti-info-circle me-2"></i>
+                Demo Mode
+              </h6>
+              <p class="mb-0">This is a demo version. In a real application, you would enter payment details here.</p>
             </div>
           </div>
           
           <div class="d-grid">
-            <button type="submit" class="btn btn-primary waves-effect waves-light">
-              <i class="ti ti-credit-card me-1"></i> Complete Purchase
+            <button type="submit" class="btn btn-primary">
+              <i class="ti ti-shopping-cart me-1"></i> Purchase Credits
             </button>
           </div>
         </form>
       </div>
     </div>
   </div>
+  
+  <!-- Information Card -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">About Credits</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="d-flex">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-primary">
+                  <i class="ti ti-calendar-stats"></i>
+                </div>
+              </div>
+              <div>
+                <h6>Book Sessions</h6>
+                <p class="mb-0">Use credits to book private sessions with instructors or join group sessions.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="d-flex">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-success">
+                  <i class="ti ti-discount-2"></i>
+                </div>
+              </div>
+              <div>
+                <h6>Better Value</h6>
+                <p class="mb-0">Purchase larger credit packages for better value. Save up to 20% with our largest package.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="d-flex">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-info">
+                  <i class="ti ti-history"></i>
+                </div>
+              </div>
+              <div>
+                <h6>No Expiration</h6>
+                <p class="mb-0">Your credits never expire. Use them whenever you're ready to book a session.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
-{% block page_js %}
-{{ block.super }}
+{% block page_js_extra %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize waves effect
-    Waves.init();
-    Waves.attach('.btn', ['waves-light']);
+    // Highlight the selected credit package card
+    const packageInputs = document.querySelectorAll('input[name="{{ form.credit_package.name }}"]');
     
-    // Handle payment method selection
-    const creditCardForm = document.getElementById('credit-card-form');
-    const paypalForm = document.getElementById('paypal-form');
-    const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
-    
-    paymentMethods.forEach(method => {
-      method.addEventListener('change', function() {
-        if (this.value === 'credit-card') {
-          creditCardForm.style.display = 'block';
-          paypalForm.style.display = 'none';
-        } else {
-          creditCardForm.style.display = 'none';
-          paypalForm.style.display = 'block';
+    packageInputs.forEach(input => {
+      input.addEventListener('change', function() {
+        // Remove highlight from all cards
+        document.querySelectorAll('.card.border').forEach(card => {
+          card.classList.remove('border-primary');
+        });
+        
+        // Add highlight to selected card
+        if (this.checked) {
+          this.closest('.card').classList.add('border-primary');
         }
       });
     });
     
-    // Handle credit option selection
-    const creditOptions = document.querySelectorAll('input[name="credit-option"]');
-    const selectedAmount = document.getElementById('selected-amount');
-    const summaryCredits = document.getElementById('summary-credits');
-    const summaryPrice = document.getElementById('summary-price');
-    const summaryTotal = document.getElementById('summary-total');
-    
-    // Set initial values
-    if (creditOptions.length > 0) {
-      const initialOption = document.querySelector('input[name="credit-option"]:checked');
-      if (initialOption) {
-        const amount = initialOption.value;
-        selectedAmount.value = amount;
-        summaryCredits.textContent = `${amount} Credits`;
-        summaryPrice.textContent = `${parseFloat(amount).toFixed(2)}`;
-        summaryTotal.textContent = `${parseFloat(amount).toFixed(2)}`;
-      }
-    }
-    
-    // Update on change
-    creditOptions.forEach(option => {
-      option.addEventListener('change', function() {
-        const amount = this.value;
-        selectedAmount.value = amount;
-        summaryCredits.textContent = `${amount} Credits`;
-        summaryPrice.textContent = `${parseFloat(amount).toFixed(2)}`;
-        summaryTotal.textContent = `${parseFloat(amount).toFixed(2)}`;
-      });
-    });
-    
-    // Form submission handler (would connect to payment gateway in production)
-    document.getElementById('purchase-form').addEventListener('submit', function(e) {
-      // In a real app, we'd process the payment here
-      // This is just a demo for the template
-      // For now, we'll just submit the form normally
-    });
+    // Trigger change on the checked input to highlight it initially
+    document.querySelector('input[name="{{ form.credit_package.name }}"]:checked').dispatchEvent(new Event('change'));
   });
-
 </script>
 {% endblock %}

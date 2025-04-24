@@ -211,7 +211,7 @@ class InstructorProfileForm(forms.ModelForm):
         model = Instructor
         fields = [
             'bio', 'teaching_style', 'profile_image', 'teaching_languages',
-            'specialties', 'hourly_rate', 'is_available',
+            'specialties', 'is_available',
         ]
         widgets = {
             'bio': forms.Textarea(attrs={
@@ -234,28 +234,11 @@ class InstructorProfileForm(forms.ModelForm):
             'specialties': forms.SelectMultiple(attrs={
                 'class': 'form-select select2'
             }),
-            'hourly_rate': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': '5',
-                'step': '0.01'
-            }),
             'is_available': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
             })
         }
-    
-    def __init__(self, *args, **kwargs):
-        super(InstructorProfileForm, self).__init__(*args, **kwargs)
-        # Make hourly_rate optional by setting required=False
-        self.fields['hourly_rate'].required = False
         
-    def clean_hourly_rate(self):
-        """Set default value for hourly_rate if not provided"""
-        hourly_rate = self.cleaned_data.get('hourly_rate')
-        if hourly_rate is None or hourly_rate == '':
-            return 25.00  # Default value from the model
-        return hourly_rate
-
 class PrivateSessionForm(forms.ModelForm):
     """Form for creating private session slots"""
     class Meta:

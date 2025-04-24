@@ -434,17 +434,36 @@
                     <td>
                       <div class="d-flex">
                         {% if slot.status == 'booked' %}
-                          {% if slot.meeting %}
-                            <a href="{{ slot.meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary me-2">
-                              <i class="ti ti-video me-1"></i> Join
-                            </a>
+                          {% if slot.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" and slot.end_time|date:"U"|add:"0" > now|date:"U"|add:"0" %}
+                            <!-- Session is active or starting soon (within 10 minutes) -->
+                            {% if slot.meeting %}
+                              <a href="{{ slot.meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary me-2">
+                                <i class="ti ti-video me-1"></i> Join
+                              </a>
+                            {% else %}
+                              <a href="{% url 'content:get_meeting_link' session_type='private' session_id=slot.id %}" class="btn btn-sm btn-primary me-2">
+                                <i class="ti ti-video me-1"></i> Join
+                              </a>
+                            {% endif %}
                           {% endif %}
                           
                           {% if slot.start_time|date:"U"|add:"0" > now|date:"U"|add:"86400" %}
-                          <a href="{% url 'booking:cancel_private_session' slot_id=slot.id %}" class="btn btn-sm btn-outline-danger">
-                            <i class="ti ti-x me-1"></i> Cancel
-                          </a>                          
+                            <!-- More than 24 hours before session starts -->
+                            <a href="{% url 'booking:cancel_private_session' slot_id=slot.id %}" class="btn btn-sm btn-outline-danger">
+                              <i class="ti ti-x me-1"></i> Cancel
+                            </a>                          
+                          {% elif slot.start_time|date:"U"|add:"0" > now|date:"U"|add:"3600" %}
+                            <!-- Less than 24 hours but more than 1 hour before session -->
+                            <a href="{% url 'booking:cancel_private_session' slot_id=slot.id %}" class="btn btn-sm btn-outline-warning">
+                              <i class="ti ti-x me-1"></i> Late Cancel
+                            </a>
                           {% endif %}
+                        {% elif slot.status == 'cancelled' %}
+                          <span class="text-muted">Cancelled</span>
+                        {% elif slot.status == 'completed' %}
+                          <a href="{% url 'content:create_feedback' session_type='private' session_id=slot.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="ti ti-message-circle me-1"></i> Feedback
+                          </a>
                         {% endif %}
                       </div>
                     </td>

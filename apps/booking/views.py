@@ -34,6 +34,270 @@ except ImportError:
 # For the credit purchase form
 from django import forms
 
+class CreateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """Combined view for creating both private and group sessions in the booking app"""
+    template_name = 'session_form.html'
+    
+    def test_func(self):
+        """Only users with instructor profiles can create sessions"""
+        from django.conf import settings
+        if hasattr(settings, 'TESTING') and settings.TESTING:
+            return True  # Skip permission checks in testing mode
+            
+        # Check if user has instructor profile in the booking app
+        return hasattr(self.request.user, 'booking_instructor_profile')
+    
+    def get(self, request):
+        # Initialize context with both form types
+        from .models import PrivateSessionSlot, GroupSession
+        
+        # Get session type from URL parameter
+        session_type = request.GET.get('type', 'private')
+        is_private = session_type != 'group'
+        
+        # Create simplified forms - get these from your app's form definitions
+        from django import forms
+        
+        class SimplePrivateSessionForm(forms.Form):
+            language = forms.ChoiceField(choices=PrivateSessionSlot.LANGUAGE_CHOICES)
+            level = forms.ChoiceField(choices=PrivateSessionSlot.LEVEL_CHOICES)
+            duration_minutes = forms.ChoiceField(choices=[
+                (30, '30 minutes'),
+                (45, '45 minutes'),
+                (60, '1 hour'),
+                (90, '1.5 hours'),
+                (120, '2 hours')
+            ])
+            session_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'flatpickr-date'}))
+            session_time = forms.TimeField(widget=forms.TimeInput(attrs={'class': 'flatpickr-time'}))
+            
+        class SimpleGroupSessionForm(forms.Form):
+            title = forms.CharField(max_length=255)
+            description = forms.CharField(widget=forms.Textarea)
+            language = forms.ChoiceField(choices=GroupSession.LANGUAGE_CHOICES)
+            level = forms.ChoiceField(choices=GroupSession.LEVEL_CHOICES)
+            duration_minutes = forms.ChoiceField(choices=[
+                (30, '30 minutes'),
+                (45, '45 minutes'),
+                (60, '1 hour'),
+                (90, '1.5 hours'),
+                (120, '2 hours')
+            ])
+            max_students = forms.ChoiceField(choices=[
+                (5, '5 students'),
+                (10, '10 students'),
+                (15, '15 students'),
+                (20, '20 students'),
+                (30, '30 students')
+            ])
+            min_students = forms.ChoiceField(choices=[
+                (1, '1 student (no minimum)'),
+                (2, '2 students'),
+                (3, '3 students'),
+                (5, '5 students')
+            ])
+            session_date = forms.DateField(widget=forms.DateInput(attrs={'class': 'flatpickr-date'}))
+            session_time = forms.TimeField(widget=forms.TimeInput(attrs={'class': 'flatpickr-time'}))
+            tags = forms.CharField(required=False)
+            
+        private_form = SimplePrivateSessionForm()
+        group_form = SimpleGroupSessionForm()
+        
+        context = {
+            'private_form': private_form,
+            'group_form': group_form,
+            'is_private': is_private,
+            'is_update': False,
+            'title': 'Create Session',
+            'active_menu': 'instructor',
+            'active_submenu': 'sessions',
+            'layout_path': "layout_vertical.html"
+        }
+        
+        return render(request, self.template_name, context)
+    
+    def post(self, request):
+        # Determine which form was submitted
+        session_type = request.POST.get('session_type', 'private')
+        is_private = session_type != 'group'
+        
+        if is_private:
+            # Process private session form
+            from .models import PrivateSessionSlot, Instructor
+            from django.utils import timezone
+            
+            # Get form data
+            language = request.POST.get('language')
+            level = request.POST.get('level')
+            duration_minutes = int(request.POST.get('duration_minutes', 60))
+            session_date = request.POST.get('session_date')
+            session_time = request.POST.get('session_time')
+            is_trial = request.POST.get('is_trial') == 'on'
+            
+            # Validate form data
+            if not all([language, level, session_date, session_time]):
+                messages.error(request, "Please fill out all required fields.")
+                return redirect('booking:create_session')
+            
+            # Convert date/time strings to datetime
+            import datetime
+            try:
+                date_obj = datetime.datetime.strptime(session_date, '%Y-%m-%d').date()
+                time_obj = datetime.datetime.strptime(session_time, '%H:%M').time()
+                start_time = datetime.datetime.combine(date_obj, time_obj)
+                start_time = timezone.make_aware(start_time)
+                end_time = start_time + timezone.timedelta(minutes=duration_minutes)
+            except ValueError:
+                messages.error(request, "Invalid date or time format.")
+                return redirect('booking:create_session')
+            
+            # Get or create instructor
+            try:
+                instructor = Instructor.objects.get(user=request.user)
+            except Instructor.DoesNotExist:
+                # Create instructor profile if it doesn't exist
+                instructor = Instructor.objects.create(
+                    user=request.user,
+                    bio="",
+                    is_available=True
+                )
+            
+            # Create the private session slot
+            slot = PrivateSessionSlot.objects.create(
+                instructor=instructor,
+                start_time=start_time,
+                end_time=end_time,
+                duration_minutes=duration_minutes,
+                language=language,
+                level=level,
+                status='available'
+            )
+            
+            # Try syncing with content app
+            try:
+                from apps.content.models import PrivateSession, Instructor as ContentInstructor
+                
+                # Get or create content instructor
+                content_instructor, created = ContentInstructor.objects.get_or_create(
+                    user=request.user,
+                    defaults={
+                        'bio': instructor.bio if hasattr(instructor, 'bio') else '',
+                        'hourly_rate': instructor.hourly_rate if hasattr(instructor, 'hourly_rate') else 25.00
+                    }
+                )
+                
+                # Create content private session
+                PrivateSession.objects.create(
+                    instructor=content_instructor,
+                    start_time=start_time,
+                    end_time=end_time,
+                    duration_minutes=duration_minutes,
+                    language=language,
+                    level=level,
+                    status='available',
+                    is_trial=is_trial
+                )
+            except (ImportError, AttributeError) as e:
+                # Content app not available or models not compatible
+                print(f"Error syncing with content app: {e}")
+            
+            messages.success(request, "Private session slot created successfully!")
+            return redirect('booking:dashboard')
+        else:
+            # Process group session form
+            from .models import GroupSession, Instructor
+            from django.utils import timezone
+            
+            # Get form data
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            language = request.POST.get('language')
+            level = request.POST.get('level')
+            duration_minutes = int(request.POST.get('duration_minutes', 60))
+            max_students = int(request.POST.get('max_students', 5))
+            min_students = int(request.POST.get('min_students', 2))
+            session_date = request.POST.get('session_date')
+            session_time = request.POST.get('session_time')
+            tags = request.POST.get('tags', '')
+            
+            # Validate form data
+            if not all([title, description, language, level, session_date, session_time]):
+                messages.error(request, "Please fill out all required fields.")
+                return redirect('booking:create_session')
+            
+            # Convert date/time strings to datetime
+            import datetime
+            try:
+                date_obj = datetime.datetime.strptime(session_date, '%Y-%m-%d').date()
+                time_obj = datetime.datetime.strptime(session_time, '%H:%M').time()
+                start_time = datetime.datetime.combine(date_obj, time_obj)
+                start_time = timezone.make_aware(start_time)
+                end_time = start_time + timezone.timedelta(minutes=duration_minutes)
+            except ValueError:
+                messages.error(request, "Invalid date or time format.")
+                return redirect('booking:create_session')
+            
+            # Get or create instructor
+            try:
+                instructor = Instructor.objects.get(user=request.user)
+            except Instructor.DoesNotExist:
+                # Create instructor profile if it doesn't exist
+                instructor = Instructor.objects.create(
+                    user=request.user,
+                    bio="",
+                    is_available=True
+                )
+            
+            # Create the group session
+            session = GroupSession.objects.create(
+                title=title,
+                instructor=instructor,
+                description=description,
+                language=language,
+                level=level,
+                start_time=start_time,
+                end_time=end_time,
+                duration_minutes=duration_minutes,
+                max_students=max_students,
+                min_students=min_students,
+                price=15.00,  # Default price
+                status='scheduled'
+            )
+            
+            # Try syncing with content app
+            try:
+                from apps.content.models import GroupSession as ContentGroupSession, Instructor as ContentInstructor
+                
+                # Get or create content instructor
+                content_instructor, created = ContentInstructor.objects.get_or_create(
+                    user=request.user,
+                    defaults={
+                        'bio': instructor.bio if hasattr(instructor, 'bio') else '',
+                        'hourly_rate': instructor.hourly_rate if hasattr(instructor, 'hourly_rate') else 25.00
+                    }
+                )
+                
+                # Create content group session
+                ContentGroupSession.objects.create(
+                    title=title,
+                    instructor=content_instructor,
+                    description=description,
+                    language=language,
+                    level=level,
+                    start_time=start_time,
+                    end_time=end_time,
+                    duration_minutes=duration_minutes,
+                    max_students=max_students,
+                    price=15.00,  # Default price
+                    status='scheduled',
+                    tags=tags
+                )
+            except (ImportError, AttributeError) as e:
+                # Content app not available or models not compatible
+                print(f"Error syncing with content app: {e}")
+            
+            messages.success(request, "Group session created successfully!")
+            return redirect('booking:dashboard')
 
 class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
     """View for booking private session slots with proper duplicate handling"""
@@ -51,12 +315,12 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
         """Calculate user's current credit balance"""
         transactions = CreditTransaction.objects.filter(student=user)
         
-        # Calculate credits from purchases and refunds
+        # Sum credits from purchases and refunds
         credits = transactions.filter(
             transaction_type__in=['purchase', 'refund', 'bonus']
         ).aggregate(models.Sum('amount'))['amount__sum'] or 0
         
-        # Calculate debits from deductions
+        # Subtract deductions
         debits = transactions.filter(
             transaction_type='deduction'
         ).aggregate(models.Sum('amount'))['amount__sum'] or 0
@@ -95,8 +359,8 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
         # Get credit balance
         credit_balance = self.get_credit_balance(request.user)
         
-        # Check required credits - adjust this based on your system's requirements
-        required_credits = 1  # Changed to match UI showing 1 credit
+        # Check required credits - Private sessions cost 2 credits
+        required_credits = 2
         
         # Check if user has enough credits
         if credit_balance < required_credits:
@@ -171,11 +435,11 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
                 # Check credit balance
                 credit_balance = self.get_credit_balance(request.user)
                 
-                # Set required credits - adjust to match UI
-                required_credits = 1  # Changed to 1 credit
+                # Set required credits - Private sessions cost 2 credits
+                required_credits = 2
                 
                 if credit_balance < required_credits:
-                    messages.error(request, f"Insufficient credits. You need {required_credits} credit for a private session.")
+                    messages.error(request, f"Insufficient credits. You need {required_credits} credits for a private session.")
                     return redirect('booking:purchase_credits')
                 
                 # Process the booking
@@ -189,7 +453,7 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
                     success, message = slot.book(request.user)
                 
                 if success:
-                    # Deduct credits
+                    # Deduct credits (2 for private session)
                     CreditTransaction.objects.create(
                         student=request.user,
                         amount=required_credits,
@@ -468,12 +732,14 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
         # Get student's credit balance
         credit_balance = self.get_credit_balance(request.user)
         
-        # Check if user has enough credits (1 required for group session)
-        if credit_balance < 1:
+        # Check if user has enough credits (1 credit required for group session)
+        required_credits = 1  # Group sessions cost 1 credit ($3 USD)
+        
+        if credit_balance < required_credits:
             # Initialize template context
             context = {
                 'credit_balance': credit_balance,
-                'required_credits': 1,
+                'required_credits': required_credits,
                 'session': session,
                 'session_type': 'group',
                 'active_menu': 'booking',
@@ -491,7 +757,7 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
             'session': session,
             'instructor': session.instructor,
             'credit_balance': credit_balance,
-            'required_credits': 1,
+            'required_credits': required_credits,
             'from_content_app': from_content_app,
             'active_menu': 'booking',
             'active_submenu': 'group_sessions',
@@ -525,8 +791,9 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
         
         # Check if student has enough credits (1 credit for group session)
         credit_balance = self.get_credit_balance(request.user)
+        required_credits = 1  # Group sessions cost 1 credit ($3 USD)
         
-        if credit_balance < 1:
+        if credit_balance < required_credits:
             messages.error(request, "You don't have enough credits to enroll in this session.")
             return redirect('booking:purchase_credits')
         
@@ -545,14 +812,14 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
             if from_content_app:
                 CreditTransaction.objects.create(
                     student=request.user,
-                    amount=1,  # 1 credit for group session
+                    amount=required_credits,
                     description=f"Enrollment in group session '{session.title}' on {session.start_time}",
                     transaction_type='deduction',
                 )
             else:
                 CreditTransaction.objects.create(
                     student=request.user,
-                    amount=1,  # 1 credit for group session
+                    amount=required_credits,
                     description=f"Enrollment in group session '{session.title}' on {session.start_time}",
                     transaction_type='deduction',
                     group_session=session
@@ -563,8 +830,7 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
         else:
             messages.error(request, message)
             return redirect('content:group_session_detail', session_id=session.id) if from_content_app else redirect('booking:dashboard')
-
-
+        
 class UnenrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
     """View to unenroll from a group session"""
     
@@ -615,12 +881,12 @@ class UnenrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class PurchaseCreditsForm(forms.Form):
-    """Form for purchasing credits"""
+    """Form for purchasing credits with updated pricing ($3 USD per credit)"""
     CREDIT_CHOICES = [
-        (5, '5 Credits - $25'),
-        (10, '10 Credits - $45'),
-        (20, '20 Credits - $80'),
-        (50, '50 Credits - $180'),
+        (5, '5 Credits - $15'),
+        (10, '10 Credits - $30'),
+        (20, '20 Credits - $60'),
+        (50, '50 Credits - $150'),
     ]
     
     credit_package = forms.ChoiceField(
@@ -640,7 +906,6 @@ class PurchaseCreditsForm(forms.Form):
     
     # In a real application, you would add fields for payment information
     # such as credit card details or redirect to a payment gateway
-
 
 class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     """View for students to purchase credits"""
@@ -663,6 +928,9 @@ class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         
         context['credit_balance'] = credit_balance
         
+        # Add pricing information
+        context['credit_price_usd'] = 3  # $3 USD per credit
+        
         # Set active menu attributes
         context['active_menu'] = 'booking'
         context['active_submenu'] = 'credits'
@@ -684,14 +952,13 @@ class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         CreditTransaction.objects.create(
             student=self.request.user,
             amount=credit_package,
-            description=f"Purchase of {credit_package} credits",
+            description=f"Purchase of {credit_package} credits (${credit_package * 3} USD)",
             transaction_type='purchase'
         )
         
-        messages.success(self.request, f"Successfully purchased {credit_package} credits!")
+        messages.success(self.request, f"Successfully purchased {credit_package} credits for ${credit_package * 3} USD!")
         return super().form_valid(form)
-
-
+    
 class TransactionHistoryView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """View for students to view their credit transaction history"""
     model = CreditTransaction

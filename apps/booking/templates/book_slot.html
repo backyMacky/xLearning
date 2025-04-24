@@ -5,7 +5,6 @@
 
 {% block title %}Book Session - Learning Platform{% endblock title %}
 
-
 {% block content %}
 <div class="row">
   <div class="col-md-8 col-lg-6 mx-auto">
@@ -24,7 +23,7 @@
               <div>
                 <h6 class="alert-heading mb-1">Session Details</h6>
                 <p class="mb-0">
-                  You are about to book a session with <strong>{{ slot.teacher.username }}</strong>
+                  You are about to book a session with <strong>{{ slot.instructor.user.username }}</strong>
                 </p>
               </div>
             </div>
@@ -45,16 +44,16 @@
                 </tr>
                 <tr>
                   <th class="ps-0">Duration:</th>
-                  <td>{{ slot.duration }} minutes</td>
+                  <td>{{ slot.duration_minutes }} minutes</td>
                 </tr>
                 <tr>
                   <th class="ps-0">Cost:</th>
-                  <td>1 credit</td>
+                  <td>2 credits ($6.00 USD)</td>
                 </tr>
                 <tr>
                   <th class="ps-0">Your Balance:</th>
                   <td>
-                    {% if credit_balance >= 1 %}
+                    {% if credit_balance >= 2 %}
                     <span class="badge bg-label-success">{{ credit_balance }} credits</span>
                     {% else %}
                     <span class="badge bg-label-danger">{{ credit_balance }} credits</span>
@@ -66,7 +65,7 @@
           </div>
         </div>
         
-        {% if credit_balance < 1 %}
+        {% if credit_balance < 2 %}
         <div class="mb-4">
           <div class="alert alert-danger">
             <div class="d-flex">
@@ -74,7 +73,7 @@
               <div>
                 <h6 class="alert-heading mb-1">Insufficient Credits</h6>
                 <p class="mb-0">
-                  You don't have enough credits to book this session. Please purchase more credits.
+                  You don't have enough credits to book this session. You need 2 credits for a private session.
                 </p>
               </div>
             </div>
@@ -95,7 +94,7 @@
                 <div>
                   <h6 class="alert-heading mb-1">Booking Confirmation</h6>
                   <p class="mb-0">
-                    By confirming this booking, 1 credit will be deducted from your account.
+                    By confirming this booking, 2 credits will be deducted from your account.
                     You can cancel this booking up to 24 hours before the scheduled time to receive a refund.
                   </p>
                 </div>
@@ -115,6 +114,4 @@
     </div>
   </div>
 </div>
-</div>
-
 {% endblock %}

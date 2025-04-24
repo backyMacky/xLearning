@@ -68,7 +68,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.booking.middleware.DuplicateSessionCleanupMiddleware",
+
 ]
+
+# Optional: clean up on startup - set to True to run cleanup when the server starts
+CLEAN_DUPLICATE_SESSIONS_ON_STARTUP = True
 
 ROOT_URLCONF = "config.urls"
 

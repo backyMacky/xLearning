@@ -118,38 +118,57 @@
                           </div>
                         </td>
                         <td>
-                          <span class="badge bg-label-primary">{{ session.language.name }}</span>
-                          <span class="badge bg-label-info">{{ session.level.name }}</span>
+                          <span class="badge bg-label-primary">{{ session.get_language_display }}</span>
+                          <span class="badge bg-label-info">{{ session.get_level_display }}</span>
                         </td>
                         <td>
                           <span class="badge bg-label-success">Confirmed</span>
                         </td>
                         <td>
-                          <div class="dropdown">
-                            <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" type="button" id="sessionMenu{{ forloop.counter }}" data-bs-toggle="dropdown" aria-expanded="false">
-                              <i class="ti ti-dots-vertical"></i>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="sessionMenu{{ forloop.counter }}">
-                              <li>
-                                <a class="dropdown-item" href="#">
-                                  <i class="ti ti-eye me-1"></i> View Details
+                          <div class="d-flex gap-2">
+                            {% if session.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" and session.end_time|date:"U"|add:"0" > now|date:"U"|add:"0" %}
+                              <!-- Session is active or starting within 10 minutes -->
+                              {% if session.meeting %}
+                                <a href="{{ session.meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">
+                                  <i class="ti ti-video me-1"></i> Join
                                 </a>
-                              </li>
-                              {% if session.meeting_link %}
+                              {% else %}
+                                <a href="{% url 'content:get_meeting_link' session_type='private' session_id=session.id %}" class="btn btn-sm btn-primary">
+                                  <i class="ti ti-video me-1"></i> Join
+                                </a>
+                              {% endif %}
+                            {% endif %}
+                              
+                            {% if session.start_time|date:"U"|add:"0" > now|date:"U"|add:"86400" %}
+                              <!-- More than 24 hours before session starts -->
+                              <a href="{% url 'booking:cancel_private_session' slot_id=session.id %}" class="btn btn-sm btn-outline-danger">
+                                <i class="ti ti-x me-1"></i> Cancel
+                              </a>
+                            {% elif session.start_time|date:"U"|add:"0" > now|date:"U"|add:"3600" %}
+                              <!-- Less than 24 hours but more than 1 hour before session -->
+                              <a href="{% url 'booking:cancel_private_session' slot_id=session.id %}" class="btn btn-sm btn-outline-warning">
+                                <i class="ti ti-x me-1"></i> Late Cancel
+                              </a>
+                            {% endif %}
+                            
+                            <!-- Add calendar and details options -->
+                            <div class="dropdown">
+                              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ti ti-dots-vertical"></i>
+                              </button>
+                              <ul class="dropdown-menu">
                                 <li>
-                                  <a class="dropdown-item" href="{{ session.meeting_link }}" target="_blank">
-                                    <i class="ti ti-video me-1"></i> Join Meeting
+                                  <a class="dropdown-item" href="#">
+                                    <i class="ti ti-eye me-1"></i> View Details
                                   </a>
                                 </li>
-                              {% endif %}
-                              {% if session.start_time|date:"U"|add:"0" > now|date:"U"|add:"3600" %}
                                 <li>
-                                  <a class="dropdown-item text-danger" href="{% url 'booking:cancel_private_session' slot_id=session.id %}">
-                                    <i class="ti ti-calendar-off me-1"></i> Cancel
+                                  <a class="dropdown-item" href="#">
+                                    <i class="ti ti-calendar-plus me-1"></i> Add to Calendar
                                   </a>
                                 </li>
-                              {% endif %}
-                            </ul>
+                              </ul>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -186,8 +205,8 @@
                           <div>
                             <span>{{ session.title }}</span>
                             <div>
-                              <span class="badge bg-label-primary">{{ session.language.name }}</span>
-                              <span class="badge bg-label-info">{{ session.level.name }}</span>
+                              <span class="badge bg-label-primary">{{ session.get_language_display }}</span>
+                              <span class="badge bg-label-info">{{ session.get_level_display }}</span>
                             </div>
                           </div>
                         </td>
@@ -220,31 +239,52 @@
                           </div>
                         </td>
                         <td>
-                          <div class="dropdown">
-                            <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow" type="button" id="groupSessionMenu{{ forloop.counter }}" data-bs-toggle="dropdown" aria-expanded="false">
-                              <i class="ti ti-dots-vertical"></i>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="groupSessionMenu{{ forloop.counter }}">
-                              <li>
-                                <a class="dropdown-item" href="{% url 'content:group_session_detail' session_id=session.id %}">
-                                  <i class="ti ti-eye me-1"></i> View Details
+                          <div class="d-flex gap-2">
+                            {% if session.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" and session.end_time|date:"U"|add:"0" > now|date:"U"|add:"0" %}
+                              <!-- Session is active or starting within 10 minutes -->
+                              {% if session.meeting %}
+                                <a href="{{ session.meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">
+                                  <i class="ti ti-video me-1"></i> Join
                                 </a>
-                              </li>
-                              {% if session.meeting_link %}
+                              {% else %}
+                                <a href="{% url 'content:get_meeting_link' session_type='group' session_id=session.id %}" class="btn btn-sm btn-primary">
+                                  <i class="ti ti-video me-1"></i> Join
+                                </a>
+                              {% endif %}
+                            {% endif %}
+                              
+                            {% if session.start_time|date:"U"|add:"0" > now|date:"U"|add:"86400" %}
+                              <!-- More than 24 hours before session starts -->
+                              <a href="{% url 'booking:unenroll_group_session' session_id=session.id %}" class="btn btn-sm btn-outline-danger">
+                                <i class="ti ti-user-minus me-1"></i> Leave
+                              </a>
+                            {% endif %}
+                            
+                            <!-- View details button always visible -->
+                            <a href="{% url 'content:group_session_detail' session_id=session.id %}" class="btn btn-sm btn-outline-secondary">
+                              <i class="ti ti-eye me-1"></i> Details
+                            </a>
+
+                            <div class="dropdown d-inline-block">
+                              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ti ti-dots-vertical"></i>
+                              </button>
+                              <ul class="dropdown-menu">
                                 <li>
-                                  <a class="dropdown-item" href="{{ session.meeting_link }}" target="_blank">
-                                    <i class="ti ti-video me-1"></i> Join Meeting
+                                  <a class="dropdown-item" href="#">
+                                    <i class="ti ti-calendar-plus me-1"></i> Add to Calendar
                                   </a>
                                 </li>
-                              {% endif %}
-                              {% if session.start_time|date:"U"|add:"0" > now|date:"U"|add:"3600" %}
-                                <li>
-                                  <a class="dropdown-item text-danger" href="{% url 'booking:unenroll_group_session' session_id=session.id %}">
-                                    <i class="ti ti-user-minus me-1"></i> Leave Session
-                                  </a>
-                                </li>
-                              {% endif %}
-                            </ul>
+                                {% if session.start_time|date:"U"|add:"0" > now|date:"U"|add:"3600" and session.start_time|date:"U"|add:"0" < now|date:"U"|add:"86400" %}
+                                  <!-- Less than 24 hours but more than 1 hour before session -->
+                                  <li>
+                                    <a class="dropdown-item text-warning" href="{% url 'booking:unenroll_group_session' session_id=session.id %}">
+                                      <i class="ti ti-user-minus me-1"></i> Late Unenroll
+                                    </a>
+                                  </li>
+                                {% endif %}
+                              </ul>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -318,11 +358,11 @@
                           </div>
                         </td>
                         <td>
-                          <span class="badge bg-label-primary">{{ session.language.name }}</span>
+                          <span class="badge text-primary bg-label-primary">{{ session.language.name }}</span>
                           <span class="badge bg-label-info">{{ session.level.name }}</span>
                         </td>
                         <td>
-                          <span class="badge bg-label-{{ session.status|lower|slugify }}">
+                          <span class="badge text-info bg-label-{{ session.status|lower|slugify }}">
                             {{ session.status|title }}
                           </span>
                         </td>
