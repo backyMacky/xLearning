@@ -3,12 +3,8 @@ Django==5.0.1
 django-extensions==3.2.0
 
 # Database
-<<<<<<< HEAD
-psycopg2-binary==2.9.6
-=======
 
 psycopg[binary]
->>>>>>> 4cbc122 (email integration)
 
 # Environment variables
 python-dotenv==1.0.0
@@ -41,11 +37,8 @@ django-crispy-forms==2.1.0
 django-multiselectfield==0.1.13
 
 # Image Processing
-<<<<<<< HEAD
-Pillow==10.0.0
-=======
+
 Pillow==11.2.1
->>>>>>> 4cbc122 (email integration)
 
 # Calendar Integration
 google-api-python-client==2.94.0
