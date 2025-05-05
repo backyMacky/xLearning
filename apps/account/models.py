@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User, AbstractUser, Permission, Group
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser, Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.signals import post_save
@@ -7,6 +8,8 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+import random
+import string
 
 
 class UserType(models.TextChoices):
@@ -15,57 +18,47 @@ class UserType(models.TextChoices):
     ADMIN = 'admin', 'Administrator'
 
 
-# Add fields to User model
-User.add_to_class('user_type', models.CharField(max_length=20, choices=UserType.choices, default=UserType.STUDENT))
-User.add_to_class('is_verified', models.BooleanField(default=False))
-User.add_to_class('verification_token', models.CharField(max_length=100, blank=True, null=True))
-User.add_to_class('reset_password_token', models.CharField(max_length=100, blank=True, null=True))
-User.add_to_class('reset_password_expiry', models.DateTimeField(blank=True, null=True))
+class CustomUser(AbstractUser):
+    """Custom User model extending Django's AbstractUser"""
+    user_type = models.CharField(max_length=20, choices=UserType.choices, default=UserType.STUDENT)
+    is_verified = models.BooleanField(default=False)
+    verification_token = models.CharField(max_length=100, blank=True, null=True)
+    reset_password_token = models.CharField(max_length=100, blank=True, null=True)
+    reset_password_expiry = models.DateTimeField(blank=True, null=True)
+    first_login = models.BooleanField(default=True)
+    created_by_admin = models.BooleanField(default=False)
+    instructor_approved_by = models.ForeignKey(
+        'self', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='approved_instructors'
+    )
 
-# Helper methods for user types
-def is_teacher(self):
-    return self.user_type == UserType.TEACHER
-
-def is_student(self):
-    return self.user_type == UserType.STUDENT
-
-def is_admin(self):
-    return self.user_type == UserType.ADMIN
-
-User.add_to_class('is_teacher', property(is_teacher))
-User.add_to_class('is_student', property(is_student))
-User.add_to_class('is_admin', property(is_admin))
-
-
-# Role and Permission management
-class Role(models.Model):
-    """Model for custom roles with specific permissions"""
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True, null=True)
-    permissions = models.ManyToManyField(Permission, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return self.name
-
-class UserRole(models.Model):
-    """Model to assign roles to users"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_roles')
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)
-    assigned_at = models.DateTimeField(auto_now_add=True)
-    assigned_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='role_assignments')
-    
     class Meta:
-        unique_together = ('user', 'role')
-        
-    def __str__(self):
-        return f"{self.user.username} - {self.role.name}"
+        swappable = 'AUTH_USER_MODEL'
+        permissions = (
+            ("can_manage_instructors", "Can manage instructor accounts"),
+            ("can_view_all_users", "Can view all users"),
+            ("can_approve_instructor_requests", "Can approve instructor applications"),
+        )
+    
+    def is_teacher(self):
+        return self.user_type == UserType.TEACHER
+    
+    def is_student(self):
+        return self.user_type == UserType.STUDENT
+    
+    def is_admin(self):
+        return self.user_type == UserType.ADMIN
 
-# Update the Profile model to support additional fields
+    def __str__(self):
+        return self.username
+
+
 class Profile(models.Model):
     """Extended user profile information"""
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     native_language = models.CharField(max_length=50, blank=True, null=True)
     learning_language = models.CharField(max_length=50, blank=True, null=True)
     profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
@@ -81,6 +74,13 @@ class Profile(models.Model):
     teacher_experience = models.TextField(blank=True, null=True)
     teacher_subjects = models.TextField(blank=True, null=True)
     
+    # Purchase tracking
+    has_purchased = models.BooleanField(default=False)
+    password_changed_once = models.BooleanField(default=False)
+    
+    class Meta:
+        app_label = 'account'
+
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
@@ -93,40 +93,45 @@ class Profile(models.Model):
             'native_language': self.native_language,
             'learning_language': self.learning_language,
             'profile_image': self.profile_image.url if self.profile_image else None,
-            'is_teacher': self.user.user_type == UserType.TEACHER,
-            'is_student': self.user.user_type == UserType.STUDENT,
-            'is_admin': self.user.user_type == UserType.ADMIN,
+            'is_teacher': self.user.is_teacher(),
+            'is_student': self.user.is_student(),
+            'is_admin': self.user.is_admin(),
             'is_verified': self.user.is_verified,
             'bio': self.bio,
             'phone_number': self.phone_number,
             'date_of_birth': self.date_of_birth,
             'teacher_request_pending': self.teacher_request_pending,
             'teacher_request_date': self.teacher_request_date,
+            'first_login': self.user.first_login,
+            'created_by_admin': self.user.created_by_admin,
+            'has_purchased': self.has_purchased
         }
+
+
+class Role(models.Model):
+    """Model for custom roles with specific permissions"""
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+    permissions = models.ManyToManyField(Permission, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.name
+
+
+class UserRole(models.Model):
+    """Model to assign roles to users"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_roles')
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='role_assignments')
     
     class Meta:
-        app_label = 'account'
-
-# Function to authenticate with email
-def authenticate_with_email(email, password):
-    """Custom authenticate function that uses email instead of username"""
-    try:
-        user = User.objects.get(email=email)
-        if user.check_password(password):
-            return user
-    except User.DoesNotExist:
-        pass
-    return None
-
-# Create Profile automatically when a User is created
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+        unique_together = ('user', 'role')
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.role.name}"
 
 
 class NotificationType(models.TextChoices):
@@ -140,12 +145,16 @@ class NotificationType(models.TextChoices):
     MESSAGE = 'message', 'Message'
     CONNECTION = 'connection', 'Connection'
     ORDER = 'order', 'Order'
+    INSTRUCTOR_APPROVAL = 'instructor_approval', 'Instructor Approval'
+    INSTRUCTOR_REJECTION = 'instructor_rejection', 'Instructor Rejection'
+    ACCOUNT_CREATED = 'account_created', 'Account Created'
+
 
 class Notification(models.Model):
     """Model for storing user notifications"""
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_notifications')
-    notification_type = models.CharField(max_length=20, choices=NotificationType.choices, default=NotificationType.INFO)
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_notifications')
+    notification_type = models.CharField(max_length=30, choices=NotificationType.choices, default=NotificationType.INFO)
     title = models.CharField(max_length=255)
     message = models.TextField()
     read = models.BooleanField(default=False)
@@ -181,7 +190,7 @@ class Notification(models.Model):
         # If no action URL, try to generate one based on related object
         if self.related_object and hasattr(self.related_object, 'get_absolute_url'):
             return self.related_object.get_absolute_url()
-        return None   
+        return None
 
 
 class ContactMessage(models.Model):
@@ -213,6 +222,7 @@ class ContactMessage(models.Model):
     def __str__(self):
         return f"{self.name} - {self.subject} ({self.created_at.strftime('%Y-%m-%d')})"
 
+
 class Subscriber(models.Model):
     """Model for storing newsletter subscribers"""
     email = models.EmailField(unique=True, verbose_name=_("Email Address"))
@@ -226,3 +236,50 @@ class Subscriber(models.Model):
     
     def __str__(self):
         return self.email
+
+
+class LoginHistory(models.Model):
+    """Track user login history for security purposes"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='login_history')
+    login_time = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True, null=True)
+    device_info = models.CharField(max_length=200, blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    was_first_login = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.login_time}"
+    
+    class Meta:
+        ordering = ['-login_time']
+        verbose_name = _("Login History")
+        verbose_name_plural = _("Login Histories")
+
+
+# Create Profile automatically when a User is created
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)  
+def save_user_profile(sender, instance, **kwargs):
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
+
+
+# Password generation utility
+def generate_random_password(length=12):
+    """Generate a random password for admin-created accounts"""
+    characters = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choice(characters) for _ in range(length))
+
+
+# Utility function to check if user needs to change password
+def should_change_password(user):
+    """Check if a user should change their password"""
+    if user.created_by_admin and not user.profile.password_changed_once:
+        return True
+    return False

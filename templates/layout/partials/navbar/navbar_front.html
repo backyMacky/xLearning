@@ -10,7 +10,7 @@
         <!-- Mobile menu toggle: End-->
         <a href="{% url 'front_pages:home' %}" class="app-brand-link">
           <span class="app-brand-logo demo">{% include 'partials/logo.html' %}</span>
-          <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1 text-primary">xLearning</span>
+          <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1 text-primary">LinguaConnect</span>
         </a>
       </div>
       <!-- Menu logo wrapper: End -->
@@ -30,32 +30,47 @@
             <ul class="dropdown-menu">
               <li>
                 <a class="dropdown-item" href="{% url 'front_pages:content-management' %}">
-                  <i class="ti ti-book ti-sm me-2"></i>
-                  <span>Content Management</span>
+                  <i class="ti ti-folders ti-sm me-2"></i>
+                  <span>Resource Library</span>
                 </a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'front_pages:live-sessions' %}">
-                  <i class="ti ti-video ti-sm me-2"></i>
-                  <span>Live Sessions</span>
+                  <i class="ti ti-calendar-time ti-sm me-2"></i>
+                  <span>Smart Scheduling</span>
                 </a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'front_pages:assessment-tools' %}">
-                  <i class="ti ti-clipboard-check ti-sm me-2"></i>
-                  <span>Assessment Tools</span>
+                  <i class="ti ti-report-analytics ti-sm me-2"></i>
+                  <span>Progress Tracking</span>
                 </a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'front_pages:student-management' %}">
-                  <i class="ti ti-users ti-sm me-2"></i>
+                  <i class="ti ti-users-group ti-sm me-2"></i>
                   <span>Student Management</span>
                 </a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'front_pages:booking-payment' %}">
-                  <i class="ti ti-calendar ti-sm me-2"></i>
-                  <span>Booking & Payment</span>
+                  <i class="ti ti-credit-card ti-sm me-2"></i>
+                  <span>Payment Processing</span>
+                </a>
+              </li>
+              <li>
+                <div class="dropdown-divider"></div>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:help-center' %}">
+                  <i class="ti ti-bulb ti-sm me-2"></i>
+                  <span>Teaching Tools</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:help-center' %}">
+                  <i class="ti ti-messages ti-sm me-2"></i>
+                  <span>Communication Hub</span>
                 </a>
               </li>
             </ul>
@@ -63,11 +78,39 @@
           <li class="nav-item">
             <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'pricing' %}active{% endif %}" href="{% url 'front_pages:pricing' %}">Pricing</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'front_pages:about' %}">About Us</a>
+          <li class="nav-item dropdown">
+            <a href="javascript:void(0);" class="nav-link dropdown-toggle fw-medium" aria-expanded="false" data-bs-toggle="dropdown">
+              <span>Resources</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:blog' %}">
+                  <i class="ti ti-article ti-sm me-2"></i>
+                  <span>Teaching Blog</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'front_pages:help-center' %}">
+                  <i class="ti ti-help ti-sm me-2"></i>
+                  <span>Help Center</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="ti ti-device-desktop ti-sm me-2"></i>
+                  <span>Webinars</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="ti ti-users ti-sm me-2"></i>
+                  <span>Community</span>
+                </a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'blog' %}active{% endif %}" href="{% url 'front_pages:blog' %}">Blog</a>
+            <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'front_pages:about' %}">About Us</a>
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'front_pages:contact' %}">Contact Us</a>
@@ -151,7 +194,22 @@
                 <span class="align-middle">Dashboard</span>
               </a>
             </li>
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="ti ti-folders me-2 ti-sm"></i>
+                <span class="align-middle">My Resources</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="ti ti-users me-2 ti-sm"></i>
+                <span class="align-middle">My Students</span>
+              </a>
+            </li>
             {% if request.user.is_superuser or request.user.is_admin %}
+            <li>
+              <div class="dropdown-divider"></div>
+            </li>
             <li>
               <a class="dropdown-item" href="{% url 'front_pages:contact_messages' %}">
                 <i class="ti ti-message-circle me-2 ti-sm"></i>
@@ -184,7 +242,7 @@
           <a href="{% url 'account:login' %}" class="btn btn-primary me-2"><span class="tf-icons ti ti-login me-md-1"></span><span class="d-none d-md-block">Login</span></a>
         </li>
         <li>
-          <a href="{% url 'account:register' %}" class="btn btn-outline-primary"><span class="tf-icons ti ti-user-plus me-md-1"></span><span class="d-none d-md-block">Register</span></a>
+          <a href="{% url 'account:register' %}" class="btn btn-outline-primary"><span class="tf-icons ti ti-user-plus me-md-1"></span><span class="d-none d-md-block">Free Trial</span></a>
         </li>
         {% endif %}
         <!-- navbar button: End -->

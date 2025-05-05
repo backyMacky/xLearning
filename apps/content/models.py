@@ -1,6 +1,6 @@
 from django.utils import timezone
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings 
 from django.utils.text import slugify
 from django.urls import reverse
 from multiselectfield import MultiSelectField
@@ -39,8 +39,8 @@ class Course(models.Model):
     description = models.TextField()
     language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES)
     level = models.CharField(max_length=2, choices=LEVEL_CHOICES)
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='taught_courses')
-    students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True)
+    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='taught_courses')
+    students = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='enrolled_courses', blank=True)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True)
     is_featured = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
@@ -181,7 +181,7 @@ class Lesson(models.Model):
 
 class LessonCompletion(models.Model):
     """Model to track which lessons a student has completed"""
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='completed_lessons')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='completed_lessons')
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='completions')
     completed_at = models.DateTimeField(auto_now_add=True)
     
@@ -191,7 +191,7 @@ class LessonCompletion(models.Model):
 
 class CourseProgress(models.Model):
     """Model to track a student's progress in a course"""
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_progress')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_progress')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='student_progress')
     last_accessed = models.DateTimeField(auto_now=True)
     
@@ -232,7 +232,7 @@ class Resource(models.Model):
     resource_type = models.CharField(max_length=20, choices=RESOURCE_TYPES, default='document')
     file = models.FileField(upload_to='content_resources/', blank=True, null=True)
     external_url = models.URLField(blank=True, null=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_resources')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_resources')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='resources', null=True, blank=True)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='resources', null=True, blank=True)
     language = models.CharField(max_length=10, choices=Course.LANGUAGE_CHOICES)
@@ -262,7 +262,7 @@ class Instructor(models.Model):
         ('technical', 'Technical & Scientific'),
     ]
     
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='instructor_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='instructor_profile')
     bio = models.TextField(blank=True, null=True)
     teaching_style = models.TextField(blank=True, null=True)
     profile_image = models.ImageField(upload_to='instructor_profiles/', blank=True, null=True)
@@ -304,7 +304,7 @@ class Instructor(models.Model):
 class InstructorReview(models.Model):
     """Model for student reviews of instructors"""
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='reviews')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_reviews')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='given_reviews')
     rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -355,7 +355,7 @@ class PrivateSession(models.Model):
     ]
     
     instructor = models.ForeignKey('Instructor', on_delete=models.CASCADE, related_name='private_sessions')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='private_sessions', null=True, blank=True)
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='private_sessions', null=True, blank=True)
     language = models.CharField(max_length=10, choices=LANGUAGE_CHOICES)
     level = models.CharField(max_length=2, choices=LEVEL_CHOICES)
     start_time = models.DateTimeField()
@@ -466,7 +466,7 @@ class GroupSession(models.Model):
     duration_minutes = models.PositiveIntegerField(default=60)
     max_students = models.PositiveIntegerField(default=5)
     min_students = models.PositiveIntegerField(default=2)
-    students = models.ManyToManyField(User, related_name='group_sessions', blank=True)
+    students = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='group_sessions', blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     price = models.DecimalField(max_digits=6, decimal_places=2, default=15.00)
     tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated tags")
@@ -544,7 +544,7 @@ class SessionFeedback(models.Model):
         ('group', 'Group Session'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_session_feedback')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='given_session_feedback')
     session_type = models.CharField(max_length=10, choices=SESSION_TYPE_CHOICES)
     private_session = models.ForeignKey(PrivateSession, on_delete=models.CASCADE, null=True, blank=True, related_name='feedback')
     group_session = models.ForeignKey(GroupSession, on_delete=models.CASCADE, null=True, blank=True, related_name='feedback')

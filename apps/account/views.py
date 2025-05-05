@@ -73,14 +73,14 @@ class RegisterView(BaseAccountView, FormView):
         })
         return context
     
-    def get_form(self, form_class=None):
-        # Django forms would be better here, but keeping close to original code
-        return None
-    
     def post(self, request, *args, **kwargs):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        native_language = request.POST.get('native_language', '')
+        learning_language = request.POST.get('learning_language', '')
         
         # Check if user already exists
         if User.objects.filter(username=username).exists():
@@ -91,7 +91,13 @@ class RegisterView(BaseAccountView, FormView):
             return redirect('account:register')
         
         # Create user - always as student by default
-        user = User.objects.create_user(username=username, email=email, password=password)
+        user = User.objects.create_user(
+            username=username, 
+            email=email, 
+            password=password,
+            first_name=first_name,
+            last_name=last_name
+        )
         
         # Set user type to student by default
         user.user_type = UserType.STUDENT
@@ -103,12 +109,12 @@ class RegisterView(BaseAccountView, FormView):
         
         # Update profile
         profile = user.profile
-        profile.native_language = request.POST.get('native_language')
-        profile.learning_language = request.POST.get('learning_language')
+        profile.native_language = native_language
+        profile.learning_language = learning_language
         profile.save()
         
-        # Send verification email
-        self.send_verification_email(request, user, token)
+        # Send welcome and verification email
+        self.send_welcome_verification_email(request, user, token)
         
         # Create success message
         messages.success(request, "Registration successful! Please check your email to verify your account.")
@@ -116,39 +122,44 @@ class RegisterView(BaseAccountView, FormView):
         # Redirect to verification page
         return redirect(self.success_url)
     
-    def send_verification_email(self, request, user, token):
-        """Helper method to send verification email"""
+    def send_welcome_verification_email(self, request, user, token):
+        """Send welcome and verification email"""
         verify_url = request.build_absolute_uri(
             reverse('account:verify_email_confirm', kwargs={'token': token})
         )
         
-        subject = 'Verify your email address'
-        message = f'Hi {user.username},\n\nPlease click the link below to verify your email address:\n\n{verify_url}\n\nThanks!'
+        context = {
+            'user': user,
+            'verify_url': verify_url,
+            'site_name': 'xLearning',
+            'site_url': request.build_absolute_uri('/'),
+        }
+        
+        # Render HTML email template
+        html_message = render_to_string('email/welcome_verification.html', context)
+        plain_message = strip_tags(html_message)
+        
+        subject = 'Welcome to xLearning - Verify Your Account'
         email_from = settings.DEFAULT_FROM_EMAIL
         recipient_list = [user.email]
         
-        send_mail(subject, message, email_from, recipient_list)
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=email_from,
+            recipient_list=recipient_list,
+            html_message=html_message,
+            fail_silently=False
+        )
 
 class LoginView(BaseAccountView, FormView):
     """Class-based view for user login"""
     template_name = 'login.html'
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            "page_title": "Login to Your Account",
-            "page_description": "Sign in and continue your teaching journey."
-        })
-        return context
-    
-    def get_form(self, form_class=None):
-        # Django forms would be better here, but keeping close to original code
-        return None
-    
     def post(self, request, *args, **kwargs):
         email_username = request.POST.get('email-username')
         password = request.POST.get('password')
-        next_url = request.POST.get('next', 'dashboards:overview')
+        next_url = request.POST.get('next', '')
         
         # Try to authenticate with email or username
         user = None
@@ -162,13 +173,21 @@ class LoginView(BaseAccountView, FormView):
                 
             # Verify password
             if user.check_password(password):
-                # Commented out email verification check
-                # if not user.is_verified and user.user_type != UserType.ADMIN:
-                #     messages.warning(request, "Please verify your email address before logging in.")
-                #     return redirect('account:verify_email')
+                # Check if email is verified
+                if not user.is_verified and user.user_type != UserType.ADMIN:
+                    messages.warning(request, "Please verify your email address before logging in.")
+                    return redirect('account:verify_email')
                 
                 login(request, user)
-                return redirect(next_url)
+                
+                # Check if this is the first login and user needs to purchase credits
+                if user.first_login and user.user_type == UserType.STUDENT:
+                    user.first_login = False
+                    user.save()
+                    return redirect('booking:purchase_credits')
+                
+                # Normal redirection
+                return redirect(next_url if next_url else 'dashboards:overview')
             else:
                 user = None
         except User.DoesNotExist:
@@ -179,6 +198,7 @@ class LoginView(BaseAccountView, FormView):
             return render(request, 'login.html', self.get_context_data())
         
         return super().form_invalid(None)
+
 
 class LogoutView(View):
     """Class-based view for user logout"""
@@ -717,7 +737,9 @@ class SecuritySettingsView(LoginRequiredMixin, BaseAccountView):
         context = super().get_context_data(**kwargs)
         context.update({
             "page_title": "Security Settings",
-            "page_description": "Manage your account security preferences."
+            "page_description": "Manage your account security preferences.",
+            "active_menu": "account",
+            "active_submenu": "security",
         })
         return context
     
@@ -729,26 +751,53 @@ class SecuritySettingsView(LoginRequiredMixin, BaseAccountView):
             new_password = request.POST.get('new_password')
             confirm_password = request.POST.get('confirm_password')
             
-            # Check current password
+            # Validation
             if not request.user.check_password(current_password):
                 messages.error(request, "Current password is incorrect.")
-                return self.get(request, *args, **kwargs)
+                return redirect('account:security_settings')
             
-            # Check passwords match
             if new_password != confirm_password:
                 messages.error(request, "New passwords do not match.")
-                return self.get(request, *args, **kwargs)
+                return redirect('account:security_settings')
+            
+            if len(new_password) < 8:
+                messages.error(request, "Password must be at least 8 characters long.")
+                return redirect('account:security_settings')
             
             # Update password
             request.user.set_password(new_password)
             request.user.save()
+            
+            # Send email notification
+            self.send_password_change_email(request.user)
             
             messages.success(request, "Password changed successfully.")
             # Re-authenticate user after password change
             user = authenticate(username=request.user.username, password=new_password)
             login(request, user)
             
-        return self.get(request, *args, **kwargs)
+        return redirect('account:security_settings')
+    
+    def send_password_change_email(self, user):
+        """Send email notification about password change"""
+        context = {
+            'user': user,
+            'site_name': 'xLearning',
+            'change_time': timezone.now(),
+        }
+        
+        html_message = render_to_string('email/password_changed.html', context)
+        plain_message = strip_tags(html_message)
+        
+        send_mail(
+            subject='Your Password Has Been Changed',
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=True
+        )
+
 
 class PreferencesView(LoginRequiredMixin, BaseAccountView):
     """View for managing user preferences"""
@@ -877,6 +926,114 @@ class UserDeleteView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin
         user = self.get_object()
         messages.success(request, f"User {user.username} deleted successfully.")
         return super().delete(request, *args, **kwargs)
+
+
+# instructor
+class CreateInstructorView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """Admin-only view to create instructor accounts"""
+    model = User
+    template_name = 'create_instructor.html'
+    fields = ['username', 'email', 'first_name', 'last_name']
+    success_url = reverse_lazy('account:user_list')
+    
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.has_perm('account.can_manage_instructors')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': 'Create Instructor Account',
+            'submit_text': 'Create Instructor',
+            'active_menu': 'administration',
+            'active_submenu': 'user_management',
+        })
+        return context
+    
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        # Generate a random password
+        password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        user.set_password(password)
+        user.user_type = UserType.TEACHER
+        user.is_verified = True  # Instructors don't need email verification
+        user.created_by_admin = True
+        user.save()
+        
+        # Send email with login credentials
+        self.send_instructor_welcome_email(user, password)
+        
+        messages.success(self.request, f"Instructor account created for {user.username}")
+        return super().form_valid(form)
+    
+    def send_instructor_welcome_email(self, user, password):
+        """Send welcome email with login credentials to instructor"""
+        context = {
+            'user': user,
+            'password': password,
+            'login_url': self.request.build_absolute_uri(reverse('account:login')),
+            'site_name': 'xLearning',
+        }
+        
+        html_message = render_to_string('email/instructor_welcome.html', context)
+        plain_message = strip_tags(html_message)
+        
+        send_mail(
+            subject='Welcome to xLearning - Instructor Account Created',
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=False
+        )
+
+class ApproveInstructorRequestView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """Approve teacher requests from students"""
+    
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.has_perm('account.can_manage_instructors')
+    
+    def post(self, request, *args, **kwargs):
+        user_id = kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+        
+        if hasattr(user.profile, 'teacher_request_pending') and user.profile.teacher_request_pending:
+            # Approve the request
+            user.user_type = UserType.TEACHER
+            user.instructor_approved_by = request.user
+            user.save()
+            
+            # Clear pending request
+            user.profile.teacher_request_pending = False
+            user.profile.teacher_approved_date = timezone.now()
+            user.profile.save()
+            
+            # Send approval email
+            self.send_approval_email(user)
+            
+            messages.success(request, f"Instructor request approved for {user.username}")
+        else:
+            messages.error(request, "No pending instructor request found")
+        
+        return redirect('account:user_detail', pk=user_id)
+    
+    def send_approval_email(self, user):
+        """Send approval email to new instructor"""
+        context = {
+            'user': user,
+            'site_name': 'xLearning',
+        }
+        
+        html_message = render_to_string('email/instructor_approved.html', context)
+        plain_message = strip_tags(html_message)
+        
+        send_mail(
+            subject='Your Instructor Application Has Been Approved',
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=True
+        )
 
 
 # Role Management Views (already class-based, keeping them the same)
@@ -1143,4 +1300,55 @@ class PreferencesView(LoginRequiredMixin, TemplateView):
         # Handle preference updates
         # Example: language preference, notification settings, etc.
         messages.success(request, "Preferences updated successfully.")
-        return self.get(request, *args, **kwargs)    
+        return self.get(request, *args, **kwargs)  
+
+
+# account settings
+class AccountSettingsView(LoginRequiredMixin, BaseAccountView):
+    """Unified account settings page"""
+    template_name = 'account_settings.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get user profile
+        profile = self.request.user.profile
+        
+        # Get notification count
+        unread_notifications = Notification.objects.filter(
+            recipient=self.request.user,
+            read=False
+        ).count()
+        
+        # Get credit balance for students
+        credit_balance = 0
+        if hasattr(self.request.user, 'is_student') and self.request.user.is_student:
+            credit_balance = self.get_credit_balance(self.request.user)
+        
+        context.update({
+            "page_title": "Account Settings",
+            "page_description": "Manage your account settings and preferences.",
+            "active_menu": "account",
+            "active_submenu": "settings",
+            "profile": profile,
+            "unread_notifications": unread_notifications,
+            "credit_balance": credit_balance,
+        })
+        return context
+    
+    def get_credit_balance(self, user):
+        """Calculate user's current credit balance"""
+        from booking.models import CreditTransaction
+        transactions = CreditTransaction.objects.filter(student=user)
+        
+        # Calculate credits from purchases and refunds
+        credits = transactions.filter(
+            transaction_type__in=['purchase', 'refund', 'bonus']
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+        
+        # Calculate debits from deductions
+        debits = transactions.filter(
+            transaction_type='deduction'
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+        
+        return credits - debits          

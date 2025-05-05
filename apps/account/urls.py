@@ -14,6 +14,10 @@ urlpatterns = [
     path('verify-email/<str:token>/', views.VerifyEmailView.as_view(), name='verify_email_confirm'),
     path('resend-verification/', views.ResendVerificationEmailView.as_view(), name='resend_verification'),
     
+      # Instructor Management URLs
+    path('admin/instructors/create/', views.CreateInstructorView.as_view(), name='create_instructor'),
+    path('admin/instructors/approve/<int:user_id>/', views.ApproveInstructorRequestView.as_view(), name='approve_instructor_request'),
+    
     # Profile URLs
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('profile/update/', views.UpdateProfileView.as_view(), name='update_profile'),
@@ -58,4 +62,5 @@ urlpatterns = [
     # User Settings URLs
     path('settings/security/', views.SecuritySettingsView.as_view(), name='security_settings'),
     path('settings/preferences/', views.PreferencesView.as_view(), name='preferences'),
+    path('settings/', views.AccountSettingsView.as_view(), name='account_settings'),
 ]

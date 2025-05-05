@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings 
 from apps.content.models import Course
 
 
@@ -7,7 +7,7 @@ class Quiz(models.Model):
     """Model for quizzes and assessments"""
     title = models.CharField(max_length=255)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='quizzes')
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_quizzes')
+    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_quizzes')
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -106,7 +106,7 @@ class QuestionOption(models.Model):
 class Answer(models.Model):
     """Model for storing student answers to questions"""
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='question_answers')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='question_answers')
     text = models.TextField()
     is_correct = models.BooleanField(default=False)
     

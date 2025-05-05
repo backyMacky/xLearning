@@ -8,18 +8,21 @@
 {% block vendor_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
-<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
 {{ block.super }}
 <script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
-<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
 {% endblock vendor_js %}
 
 {% block page_css %}
 {{ block.super }}
 <style>
+  body {
+    background: linear-gradient(135deg, #f6f9fc 0%, #e5e7eb 100%);
+    min-height: 100vh;
+  }
+  
   .register-section {
     padding: 80px 0;
     position: relative;
@@ -45,87 +48,140 @@
   
   .register-card {
     border-radius: 20px;
-    box-shadow: 0 0 35px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .register-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
   }
   
   .register-header {
-    padding: 25px 30px;
-    background: linear-gradient(135deg, rgb(119, 158, 214) 0%, rgb(163, 137, 182) 100%);
+    padding: 30px 40px;
+    background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%);
     color: white;
-    border-radius: 20px 20px 0 0;
+    text-align: center;
   }
   
-  .register-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+  .register-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
   }
   
-  .register-subtitle {
-    font-size: 0.95rem;
+  .register-header p {
+    font-size: 18px;
     opacity: 0.9;
   }
   
   .register-body {
     padding: 40px;
     background: white;
-    border-radius: 0 0 20px 20px;
-  }
-  
-  .form-label {
-    font-weight: 500;
-    color: #495057;
   }
   
   .form-control {
     border-radius: 10px;
     padding: 12px 15px;
-    border: 1px solid #ced4da;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
   }
   
   .form-control:focus {
     border-color: #7367f0;
-    box-shadow: 0 0 0 0.25rem rgba(115, 103, 240, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(115, 103, 240, 0.25);
   }
   
-  .input-group-text {
-    border-radius: 10px 0 0 10px;
-    background-color: #f8f9fa;
-    border: 1px solid #ced4da;
-    border-right: none;
-    color: #7367f0;
-  }
-  
-  .input-group .form-control {
-    border-radius: 0 10px 10px 0;
-  }
-  
-  .register-submit {
-    padding: 12px 30px;
+  .form-label {
     font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+  }
+  
+  .registration-steps {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+  
+  .step {
+    width: 40px;
+    height: 40px;
+    background: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 15px;
+    color: #6c757d;
+    font-weight: bold;
+    position: relative;
+  }
+  
+  .step.active {
+    background: #7367f0;
+    color: white;
+  }
+  
+  .step::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 30px;
+    height: 2px;
+    background: #e9ecef;
+    z-index: -1;
+  }
+  
+  .step:last-child::after {
+    display: none;
+  }
+  
+  .submit-btn {
+    padding: 14px 0;
+    font-weight: 600;
+    font-size: 16px;
     border-radius: 10px;
+    background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%);
+    border: none;
     transition: all 0.3s ease;
   }
   
-  .register-submit:hover {
+  .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(115, 103, 240, 0.3);
+    box-shadow: 0 8px 25px rgba(115, 103, 240, 0.4);
   }
   
-  .password-toggle {
-    cursor: pointer;
+  .benefits-card {
+    background: #f8f9fc;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 30px;
   }
   
-  .select2-container--default .select2-selection--single {
-    height: 48px;
-    padding: 10px 15px;
-    border: 1px solid #ced4da;
+  .benefit-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .benefit-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(115, 103, 240, 0.1);
     border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7367f0;
+    margin-right: 15px;
   }
   
-  .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 46px;
+  .benefit-text {
+    font-size: 15px;
+    color: #495057;
   }
 </style>
 {% endblock page_css %}
@@ -134,110 +190,134 @@
 <section class="register-section">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="register-content">
-          <div class="row g-0">
-            <!-- Registration Form Column -->
-            <div class="col-lg-7" data-aos="fade-right" data-aos-duration="1000">
-              <div class="register-card">
-                <div class="register-header">
-                  <h3 class="register-title">Create Your Account</h3>
-                  <p class="register-subtitle mb-0">Join xLearning to start your language teaching journey</p>
+      <div class="col-lg-8">
+        <div class="register-content" data-aos="fade-up" data-aos-duration="1000">
+          <div class="register-card">
+            <div class="register-header">
+              <h2>Create Your Account</h2>
+              <p>Join xLearning to start your language journey</p>
+            </div>
+            
+            <div class="register-body">
+              <div class="registration-steps">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+              </div>
+              
+              {% if messages %}
+              {% for message in messages %}
+              <div class="alert alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}danger{% else %}warning{% endif %} alert-dismissible mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              {% endfor %}
+              {% endif %}
+              
+              <form id="registrationForm" action="{% url 'account:register' %}" method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" autofocus required>
+                  </div>
+                  
+                  <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="your.email@example.com" required>
+                  </div>
                 </div>
                 
-                <div class="register-body">
-                  {% if messages %}
-                  {% for message in messages %}
-                  <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-warning{% endif %} alert-dismissible mb-3" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstName" name="first_name" placeholder="First Name">
                   </div>
-                  {% endfor %}
-                  {% endif %}
                   
-                  <form id="registrationForm" action="{% url 'account:register' %}" method="post">
-                    {% csrf_token %}
-                    
-                    <div class="mb-3">
-                      <label for="username" class="form-label">Username</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="ti ti-user"></i></span>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" autofocus>
-                      </div>
-                      <div class="form-text">Username must be unique and contain only letters, numbers, and underscores.</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                      <label for="email" class="form-label">Email</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="ti ti-mail"></i></span>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Your email address">
-                      </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                      <label for="password" class="form-label">Password</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="ti ti-lock"></i></span>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Create a password">
-                        <span class="input-group-text password-toggle"><i class="ti ti-eye-off"></i></span>
-                      </div>
-                      <div class="form-text">
-                        Password must be at least 8 characters and include a mix of letters and numbers.
-                      </div>
-                    </div>
-                    
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <label for="native_language" class="form-label">Native Language</label>
-                        <select class="form-select select2" id="native_language" name="native_language">
-                          <option value="">Select language</option>
-                          <option value="english">English</option>
-                          <option value="spanish">Spanish</option>
-                          <option value="french">French</option>
-                          <option value="german">German</option>
-                          <option value="chinese">Chinese</option>
-                          <option value="japanese">Japanese</option>
-                          <option value="arabic">Arabic</option>
-                          <option value="russian">Russian</option>
-                        </select>
-                      </div>
-                      
-                      <div class="col-md-6 mb-3">
-                        <label for="learning_language" class="form-label">Learning Language</label>
-                        <select class="form-select select2" id="learning_language" name="learning_language">
-                          <option value="">Select language</option>
-                          <option value="english">English</option>
-                          <option value="spanish">Spanish</option>
-                          <option value="french">French</option>
-                          <option value="german">German</option>
-                          <option value="chinese">Chinese</option>
-                          <option value="japanese">Japanese</option>
-                          <option value="arabic">Arabic</option>
-                          <option value="russian">Russian</option>
-                        </select>
-                      </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
-                        <label class="form-check-label" for="terms">
-                          I agree to the <a href="{% url 'front_pages:terms-of-service' %}" target="_blank">Terms of Service</a> and <a href="{% url 'front_pages:privacy-policy' %}" target="_blank">Privacy Policy</a>
-                        </label>
-                      </div>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                      <button type="submit" class="btn btn-primary register-submit">
-                        <i class="ti ti-user-plus me-2"></i> Create Account
-                      </button>
-                    </div>
-                    
-                    <div class="text-center mt-4">
-                      <p>Already have an account? <a href="{% url 'account:login' %}" class="fw-semibold">Sign in</a></p>
-                    </div>
-                  </form>
+                  <div class="col-md-6 mb-3">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Last Name">
+                  </div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="Create a strong password" required>
+                  <div class="form-text">
+                    Password must be at least 8 characters and include a mix of letters and numbers.
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="native_language" class="form-label">Native Language</label>
+                    <select class="form-control" id="native_language" name="native_language">
+                      <option value="">Select your native language</option>
+                      <option value="english">English</option>
+                      <option value="spanish">Spanish</option>
+                      <option value="french">French</option>
+                      <option value="german">German</option>
+                      <option value="chinese">Chinese</option>
+                      <option value="japanese">Japanese</option>
+                      <option value="arabic">Arabic</option>
+                      <option value="russian">Russian</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-md-6 mb-3">
+                    <label for="learning_language" class="form-label">Learning Language</label>
+                    <select class="form-control" id="learning_language" name="learning_language">
+                      <option value="">Select language to learn</option>
+                      <option value="english">English</option>
+                      <option value="spanish">Spanish</option>
+                      <option value="french">French</option>
+                      <option value="german">German</option>
+                      <option value="chinese">Chinese</option>
+                      <option value="japanese">Japanese</option>
+                      <option value="arabic">Arabic</option>
+                      <option value="russian">Russian</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="mb-4">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                    <label class="form-check-label" for="terms">
+                      I agree to the <a href="{% url 'front_pages:terms-of-service' %}" target="_blank">Terms of Service</a> and <a href="{% url 'front_pages:privacy-policy' %}" target="_blank">Privacy Policy</a>
+                    </label>
+                  </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary submit-btn w-100">
+                  Create Account
+                </button>
+                
+                <div class="text-center mt-4">
+                  <p>Already have an account? <a href="{% url 'account:login' %}" class="text-primary fw-semibold">Sign in</a></p>
+                </div>
+              </form>
+              
+              <div class="benefits-card">
+                <h6 class="mb-3">What you'll get:</h6>
+                <div class="benefit-item">
+                  <div class="benefit-icon">
+                    <i class="ti ti-book-2"></i>
+                  </div>
+                  <div class="benefit-text">Access to personalized courses</div>
+                </div>
+                <div class="benefit-item">
+                  <div class="benefit-icon">
+                    <i class="ti ti-users"></i>
+                  </div>
+                  <div class="benefit-text">1-on-1 sessions with expert instructors</div>
+                </div>
+                <div class="benefit-item">
+                  <div class="benefit-icon">
+                    <i class="ti ti-chart-line"></i>
+                  </div>
+                  <div class="benefit-text">Track your progress in real-time</div>
                 </div>
               </div>
             </div>
@@ -259,33 +339,6 @@
       offset: 50
     });
     
-    // Initialize Select2
-    if (document.querySelector('.select2')) {
-      $('.select2').select2({
-        width: '100%'
-      });
-    }
-    
-    // Password toggle functionality
-    const passwordToggle = document.querySelector('.password-toggle');
-    if (passwordToggle) {
-      passwordToggle.addEventListener('click', function() {
-        const passwordField = document.getElementById('password');
-        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordField.setAttribute('type', type);
-        
-        // Toggle icon
-        const icon = this.querySelector('i');
-        if (type === 'password') {
-          icon.classList.remove('ti-eye');
-          icon.classList.add('ti-eye-off');
-        } else {
-          icon.classList.remove('ti-eye-off');
-          icon.classList.add('ti-eye');
-        }
-      });
-    }
-    
     // Form validation
     const registrationForm = document.getElementById('registrationForm');
     if (registrationForm) {
@@ -296,49 +349,15 @@
         const password = document.getElementById('password').value.trim();
         const terms = document.getElementById('terms').checked;
         
-        if (!username) {
+        if (!username || !email || !password || !terms) {
+          e.preventDefault();
           isValid = false;
-          highlightError('username');
-        } else {
-          removeError('username');
-        }
-        
-        if (!email) {
-          isValid = false;
-          highlightError('email');
-        } else {
-          removeError('email');
-        }
-        
-        if (!password) {
-          isValid = false;
-          highlightError('password');
-        } else {
-          removeError('password');
-        }
-        
-        if (!terms) {
-          isValid = false;
-          document.getElementById('terms').classList.add('is-invalid');
-        } else {
-          document.getElementById('terms').classList.remove('is-invalid');
         }
         
         if (!isValid) {
-          e.preventDefault();
+          alert('Please fill out all required fields.');
         }
       });
-    }
-    
-    function highlightError(fieldId) {
-      const field = document.getElementById(fieldId);
-      field.classList.add('is-invalid');
-      field.closest('.input-group').classList.add('has-validation');
-    }
-    
-    function removeError(fieldId) {
-      const field = document.getElementById(fieldId);
-      field.classList.remove('is-invalid');
     }
   });
 </script>

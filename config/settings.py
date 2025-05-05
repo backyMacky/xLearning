@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     "apps.front_pages.apps.FrontPagesConfig",
 ]
 
+AUTH_USER_MODEL = 'account.CustomUser'
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -71,6 +73,11 @@ MIDDLEWARE = [
     "apps.booking.middleware.DuplicateSessionCleanupMiddleware",
 
 ]
+
+# Security settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 
 # Optional: clean up on startup - set to True to run cleanup when the server starts
 CLEAN_DUPLICATE_SESSIONS_ON_STARTUP = True

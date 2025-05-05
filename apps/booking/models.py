@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings  # Changed from auth.models import User
 from django.utils import timezone
 from apps.meetings.models import Meeting
 from django.db.models.signals import post_save
@@ -9,7 +9,7 @@ import uuid
 
 class Instructor(models.Model):
     """Extended model for instructors"""
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='booking_instructor_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='booking_instructor_profile')
     bio = models.TextField(blank=True, null=True)
     profile_image = models.ImageField(upload_to='instructor_images/', blank=True, null=True)
     # Changed from ManyToManyField to MultiSelectField or CharField
@@ -109,7 +109,7 @@ class PrivateSessionSlot(models.Model):
     ]
     
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='private_slots')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='booked_private_slots', 
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='booked_private_slots', 
                                 null=True, blank=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
@@ -246,7 +246,7 @@ class GroupSession(models.Model):
     end_time = models.DateTimeField()
     duration_minutes = models.IntegerField(default=90)
     max_students = models.IntegerField(default=8)
-    students = models.ManyToManyField(User, related_name='enrolled_group_sessions', blank=True)
+    students = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='enrolled_group_sessions', blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     status = models.CharField(max_length=20, choices=[
         ('scheduled', 'Scheduled'),
@@ -334,7 +334,7 @@ class GroupSession(models.Model):
 class InstructorReview(models.Model):
     """Model for student reviews of instructors"""
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name='reviews')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='instructor_reviews')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='instructor_reviews')
     rating = models.IntegerField(choices=[(1, '1 - Poor'), (2, '2 - Fair'), (3, '3 - Good'), 
                                          (4, '4 - Very Good'), (5, '5 - Excellent')])
     comment = models.TextField()
@@ -355,7 +355,7 @@ class InstructorReview(models.Model):
 
 
 class CreditTransaction(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='credit_transactions')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='credit_transactions')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
     transaction_type = models.CharField(max_length=20, choices=[

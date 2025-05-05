@@ -146,8 +146,78 @@
       </div>
     </div>
     
+    <!-- Instructor Application Section -->
+    {% if user_obj.profile.teacher_request_pending and request.user.has_perm('account.can_manage_instructors') %}
+    <div class="col-xl-8 col-lg-7 col-md-7">
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Instructor Application</h5>
+          <span class="badge bg-label-warning">Pending Review</span>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning mb-4">
+            <div class="d-flex">
+              <i class="ti ti-clock me-2"></i>
+              <div>
+                <h6 class="alert-heading mb-1">Pending Instructor Request</h6>
+                <p class="mb-0">This user has requested to become an instructor. Review their application below.</p>
+              </div>
+            </div>
+          </div>
+          
+          <h6 class="mb-3">Application Details</h6>
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Qualifications</label>
+                <div class="border rounded p-3 bg-light">
+                  {{ user_obj.profile.teacher_qualifications|default:"Not provided"|linebreaks }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Experience</label>
+                <div class="border rounded p-3 bg-light">
+                  {{ user_obj.profile.teacher_experience|default:"Not provided"|linebreaks }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Teaching Subjects</label>
+                <div class="border rounded p-3 bg-light">
+                  {{ user_obj.profile.teacher_subjects|default:"Not provided"|linebreaks }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Request Date</label>
+                <div class="border rounded p-3 bg-light">
+                  {{ user_obj.profile.teacher_request_date|date:"l, F j, Y at g:i A" }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <form method="post" action="{% url 'account:approve_instructor_request' user_id=user_obj.id %}">
+            {% csrf_token %}
+            <div class="d-flex justify-content-start">
+              <button type="submit" class="btn btn-success me-2">
+                <i class="ti ti-check me-1"></i> Approve Request
+              </button>
+              <button type="submit" class="btn btn-danger" name="action" value="reject">
+                <i class="ti ti-x me-1"></i> Reject Request
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% else %}
     <!-- User Activity -->
     <div class="col-xl-8 col-lg-7 col-md-7">
+    {% endif %}
       <div class="card mb-4">
         <h5 class="card-header">User Roles</h5>
         <div class="card-body">
@@ -189,7 +259,7 @@
       <div class="card mb-4">
         <h5 class="card-header">Bio</h5>
         <div class="card-body">
-          <p>{{ user_obj.profile.bio }}</p>
+          <p>{{ user_obj.profile.bio|linebreaks }}</p>
         </div>
       </div>
       {% endif %}

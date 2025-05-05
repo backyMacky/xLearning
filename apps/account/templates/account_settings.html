@@ -1,0 +1,215 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Account Settings{% endblock %}
+
+{% block page_css %}
+<style>
+  .settings-card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .settings-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .settings-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+  }
+  
+  .settings-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .settings-description {
+    color: #6e6b7b;
+    font-size: 0.9rem;
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Profile Overview Card -->
+  <div class="col-md-4">
+    <div class="card settings-card h-100">
+      <div class="card-body text-center">
+        <div class="avatar avatar-xl mx-auto mb-3">
+          {% if profile.profile_image %}
+            <img src="{{ profile.profile_image.url }}" alt="Avatar" class="rounded-circle">
+          {% else %}
+            <span class="avatar-initial rounded-circle bg-label-primary">
+              {{ request.user.username|first|upper }}
+            </span>
+          {% endif %}
+        </div>
+        
+        <h5 class="mb-1">{{ request.user.get_full_name|default:request.user.username }}</h5>
+        <p class="mb-3">@{{ request.user.username }}</p>
+        
+        <div class="d-flex justify-content-center gap-2 mb-4">
+          <span class="badge bg-label-primary">{{ request.user.get_user_type_display }}</span>
+          {% if request.user.is_verified %}
+            <span class="badge bg-label-success">Verified</span>
+          {% endif %}
+        </div>
+        
+        <a href="{% url 'account:update_profile' %}" class="btn btn-primary w-100">
+          <i class="ti ti-edit me-1"></i> Edit Profile
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Settings Menu -->
+  <div class="col-md-8">
+    <div class="row g-4">
+      <!-- Profile Settings -->
+      <div class="col-sm-6">
+        <div class="card settings-card h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="settings-icon bg-label-primary">
+              <i class="ti ti-user text-primary"></i>
+            </div>
+            <div>
+              <h6 class="settings-title">Profile Information</h6>
+              <p class="settings-description mb-0">Update your personal details</p>
+            </div>
+          </div>
+          <div class="card-footer border-0 pt-0">
+            <a href="{% url 'account:update_profile' %}" class="btn btn-outline-primary btn-sm w-100">
+              Manage Profile
+              <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Security Settings -->
+      <div class="col-sm-6">
+        <div class="card settings-card h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="settings-icon bg-label-success">
+              <i class="ti ti-shield-check text-success"></i>
+            </div>
+            <div>
+              <h6 class="settings-title">Security</h6>
+              <p class="settings-description mb-0">Change password and security settings</p>
+            </div>
+          </div>
+          <div class="card-footer border-0 pt-0">
+            <a href="{% url 'account:security_settings' %}" class="btn btn-outline-success btn-sm w-100">
+              Manage Security
+              <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Notifications -->
+      <div class="col-sm-6">
+        <div class="card settings-card h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="settings-icon bg-label-info">
+              <i class="ti ti-bell text-info"></i>
+            </div>
+            <div>
+              <h6 class="settings-title">Notifications</h6>
+              <p class="settings-description mb-0">
+                {% if unread_notifications > 0 %}
+                  {{ unread_notifications }} unread notification{{ unread_notifications|pluralize }}
+                {% else %}
+                  All caught up!
+                {% endif %}
+              </p>
+            </div>
+          </div>
+          <div class="card-footer border-0 pt-0">
+            <a href="{% url 'account:notification_list' %}" class="btn btn-outline-info btn-sm w-100">
+              View Notifications
+              <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      {% if request.user.is_student %}
+      <!-- Credits Balance -->
+      <div class="col-sm-6">
+        <div class="card settings-card h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="settings-icon bg-label-warning">
+              <i class="ti ti-credit-card text-warning"></i>
+            </div>
+            <div>
+              <h6 class="settings-title">Credits</h6>
+              <p class="settings-description mb-0">{{ credit_balance }} credits available</p>
+            </div>
+          </div>
+          <div class="card-footer border-0 pt-0">
+            <a href="{% url 'booking:purchase_credits' %}" class="btn btn-outline-warning btn-sm w-100">
+              Manage Credits
+              <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Preferences -->
+      <div class="col-sm-6">
+        <div class="card settings-card h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="settings-icon bg-label-secondary">
+              <i class="ti ti-settings text-secondary"></i>
+            </div>
+            <div>
+              <h6 class="settings-title">Preferences</h6>
+              <p class="settings-description mb-0">Language and app preferences</p>
+            </div>
+          </div>
+          <div class="card-footer border-0 pt-0">
+            <a href="{% url 'account:preferences' %}" class="btn btn-outline-secondary btn-sm w-100">
+              Manage Preferences
+              <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Account Actions -->
+      <div class="col-sm-6">
+        <div class="card settings-card h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="settings-icon bg-label-danger">
+              <i class="ti ti-logout text-danger"></i>
+            </div>
+            <div>
+              <h6 class="settings-title">Account Actions</h6>
+              <p class="settings-description mb-0">Log out from your account</p>
+            </div>
+          </div>
+          <div class="card-footer border-0 pt-0">
+            <a href="{% url 'account:logout' %}" class="btn btn-outline-danger btn-sm w-100">
+              Sign Out
+              <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

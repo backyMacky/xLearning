@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}About xLearning - Modern Platform for Language Teachers{% endblock %}
+{% block title %}About LinguaConnect - Modern Platform for Language Teachers{% endblock %}
 
 {% block vendor_css %}
 {{ block.super }}
@@ -56,7 +56,7 @@
   .about-hero p {
     font-size: 1.25rem;
     color: rgba(255, 255, 255, 0.9);
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto 2rem;
   }
   
@@ -67,6 +67,7 @@
     overflow: hidden;
     border-top-left-radius: 80px;
     border-top-right-radius: 80px;
+    margin-top: -40px;
   }
 
   .about-vision h2 {
@@ -89,7 +90,7 @@
   
   .about-vision-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
   }
 
   .about-vision-icon {
@@ -114,22 +115,37 @@
     font-size: 1.1rem;
     line-height: 1.6;
   }
-
+  
+  /* Team Section */
   .team-section {
     padding: 80px 0;
     background-color: #ffffff;
+    position: relative;
   }
 
   .team-section h2 {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     font-size: 2.5rem;
     color: #5e5873;
   }
+  
+  .team-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 4rem;
+    color: #6e6b7b;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
 
   .team-card {
-    transition: all 0.3s ease;
     position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
   }
 
   .team-card:hover {
@@ -137,33 +153,451 @@
     box-shadow: 0 15px 30px rgba(0,0,0,0.1);
   }
 
-  .team-card img {
-    border-radius: 10px;
-    height: 250px;
-    object-fit: cover;
-  }
-
-  .team-card .social-icons {
+  .team-card .card-img-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
     display: flex;
-    gap: 10px;
-    margin-top: 15px;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
   }
 
-  .team-card .social-icons a {
-    width: 36px;
-    height: 36px;
+  .team-card .team-bio {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .team-card:hover .team-bio {
+    transform: translateY(0);
+  }
+
+  .team-card img {
+    transition: transform 0.5s ease;
+  }
+
+  .team-card:hover img {
+    transform: scale(1.05);
+  }
+
+  .team-card h4 {
+    margin-bottom: 5px;
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .team-card .position {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .team-social {
+    margin-top: 10px;
+  }
+
+  .team-social a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: #fff;
+    border-radius: 50%;
+    color: #7367f0;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+  }
+
+  .team-social a:hover {
+    background-color: #7367f0;
+    color: #fff;
+  }
+  
+  /* Solutions Section */
+  .solutions-section {
+    padding: 80px 0;
+    background-color: #f8f7fa;
+    position: relative;
+  }
+  
+  .solutions-section h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.5rem;
+    color: #5e5873;
+  }
+  
+  .solutions-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 4rem;
+    color: #6e6b7b;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .solution-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .solution-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  }
+  
+  .solution-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background-color: rgba(115, 103, 240, 0.1);
+  }
+  
+  .solution-card h4 {
+    margin-bottom: 15px;
+    color: #5e5873;
+    text-align: center;
+  }
+  
+  .solution-card p {
+    color: #6e6b7b;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+  
+  /* Values Section */
+  .values-section {
+    padding: 80px 0;
+    background-color: #ffffff;
+    position: relative;
+  }
+  
+  .values-section h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.5rem;
+    color: #5e5873;
+  }
+  
+  .values-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 4rem;
+    color: #6e6b7b;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .values-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+  }
+  
+  .value-card {
+    flex: 0 0 calc(33.333% - 30px);
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .value-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  }
+  
+  .value-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background-color: rgba(115, 103, 240, 0.1);
+  }
+  
+  .value-card h4 {
+    margin-bottom: 15px;
+    color: #5e5873;
+  }
+  
+  .value-card p {
+    color: #6e6b7b;
+    font-size: 0.95rem;
+  }
+  
+  /* Features Overview Section */
+  .features-section {
+    padding: 80px 0;
+    background-color: #f8f7fa;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .features-section h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.5rem;
+    color: #5e5873;
+  }
+  
+  .features-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 4rem;
+    color: #6e6b7b;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .features-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+  }
+  
+  .feature-item {
+    flex: 0 0 calc(50% - 40px);
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 30px;
+  }
+  
+  .feature-icon {
+    flex: 0 0 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background-color: #f8f8f8;
+    margin-right: 20px;
+    background-color: rgba(115, 103, 240, 0.1);
+  }
+  
+  .feature-content {
+    flex: 1;
+  }
+  
+  .feature-content h4 {
+    margin-bottom: 10px;
+    color: #5e5873;
+    font-size: 1.3rem;
+  }
+  
+  .feature-content p {
+    color: #6e6b7b;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+  }
+  
+  /* Global Presence Section */
+  .global-section {
+    padding: 80px 0;
+    background-color: #ffffff;
+    position: relative;
+  }
+  
+  .global-section h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.5rem;
+    color: #5e5873;
+  }
+  
+  .global-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 4rem;
+    color: #6e6b7b;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .map-container {
+    position: relative;
+    height: 400px;
+    background-image: url('{% static "img/front-pages/landing-page/world-map.png" %}');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .location-marker {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #7367f0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(115, 103, 240, 0.4);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(115, 103, 240, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(115, 103, 240, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(115, 103, 240, 0);
+    }
+  }
+  
+  .global-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+  }
+  
+  .stat-item {
+    flex: 0 0 calc(25% - 30px);
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 700;
     color: #7367f0;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
+  .stat-label {
+    color: #6e6b7b;
+    font-size: 1rem;
+  }
+  
+  /* Shape decorations */
+  .shape-1 {
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(115, 103, 240, 0.05);
+    z-index: 0;
+  }
+  
+  .shape-2 {
+    position: absolute;
+    bottom: -80px;
+    left: -80px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(115, 103, 240, 0.05);
+    z-index: 0;
+  }
+  
+  /* CTA Section */
+  .about-cta {
+    background: linear-gradient(135deg, #7367f0 0%, #a66ff0 100%);
+    padding: 80px 0;
+    text-align: center;
+    color: #fff;
+    position: relative;
+  }
+  
+  .about-cta h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  
+  .about-cta p {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 700px;
+    margin: 0 auto 2rem;
+  }
+  
+  .about-cta .btn {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 30px;
     transition: all 0.3s ease;
   }
-
-  .team-card .social-icons a:hover {
-    background-color: #7367f0;
-    color: #fff;
+  
+  .about-cta .btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .about-hero h1 {
+      font-size: 2.5rem;
+    }
+    
+    .feature-item {
+      flex: 0 0 100%;
+    }
+    
+    .value-card {
+      flex: 0 0 calc(50% - 30px);
+    }
+    
+    .stat-item {
+      flex: 0 0 calc(50% - 30px);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .about-hero {
+      padding: 80px 0 60px;
+    }
+    
+    .about-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .about-vision {
+      padding: 60px 0;
+    }
+    
+    .about-vision h2, 
+    .team-section h2, 
+    .solutions-section h2, 
+    .values-section h2,
+    .features-section h2,
+    .global-section h2 {
+      font-size: 2rem;
+    }
+    
+    .about-cta h2 {
+      font-size: 2rem;
+    }
+    
+    .value-card {
+      flex: 0 0 100%;
+    }
   }
 </style>
 {% endblock page_css %}
@@ -173,91 +607,204 @@
 <section class="about-hero">
   <div class="container">
     <div class="row align-items-center">
-      <div class="col-lg-6 about-hero-content" data-aos="fade-right" data-aos-duration="1000">
-        
-        <h1>Transforming Language Education</h1>
-        <p>At xLearning, we're dedicated to empowering language teachers with innovative tools that transform how languages are taught and learned around the world.</p>
-        <a href="#our-mission" class="btn btn-light btn-lg">Discover Our Mission</a>
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <img src="{% static 'img/front-pages/landing-page/about-hero.png' %}" alt="LinguaConnect Team" class="img-fluid rounded-4 shadow-lg" data-aos="fade-right" data-aos-duration="1000">
       </div>
-      <div class="col-lg-6 d-none d-lg-block" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-        <img src="{% static 'img/front-pages/landing-page/about.png' %}" alt="xLearning Team" class="img-fluid rounded-3 shadow-lg">
+      <div class="col-lg-6 about-hero-content" data-aos="fade-left" data-aos-duration="1000">
+        <h1>Transforming Language Education</h1>
+        <p>At LinguaConnect, we're dedicated to empowering language teachers with innovative tools that transform how languages are taught and learned worldwide.</p>
+        <a href="#our-mission" class="btn btn-light btn-lg">Discover Our Mission</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Vision Section -->
+<!-- Vision & Mission Section -->
 <section id="our-mission" class="about-vision">
   <div class="container">
-    <h2>Our Vision & Mission</h2>
+    <h2 data-aos="fade-up">Our Vision & Mission</h2>
     <div class="row g-4">
-      <div class="col-md-6" data-aos="fade-right" data-aos-duration="1000">
+      <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
         <div class="about-vision-card">
           <div class="about-vision-icon">
             <i class="ti ti-eye text-primary ti-xl"></i>
           </div>
           <h3>Our Vision</h3>
-          <p>To create a world where language learning is boundless, where teachers are empowered with cutting-edge tools, and where students can explore new cultures and connect with people across the globe.</p>
+          <p>To create a world where language learning is boundless, where teachers are liberated from administrative burdens, and where students can explore new cultures and connect with people across the globe through effective, engaging language education.</p>
         </div>
       </div>
       
-      <div class="col-md-6" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+      <div class="col-lg-6" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
         <div class="about-vision-card">
           <div class="about-vision-icon">
             <i class="ti ti-target text-success ti-xl"></i>
           </div>
           <h3>Our Mission</h3>
-          <p>To revolutionize language education by providing teachers with a comprehensive platform that streamlines administrative tasks, enhances student engagement, and improves learning outcomes.</p>
+          <p>To revolutionize language education by providing teachers with a comprehensive, integrated platform that streamlines administrative tasks, enhances student engagement, facilitates personalized learning, and ultimately improves language acquisition outcomes.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row g-4 mt-4">
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="about-vision-card">
+          <div class="about-vision-icon">
+            <i class="ti ti-clock text-warning ti-xl"></i>
+          </div>
+          <h3>Reducing Admin Time</h3>
+          <p>Our platform automates scheduling, reminders, and resource management, saving language teachers up to 10 hours per week on administrative tasks so they can focus on what matters most: teaching.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="about-vision-card">
+          <div class="about-vision-icon">
+            <i class="ti ti-users text-info ti-xl"></i>
+          </div>
+          <h3>Enhancing Experience</h3>
+          <p>We provide students with organized access to lessons, resources, and progress tracking, creating a seamless learning journey that boosts engagement and accelerates language acquisition.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="about-vision-card">
+          <div class="about-vision-icon">
+            <i class="ti ti-chart-bar text-danger ti-xl"></i>
+          </div>
+          <h3>Enabling Growth</h3>
+          <p>LinguaConnect is built to scale with your teaching practice, whether you're an independent tutor with a handful of students or a language school with hundreds of learners across multiple programs.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Team Section -->
-<section class="team-section">
+<!-- Solutions Section (Renamed from Technology) -->
+<section class="solutions-section">
+  <div class="shape-1"></div>
+  <div class="shape-2"></div>
+  
   <div class="container">
-    <h2>Meet Our Team</h2>
+    <h2 data-aos="fade-up">Our Solutions</h2>
+    <p class="solutions-intro" data-aos="fade-up" data-aos-delay="100">We've designed LinguaConnect with language teachers in mind, offering powerful tools that make teaching more effective and enjoyable.</p>
+    
     <div class="row g-4">
-      <div class="col-lg-3 col-sm-6">
-        <div class="team-card card">
-          <img src="{% static 'img/avatars/1.png' %}" class="card-img-top" alt="Sophie Gilbert">
-          <div class="card-body text-center">
-            <h5 class="mb-1">Sophie Gilbert</h5>
-            <p class="text-muted mb-2">Founder & CEO</p>
-            <p class="small text-muted mb-3">Former language teacher with 15 years of experience and a passion for educational technology.</p>
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="solution-card">
+          <div class="solution-icon">
+            <i class="ti ti-calendar text-primary ti-xl"></i>
           </div>
+          <h4>Smart Scheduling</h4>
+          <p>Intuitive calendar system with automated reminders, recurring lessons, and availability management to eliminate scheduling conflicts.</p>
         </div>
       </div>
-      <div class="col-lg-3 col-sm-6">
-        <div class="team-card card">
-          <img src="{% static 'img/avatars/2.png' %}" class="card-img-top" alt="Paul Miles">
-          <div class="card-body text-center">
-            <h5 class="mb-1">Paul Miles</h5>
-            <p class="text-muted mb-2">Head of Product</p>
-            <p class="small text-muted mb-3">Product leader with expertise in building educational technologies that teachers love.</p>
+      
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+        <div class="solution-card">
+          <div class="solution-icon">
+            <i class="ti ti-device-mobile text-primary ti-xl"></i>
           </div>
+          <h4>Anywhere Access</h4>
+          <p>Access your teaching materials, student records, and class schedule from any device, ensuring you're always prepared wherever you are.</p>
         </div>
       </div>
-      <div class="col-lg-3 col-sm-6">
-        <div class="team-card card">
-          <img src="{% static 'img/avatars/3.png' %}" class="card-img-top" alt="Nannie Ford">
-          <div class="card-body text-center">
-            <h5 class="mb-1">Nannie Ford</h5>
-            <p class="text-muted mb-2">Education Director</p>
-            <p class="small text-muted mb-3">Former university language department chair with a doctorate in language acquisition.</p>
+      
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+        <div class="solution-card">
+          <div class="solution-icon">
+            <i class="ti ti-bulb text-primary ti-xl"></i>
           </div>
+          <h4>Smart Learning</h4>
+          <p>Personalized learning recommendations adapt to each student's progress, automatically suggesting appropriate materials and exercises.</p>
         </div>
       </div>
-      <div class="col-lg-3 col-sm-6">
-        <div class="team-card card">
-          <img src="{% static 'img/avatars/4.png' %}" class="card-img-top" alt="Chris Watkins">
-          <div class="card-body text-center">
-            <h5 class="mb-1">Chris Watkins</h5>
-            <p class="text-muted mb-2">Technical Lead</p>
-            <p class="small text-muted mb-3">Software engineer with extensive experience in educational technology and AI applications.</p>
+      
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+        <div class="solution-card">
+          <div class="solution-icon">
+            <i class="ti ti-shield-check text-primary ti-xl"></i>
           </div>
+          <h4>Privacy Focused</h4>
+          <p>Your data and your students' information are protected with industry-leading security measures and strict privacy controls.</p>
         </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+        <div class="solution-card">
+          <div class="solution-icon">
+            <i class="ti ti-arrows-maximize text-primary ti-xl"></i>
+          </div>
+          <h4>Scalable System</h4>
+          <p>Whether you teach 5 students or 500, our platform grows with you, maintaining performance even as your teaching practice expands.</p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+        <div class="solution-card">
+          <div class="solution-icon">
+            <i class="ti ti-puzzle text-primary ti-xl"></i>
+          </div>
+          <h4>Seamless Integration</h4>
+          <p>Connect with your favorite tools and services, from payment processors to language learning apps, for a unified teaching ecosystem.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Values Section (New) -->
+<section class="values-section">
+  <div class="container">
+    <h2 data-aos="fade-up">Our Core Values</h2>
+    <p class="values-intro" data-aos="fade-up" data-aos-delay="100">These principles guide everything we do at LinguaConnect and shape how we build our platform and support our community of language teachers.</p>
+    
+    <div class="values-row">
+      <div class="value-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="value-icon">
+          <i class="ti ti-heart-handshake text-danger ti-xl"></i>
+        </div>
+        <h4>Teacher-First Approach</h4>
+        <p>We build every feature with language teachers' needs at the center, ensuring our platform truly serves those who use it daily.</p>
+      </div>
+      
+      <div class="value-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="value-icon">
+          <i class="ti ti-bulb text-warning ti-xl"></i>
+        </div>
+        <h4>Continuous Innovation</h4>
+        <p>We're constantly exploring new ways to improve language teaching and learning through thoughtful technology solutions.</p>
+      </div>
+      
+      <div class="value-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="value-icon">
+          <i class="ti ti-world text-success ti-xl"></i>
+        </div>
+        <h4>Cultural Connection</h4>
+        <p>We believe language learning builds bridges between cultures and creates understanding in an increasingly connected world.</p>
+      </div>
+      
+      <div class="value-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="value-icon">
+          <i class="ti ti-badge text-info ti-xl"></i>
+        </div>
+        <h4>Excellence in Education</h4>
+        <p>We're committed to helping teachers deliver the highest quality language instruction through better tools and resources.</p>
+      </div>
+      
+      <div class="value-card" data-aos="fade-up" data-aos-delay="500">
+        <div class="value-icon">
+          <i class="ti ti-users text-primary ti-xl"></i>
+        </div>
+        <h4>Community Support</h4>
+        <p>We foster a collaborative community where language teachers can share resources, ideas, and best practices.</p>
+      </div>
+      
+      <div class="value-card" data-aos="fade-up" data-aos-delay="600">
+        <div class="value-icon">
+          <i class="ti ti-shield-lock text-secondary ti-xl"></i>
+        </div>
+        <h4>Trust & Reliability</h4>
+        <p>We build secure, dependable systems that teachers can rely on every day in their important work of language education.</p>
       </div>
     </div>
   </div>

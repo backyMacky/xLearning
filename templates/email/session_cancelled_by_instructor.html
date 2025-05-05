@@ -1,59 +1,113 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Session Cancellation Notice</title>
+    <title>Session Cancelled - {{ site_name }}</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background-color: #e53935; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0;">
-            <h1 style="margin: 0; font-size: 24px;">Session Cancellation Notice</h1>
-        </div>
-        <div style="padding: 20px; background-color: #f9f9f9;">
-            <p style="margin-top: 0;">Hello {{ user.first_name|default:user.username }},</p>
-            
-            <p>We regret to inform you that your upcoming language learning session has been cancelled by the instructor. Here are the details of the cancelled session:</p>
-            
-            <div style="background-color: white; border-radius: 5px; padding: 15px; margin-bottom: 20px; border-left: 4px solid #e53935;">
-                <table style="width: 100%; border-collapse: collapse;">
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0;">
+    <table role="presentation" style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;">
+        <tr>
+            <td align="center" style="padding: 40px 0;">
+                <table role="presentation" style="width: 600px; max-width: 100%; margin: 0 auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); background-color: #ffffff;">
+                    <!-- Header -->
                     <tr>
-                        <td style="padding: 8px; font-weight: bold; width: 30%;">Instructor:</td>
-                        <td style="padding: 8px;">{{ instructor }}</td>
+                        <td style="background: linear-gradient(135deg, #ff9f43 0%, #ee7711 100%); border-radius: 15px 15px 0 0; padding: 40px 20px; text-align: center;">
+                            <div style="display: inline-block; width: 60px; height: 60px; background-color: rgba(255, 255, 255, 0.2); border-radius: 50%; margin-bottom: 20px; position: relative;">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 28px; color: #ffffff;">✕</div>
+                            </div>
+                            <h1 style="color: #ffffff; font-size: 32px; margin: 0; font-weight: 700;">Session Cancelled</h1>
+                        </td>
                     </tr>
+                    
+                    <!-- Main content -->
                     <tr>
-                        <td style="padding: 8px; font-weight: bold; width: 30%;">Date:</td>
-                        <td style="padding: 8px;">{{ session_date }}</td>
+                        <td style="padding: 40px 40px 20px; text-align: center;">
+                            <h2 style="color: #333; font-size: 24px; margin-bottom: 15px; font-weight: 600;">Hi {{ user.username }},</h2>
+                            
+                            <p style="color: #555; font-size: 16px; margin-bottom: 30px;">
+                                We regret to inform you that your session with <strong style="color: #ee7711;">{{ instructor }}</strong> has been cancelled.
+                            </p>
+                            
+                            <!-- Session Details Card -->
+                            <div style="background-color: #fff3cd; border-radius: 15px; padding: 30px; margin-bottom: 30px; text-align: left; border: 2px solid #ffeeba;">
+                                <h3 style="color: #856404; font-size: 20px; margin-bottom: 20px; margin-top: 0; font-weight: 600; text-align: center;">Cancelled Session Details</h3>
+                                
+                                <table style="width: 100%; margin-bottom: 20px;">
+                                    <tr>
+                                        <td style="padding: 10px 0; color: #856404; font-size: 14px; width: 30%;">
+                                            <strong>Date:</strong>
+                                        </td>
+                                        <td style="padding: 10px 0; color: #856404; font-size: 14px;">
+                                            {{ session_date }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px 0; color: #856404; font-size: 14px;">
+                                            <strong>Time:</strong>
+                                        </td>
+                                        <td style="padding: 10px 0; color: #856404; font-size: 14px;">
+                                            {{ session_time }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 10px 0; color: #856404; font-size: 14px;">
+                                            <strong>Refund:</strong>
+                                        </td>
+                                        <td style="padding: 10px 0; color: #28c76f; font-size: 14px;">
+                                            <strong>{{ refund_amount }} credit{{ refund_amount|pluralize }}</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <!-- Refund Information -->
+                            <div style="background-color: #d4edda; border-left: 4px solid #28c76f; padding: 20px; margin-bottom: 30px; text-align: left;">
+                                <h3 style="color: #28c76f; font-size: 18px; margin-bottom: 10px; margin-top: 0; font-weight: 600;">Good News!</h3>
+                                <p style="margin: 0; color: #155724; font-size: 14px;">
+                                    Your credits have been automatically refunded to your account. You can use them to book another session right away.
+                                </p>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div style="margin-bottom: 30px;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td style="text-align: center; padding: 10px;">
+                                            <a href="{% url 'booking:dashboard' %}" style="display: inline-block; background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%); color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: 600; margin: 0 10px;">
+                                                Find Another Session
+                                            </a>
+                                            <a href="{% url 'booking:my_sessions' %}" style="display: inline-block; background-color: #f8f9fc; color: #7367f0; text-decoration: none; padding: 15px 30px; border: 2px solid #7367f0; border-radius: 10px; font-size: 16px; font-weight: 600; margin: 0 10px;">
+                                                View Dashboard
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <p style="color: #666; font-size: 14px; margin-bottom: 0;">
+                                We apologize for any inconvenience this may cause.
+                            </p>
+                        </td>
                     </tr>
+                    
+                    <!-- Footer -->
                     <tr>
-                        <td style="padding: 8px; font-weight: bold; width: 30%;">Time:</td>
-                        <td style="padding: 8px;">{{ session_time }}</td>
+                        <td style="padding: 30px 40px; text-align: center; border-top: 1px solid #e9ecef;">
+                            <p style="color: #333; font-size: 16px; margin-bottom: 20px; font-weight: 600;">
+                                Best regards,<br>The {{ site_name }} Team
+                            </p>
+                            <div style="margin-top: 20px;">
+                                <p style="color: #999; font-size: 12px; margin-bottom: 5px;">
+                                    &copy; {% now "Y" %} {{ site_name }}. All rights reserved.
+                                </p>
+                                <a href="{{ site_url }}" style="color: #7367f0; text-decoration: none; font-size: 12px;">Visit our website</a>
+                            </div>
+                        </td>
                     </tr>
                 </table>
-            </div>
-            
-            <div style="background-color: #e8f5e9; border-radius: 5px; padding: 15px; border-left: 4px solid #4CAF50; margin-bottom: 20px;">
-                <h3 style="margin-top: 0; color: #2E7D32;">Automatic Refund</h3>
-                <p style="margin-bottom: 5px;">Your account has been automatically refunded <strong>{{ refund_amount }} credits</strong> for this cancellation.</p>
-                <p style="margin-top: 0;">Your credits are available immediately and can be used to book another session.</p>
-            </div>
-            
-            <p>We apologize for any inconvenience this may have caused. You can book a new session with the same or a different instructor at your convenience.</p>
-            
-            <p style="text-align: center;">
-                <a href="http://localhost:8000/booking/" style="display: inline-block; background-color: #696cff; color: white; text-decoration: none; padding: 12px 24px; border-radius: 5px; font-weight: bold; margin: 10px 0;">Book Another Session</a>
-            </p>
-            
-            <p>If you have any questions or concerns about this cancellation, please contact our support team at <a href="mailto:support@learningplatform.com" style="color: #696cff; text-decoration: underline;">support@learningplatform.com</a>.</p>
-            
-            <p style="margin-bottom: 0;">Thank you for your understanding.</p>
-            <p style="font-weight: bold; color: #696cff;">Learning Platform Team</p>
-        </div>
-        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
-            <p style="margin-bottom: 5px;">&copy; 2025 Learning Platform. All rights reserved.</p>
-            <p style="margin-top: 0;">This email was sent to {{ user.email }} regarding a cancelled session on our platform.</p>
-        </div>
-    </div>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
