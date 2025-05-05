@@ -4,7 +4,7 @@
       <!-- Menu logo wrapper: Start -->
       <div class="navbar-brand app-brand demo d-flex py-0 py-lg-2 me-4 me-xl-8">
         <!-- Mobile menu toggle: Start-->
-        <button class="navbar-toggler border-0 px-0 me-4" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler border-0 px-0 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <i class="ti ti-menu-2 ti-lg align-middle text-heading fw-medium"></i>
         </button>
         <!-- Mobile menu toggle: End-->
@@ -41,31 +41,7 @@
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="{% url 'front_pages:assessment-tools' %}">
-                  <i class="ti ti-report-analytics ti-sm me-2"></i>
-                  <span>Progress Tracking</span>
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{% url 'front_pages:student-management' %}">
-                  <i class="ti ti-users-group ti-sm me-2"></i>
-                  <span>Student Management</span>
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{% url 'front_pages:booking-payment' %}">
-                  <i class="ti ti-credit-card ti-sm me-2"></i>
-                  <span>Payment Processing</span>
-                </a>
-              </li>
-              <li>
                 <div class="dropdown-divider"></div>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{% url 'front_pages:help-center' %}">
-                  <i class="ti ti-bulb ti-sm me-2"></i>
-                  <span>Teaching Tools</span>
-                </a>
               </li>
               <li>
                 <a class="dropdown-item" href="{% url 'front_pages:help-center' %}">
@@ -86,7 +62,7 @@
               <li>
                 <a class="dropdown-item" href="{% url 'front_pages:blog' %}">
                   <i class="ti ti-article ti-sm me-2"></i>
-                  <span>Teaching Blog</span>
+                  <span>Blog</span>
                 </a>
               </li>
               <li>
@@ -121,131 +97,12 @@
       <!-- Menu wrapper: End -->
       <!-- Toolbar: Start -->
       <ul class="navbar-nav flex-row align-items-center ms-auto">
-        {% if has_customizer %}
-        <!-- Style Switcher -->
-        <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-1">
-          <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-            <i class='ti ti-sun ti-lg text-primary'></i>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end dropdown-styles">
-            <li>
-              <a class="dropdown-item" href="javascript:void(0);" data-theme="light">
-                <span class="align-middle"><i class='ti ti-sun me-2'></i>Light</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="javascript:void(0);" data-theme="dark">
-                <span class="align-middle"><i class="ti ti-moon-stars me-2"></i>Dark</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="javascript:void(0);" data-theme="system">
-                <span class="align-middle"><i class="ti ti-device-desktop-analytics me-2"></i>System</span>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <!-- / Style Switcher-->
-        {% endif %}
-        <!-- navbar button: Start -->
-        {% if request.user.is_authenticated %}
-        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-          <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
-            <div class="avatar avatar-online">
-              {% if request.user.profile.profile_image %}
-              <img src="{{ request.user.profile.profile_image.url }}" alt="user-avatar" class="w-px-40 h-auto rounded-circle">
-              {% else %}
-              <span class="avatar-initial rounded-circle bg-primary">{{ request.user.username|first|upper }}</span>
-              {% endif %}
-            </div>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-              <a class="dropdown-item" href="{% url 'account:profile' %}">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar avatar-online">
-                      {% if request.user.profile.profile_image %}
-                      <img src="{{ request.user.profile.profile_image.url }}" alt="user-avatar" class="w-px-40 h-auto rounded-circle">
-                      {% else %}
-                      <span class="avatar-initial rounded-circle bg-primary">{{ request.user.username|first|upper }}</span>
-                      {% endif %}
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <span class="fw-medium d-block">{{ request.user.username }}</span>
-                    <small class="text-muted">{{ request.user.get_user_type_display }}</small>
-                  </div>
-                </div>
-              </a>
-            </li>
-            <li>
-              <div class="dropdown-divider"></div>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'account:profile' %}">
-                <i class="ti ti-user-circle me-2 ti-sm"></i>
-                <span class="align-middle">My Profile</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'dashboards:overview' %}">
-                <i class="ti ti-layout-dashboard me-2 ti-sm"></i>
-                <span class="align-middle">Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#">
-                <i class="ti ti-folders me-2 ti-sm"></i>
-                <span class="align-middle">My Resources</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#">
-                <i class="ti ti-users me-2 ti-sm"></i>
-                <span class="align-middle">My Students</span>
-              </a>
-            </li>
-            {% if request.user.is_superuser or request.user.is_admin %}
-            <li>
-              <div class="dropdown-divider"></div>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'front_pages:contact_messages' %}">
-                <i class="ti ti-message-circle me-2 ti-sm"></i>
-                <span class="align-middle">Contact Messages</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'front_pages:subscribers' %}">
-                <i class="ti ti-users me-2 ti-sm"></i>
-                <span class="align-middle">Subscribers</span>
-              </a>
-            </li>
-            {% endif %}
-            <li>
-              <div class="dropdown-divider"></div>
-            </li>
-            <li>
-              <form action="{% url 'account:logout' %}" method="post" class="px-3 py-2">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-danger d-flex w-100">
-                  <span class="align-middle">Log Out</span>
-                  <i class="ti ti-logout ms-2 ti-sm"></i>
-                </button>
-              </form>
-            </li>
-          </ul>
-        </li>
-        {% else %}
         <li>
-          <a href="{% url 'account:login' %}" class="btn btn-primary me-2"><span class="tf-icons ti ti-login me-md-1"></span><span class="d-none d-md-block">Login</span></a>
+          <a href="{% url 'account:login' %}" class="btn btn-primary btn-sm">
+            <span class="tf-icons ti ti-login"></span>
+            <span class="d-none d-sm-inline-block">Login</span>
+          </a>
         </li>
-        <li>
-          <a href="{% url 'account:register' %}" class="btn btn-outline-primary"><span class="tf-icons ti ti-user-plus me-md-1"></span><span class="d-none d-md-block">Free Trial</span></a>
-        </li>
-        {% endif %}
-        <!-- navbar button: End -->
       </ul>
       <!-- Toolbar: End -->
     </div>

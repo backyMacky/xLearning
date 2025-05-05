@@ -421,3 +421,44 @@ class BlogPostView(BaseFrontPageView):
             "post": post
         })
         return context
+
+
+
+class WebinarView(BaseFrontPageView):
+    """Webinar page view"""
+    template_name = "webinar.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Language Teaching Webinars",
+            "page_description": "Professional development webinars for language educators.",
+            "active_menu": "resources"
+        })
+        return context
+
+class CommunityView(BaseFrontPageView):
+    """Community page view"""
+    template_name = "community.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Language Teacher Community",
+            "page_description": "Connect with educators worldwide and share teaching resources.",
+            "active_menu": "community"
+        })
+        return context
+
+class CookiePolicyView(BaseFrontPageView):
+    """Cookie policy page view"""
+    template_name = "cookie_policy.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "page_title": "Cookie Policy",
+            "page_description": "Learn how we use cookies to enhance your experience.",
+            "active_menu": "legal"
+        })
+        return context

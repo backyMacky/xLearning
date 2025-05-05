@@ -5,590 +5,735 @@
 
 {% block title %}Privacy Policy - xLearning Platform{% endblock %}
 
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<style>
+:root {
+  --privacy-primary: #7367f0;
+  --privacy-secondary: #a66ff0;
+  --privacy-bg-light: #f8f7fa;
+  --privacy-card-bg: #ffffff;
+  --privacy-text-primary: #5e5873;
+  --privacy-text-secondary: #6e6b7b;
+  --privacy-border-color: #e0e0e0;
+  --privacy-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  --privacy-shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Hero Section with Modern Design */
+.privacy-hero {
+  background: linear-gradient(135deg, var(--privacy-primary) 0%, var(--privacy-secondary) 100%);
+  color: white;
+  padding: 150px 0;
+  position: relative;
+  overflow: hidden;
+  min-height: 400px;
+}
+
+.privacy-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80%;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='80' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.1'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.1'/%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='%23ffffff' stroke-width='0.5' stroke-opacity='0.1'/%3E%3C/svg%3E");
+  background-size: 50px 50px;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.privacy-hero__floating {
+  position: absolute;
+  width: 80px;
+  height: 60px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  animation: floating 8s infinite ease-in-out;
+}
+
+.privacy-hero__floating--1 {
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.privacy-hero__floating--2 {
+  top: 60%;
+  left: 20%;
+  animation-delay: -2s;
+}
+
+.privacy-hero__floating--3 {
+  top: 40%;
+  right: 15%;
+  animation-delay: -4s;
+}
+
+@keyframes floating {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, 10px); }
+}
+
+.privacy-hero__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.privacy-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.privacy-hero p {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+}
+
+.privacy-hero__badge {
+  display: inline-block;
+  padding: 8px 20px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(5px);
+}
+
+.privacy-hero__icon-box {
+  width: 100px;
+  height: 80px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  transform: rotate(-10deg);
+}
+
+.privacy-hero__icon-box i {
+  font-size: 3rem;
+  transform: rotate(10deg);
+}
+
+/* Wave Shape for Transition */
+.privacy-hero__wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: var(--privacy-bg-light);
+  clip-path: polygon(0 50%, 100% 0%, 100% 100%, 0 100%);
+}
+
+/* Content Section */
+.privacy-content {
+  background: var(--privacy-bg-light);
+  padding: 80px 0;
+  position: relative;
+}
+
+.privacy-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Section Cards */
+.privacy-section {
+  background: var(--privacy-card-bg);
+  border-radius: 20px;
+  box-shadow: var(--privacy-shadow);
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.privacy-section:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--privacy-shadow-lg);
+}
+
+.privacy-section-header {
+  background: var(--privacy-bg-light);
+  padding: 20px;
+  border-bottom: 1px solid var(--privacy-border-color);
+}
+
+.privacy-section-header h2 {
+  color: var(--privacy-text-primary);
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.privacy-section-header .icon-wrapper {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--privacy-primary), var(--privacy-secondary));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: white;
+}
+
+.privacy-section-content {
+  padding: 20px;
+}
+
+.privacy-section-content p {
+  color: var(--privacy-text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.2;
+  margin-bottom: 1.3rem;
+}
+
+/* Interactive Information Cards */
+.info-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin: 40px 0;
+}
+
+.info-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid var(--privacy-border-color);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.info-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(135deg, var(--privacy-primary), var(--privacy-secondary));
+  transform: translateX(-5px);
+  transition: transform 0.3s ease;
+}
+
+.info-card:hover::before {
+  transform: translateX(0);
+}
+
+.info-card:hover {
+  transform: translateX(5px);
+  box-shadow: var(--privacy-shadow);
+}
+
+.info-card h4 {
+  color: var(--privacy-text-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.info-card p {
+  color: var(--privacy-text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Special Highlights */
+.privacy-highlight {
+  background: linear-gradient(135deg, #f8f7fa, #eef2f7);
+  border-radius: 15px;
+  padding: 30px;
+  margin: 30px 0;
+  border-left: 5px solid var(--privacy-primary);
+}
+
+.privacy-alert {
+  background: #fff3cd;
+  border-left: 5px solid #ffc107;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 0 10px 10px 0;
+}
+
+.privacy-alert-icon {
+  color: #ffc107;
+  font-size: 1.5rem;
+  margin-right: 15px;
+}
+
+/* Data Usage Icons */
+.data-usage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  margin: 40px 0;
+}
+
+.data-usage-item {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--privacy-shadow);
+  transition: transform 0.3s ease;
+}
+
+.data-usage-item:hover {
+  transform: translateY(-5px);
+}
+
+.data-usage-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, rgba(115, 103, 240, 0.1), rgba(166, 111, 240, 0.1));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--privacy-primary);
+  font-size: 1.5rem;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+/* Contact Section */
+.privacy-contact {
+  background: white;
+  border-radius: 20px;
+  box-shadow: var(--privacy-shadow);
+  padding: 50px;
+  margin-top: 60px;
+  position: relative;
+}
+
+.privacy-contact::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--privacy-primary), var(--privacy-secondary));
+  border-radius: 20px 20px 0 0;
+}
+
+.privacy-contact h3 {
+  color: var(--privacy-text-primary);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: var(--privacy-bg-light);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+  transform: translateX(5px);
+  background: linear-gradient(135deg, rgba(115, 103, 240, 0.05), rgba(166, 111, 240, 0.05));
+}
+
+.contact-icon {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--privacy-primary);
+  font-size: 1.5rem;
+  margin-right: 20px;
+  box-shadow: var(--privacy-shadow);
+}
+
+/* Footer CTA */
+.privacy-footer-cta {
+  background: linear-gradient(135deg, var(--privacy-primary), var(--privacy-secondary));
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.privacy-footer-cta::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zm20.97 0l-9.315 9.314L26.927 7.9l7.285-7.285L36.97 0h.686zM22.344 0l-9.315 9.314 1.414 1.414 7.285-7.285L24.485 0h-2.14zM0 5.373l.828-.83 1.415 1.415L0 8.2V5.374zm0 5.656l.828-.83 1.415 1.415L0 13.857v-2.828zm0 5.657l.828-.83 1.415 1.415L0 19.513v-2.827zm0 5.657l.828-.83 1.415 1.415L0 25.17v-2.83zM0 28.342l.828-.83 1.415 1.415L0 30.97v-2.97zm0 5.657l.828-.83 1.415 1.415L0 36.627V33.8zm0 5.657l6.485-6.485 1.414 1.414L0 42.284v-2.828zm0 5.657l6.485-6.485 1.414 1.414L0 47.94v-2.83zm0 5.657l6.485-6.485 1.414 1.414L2.828 54H0v-2.83zm0 5.657l6.485-6.485 1.414 1.414L5.656 57H0v-2.686zM54 5.373l-.828-.83-1.415 1.415L54 8.2V5.374zm0 5.656l-.828-.83-1.415 1.415L54 13.857v-2.828zm0 5.657l-.828-.83-1.415 1.415L54 19.513v-2.827zm0 5.657l-.828-.83-1.415 1.415L54 25.17v-2.83zM54 28.342l-.828-.83-1.415 1.415L54 30.97v-2.97zm0 5.657l-.828-.83-1.415 1.415L54 36.627V33.8zm0 5.657l-6.485-6.485-1.414 1.414L54 42.284v-2.828zm0 5.657l-6.485-6.485-1.414 1.414L54 47.94v-2.83zm0 5.657l-6.485-6.485-1.414 1.414L51.172 54H54v-2.83zm0 5.657l-6.485-6.485-1.414 1.414L48.344 57H54v-2.686z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-size: 30px 30px;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.privacy-footer-cta h3 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.privacy-footer-cta p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.privacy-footer-cta .btn {
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.privacy-footer-cta .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .privacy-hero {
+    padding: 100px 0;
+  }
+  
+  .privacy-hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  .info-card-grid,
+  .data-usage-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .privacy-hero {
+    padding: 80px 0;
+  }
+  
+  .privacy-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .privacy-section-content {
+    padding: 15px;
+  }
+  
+  .privacy-contact {
+    padding: 30px;
+  }
+}
+</style>
+{% endblock page_css %}
+
 {% block content %}
 <!-- Privacy Hero Section -->
-<section class="privacy-hero position-relative overflow-hidden py-5 ">
-  <div class="privacy-hero__bg position-absolute w-100 h-100 top-0 start-0 z-n1 bg-gradient-primary pt-5"></div>
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-xl-8 text-center">
-        <h3 class="  text-white mb-3  ">Privacy Policy</h3>
+<section class="privacy-hero">
+  <div class="privacy-hero__floating privacy-hero__floating--1"></div>
+  <div class="privacy-hero__floating privacy-hero__floating--2"></div>
+  <div class="privacy-hero__floating privacy-hero__floating--3"></div>
   
-        <div class="privacy-hero__card bg-white rounded-4 shadow-lg p-4 mt-5 position-relative">
-          <div class="row align-items-center">
-            <div class="col-md-3 text-center mb-3 mb-md-0">
-              <div class="privacy-hero__icon bg-light rounded-circle p-3 d-inline-flex mx-auto">
-                <i class="ti ti-shield-lock text-primary ti-3x"></i>
-              </div>
-            </div>
-            <div class="col-md-9">
-              <p class="fs-5 mb-0">This Privacy Policy explains how xLearning collects, uses, and protects your personal information. Your privacy is important to us, and we are committed to protecting it.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="privacy-hero__shape position-absolute bottom-0 start-0 w-100">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none" class="w-100" style="height: 60px;">
-      <path fill="#ffffff" fill-opacity="1" d="M0,32L80,42.7C160,53,320,75,480,74.7C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z"></path>
-    </svg>
-  </div>
-</section>
-<!-- /Privacy Hero Section -->
- 
-
-<!-- Privacy Content -->
-<section class="py-5">
   <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-xl-8">
-        <div class="card border-0 shadow-sm">
-          <div class="card-body p-4 p-md-5">
-            <!-- Introduction -->
-            <div id="introduction" class="privacy-section mb-5">
-              <div class="d-flex align-items-center mb-4">
-                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                  <i class="ti ti-info-circle text-primary fs-3"></i>
-                </div>
-                <h2 class="h3 mb-0">1. Introduction</h2>
-              </div>
-              <p>At xLearning, we respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, website, and services (collectively, the "Services").</p>
-              
-              <p>We encourage you to read this Privacy Policy carefully to understand our practices regarding your personal information. By accessing or using our Services, you acknowledge that you have read and understood this Privacy Policy.</p>
-            </div>
-            
-            <!-- Information We Collect -->
-            <div id="information-collected" class="privacy-section mb-5">
-              <div class="d-flex align-items-center mb-4">
-                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                  <i class="ti ti-database text-primary fs-3"></i>
-                </div>
-                <h2 class="h3 mb-0">2. Information We Collect</h2>
-              </div>
-              <p>We collect several types of information from and about users of our Services:</p>
-              
-              <div class="card bg-light border-0 rounded-4 mb-4 mt-4">
-                <div class="card-body">
-                  <h3 class="h5 mb-3">2.1 Information You Provide to Us</h3>
-                  <div class="table-responsive">
-                    <table class="table table-borderless mb-0">
-                      <tbody>
-                        <tr>
-                          <td width="30%" class="fw-semibold text-primary">Account Information</td>
-                          <td>When you register for an account, we collect your name, email address, password, and user type (teacher or student).</td>
-                        </tr>
-                        <tr>
-                          <td class="fw-semibold text-primary">Profile Information</td>
-                          <td>You may provide additional information such as profile picture, bio, teaching specialties, language proficiency, and educational background.</td>
-                        </tr>
-                        <tr>
-                          <td class="fw-semibold text-primary">Content</td>
-                          <td>We collect content you create, upload, or share through our Services, including teaching materials, assessments, comments, and messages.</td>
-                        </tr>
-                        <tr>
-                          <td class="fw-semibold text-primary">Payment Information</td>
-                          <td>If you subscribe to a paid plan, we collect payment details such as credit card information or PayPal account information. However, this information is processed by our payment processors and we do not store complete payment details on our servers.</td>
-                        </tr>
-                        <tr>
-                          <td class="fw-semibold text-primary">Communications</td>
-                          <td>We collect information you provide when you contact us for support, respond to surveys, or communicate with other users through our platform.</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="card bg-light border-0 rounded-4">
-                <div class="card-body">
-                  <h3 class="h5 mb-3">2.2 Information We Collect Automatically</h3>
-                  <div class="row g-4">
-                    <div class="col-md-6">
-                      <div class="d-flex">
-                        <div class="flex-shrink-0">
-                          <i class="ti ti-device-analytics text-primary fs-4 me-2"></i>
-                        </div>
-                        <div>
-                          <h4 class="h6 mb-2">Usage Data</h4>
-                          <p class="mb-0 small">We collect information about how you interact with our Services, including the pages you visit, features you use, and activity duration.</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="d-flex">
-                        <div class="flex-shrink-0">
-                          <i class="ti ti-device-laptop text-primary fs-4 me-2"></i>
-                        </div>
-                        <div>
-                          <h4 class="h6 mb-2">Device Information</h4>
-                          <p class="mb-0 small">We collect information about your device, including device type, operating system, browser, and IP address.</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="d-flex">
-                        <div class="flex-shrink-0">
-                          <i class="ti ti-map-pin text-primary fs-4 me-2"></i>
-                        </div>
-                        <div>
-                          <h4 class="h6 mb-2">Location Information</h4>
-                          <p class="mb-0 small">We may collect general location information (such as city and country) based on your IP address.</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="d-flex">
-                        <div class="flex-shrink-0">
-                          <i class="ti ti-cookie text-primary fs-4 me-2"></i>
-                        </div>
-                        <div>
-                          <h4 class="h6 mb-2">Cookies & Tracking</h4>
-                          <p class="mb-0 small">We use cookies and similar tracking technologies to collect information and remember preferences.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- How We Use Your Information -->
-            <div id="information-use" class="privacy-section mb-5">
-              <div class="d-flex align-items-center mb-4">
-                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                  <i class="ti ti-arrow-right-circle text-primary fs-3"></i>
-                </div>
-                <h2 class="h3 mb-0">3. How We Use Your Information</h2>
-              </div>
-              <p>We use the information we collect for various purposes, including:</p>
-              
-              <div class="row g-4 mt-2">
-                <div class="col-md-6">
-                  <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                      <div class="d-flex align-items-center mb-3">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
-                          <i class="ti ti-app-window text-primary"></i>
-                        </div>
-                        <h4 class="h6 mb-0">Providing the Services</h4>
-                      </div>
-                      <p class="small mb-0">To operate, maintain, and provide the features and functionality of our Services, including processing transactions and facilitating communication.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                      <div class="d-flex align-items-center mb-3">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
-                          <i class="ti ti-user-check text-primary"></i>
-                        </div>
-                        <h4 class="h6 mb-0">Personalization</h4>
-                      </div>
-                      <p class="small mb-0">To personalize your experience, recommend content, and provide tailored features based on your preferences and activities.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                      <div class="d-flex align-items-center mb-3">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
-                          <i class="ti ti-chart-bar text-primary"></i>
-                        </div>
-                        <h4 class="h6 mb-0">Improvement</h4>
-                      </div>
-                      <p class="small mb-0">To understand how users interact with our Services, identify usage trends, and improve the overall quality and user experience.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                      <div class="d-flex align-items-center mb-3">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
-                          <i class="ti ti-mail text-primary"></i>
-                        </div>
-                        <h4 class="h6 mb-0">Communication</h4>
-                      </div>
-                      <p class="small mb-0">To communicate with you about your account, respond to inquiries, send service-related notices, and provide customer support.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                      <div class="d-flex align-items-center mb-3">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
-                          <i class="ti ti-speakerphone text-primary"></i>
-                        </div>
-                        <h4 class="h6 mb-0">Marketing</h4>
-                      </div>
-                      <p class="small mb-0">With your consent, to send promotional emails about new features, special offers, or other information we think you may find interesting.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                      <div class="d-flex align-items-center mb-3">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
-                          <i class="ti ti-shield-lock text-primary"></i>
-                        </div>
-                        <h4 class="h6 mb-0">Security</h4>
-                      </div>
-                      <p class="small mb-0">To detect, prevent, and address fraud, unauthorized access, security breaches, and other harmful activities.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Sharing Your Information -->
-            <div id="information-sharing" class="privacy-section mb-5">
-              <div class="d-flex align-items-center mb-4">
-                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                  <i class="ti ti-share text-primary fs-3"></i>
-                </div>
-                <h2 class="h3 mb-0">4. Sharing Your Information</h2>
-              </div>
-              <p>We may share your information in the following circumstances:</p>
-              
-              <div class="accordion mt-4" id="sharingAccordion">
-                <div class="accordion-item border-0 mb-3 shadow-sm">
-                  <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                      <i class="ti ti-users text-primary me-2"></i> With Other Users
-                    </button>
-                  </h3>
-                  <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#sharingAccordion">
-                    <div class="accordion-body">
-                      Certain information, such as your name, profile picture, and content you share, may be visible to other users of the Services according to your privacy settings.
-                    </div>
-                  </div>
-                </div>
-                <div class="accordion-item border-0 mb-3 shadow-sm">
-                  <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                      <i class="ti ti-building text-primary me-2"></i> With Service Providers
-                    </button>
-                  </h3>
-                  <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#sharingAccordion">
-                    <div class="accordion-body">
-                      We may share your information with third-party vendors, consultants, and other service providers who perform services on our behalf, such as hosting, data analytics, payment processing, and customer support.
-                    </div>
-                  </div>
-                </div>
-                <div class="accordion-item border-0 mb-3 shadow-sm">
-                  <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                      <i class="ti ti-businessplan text-primary me-2"></i> For Business Transfers
-                    </button>
-                  </h3>
-                  <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#sharingAccordion">
-                    <div class="accordion-body">
-                      If we are involved in a merger, acquisition, or sale of all or a portion of our assets, your information may be transferred as part of that transaction.
-                    </div>
-                  </div>
-                </div>
-                <div class="accordion-item border-0 mb-3 shadow-sm">
-                  <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                      <i class="ti ti-gavel text-primary me-2"></i> For Legal Reasons
-                    </button>
-                  </h3>
-                  <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#sharingAccordion">
-                    <div class="accordion-body">
-                      We may disclose your information if required to do so by law or in response to valid requests by public authorities (e.g., a court or government agency).
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="alert alert-info mt-4">
-                <div class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="ti ti-info-circle text-info fs-4 me-3"></i>
-                  </div>
-                  <div>
-                    <p class="mb-0">We do not sell, rent, or trade your personal information to third parties for their marketing purposes.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Data Security -->
-            <div id="data-security" class="privacy-section mb-5">
-              <div class="d-flex align-items-center mb-4">
-                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                  <i class="ti ti-lock text-primary fs-3"></i>
-                </div>
-                <h2 class="h3 mb-0">5. Data Security</h2>
-              </div>
-              <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, accidental loss, alteration, or disclosure.</p>
-              
-              <div class="row g-4 mt-3">
-                <div class="col-md-4">
-                  <div class="card bg-light border-0 h-100 text-center p-4">
-                    <div class="mb-3">
-                      <i class="ti ti-encryption text-primary fs-2"></i>
-                    </div>
-                    <h4 class="h6 mb-2">Encryption</h4>
-                    <p class="small mb-0">Sensitive data is encrypted in transit and at rest</p>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card bg-light border-0 h-100 text-center p-4">
-                    <div class="mb-3">
-                      <i class="ti ti-shield-check text-primary fs-2"></i>
-                    </div>
-                    <h4 class="h6 mb-2">Regular Testing</h4>
-                    <p class="small mb-0">Security assessments and penetration testing</p>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card bg-light border-0 h-100 text-center p-4">
-                    <div class="mb-3">
-                      <i class="ti ti-user-check text-primary fs-2"></i>
-                    </div>
-                    <h4 class="h6 mb-2">Access Control</h4>
-                    <p class="small mb-0">Strict access controls and authentication mechanisms</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="alert alert-warning mt-4">
-                <div class="d-flex">
-                  <div class="flex-shrink-0">
-                    <i class="ti ti-alert-triangle text-warning fs-4 me-3"></i>
-                  </div>
-                  <div>
-                    <p class="mb-0">While we strive to protect your personal information, no method of transmission over the Internet or method of electronic storage is 100% secure. Therefore, we cannot guarantee absolute security.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Your Rights -->
-            <div id="your-rights" class="privacy-section mb-5">
-              <div class="d-flex align-items-center mb-4">
-                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                  <i class="ti ti-user-check text-primary fs-3"></i>
-                </div>
-                <h2 class="h3 mb-0">9. Your Rights</h2>
-              </div>
-              <p>Depending on your location, you may have certain rights regarding your personal information, including:</p>
-              
-              <div class="row g-4 mt-3">
-                <div class="col-md-6">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <i class="ti ti-file-search text-primary fs-4 me-2"></i>
-                    </div>
-                    <div>
-                      <h4 class="h6 mb-2">Access</h4>
-                      <p class="small mb-0">You have the right to request access to the personal information we hold about you.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <i class="ti ti-edit text-primary fs-4 me-2"></i>
-                    </div>
-                    <div>
-                      <h4 class="h6 mb-2">Correction</h4>
-                      <p class="small mb-0">You have the right to request that we correct inaccurate or incomplete personal information about you.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <i class="ti ti-trash text-primary fs-4 me-2"></i>
-                    </div>
-                    <div>
-                      <h4 class="h6 mb-2">Deletion</h4>
-                      <p class="small mb-0">You have the right to request that we delete your personal information in certain circumstances.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <i class="ti ti-refresh text-primary fs-4 me-2"></i>
-                    </div>
-                    <div>
-                      <h4 class="h6 mb-2">Restriction</h4>
-                      <p class="small mb-0">You have the right to request that we restrict the processing of your personal information in certain circumstances.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <i class="ti ti-download text-primary fs-4 me-2"></i>
-                    </div>
-                    <div>
-                      <h4 class="h6 mb-2">Data Portability</h4>
-                      <p class="small mb-0">You have the right to receive your personal information in a structured, commonly used, and machine-readable format.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <i class="ti ti-hand-stop text-primary fs-4 me-2"></i>
-                    </div>
-                    <div>
-                      <h4 class="h6 mb-2">Objection</h4>
-                      <p class="small mb-0">You have the right to object to our processing of your personal information in certain circumstances.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          -->
-          <div id="contact-us" class="privacy-section">
-            <div class="d-flex align-items-center mb-4">
-              <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
-                <i class="ti ti-mail text-primary fs-3"></i>
-              </div>
-              <h2 class="h3 mb-0">12. Contact Us</h2>
-            </div>
-            <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our privacy practices, please contact our Data Protection Officer at:</p>
-            
-            <div class="card border-0 bg-light p-4 mt-4">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-mail text-primary fs-4 me-3"></i>
-                    <div>
-                      <h4 class="h6 mb-1">Email</h4>
-                      <a href="mailto:privacy@xlearning.com" class="text-decoration-none">privacy@xlearning.com</a>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="d-flex align-items-center">
-                    <i class="ti ti-map-pin text-primary fs-4 me-3"></i>
-                    <div>
-                      <h4 class="h6 mb-1">Address</h4>
-                      <p class="mb-0">xLearning, Inc., 123 Tech Plaza, Boston, MA 02210, United States</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="alert alert-light border mt-4">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <i class="ti ti-info-circle text-primary fs-4 me-3"></i>
-                </div>
-                <div>
-                  <p class="mb-0">If you have unresolved concerns, you may also have the right to complain to your local data protection authority.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-       
+    <div class="privacy-hero__content" data-aos="fade-up">
+     
+      <h1 data-aos="fade-up" data-aos-delay="300">Privacy Policy</h1>
+      <p data-aos="fade-up" data-aos-delay="400">Your privacy is our priority. Learn how we collect, use, and protect your personal information on xLearning.</p>
+    </div>
+  </div>
+  
+  <div class="privacy-hero__wave"></div>
 </section>
-<!-- /Privacy Content -->
 
-<!-- Related Links -->
-<section class="section-py bg-body">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-xl-10">
-        <h4 class="text-center mb-4">Related Legal Documents</h4>
-        <div class="row g-4">
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body text-center">
-                <i class="ti ti-file-text ti-lg text-primary mb-3"></i>
-                <h5 class="mb-2">Terms and Conditions</h5>
-                <p class="mb-3">The rules and guidelines for using our platform.</p>
-                <a href="{% url 'front_pages:terms-of-service' %}" class="btn btn-label-primary">Read Terms</a>
-              </div>
+<!-- Main Content -->
+<section class="privacy-content">
+  <div class="privacy-container">
+    
+    <!-- Introduction Section -->
+    <div class="privacy-section" data-aos="fade-up">
+      <div class="privacy-section-header">
+        <h2>
+          <div class="icon-wrapper">
+            <i class="ti ti-info-circle"></i>
+          </div>
+          1. Introduction
+        </h2>
+      </div>
+      <div class="privacy-section-content">
+        <p>At xLearning, we respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, website, and services (collectively, the "Services").</p>
+        
+        <p>We encourage you to read this Privacy Policy carefully to understand our practices regarding your personal information. By accessing or using our Services, you acknowledge that you have read and understood this Privacy Policy.</p>
+      </div>
+    </div>
+    
+    <!-- Information Collection Section -->
+    <div class="privacy-section" data-aos="fade-up" data-aos-delay="100">
+      <div class="privacy-section-header">
+        <h2>
+          <div class="icon-wrapper">
+            <i class="ti ti-database"></i>
+          </div>
+          2. Information We Collect
+        </h2>
+      </div>
+      <div class="privacy-section-content">
+        <p>We collect several types of information from and about users of our Services:</p>
+        
+        <div class="privacy-highlight">
+          <h4>2.1 Information You Provide to Us</h4>
+          <div class="info-card-grid">
+            <div class="info-card">
+              <h4>Account Information</h4>
+              <p>When you register for an account, we collect your name, email address, password, and user type (teacher or student).</p>
+            </div>
+            <div class="info-card">
+              <h4>Profile Information</h4>
+              <p>You may provide additional information such as profile picture, bio, teaching specialties, language proficiency, and educational background.</p>
+            </div>
+            <div class="info-card">
+              <h4>Content</h4>
+              <p>We collect content you create, upload, or share through our Services, including teaching materials, assessments, comments, and messages.</p>
+            </div>
+            <div class="info-card">
+              <h4>Payment Information</h4>
+              <p>If you subscribe to a paid plan, we collect payment details such as credit card information or PayPal account information. However, this information is processed by our payment processors and we do not store complete payment details on our servers.</p>
+            </div>
+            <div class="info-card">
+              <h4>Communications</h4>
+              <p>We collect information you provide when you contact us for support, respond to surveys, or communicate with other users through our platform.</p>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body text-center">
-                <i class="ti ti-cookie ti-lg text-primary mb-3"></i>
-                <h5 class="mb-2">Cookie Policy</h5>
-                <p class="mb-3">Information about cookies and tracking technologies we use.</p>
-                <a href="#" class="btn btn-label-primary">Read Cookie Policy</a>
+        </div>
+        
+        <div class="privacy-highlight">
+          <h4>2.2 Information We Collect Automatically</h4>
+          <div class="data-usage-grid">
+            <div class="data-usage-item">
+              <div class="data-usage-icon">
+                <i class="ti ti-device-analytics"></i>
+              </div>
+              <div>
+                <h4>Usage Data</h4>
+                <p>We collect information about how you interact with our Services, including the pages you visit, features you use, and activity duration.</p>
               </div>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body text-center">
-                <i class="ti ti-shield-check ti-lg text-primary mb-3"></i>
-                <h5 class="mb-2">GDPR Compliance</h5>
-                <p class="mb-3">How we comply with European data protection regulations.</p>
-                <a href="#" class="btn btn-label-primary">Learn More</a>
+            <div class="data-usage-item">
+              <div class="data-usage-icon">
+                <i class="ti ti-device-laptop"></i>
+              </div>
+              <div>
+                <h4>Device Information</h4>
+                <p>We collect information about your device, including device type, operating system, browser, and IP address.</p>
+              </div>
+            </div>
+            <div class="data-usage-item">
+              <div class="data-usage-icon">
+                <i class="ti ti-map-pin"></i>
+              </div>
+              <div>
+                <h4>Location Information</h4>
+                <p>We may collect general location information (such as city and country) based on your IP address.</p>
+              </div>
+            </div>
+            <div class="data-usage-item">
+              <div class="data-usage-icon">
+                <i class="ti ti-cookie"></i>
+              </div>
+              <div>
+                <h4>Cookies & Tracking</h4>
+                <p>We use cookies and similar tracking technologies to collect information and remember preferences.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    
+    <!-- How We Use Information Section -->
+    <div class="privacy-section" data-aos="fade-up" data-aos-delay="200">
+      <div class="privacy-section-header">
+        <h2>
+          <div class="icon-wrapper">
+            <i class="ti ti-arrow-right-circle"></i>
+          </div>
+          3. How We Use Your Information
+        </h2>
+      </div>
+      <div class="privacy-section-content">
+        <p>We use the information we collect for various purposes, including:</p>
+        
+        <div class="info-card-grid">
+          <div class="info-card">
+            <h4>
+              <i class="ti ti-app-window text-primary"></i> Providing the Services
+            </h4>
+            <p>To operate, maintain, and provide the features and functionality of our Services, including processing transactions and facilitating communication.</p>
+          </div>
+          <div class="info-card">
+            <h4>
+              <i class="ti ti-user-check text-primary"></i> Personalization
+            </h4>
+            <p>To personalize your experience, recommend content, and provide tailored features based on your preferences and activities.</p>
+          </div>
+          <div class="info-card">
+            <h4>
+              <i class="ti ti-chart-bar text-primary"></i> Improvement
+            </h4>
+            <p>To understand how users interact with our Services, identify usage trends, and improve the overall quality and user experience.</p>
+          </div>
+          <div class="info-card">
+            <h4>
+              <i class="ti ti-mail text-primary"></i> Communication
+            </h4>
+            <p>To communicate with you about your account, respond to inquiries, send service-related notices, and provide customer support.</p>
+          </div>
+          <div class="info-card">
+            <h4>
+              <i class="ti ti-speakerphone text-primary"></i> Marketing
+            </h4>
+            <p>With your consent, to send promotional emails about new features, special offers, or other information we think you may find interesting.</p>
+          </div>
+          <div class="info-card">
+            <h4>
+              <i class="ti ti-shield-lock text-primary"></i> Security
+            </h4>
+            <p>To detect, prevent, and address fraud, unauthorized access, security breaches, and other harmful activities.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Continue with other sections... -->
+    <!-- Contact Section -->
+    <div class="privacy-contact" data-aos="fade-up" data-aos-delay="800">
+      <h3>Contact Our Privacy Team</h3>
+      <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our privacy practices, please contact our Data Protection Officer at:</p>
+      
+      <div class="contact-grid">
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="ti ti-mail"></i>
+          </div>
+          <div>
+            <h4>Email Address</h4>
+            <p>privacy@xlearning.com</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">
+            <i class="ti ti-map-pin"></i>
+          </div>
+          <div>
+            <h4>Physical Address</h4>
+            <p>xLearning, Inc., 123 Tech Plaza, Boston, MA 02210, United States</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="privacy-alert" style="margin-top: 30px;">
+        <div class="d-flex align-items-start">
+          <i class="ti ti-info-circle privacy-alert-icon"></i>
+          <p class="mb-0">If you have unresolved concerns, you may also have the right to complain to your local data protection authority.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
-<!-- /Related Links -->
 
-<!-- Data Request CTA -->
-<section class="py-5 bg-gradient-primary position-relative">
-  <div class="position-absolute top-0 start-0 w-100">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none" class="w-100" style="height: 60px;">
-      <path fill="#f8f9fa" fill-opacity="1" d="M0,32L80,42.7C160,53,320,75,480,74.7C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"></path>
-    </svg>
-  </div>
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-8 text-center text-white">
-        <div class="position-relative p-4">
-          <div class="position-absolute top-0 start-50 translate-middle">
-            <div class="bg-white text-primary rounded-circle p-3 shadow">
-              <i class="ti ti-user-shield fs-2"></i>
-            </div>
-          </div>
-          <h2 class="display-6 text-white mt-4 pt-3 mb-3">Privacy policy</h2>
-          <p class="lead text-white-50 mb-4">This Privacy Policy explains how xLearning collects, uses, and protects your personal information. Your privacy is important to us, and we are committed to protecting it.            .</p>
-          <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-5">
-             
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="position-absolute bottom-0 start-0 w-100">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none" class="w-100" style="height: 60px;">
-      <path fill="#ffffff" fill-opacity="1" d="M0,64L120,69.3C240,75,480,85,720,80C960,75,1200,53,1320,42.7L1440,32L1440,100L1320,100C1200,100,960,100,720,100C480,100,240,100,120,100L0,100Z"></path>
-    </svg>
-  </div>
-</section>
-<!-- /Data Request CTA -->
- 
-<!-- Contact Section -->
-<section class="py-5 bg-light">
+<!-- Footer CTA -->
+<section class="privacy-footer-cta">
   <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8 text-center">
-        <h2 class="h3 mb-4">Still Have Questions?</h2>
-        <p class="mb-5">Our data protection team is here to help with any privacy-related questions or concerns</p>
-        <a href="mailto:privacy@xlearning.com" class="btn btn-primary btn-lg">
-          <i class="ti ti-mail me-2"></i> Contact Our Privacy Team
-        </a>
-      </div>
+    <div data-aos="fade-up">
+      <h3>Your Privacy, Our Commitment</h3>
+      <p>We're dedicated to protecting your personal information and ensuring transparency in how we handle your data. If you have any questions, don't hesitate to reach out to our privacy team.</p>
+      <a href="mailto:privacy@xlearning.com" class="btn btn-light">Contact Privacy Team</a>
     </div>
   </div>
 </section>
-<!-- /Contact Section -->
 {% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize AOS
+  AOS.init({
+    duration: 600,
+    easing: 'ease-in-out',
+    once: true,
+    mirror: false,
+    offset: 100
+  });
+  
+  // Smooth scrolling for internal links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      
+      if (targetElement) {
+        const headerOffset = 80;
+        const elementPosition = targetElement.getBoundingClientRect().top;
+        const offsetPosition = elementPosition - headerOffset;
+        
+        window.scrollBy({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+});
+</script>
+{% endblock page_js %}

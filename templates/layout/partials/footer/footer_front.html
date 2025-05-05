@@ -24,7 +24,7 @@
             {% csrf_token %}
             <label for="footer-email" class="small text-white">Subscribe to our newsletter</label>
             <div class="d-flex mt-1">
-              <input type="email" class="form-control rounded-0 rounded-start-bottom rounded-start-top" id="footer-email" name="email" placeholder="Your email" required />
+              <input type="email" class="form-control rounded-0 rounded-start-bottom rounded-start-top text-white" id="footer-email" name="email" placeholder="Your email" required />
               <button type="submit" id="footer-subscribe-btn" class="btn btn-primary shadow-none rounded-0 rounded-end-bottom rounded-end-top">
                 <span>Subscribe</span> 
                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
@@ -37,7 +37,7 @@
         <div class="col-lg-2 col-md-4 col-sm-6">
           <h6 class="footer-title mb-4">Platform</h6>
           <ul class="list-unstyled">
-            <li class="mb-2"><a href="{% url 'front_pages:content-management' %}" class="footer-link">Features</a></li>
+           
             <li class="mb-2"><a href="{% url 'front_pages:pricing' %}" class="footer-link">Pricing</a></li>
             <li class="mb-2"><a href="{% url 'front_pages:about' %}" class="footer-link">About Us</a></li>
             <li class="mb-2"><a href="{% url 'front_pages:faq' %}" class="footer-link">FAQ</a></li>
@@ -51,7 +51,6 @@
             <li class="mb-2"><a href="{% url 'front_pages:blog' %}" class="footer-link">Blog</a></li>
             <li class="mb-2"><a href="{% url 'front_pages:help-center' %}" class="footer-link">Help Center</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Webinars</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Teaching Resources</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Community</a></li>
           </ul>
         </div>
@@ -62,7 +61,7 @@
             <li class="mb-2"><a href="{% url 'front_pages:privacy-policy' %}" class="footer-link">Privacy Policy</a></li>
             <li class="mb-2"><a href="{% url 'front_pages:terms-of-service' %}" class="footer-link">Terms of Service</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Cookie Policy</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">GDPR Compliance</a></li>
+          
           </ul>
         </div>
       </div>
@@ -82,9 +81,6 @@
         </a>
         <a href="#" class="me-2" target="_blank">
           <img src="{% static 'img/front-pages/icons/facebook.svg' %}" alt="facebook icon" />
-        </a>
-        <a href="#" class="me-2" target="_blank">
-          <img src="{% static 'img/front-pages/icons/linkedin.svg' %}" alt="linkedin icon" />
         </a>
         <a href="#" target="_blank">
           <img src="{% static 'img/front-pages/icons/instagram.svg' %}" alt="instagram icon" />

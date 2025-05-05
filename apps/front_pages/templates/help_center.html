@@ -3,537 +3,720 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}LinguaConnect Help Center - Support for Language Teachers{% endblock %}
+{% block title %}Help Center - xLearning Platform{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
 
 {% block page_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'vendor/css/pages/front-page-help-center.css' %}" />
 <style>
-  .hero-section {
-    background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%);
-    color: white;
-    border-radius: 0.5rem;
-    position: relative;
-    overflow: hidden;
+:root {
+  --help-primary: #7367f0;
+  --help-secondary: #a66ff0;
+  --help-bg-light: #f8f7fa;
+  --help-card-bg: #ffffff;
+  --help-text-primary: #5e5873;
+  --help-text-secondary: #6e6b7b;
+  --help-border-color: #e0e0e0;
+  --help-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  --help-shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Hero Section */
+.help-hero {
+  background: linear-gradient(135deg, var(--help-primary) 0%, var(--help-secondary) 100%);
+  color: white;
+  padding: 100px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.help-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l80 80V0H0zm20 60l40-40V0L20 40v20zm0 0v20h20z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.help-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.help-hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.help-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+}
+
+.help-hero-icon {
+  width: 100px;
+  height: 100px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.help-hero-icon i {
+  font-size: 3rem;
+}
+
+/* Content Section */
+.help-content {
+  padding: 80px 0;
+  background: var(--help-bg-light);
+}
+
+.help-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Help Categories */
+.help-categories {
+  margin-bottom: 80px;
+}
+
+.help-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.help-category-card {
+  background: var(--help-card-bg);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: var(--help-shadow);
+  transition: all 0.3s ease;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.help-category-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--help-shadow-lg);
+}
+
+.help-category-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--help-primary), var(--help-secondary));
+}
+
+.help-category-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, rgba(115, 103, 240, 0.1), rgba(166, 111, 240, 0.1));
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: var(--help-primary);
+  font-size: 2rem;
+}
+
+.help-category-card h3 {
+  color: var(--help-text-primary);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.help-category-card p {
+  color: var(--help-text-secondary);
+  margin-bottom: 25px;
+}
+
+.help-category-link {
+  color: var(--help-primary);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.help-category-link:hover {
+  padding-left: 10px;
+}
+
+.help-category-link i {
+  margin-left: 8px;
+  transition: all 0.3s ease;
+}
+
+.help-category-link:hover i {
+  transform: translateX(5px);
+}
+
+/* Popular Guides Section */
+.help-guides {
+  background: white;
+  padding: 60px 0;
+  border-radius: 30px;
+  box-shadow: var(--help-shadow);
+}
+
+.help-guides h2 {
+  text-align: center;
+  color: var(--help-text-primary);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 50px;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.guide-card {
+  background: var(--help-bg-light);
+  border-radius: 12px;
+  padding: 25px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: flex-start;
+}
+
+.guide-card:hover {
+  transform: translateX(10px);
+  background: rgba(115, 103, 240, 0.05);
+}
+
+.guide-icon {
+  width: 60px;
+  height: 60px;
+  background: var(--help-card-bg);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  flex-shrink: 0;
+  color: var(--help-primary);
+  font-size: 1.5rem;
+  box-shadow: var(--help-shadow);
+}
+
+.guide-content h4 {
+  color: var(--help-text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.guide-content p {
+  color: var(--help-text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Contact Support Section */
+.help-contact {
+  padding: 80px 0;
+  background: linear-gradient(135deg, var(--help-primary), var(--help-secondary));
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.help-contact::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.help-contact-content {
+  position: relative;
+  z-index: 2;
+}
+
+.help-contact h3 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.help-contact p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+.help-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.contact-option {
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.contact-option:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-5px);
+}
+
+.contact-option-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.contact-option h4 {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.contact-option p {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+.contact-option .btn {
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-weight: 600;
+  background: white;
+  color: var(--help-primary);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.contact-option .btn:hover {
+  background: var(--help-primary);
+  color: white;
+}
+
+/* Resources Section */
+.help-resources {
+  padding: 80px 0;
+  background: var(--help-bg-light);
+}
+
+.help-resources h2 {
+  text-align: center;
+  color: var(--help-text-primary);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 50px;
+}
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.resource-card {
+  background: var(--help-card-bg);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: var(--help-shadow);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.resource-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--help-shadow-lg);
+}
+
+.resource-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, rgba(115, 103, 240, 0.1), rgba(166, 111, 240, 0.1));
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: var(--help-primary);
+  font-size: 1.8rem;
+}
+
+.resource-card h4 {
+  color: var(--help-text-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.resource-card p {
+  color: var(--help-text-secondary);
+  margin-bottom: 25px;
+}
+
+.resource-link {
+  color: var(--help-primary);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.resource-link:hover {
+  padding-left: 10px;
+}
+
+.resource-link i {
+  margin-left: 8px;
+  transition: all 0.3s ease;
+}
+
+.resource-link:hover i {
+  transform: translateX(5px);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .help-hero h1 {
+    font-size: 2.5rem;
   }
   
-  .hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
-    z-index: 0;
+  .help-guides h2,
+  .help-resources h2 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .help-hero {
+    padding: 80px 0;
   }
   
-  .hero-content {
-    position: relative;
-    z-index: 1;
+  .help-hero h1 {
+    font-size: 2rem;
   }
   
-  .feature-card {
-    transition: all 0.3s ease;
-    border: none;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  .help-content {
+    padding: 60px 0;
   }
   
-  .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  .guide-card {
+    flex-direction: column;
+    text-align: center;
   }
   
-  .category-card {
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.08);
+  .guide-icon {
+    margin: 0 auto 20px;
   }
-  
-  .category-card:hover {
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    border-color: transparent;
-  }
-  
-  .category-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    margin-bottom: 1rem;
-  }
-  
-  .faq-section .accordion-button:not(.collapsed) {
-    background-color: rgba(67, 89, 113, 0.05);
-    color: var(--bs-primary);
-  }
-  
-  .faq-section .accordion-button:focus {
-    box-shadow: none;
-    border-color: rgba(67, 89, 113, 0.1);
-  }
-  
-  .testimonial-card {
-    background-color: rgba(67, 89, 113, 0.03);
-    border-radius: 1rem;
-  }
-  
-  .avatar-md {
-    width: 56px;
-    height: 56px;
-  }
-  
-  .cta-section {
-    background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
-    color: white;
-    border-radius: 0.5rem;
-  }
+}
 </style>
 {% endblock page_css %}
 
 {% block content %}
-<!-- Hero Section: Start -->
-<section class="section-py first-section-pt hero-section mb-5">
-  <div class="container py-5 hero-content">
-    <div class="row align-items-center">
-      <div class="col-lg-7 text-center text-lg-start mb-4 mb-lg-0">
-        <h1 class="display-5 fw-bold mb-3">LinguaConnect Help Center</h1>
-        <p class="fs-5 mb-4">Everything you need to know about using our platform to enhance your language teaching experience.</p>
-        <div class="d-flex flex-column flex-sm-row gap-3">
-          <a href="#popular-articles" class="btn btn-light btn-lg fw-medium">Browse Articles</a>
-          <a href="#contact" class="btn btn-outline-light btn-lg fw-medium">Contact Support</a>
-        </div>
-      </div>
-      <div class="col-lg-5 text-center">
-        <img src="{% static 'img/pages/help-center-hero.png' %}" alt="LinguaConnect Help" class="img-fluid" style="max-height: 300px;">
-      </div>
-    </div>
-  </div>
-</section>
-<!-- Hero Section: End -->
-
-<!-- Quick Links: Start -->
-<section class="container mb-5">
-  <div class="row g-4 justify-content-center">
-    <div class="col-6 col-md-4 col-lg-2">
-      <div class="card category-card h-100 text-center">
-        <div class="card-body">
-          <div class="category-icon bg-primary-subtle text-primary mx-auto">
-            <i class="ti ti-user-circle fs-3"></i>
-          </div>
-          <h6 class="mb-1">Account</h6>
-          <p class="mb-0 small text-muted">Setup & Security</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-4 col-lg-2">
-      <div class="card category-card h-100 text-center">
-        <div class="card-body">
-          <div class="category-icon bg-success-subtle text-success mx-auto">
-            <i class="ti ti-users fs-3"></i>
-          </div>
-          <h6 class="mb-1">Students</h6>
-          <p class="mb-0 small text-muted">Management</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-4 col-lg-2">
-      <div class="card category-card h-100 text-center">
-        <div class="card-body">
-          <div class="category-icon bg-warning-subtle text-warning mx-auto">
-            <i class="ti ti-calendar fs-3"></i>
-          </div>
-          <h6 class="mb-1">Scheduling</h6>
-          <p class="mb-0 small text-muted">Classes & Events</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-4 col-lg-2">
-      <div class="card category-card h-100 text-center">
-        <div class="card-body">
-          <div class="category-icon bg-info-subtle text-info mx-auto">
-            <i class="ti ti-file-text fs-3"></i>
-          </div>
-          <h6 class="mb-1">Resources</h6>
-          <p class="mb-0 small text-muted">Materials Library</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-4 col-lg-2">
-      <div class="card category-card h-100 text-center">
-        <div class="card-body">
-          <div class="category-icon bg-danger-subtle text-danger mx-auto">
-            <i class="ti ti-chart-bar fs-3"></i>
-          </div>
-          <h6 class="mb-1">Progress</h6>
-          <p class="mb-0 small text-muted">Tracking & Reports</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-md-4 col-lg-2">
-      <div class="card category-card h-100 text-center">
-        <div class="card-body">
-          <div class="category-icon bg-secondary-subtle text-secondary mx-auto">
-            <i class="ti ti-settings fs-3"></i>
-          </div>
-          <h6 class="mb-1">Settings</h6>
-          <p class="mb-0 small text-muted">Customization</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- Quick Links: End -->
-
-<!-- Popular Articles: Start -->
-<section id="popular-articles" class="section-py bg-body-tertiary">
+<!-- Help Center Hero -->
+<section class="help-hero">
   <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="mb-2">Popular Articles</h2>
-      <p class="text-muted">Our most read guides to help you get the most out of LinguaConnect</p>
-    </div>
-    <div class="row g-4">
-      <div class="col-lg-4 col-md-6">
-        <div class="card feature-card h-100">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M27.235 3.71096C27.7312 3.30004 28.3553 3.07507 28.9999 3.07507C29.6459 3.07507 30.2715 3.30111 30.7683 3.71388C32.9647 5.50218 37.7192 9.93865 40.3437 16.7605C41.2551 19.1295 41.9046 21.7738 42.1067 24.6785L49.1354 33.1129C49.416 33.4422 49.6141 33.8337 49.7132 34.2549C49.8117 34.6734 49.8096 35.1092 49.7073 35.5266L46.9233 48.1336L46.9226 48.1367C46.8183 48.6021 46.5973 49.0334 46.2804 49.3899C45.9635 49.7465 45.5611 50.0165 45.1111 50.1747C44.6611 50.3329 44.1782 50.3741 43.7079 50.2943C43.2376 50.2145 42.7953 50.0165 42.4226 49.7187L42.4222 49.7183L35.8992 44.5H22.1007L15.5778 49.7183L15.5773 49.7187C15.2046 50.0165 14.7624 50.2146 14.2921 50.2943C13.8218 50.3741 13.3389 50.333 12.8889 50.1748C12.4389 50.0165 12.0365 49.7465 11.7196 49.3899C11.4027 49.0334 11.1817 48.6021 11.0773 48.1367L11.0766 48.1336L8.29268 35.5266C8.19032 35.1092 8.18824 34.6734 8.28671 34.2549C8.38587 33.8335 8.58413 33.4418 8.86498 33.1124L15.7606 24.8552C15.9445 21.8769 16.6066 19.1694 17.5467 16.749C20.1971 9.92535 25.0133 5.48954 27.235 3.71096Z" fill="#696CFF" />
-              </svg>
-            </div>
-
-            <h4 class="card-title mb-3">Getting Started with LinguaConnect</h4>
-            <p class="card-text mb-4">A comprehensive guide for language teachers to set up their account, customize their profile, and navigate the platform's key features.</p>
-            <ul class="list-unstyled mb-4 text-start">
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Account setup walkthrough</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Dashboard navigation guide</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Profile customization tips</li>
-            </ul>
-            <a class="btn btn-primary" href="">Read Full Guide</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="card feature-card h-100">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M32.2689 8.56722C31.7876 9.05354 31.3688 9.84814 31.029 10.8704C30.6946 11.8767 30.4652 13.0152 30.31 14.1032C30.1553 15.1872 30.0776 16.197 30.0386 16.9371C30.0358 16.991 30.0332 17.0434 30.0307 17.0943C30.0816 17.0918 30.134 17.0892 30.1879 17.0864C30.928 17.0475 31.9378 16.9697 33.0218 16.815C34.1098 16.6598 35.2483 16.4304 36.2546 16.096C37.2769 15.7562 38.0715 15.3374 38.5578 14.8561C39.3907 14.0223 39.8587 12.8919 39.8587 11.7133C39.8587 10.5339 39.3901 9.4028 38.5562 8.56883C37.7222 7.73487 36.5911 7.26636 35.4117 7.26636C34.2331 7.26636 33.1027 7.73427 32.2689 8.56722Z" fill="#696CFF" />
-              </svg>
-            </div>
-
-            <h4 class="card-title mb-3">Student Management Mastery</h4>
-            <p class="card-text mb-4">Learn how to efficiently add, organize, and track student information with our advanced tools designed specifically for language teachers.</p>
-            <ul class="list-unstyled mb-4 text-start">
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Creating student profiles</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Managing groups and classes</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Tracking attendance and participation</li>
-            </ul>
-            <a class="btn btn-primary" href="">Read Full Guide</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-md-6">
-        <div class="card feature-card h-100">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.6875 14.6133C6.6875 14.2401 6.99006 13.9375 7.36328 13.9375H50.6367C51.0099 13.9375 51.3125 14.2401 51.3125 14.6133V43.3867C51.3125 43.7599 51.0099 44.0625 50.6367 44.0625H7.36328C6.99006 44.0625 6.6875 43.7599 6.6875 43.3867V14.6133Z" fill="#696CFF" />
-              </svg>
-            </div>
-
-            <h4 class="card-title mb-3">Teaching Resources Library</h4>
-            <p class="card-text mb-4">Discover how to upload, organize, and share language teaching materials with your students through our comprehensive resource management system.</p>
-            <ul class="list-unstyled mb-4 text-start">
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Uploading diverse resource types</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Creating organized collections</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Controlling access permissions</li>
-            </ul>
-            <a class="btn btn-primary" href="">Read Full Guide</a>
-          </div>
-        </div>
+    <div class="help-hero-content" data-aos="fade-up">
+      <div class="help-hero-icon" data-aos="zoom-in" data-aos-delay="200">
+        <i class="ti ti-help-circle"></i>
       </div>
       
-      <div class="col-lg-4 col-md-6">
-        <div class="card feature-card h-100">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <i class="ti ti-calendar text-primary" style="font-size: 3rem;"></i>
-            </div>
-
-            <h4 class="card-title mb-3">Effective Lesson Scheduling</h4>
-            <p class="card-text mb-4">Master the art of organizing your teaching schedule, planning recurring lessons, and managing your availability with our intuitive calendar tools.</p>
-            <ul class="list-unstyled mb-4 text-start">
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Setting up your teaching calendar</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Creating recurring lesson plans</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Managing student appointments</li>
-            </ul>
-            <a class="btn btn-primary" href="">Read Full Guide</a>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-lg-4 col-md-6">
-        <div class="card feature-card h-100">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <i class="ti ti-chart-line text-primary" style="font-size: 3rem;"></i>
-            </div>
-
-            <h4 class="card-title mb-3">Progress Tracking & Analytics</h4>
-            <p class="card-text mb-4">Learn how to track student progress, generate insightful reports, and visualize learning outcomes to enhance your teaching effectiveness.</p>
-            <ul class="list-unstyled mb-4 text-start">
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Setting proficiency benchmarks</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Creating custom assessment criteria</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Generating progress reports</li>
-            </ul>
-            <a class="btn btn-primary" href="">Read Full Guide</a>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-lg-4 col-md-6">
-        <div class="card feature-card h-100">
-          <div class="card-body text-center p-4">
-            <div class="mb-3">
-              <i class="ti ti-message-circle text-primary" style="font-size: 3rem;"></i>
-            </div>
-
-            <h4 class="card-title mb-3">Communication Tools</h4>
-            <p class="card-text mb-4">Explore our suite of communication features designed to keep you connected with your students through messaging, announcements, and feedback systems.</p>
-            <ul class="list-unstyled mb-4 text-start">
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Direct messaging with students</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Creating class announcements</li>
-              <li class="mb-2"><i class="ti ti-check-circle text-success me-2"></i> Providing assignment feedback</li>
-            </ul>
-            <a class="btn btn-primary" href="">Read Full Guide</a>
-          </div>
-        </div>
-      </div>
+      <h1 data-aos="fade-up" data-aos-delay="300">Help Center</h1>
+      <p data-aos="fade-up" data-aos-delay="400">Find answers to your questions and get the support you need to make the most of xLearning.</p>
     </div>
   </div>
 </section>
-<!-- Popular Articles: End -->
 
-<!-- Video Tutorials: Start -->
-<section class="section-py">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="mb-2">Video Tutorials</h2>
-      <p class="text-muted">Step-by-step visual guides to help you navigate LinguaConnect</p>
+<!-- Main Content -->
+<section class="help-content">
+  <div class="help-container">
+    
+    <!-- Help Categories -->
+    <div class="help-categories">
+      <div class="help-categories-grid">
+        <div class="help-category-card" data-aos="fade-up">
+          <div class="help-category-icon">
+            <i class="ti ti-user-circle"></i>
+          </div>
+          <h3>Account Management</h3>
+          <p>Learn how to manage your account, update your profile, and configure settings.</p>
+          <a href="#" class="help-category-link">
+            View Articles <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+        
+        <div class="help-category-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="help-category-icon">
+            <i class="ti ti-books"></i>
+          </div>
+          <h3>Getting Started</h3>
+          <p>New to xLearning? Find beginner guides and essential information here.</p>
+          <a href="#" class="help-category-link">
+            View Articles <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+        
+        <div class="help-category-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="help-category-icon">
+            <i class="ti ti-calendar-event"></i>
+          </div>
+          <h3>Scheduling Lessons</h3>
+          <p>Learn how to schedule and manage your language learning sessions.</p>
+          <a href="#" class="help-category-link">
+            View Articles <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+        
+        <div class="help-category-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="help-category-icon">
+            <i class="ti ti-credit-card"></i>
+          </div>
+          <h3>Payments & Billing</h3>
+          <p>Information about payments, subscriptions, and billing management.</p>
+          <a href="#" class="help-category-link">
+            View Articles <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+        
+        <div class="help-category-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="help-category-icon">
+            <i class="ti ti-device-laptop"></i>
+          </div>
+          <h3>Technical Support</h3>
+          <p>Troubleshooting guides and technical assistance for common issues.</p>
+          <a href="#" class="help-category-link">
+            View Articles <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+        
+        <div class="help-category-card" data-aos="fade-up" data-aos-delay="500">
+          <div class="help-category-icon">
+            <i class="ti ti-shield-check"></i>
+          </div>
+          <h3>Security & Privacy</h3>
+          <p>Learn about our security measures and privacy policies.</p>
+          <a href="#" class="help-category-link">
+            View Articles <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+      </div>
     </div>
     
-    <div class="row g-4">
-      <div class="col-md-6 col-lg-4">
-        <div class="card">
-          <div class="position-relative">
-            <img src="{% static 'img/elements/video-thumbnail-1.jpg' %}" class="card-img-top" alt="Video thumbnail">
-            <div class="position-absolute top-50 start-50 translate-middle">
-              <button class="btn btn-primary btn-icon rounded-pill">
-                <i class="ti ti-player-play"></i>
-              </button>
-            </div>
+    <!-- Popular Guides -->
+    <div class="help-guides" data-aos="fade-up">
+      <h2>Popular Guides</h2>
+      <div class="guide-grid">
+        <div class="guide-card">
+          <div class="guide-icon">
+            <i class="ti ti-rocket"></i>
           </div>
-          <div class="card-body">
-            <h5 class="card-title">Platform Walkthrough</h5>
-            <p class="card-text">A comprehensive tour of the LinguaConnect dashboard and main features.</p>
-            <p class="text-muted small"><i class="ti ti-clock me-1"></i> 8:45 minutes</p>
+          <div class="guide-content">
+            <h4>Quick Start Guide</h4>
+            <p>Get up and running with xLearning in just a few minutes with our comprehensive quick start guide.</p>
           </div>
         </div>
-      </div>
-      
-      <div class="col-md-6 col-lg-4">
-        <div class="card">
-          <div class="position-relative">
-            <img src="{% static 'img/elements/video-thumbnail-2.jpg' %}" class="card-img-top" alt="Video thumbnail">
-            <div class="position-absolute top-50 start-50 translate-middle">
-              <button class="btn btn-primary btn-icon rounded-pill">
-                <i class="ti ti-player-play"></i>
-              </button>
-            </div>
+        
+        <div class="guide-card">
+          <div class="guide-icon">
+            <i class="ti ti-users"></i>
           </div>
-          <div class="card-body">
-            <h5 class="card-title">Creating Lesson Plans</h5>
-            <p class="card-text">Learn how to build interactive lesson plans using our template system.</p>
-            <p class="text-muted small"><i class="ti ti-clock me-1"></i> 12:30 minutes</p>
+          <div class="guide-content">
+            <h4>Managing Students</h4>
+            <p>Learn how to add, organize, and track your students' progress effectively.</p>
           </div>
         </div>
-      </div>
-      
-      <div class="col-md-6 col-lg-4">
-        <div class="card">
-          <div class="position-relative">
-            <img src="{% static 'img/elements/video-thumbnail-3.jpg' %}" class="card-img-top" alt="Video thumbnail">
-            <div class="position-absolute top-50 start-50 translate-middle">
-              <button class="btn btn-primary btn-icon rounded-pill">
-                <i class="ti ti-player-play"></i>
-              </button>
-            </div>
+        
+        <div class="guide-card">
+          <div class="guide-icon">
+            <i class="ti ti-folder"></i>
           </div>
-          <div class="card-body">
-            <h5 class="card-title">Assessment Tools</h5>
-            <p class="card-text">Create quizzes, tests, and assignments to evaluate student progress.</p>
-            <p class="text-muted small"><i class="ti ti-clock me-1"></i> 10:15 minutes</p>
+          <div class="guide-content">
+            <h4>Resource Management</h4>
+            <p>Organize your teaching materials and share them efficiently with your students.</p>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-icon">
+            <i class="ti ti-chart-bar"></i>
+          </div>
+          <div class="guide-content">
+            <h4>Progress Tracking</h4>
+            <p>Monitor student performance and generate insightful progress reports.</p>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-icon">
+            <i class="ti ti-video"></i>
+          </div>
+          <div class="guide-content">
+            <h4>Live Sessions</h4>
+            <p>Set up and conduct live teaching sessions with built-in features.</p>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-icon">
+            <i class="ti ti-settings"></i>
+          </div>
+          <div class="guide-content">
+            <h4>Platform Settings</h4>
+            <p>Customize your experience and configure advanced platform settings.</p>
           </div>
         </div>
       </div>
     </div>
     
-    <div class="text-center mt-4">
-      <a href="" class="btn btn-outline-primary">View All Tutorials</a>
-    </div>
-  </div>
-</section>
-<!-- Video Tutorials: End -->
-
-<!-- FAQ Section: Start --> 
-<section class="section-py bg-body-tertiary faq-section">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="mb-2">Frequently Asked Questions</h2>
-      <p class="text-muted">Quick answers to common questions about LinguaConnect</p>
+    <!-- Contact Support -->
+    <div class="help-contact" data-aos="fade-up">
+      <div class="help-contact-content">
+        <h3>Need More Help?</h3>
+        <p>Can't find what you're looking for? Our support team is here to help you with any questions or issues.</p>
+        
+        <div class="help-contact-grid">
+          <div class="contact-option">
+            <div class="contact-option-icon">
+              <i class="ti ti-mail"></i>
+            </div>
+            <h4>Email Support</h4>
+            <p>Get help through email within 24 hours</p>
+            <a href="mailto:support@xlearning.com" class="btn">Email Us</a>
+          </div>
+          
+          <div class="contact-option">
+            <div class="contact-option-icon">
+              <i class="ti ti-message-circle"></i>
+            </div>
+            <h4>Live Chat</h4>
+            <p>Chat with our support team in real-time</p>
+            <a href="#" class="btn">Start Chat</a>
+          </div>
+          
+          <div class="contact-option">
+            <div class="contact-option-icon">
+              <i class="ti ti-forms"></i>
+            </div>
+            <h4>Support Ticket</h4>
+            <p>Submit a detailed support request</p>
+            <a href="#" class="btn">Create Ticket</a>
+          </div>
+        </div>
+      </div>
     </div>
     
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="accordion" id="faqAccordion">
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne" aria-expanded="true" aria-controls="faqOne">
-                How do I invite students to join my class?
-              </button>
-            </h2>
-            <div id="faqOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                You can invite students by navigating to the "Students" section in your dashboard and clicking the "Invite Students" button. You can either send individual invitations via email or generate a class code that students can use to join your class directly. The system also allows you to import student lists from CSV files for bulk invitations.
-              </div>
-            </div>
+    <!-- Additional Resources -->
+    <div class="help-resources" data-aos="fade-up">
+      <h2>Additional Resources</h2>
+      <div class="resource-grid">
+        <div class="resource-card">
+          <div class="resource-icon">
+            <i class="ti ti-video"></i>
           </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTwo" aria-expanded="false" aria-controls="faqTwo">
-                Can I customize the learning path for different students?
-              </button>
-            </h2>
-            <div id="faqTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                Yes, LinguaConnect allows you to create personalized learning paths for individual students or groups. In the "Curriculum" section, you can design custom learning sequences, assign specific resources, and set unique proficiency goals based on each student's needs and progress level.
-              </div>
-            </div>
+          <h4>Video Tutorials</h4>
+          <p>Watch step-by-step video guides to learn platform features.</p>
+          <a href="#" class="resource-link">
+            Watch Videos <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+        
+        <div class="resource-card">
+          <div class="resource-icon">
+            <i class="ti ti-book-2"></i>
           </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqThree" aria-expanded="false" aria-controls="faqThree">
-                How do I integrate external resources into my lessons?
-              </button>
-            </h2>
-            <div id="faqThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                LinguaConnect supports multiple ways to incorporate external resources. You can upload files directly to your resource library, embed content from popular platforms like YouTube or Vimeo, link to external websites, or use our integration options with services like Google Drive, Dropbox, and OneDrive to keep your teaching materials organized and accessible.
-              </div>
-            </div>
+          <h4>Documentation</h4>
+          <p>Access detailed technical documentation and guides.</p>
+          <a href="#" class="resource-link">
+            View Docs <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+        
+        <div class="resource-card">
+          <div class="resource-icon">
+            <i class="ti ti-users-group"></i>
           </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFour" aria-expanded="false" aria-controls="faqFour">
-                How does the progress tracking system work?
-              </button>
-            </h2>
-            <div id="faqFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                Our progress tracking system monitors student activities across all learning modules. Teachers can access detailed analytics that show completion rates, time spent on activities, performance on quizzes and assignments, and participation in discussions. Students can also view their own progress through user-friendly dashboards that highlight achievements and areas needing improvement.
-              </div>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFive" aria-expanded="false" aria-controls="faqFive">
-                What languages are supported by LinguaConnect?
-              </button>
-            </h2>
-            <div id="faqFive" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                LinguaConnect currently supports teaching and learning in over 25 languages, including Spanish, French, German, Mandarin Chinese, Japanese, Arabic, Russian, Italian, Portuguese, and many more. Our platform interface is available in 10 languages, and we're continuously adding support for additional languages based on user requests and global education needs.
-              </div>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqSix" aria-expanded="false" aria-controls="faqSix">
-                How can I provide feedback on student assignments?
-              </button>
-            </h2>
-            <div id="faqSix" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                LinguaConnect offers multiple feedback options for assignments. You can provide text comments, audio recordings, video feedback, or use our annotation tools for written work. The platform also includes rubric-based assessment tools to streamline grading and ensure consistent evaluation. Students receive notifications when feedback is available and can respond directly through the platform's messaging system.
-              </div>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqSeven" aria-expanded="false" aria-controls="faqSeven">
-                Is LinguaConnect accessible on mobile devices?
-              </button>
-            </h2>
-            <div id="faqSeven" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                Yes, LinguaConnect is fully responsive and works on all devices. We also offer dedicated mobile apps for iOS and Android that provide an optimized experience for smartphones and tablets. The mobile version includes all core features of the platform, allowing teachers and students to manage their language learning activities on the go.
-              </div>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqEight" aria-expanded="false" aria-controls="faqEight">
-                How do I set up conversation practice activities?
-              </button>
-            </h2>
-            <div id="faqEight" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                To create conversation practice activities, go to the "Activities" section and select "New Conversation Practice." You can set up guided dialogues with prompts, role-playing scenarios, or free-form discussions. Our platform supports both text-based and audio/video conversation formats. You can assign students to pairs or groups, provide preparation materials, and schedule synchronous or asynchronous practice sessions.
-              </div>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqNine" aria-expanded="false" aria-controls="faqNine">
-                What technical support options are available?
-              </button>
-            </h2>
-            <div id="faqNine" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                LinguaConnect provides several support channels. Our help center contains comprehensive guides and tutorials. For direct assistance, you can contact our support team via email, live chat (available Monday-Friday, 8am-8pm EST), or schedule a video call for more complex issues. Premium and institutional accounts receive priority support with dedicated account managers and faster response times.
-              </div>
-            </div>
-          </div>
-          
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTen" aria-expanded="false" aria-controls="faqTen">
-                How can I export student data and reports?
-              </button>
-            </h2>
-            <div id="faqTen" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">
-                In the "Reports" section of your dashboard, you can generate various reports on student performance and activity. All reports can be exported in multiple formats including PDF, Excel, CSV, and Google Sheets. You can schedule regular automated reports or create custom one-time exports. The platform complies with data privacy regulations, ensuring that all exported data is handled securely.
-              </div>
-            </div>
-          </div>
+          <h4>Community Forum</h4>
+          <p>Connect with other educators and share experiences.</p>
+          <a href="#" class="resource-link">
+            Join Forum <i class="ti ti-arrow-right"></i>
+          </a>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!-- FAQ Section: End -->
- {% endblock %}
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize AOS
+  AOS.init({
+    duration: 800,
+    easing: 'ease-in-out',
+    once: true,
+    mirror: false,
+    offset: 100
+  });
+});
+</script>
+{% endblock page_js %}

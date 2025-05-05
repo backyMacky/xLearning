@@ -55,7 +55,16 @@ urlpatterns = [
     path("features/assessment-tools/", AssessmentToolsView.as_view(), name="assessment-tools"),
     path("features/student-management/", StudentManagementView.as_view(), name="student-management"),
     path("features/booking-payment/", BookingPaymentView.as_view(), name="booking-payment"),
-    
+
+    # Webinar
+    path("webinars/", WebinarView.as_view(), name="webinars"),
+
+    # Community
+    path("community/", CommunityView.as_view(), name="community"),
+
+    # Cookie Policy
+    path("cookie-policy/", CookiePolicyView.as_view(), name="cookie-policy"),
+
     # Help center
     path("help/", HelpCenterHomeView.as_view(), name="help-center"),
     path("help/article/<slug:slug>/", HelpCenterArticleView.as_view(), name="help-center-article"),

@@ -1,0 +1,705 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Cookie Policy - xLearning Platform{% endblock %}
+
+{% block page_css %}
+{{ block.super }}
+<style>
+  /* Cookie Policy Styles */
+  .cookie-hero {
+    background: linear-gradient(135deg, rgb(178, 140, 220) 0%, rgb(167, 152, 214) 100%);
+    padding: 120px 0 80px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .cookie-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/patterns/cookies-pattern.svg" %}');
+    opacity: 0.05;
+    z-index: 0;
+  }
+  
+  .cookie-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .cookie-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    opacity: 0.2;
+  }
+  
+  .cookie-content {
+    background: white;
+    border-radius: 20px;
+    padding: 60px;
+    margin: -50px auto 0;
+    max-width: 1000px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .cookie-section {
+    margin-bottom: 50px;
+  }
+  
+  .cookie-section h2 {
+    color: #5a4fcf;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+  
+  .cookie-section h3 {
+    color: #4a4a4a;
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    margin-top: 30px;
+    font-weight: 600;
+  }
+  
+  .cookie-section p {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+  
+  .cookie-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin: 40px 0;
+  }
+  
+  .cookie-type-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .cookie-type-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .cookie-type-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #5a4fcf, #7e56a5);
+    color: white;
+  }
+  
+  .cookie-type-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .cookie-table {
+    width: 100%;
+    margin: 30px 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .cookie-table th {
+    background: #5a4fcf;
+    color: white;
+    padding: 15px;
+    font-weight: 600;
+    text-align: left;
+  }
+  
+  .cookie-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    background: white;
+  }
+  
+  .cookie-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .cookie-table tr:nth-child(even) {
+    background: #f8f9fa;
+  }
+  
+  .cookie-control {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 40px;
+    margin: 40px 0;
+  }
+  
+  .control-group {
+    margin-bottom: 25px;
+  }
+  
+  .control-label {
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  
+  .toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    margin-left: 20px;
+  }
+  
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 30px;
+  }
+  
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+  
+  input:checked + .toggle-slider {
+    background-color: #5a4fcf;
+  }
+  
+  input:checked + .toggle-slider:before {
+    transform: translateX(30px);
+  }
+  
+  .cookie-info-box {
+    background: #e8e5ff;
+    border-left: 4px solid #5a4fcf;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 0 10px 10px 0;
+  }
+  
+  .cookie-info-box h4 {
+    color: #5a4fcf;
+    margin-bottom: 10px;
+  }
+  
+  .save-preferences {
+    text-align: center;
+    margin-top: 40px;
+  }
+  
+  .save-preferences .btn {
+    padding: 12px 40px;
+    border-radius: 50px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #5a4fcf, #7e56a5);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .save-preferences .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(90, 79, 207, 0.3);
+  }
+  
+  .cookie-timeline {
+    position: relative;
+    padding-left: 40px;
+    margin: 40px 0;
+  }
+  
+  .cookie-timeline::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    bottom: 0;
+    width: 2px;
+    background: #5a4fcf;
+  }
+  
+  .timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+  }
+  
+  .timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -44px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #5a4fcf;
+  }
+  
+  .timeline-date {
+    color: #5a4fcf;
+    font-weight: 600;
+  }
+  
+  .timeline-content {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+  
+  .cookie-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 40px 0;
+  }
+  
+  .cookie-warning h4 {
+    color: #856404;
+    margin-bottom: 10px;
+  }
+  
+  .cookie-warning p {
+    color: #856404;
+    margin-bottom: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .cookie-content {
+      padding: 30px;
+      margin-top: -30px;
+    }
+    
+    .cookie-types {
+      grid-template-columns: 1fr;
+    }
+    
+    .cookie-section h2 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<!-- Cookie Policy Hero -->
+<section class="cookie-hero">
+  <div class="container">
+    <div class="cookie-hero-content text-center">
+      <i class="ti ti-cookie cookie-icon"></i>
+      <h1>Cookie Policy</h1>
+      <p>Learn how xLearning uses cookies to enhance your browsing experience</p>
+    </div>
+  </div>
+</section>
+
+<!-- Cookie Policy Content -->
+<section class="py-5">
+  <div class="container">
+    <div class="cookie-content">
+      <!-- Introduction -->
+      <div class="cookie-section">
+        <h2>What Are Cookies?</h2>
+        <p>
+          Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences, analyzing site usage, and improving our services.
+        </p>
+        
+        <div class="cookie-info-box">
+          <h4>Did You Know?</h4>
+          <p>The term "cookie" was coined by web-browser programmer Lou Montulli. It was inspired by the term "magic cookie," a packet of data a program receives and sends back unchanged, used by Unix programmers.</p>
+        </div>
+      </div>
+
+      <!-- Types of Cookies -->
+      <div class="cookie-section">
+        <h2>Types of Cookies We Use</h2>
+        
+        <div class="cookie-types">
+          <div class="cookie-type-card">
+            <div class="cookie-type-icon">
+              <i class="ti ti-key"></i>
+            </div>
+            <h3 class="cookie-type-title">Essential Cookies</h3>
+            <p>Necessary for the website to function properly. Cannot be disabled.</p>
+          </div>
+          
+          <div class="cookie-type-card">
+            <div class="cookie-type-icon">
+              <i class="ti ti-chart-bar"></i>
+            </div>
+            <h3 class="cookie-type-title">Analytics Cookies</h3>
+            <p>Help us understand how visitors interact with our website.</p>
+          </div>
+          
+          <div class="cookie-type-card">
+            <div class="cookie-type-icon">
+              <i class="ti ti-palette"></i>
+            </div>
+            <h3 class="cookie-type-title">Preference Cookies</h3>
+            <p>Remember your preferences like language and display settings.</p>
+          </div>
+          
+          <div class="cookie-type-card">
+            <div class="cookie-type-icon">
+              <i class="ti ti-target"></i>
+            </div>
+            <h3 class="cookie-type-title">Marketing Cookies</h3>
+            <p>Used to deliver relevant advertisements and track ad performance.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cookie List -->
+      <div class="cookie-section">
+        <h2>Cookies We Set</h2>
+        <p>The following table provides detailed information about the cookies we use:</p>
+        
+        <table class="cookie-table">
+          <thead>
+            <tr>
+              <th>Cookie Name</th>
+              <th>Purpose</th>
+              <th>Duration</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>sessionid</code></td>
+              <td>Maintains your login state across page visits</td>
+              <td>Session</td>
+              <td>Essential</td>
+            </tr>
+            <tr>
+              <td><code>csrftoken</code></td>
+              <td>Prevents cross-site request forgery attacks</td>
+              <td>1 year</td>
+              <td>Essential</td>
+            </tr>
+            <tr>
+              <td><code>_ga</code></td>
+              <td>Google Analytics - distinguishes users</td>
+              <td>2 years</td>
+              <td>Analytics</td>
+            </tr>
+            <tr>
+              <td><code>language_preference</code></td>
+              <td>Remembers your language choice</td>
+              <td>1 year</td>
+              <td>Preference</td>
+            </tr>
+            <tr>
+              <td><code>theme_mode</code></td>
+              <td>Stores your dark/light mode preference</td>
+              <td>1 year</td>
+              <td>Preference</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Third-Party Cookies -->
+      <div class="cookie-section">
+        <h2>Third-Party Cookies</h2>
+        <p>
+          Some cookies are placed by third-party services that appear on our pages. These include:
+        </p>
+        
+        <h3>Google Analytics</h3>
+        <p>
+          We use Google Analytics to understand how our website is being used and to improve our content. These cookies collect information in an anonymized form, including the number of visitors to the site, where visitors have come from, and the pages they visited.
+        </p>
+        
+        <h3>Social Media Plugins</h3>
+        <p>
+          Our website includes plugins for social media sharing. These cookies allow you to share content on social networks and may track your browsing activity across the internet.
+        </p>
+        
+        <div class="cookie-warning">
+          <h4>Important Note</h4>
+          <p>Third-party services have their own privacy policies and cookie practices. We recommend reviewing their policies for more information about their data collection practices.</p>
+        </div>
+      </div>
+
+      <!-- Cookie Control -->
+      <div class="cookie-section">
+        <h2>Your Cookie Preferences</h2>
+        <p>
+          You can manage your cookie preferences at any time. Please note that disabling certain cookies may affect the functionality of our website.
+        </p>
+        
+        <div class="cookie-control">
+          <div class="control-group">
+            <label class="control-label">
+              Essential Cookies
+              <span class="toggle-switch">
+                <input type="checkbox" checked disabled>
+                <span class="toggle-slider"></span>
+              </span>
+            </label>
+            <p class="mb-0 mt-2 text-muted">Required for basic website functionality. Cannot be disabled.</p>
+          </div>
+          
+          <div class="control-group">
+            <label class="control-label">
+              Analytics Cookies
+              <span class="toggle-switch">
+                <input type="checkbox" id="analytics-toggle" checked>
+                <span class="toggle-slider"></span>
+              </span>
+            </label>
+            <p class="mb-0 mt-2 text-muted">Help us analyze website usage and improve user experience.</p>
+          </div>
+          
+          <div class="control-group">
+            <label class="control-label">
+              Preference Cookies
+              <span class="toggle-switch">
+                <input type="checkbox" id="preference-toggle" checked>
+                <span class="toggle-slider"></span>
+              </span>
+            </label>
+            <p class="mb-0 mt-2 text-muted">Remember your settings and preferences across sessions.</p>
+          </div>
+          
+          <div class="control-group">
+            <label class="control-label">
+              Marketing Cookies
+              <span class="toggle-switch">
+                <input type="checkbox" id="marketing-toggle">
+                <span class="toggle-slider"></span>
+              </span>
+            </label>
+            <p class="mb-0 mt-2 text-muted">Deliver relevant advertisements based on your interests.</p>
+          </div>
+          
+          <div class="save-preferences">
+            <button class="btn btn-primary">Save Preferences</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- How to Manage Cookies -->
+      <div class="cookie-section">
+        <h2>Managing Cookies Through Your Browser</h2>
+        <p>
+          Most web browsers allow you to control cookies through their settings preferences. However, if you limit the ability of websites to set cookies, you may worsen your overall user experience.
+        </p>
+        
+        <h3>Popular Browser Cookie Settings:</h3>
+        <ul>
+          <li><strong>Google Chrome:</strong> Settings > Privacy and security > Cookies and other site data</li>
+          <li><strong>Mozilla Firefox:</strong> Options > Privacy & Security > Cookies and Site Data</li>
+          <li><strong>Safari:</strong> Preferences > Privacy > Manage Website Data</li>
+          <li><strong>Microsoft Edge:</strong> Settings > Cookies and site permissions > Cookies and site data</li>
+        </ul>
+      </div>
+
+      <!-- Changes to This Policy -->
+      <div class="cookie-section">
+        <h2>Changes to This Cookie Policy</h2>
+        <p>
+          We may update this Cookie Policy from time to time. We will notify you of any changes by posting the new Cookie Policy on this page and updating the "last updated" date.
+        </p>
+        
+        <div class="cookie-timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">May 5, 2025</div>
+            <div class="timeline-content">
+              <h4>Current Version</h4>
+              <p>Added detailed information about third-party cookies and updated preference management options.</p>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-date">January 15, 2025</div>
+            <div class="timeline-content">
+              <h4>Updated Cookie Categories</h4>
+              <p>Expanded cookie classification system to provide clearer information about cookie types.</p>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-date">June 1, 2024</div>
+            <div class="timeline-content">
+              <h4>Initial Policy</h4>
+              <p>First version of our Cookie Policy published, establishing our cookie practices and user rights.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="cookie-section">
+        <h2>Contact Us About Cookies</h2>
+        <p>
+          If you have any questions about our use of cookies or this Cookie Policy, please contact our Data Protection Officer:
+        </p>
+        
+        <div class="cookie-info-box">
+          <h4>Data Protection Officer</h4>
+          <p>
+            Email: <a href="mailto:privacy@xlearning.com">privacy@xlearning.com</a><br>
+            Address: xLearning, Inc., 123 Tech Plaza, Boston, MA 02210, United States
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Related Links -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h3 class="text-center mb-4">Related Privacy Information</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+          <div class="card-body">
+            <i class="ti ti-shield-lock ti-lg text-primary mb-3"></i>
+            <h5>Privacy Policy</h5>
+            <p>Read our complete privacy policy</p>
+            <a href="{% url 'front_pages:privacy-policy' %}" class="btn btn-outline-primary">View Privacy Policy</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+          <div class="card-body">
+            <i class="ti ti-file-text ti-lg text-primary mb-3"></i>
+            <h5>Terms & Conditions</h5>
+            <p>Review our terms of service</p>
+            <a href="{% url 'front_pages:terms-of-service' %}" class="btn btn-outline-primary">View Terms</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center shadow-sm">
+          <div class="card-body">
+            <i class="ti ti-message ti-lg text-primary mb-3"></i>
+            <h5>Contact Us</h5>
+            <p>Have questions? Get in touch</p>
+            <a href="{% url 'front_pages:contact' %}" class="btn btn-outline-primary">Contact Support</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Save cookie preferences
+  const saveButton = document.querySelector('.save-preferences .btn');
+  saveButton.addEventListener('click', function() {
+    const analytics = document.getElementById('analytics-toggle').checked;
+    const preference = document.getElementById('preference-toggle').checked;
+    const marketing = document.getElementById('marketing-toggle').checked;
+    
+    // Save preferences (implement your cookie setting logic here)
+    setCookie('cookie_preferences', JSON.stringify({
+      analytics: analytics,
+      preference: preference,
+      marketing: marketing
+    }), 365);
+    
+    // Show success message
+    const toast = document.createElement('div');
+    toast.className = 'toast position-fixed bottom-0 end-0 m-3';
+    toast.innerHTML = `
+      <div class="toast-header">
+        <strong class="me-auto">Cookie Preferences</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+      </div>
+      <div class="toast-body">
+        Your cookie preferences have been saved successfully.
+      </div>
+    `;
+    document.body.appendChild(toast);
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    // Remove toast after it's hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+      toast.remove();
+    });
+  });
+  
+  // Load saved preferences
+  const savedPreferences = getCookie('cookie_preferences');
+  if (savedPreferences) {
+    const prefs = JSON.parse(savedPreferences);
+    document.getElementById('analytics-toggle').checked = prefs.analytics;
+    document.getElementById('preference-toggle').checked = prefs.preference;
+    document.getElementById('marketing-toggle').checked = prefs.marketing;
+  }
+});
+
+// Cookie utility functions
+function setCookie(name, value, days) {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+}
+
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
+</script>
+{% endblock page_js %}

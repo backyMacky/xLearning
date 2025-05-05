@@ -4,331 +4,777 @@
 {% load i18n %}
 
 {% block title %}Terms and Conditions - xLearning Platform{% endblock %}
- 
-{% block content %}
-<!-- Terms Header with Irregular Shape Background -->
-<section class="section-py first-section-pt position-relative overflow-hidden">
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<style>
+:root {
+  --terms-primary: #7367f0;
+  --terms-secondary: #a66ff0;
+  --terms-accent: #00bad1;
+  --terms-bg-light: #f8f7fa;
+  --terms-card-bg: #ffffff;
+  --terms-text-primary: #5e5873;
+  --terms-text-secondary: #6e6b7b;
+  --terms-border-color: #e0e0e0;
+  --terms-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  --terms-shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Hero Section with Dynamic Background */
+.terms-hero {
+  background: linear-gradient(135deg, var(--terms-primary) 0%, var(--terms-secondary) 100%);
+  color: white;
+  padding: 100px 0 100px;
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+}
+
+.terms-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.terms-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.terms-hero h1 {
+  font-size: 3.5rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.terms-hero p {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+}
+
+.terms-hero-badge {
+  display: inline-block;
+  padding: 8px 24px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.terms-hero-icon {
+  width: 100px;
+  height: 100px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  transform: perspective(1000px) rotateX(10deg) rotateY(-10deg);
+}
+
+.terms-hero-icon i {
+  font-size: 3rem;
+}
+
+/* Content Container */
+.terms-content {
+  padding: 80px 0;
+  background: var(--terms-bg-light);
+  margin-top: -100px;
+  position: relative;
+  z-index: 5;
+}
+
+.terms-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Section Styles */
+.terms-section {
+  background: var(--terms-card-bg);
+  border-radius: 20px;
+  box-shadow: var(--terms-shadow);
+  margin-bottom: 40px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.terms-section:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--terms-shadow-lg);
+}
+
+.terms-section-header {
+  background: linear-gradient(135deg, rgba(115, 103, 240, 0.05), rgba(166, 111, 240, 0.05));
+  padding: 30px;
+  border-bottom: 1px solid var(--terms-border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.terms-section-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(135deg, var(--terms-primary), var(--terms-secondary));
+}
+
+.terms-section-header h2 {
+  color: var(--terms-text-primary);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.terms-section-header .section-number {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--terms-primary), var(--terms-secondary));
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.terms-section-content {
+  padding: 40px;
+}
+
+.terms-section-content p {
+  color: var(--terms-text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+/* Highlighted Content */
+.terms-highlight {
+  background: linear-gradient(135deg, #f8f7fa, #eef2f7);
+  border-radius: 15px;
+  padding: 30px;
+  margin: 30px 0;
+  border-left: 5px solid var(--terms-primary);
+  position: relative;
+}
+
+.terms-highlight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100px;
+  background: linear-gradient(45deg, transparent, rgba(115, 103, 240, 0.05));
+  border-radius: 0 15px 15px 0;
+}
+
+/* Info Cards */
+.terms-info-card {
+  background: white;
+  border: 1px solid var(--terms-border-color);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.terms-info-card:hover {
+  border-color: var(--terms-primary);
+  transform: translateX(5px);
+}
+
+.terms-info-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+.terms-info-card:hover::before {
+  background: var(--terms-primary);
+}
+
+.terms-info-card h4 {
+  color: var(--terms-text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.terms-info-card ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* Restriction Cards */
+.terms-restriction-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin: 30px 0;
+}
+
+.terms-restriction-card {
+  background: white;
+  border: 1px solid rgba(234, 84, 85, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.terms-restriction-card:hover {
+  border-color: #ea5455;
+  box-shadow: 0 5px 15px rgba(234, 84, 85, 0.1);
+}
+
+.terms-restriction-card .restriction-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(234, 84, 85, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ea5455;
+  margin-bottom: 15px;
+}
+
+.terms-restriction-card h4 {
+  color: var(--terms-text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Acceptance Section */
+.terms-acceptance {
+  background: linear-gradient(135deg, var(--terms-primary), var(--terms-secondary));
+  color: white;
+  border-radius: 20px;
+  padding: 40px;
+  margin-top: 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.terms-acceptance::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.terms-acceptance-content {
+  position: relative;
+  z-index: 2;
+}
+
+.terms-acceptance-icon {
+  width: 70px;
+  height: 70px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.terms-acceptance-icon i {
+  font-size: 2rem;
+}
+
+/* Footer */
+.terms-footer {
+  background: var(--terms-bg-light);
+  padding: 60px 0;
+  border-top: 1px solid var(--terms-border-color);
+}
+
+.terms-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.terms-footer-card {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: var(--terms-shadow);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.terms-footer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--terms-shadow-lg);
+}
+
+.terms-footer-card .icon-wrapper {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, rgba(115, 103, 240, 0.1), rgba(166, 111, 240, 0.1));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: var(--terms-primary);
+  font-size: 1.5rem;
+}
+
+.terms-footer-card h4 {
+  color: var(--terms-text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.terms-footer-card p {
+  color: var(--terms-text-secondary);
+  margin-bottom: 20px;
+}
+
+.terms-footer-card .btn {
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-weight: 600;
+}
+
+/* Last Update Notice */
+.terms-update-notice {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: white;
+  box-shadow: var(--terms-shadow-lg);
+  border-radius: 12px;
+  padding: 15px 25px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  transform: translateY(100px);
+  opacity: 0;
+  animation: slideUp 0.5s ease forwards 1s;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.terms-update-notice i {
+  color: var(--terms-primary);
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.terms-update-notice span {
+  color: var(--terms-text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .terms-hero {
+    padding: 100px 0 140px;
+  }
   
-    <h2 class="text-center mb-4 display-5 fw-bold">
-      <span class="position-relative">Terms and Conditions
-        <img src="{% static 'img/front-pages/icons/section-title-icon.png' %}" alt="terms icon" class="section-title-img position-absolute object-fit-contain bottom-0 z-n1">
-      </span>
-    </h2> 
-    <div class="row justify-content-center">
-      <div class="col-xl-8 text-center">
-        <div class="card shadow border-0 rounded-4 mt-4 overflow-hidden">
-          <div class="card-body p-4 p-md-5">
-            <div class="d-flex align-items-center flex-column flex-md-row text-center text-md-start">
-              <p class="mb-0 fs-5">Please read these terms carefully before using the xLearning platform. By using our services, you agree to be bound by these terms.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+  .terms-hero h1 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .terms-hero {
+    padding: 80px 0 120px;
+  }
+  
+  .terms-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .terms-section-content {
+    padding: 25px;
+  }
+  
+  .terms-update-notice {
+    display: none;
+  }
+}
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<!-- Terms Hero Section -->
+<section class="terms-hero">
+  <div class="container">
+    <div class="terms-hero-content" data-aos="fade-up">
+      <h1 data-aos="fade-up" data-aos-delay="300">Terms and Conditions</h1>
+      <p data-aos="fade-up" data-aos-delay="400">Please read these terms carefully before using the xLearning platform. By using our services, you agree to be bound by these terms.</p>
     </div>
   </div>
 </section>
-<!-- /Terms Header -->
 
-<!-- Terms Content with Irregular Shape Design -->
-<section class="section-py position-relative">
-  <!-- Decorative elements -->
-  <div class="position-absolute start-50 top-0 translate-middle-x d-none d-lg-block">
-    <svg height="120" width="120" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="45" fill="rgba(105, 108, 255, 0.04)" />
-      <circle cx="50" cy="50" r="35" fill="rgba(105, 108, 255, 0.06)" />
-      <circle cx="50" cy="50" r="25" fill="rgba(105, 108, 255, 0.08)" />
-    </svg>
-  </div>
-  
-  <div class="container position-relative">
-    <div class="row justify-content-center">
-      <div class="col-xl-9">
-        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-          <div class="card-header border-bottom bg-primary bg-opacity-10">
-            <div class="d-flex align-items-center">
-              
-              <h4 class="mb-0">Our Terms & Conditions</h4>
-            </div>
-          </div>
-          <div class="card-body p-4 p-lg-5">
-            
-            <!-- Term sections with improved styling -->
-            <div class="terms-section mb-5">
-              <div class="d-flex align-items-center mb-3">
-                <div class="bg-label-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                  <h5 class="mb-0">1</h5>
-                </div>
-                <h4 class="ms-3 mb-0">Introduction</h4>
-              </div>
-              <div class="ps-5 ms-2">
-                <p>Welcome to xLearning. These Terms and Conditions govern your use of the xLearning platform, website, and services (collectively, the "Services"). By accessing or using our Services, you agree to be bound by these Terms. If you disagree with any part of these terms, you may not access the Services.</p>
-                
-                <p>Throughout these Terms, "we," "us," and "our" refer to xLearning, Inc. "You" refers to you, as a user of our Services. These Terms apply to all users of the Services, including without limitation users who are browsers, customers, educators, students, and content contributors.</p>
-              </div>
-            </div>
-            
-            <div class="terms-section mb-5">
-              <div class="d-flex align-items-center mb-3">
-                <div class="bg-label-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                  <h5 class="mb-0">2</h5>
-                </div>
-                <h4 class="ms-3 mb-0">Account Terms</h4>
-              </div>
-              <div class="ps-5 ms-2">
-                <p>To access and use certain features of the Services, you must register for an account. When you register, you agree to provide accurate, current, and complete information about yourself as prompted by our registration form.</p>
-                
-                <div class="card bg-light border-0 rounded-3 p-3 mb-3">
-                  <p class="fw-semibold mb-2">You are responsible for:</p>
-                  <ul class="mb-0">
-                    <li>Maintaining the confidentiality of your account and password</li>
-                    <li>Restricting access to your computer or device</li>
-                    <li>Assuming responsibility for all activities that occur under your account</li>
-                  </ul>
-                </div>
-                
-                <p>You agree to notify us immediately of any unauthorized access to or use of your account. We reserve the right to refuse service, terminate accounts, or remove content at our sole discretion.</p>
-              </div>
-            </div>
-            
-            <div class="terms-section mb-5">
-              <div class="d-flex align-items-center mb-3">
-                <div class="bg-label-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                  <h5 class="mb-0">3</h5>
-                </div>
-                <h4 class="ms-3 mb-0">Subscription and Payments</h4>
-              </div>
-              <div class="ps-5 ms-2">
-                <p>Some of our Services are offered on a subscription basis. By subscribing to our Services, you agree to pay the fees associated with your selected plan. All payments are processed securely through our third-party payment processors.</p>
-                
-                <div class="bg-label-info rounded-3 p-4 mb-3">
-                  <div class="d-flex">
-                    <i class="ti ti-info-circle text-info ti-lg mt-1 me-3"></i>
-                    <div>
-                      <p class="mb-2">Subscription fees are billed in advance on a monthly or annual basis, depending on the plan you select. You authorize us to charge your payment method for all fees incurred.</p>
-                      <p class="mb-0">You may cancel your subscription at any time through your account settings. Upon cancellation, you will continue to have access to the Services until the end of your current billing period.</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <p>If we are unable to process your payment, we may suspend or terminate your access to the Services. We do not provide refunds for partial subscription periods.</p>
-              </div>
-            </div>
-            
-            <div class="terms-section mb-5">
-              <div class="d-flex align-items-center mb-3">
-                <div class="bg-label-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                  <h5 class="mb-0">4</h5>
-                </div>
-                <h4 class="ms-3 mb-0">Content and Conduct</h4>
-              </div>
-              <div class="ps-5 ms-2">
-                <p>Our Services allow you to create, upload, post, share, and store content, including text, images, videos, and other materials ("Content"). You retain all rights to your Content, but you grant us a non-exclusive, worldwide, royalty-free license to use, reproduce, modify, adapt, publish, and distribute your Content solely for the purpose of providing and improving the Services.</p>
-                
-                <div class="p-4 rounded-3 mb-3" style="background-color: rgba(105, 108, 255, 0.05); border-left: 4px solid var(--bs-primary);">
-                  <p class="fw-semibold mb-2">By posting Content, you represent and warrant that:</p>
-                  <ul class="mb-0">
-                    <li>You own or have the necessary rights to use and authorize us to use your Content</li>
-                    <li>Your Content does not violate the privacy rights, publicity rights, copyright, contractual rights, intellectual property rights, or any other rights of any person</li>
-                    <li>Your Content does not contain material that is unlawful, obscene, defamatory, threatening, pornographic, harassing, hateful, or otherwise objectionable</li>
-                  </ul>
-                </div>
-                
-                <p>We reserve the right to remove any Content that violates these Terms or that we determine is harmful, offensive, or otherwise unacceptable.</p>
-              </div>
-            </div>
-            
-            <!-- Add remaining sections with similar styling -->
-            <div class="terms-section mb-5">
-              <div class="d-flex align-items-center mb-3">
-                <div class="bg-label-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                  <h5 class="mb-0">5</h5>
-                </div>
-                <h4 class="ms-3 mb-0">Acceptable Use</h4>
-              </div>
-              <div class="ps-5 ms-2">
-                <p>You agree not to use the Services to:</p>
-                
-                <div class="row g-3 mb-3">
-                  <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm">
-                      <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                          <div class="bg-label-danger rounded-circle p-1 me-2">
-                            <i class="ti ti-x text-danger"></i>
-                          </div>
-                          <span>Violate any applicable laws</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                          <div class="bg-label-danger rounded-circle p-1 me-2">
-                            <i class="ti ti-x text-danger"></i>
-                          </div>
-                          <span>Infringe upon others' rights</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                          <div class="bg-label-danger rounded-circle p-1 me-2">
-                            <i class="ti ti-x text-danger"></i>
-                          </div>
-                          <span>Distribute malware</span>
-                        </div>
-                        <div class="d-flex align-items-center">
-                          <div class="bg-label-danger rounded-circle p-1 me-2">
-                            <i class="ti ti-x text-danger"></i>
-                          </div>
-                          <span>Interfere with the Services</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm">
-                      <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                          <div class="bg-label-danger rounded-circle p-1 me-2">
-                            <i class="ti ti-x text-danger"></i>
-                          </div>
-                          <span>Collect personal data without consent</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                          <div class="bg-label-danger rounded-circle p-1 me-2">
-                            <i class="ti ti-x text-danger"></i>
-                          </div>
-                          <span>Impersonate another person</span>
-                        </div>
-                        <div class="d-flex align-items-center mb-2">
-                          <div class="bg-label-danger rounded-circle p-1 me-2">
-                            <i class="ti ti-x text-danger"></i>
-                          </div>
-                          <span>Harm minors</span>
-                        </div>
-                        <div class="d-flex align-items-center">
-                          <div class="bg-label-danger rounded-circle p-1 me-2">
-                            <i class="ti ti-x text-danger"></i>
-                          </div>
-                          <span>Gain unauthorized access</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <p>We reserve the right to terminate your access to the Services for violations of this acceptable use policy.</p>
-              </div>
-            </div>
-            
-            <!-- Continue with rest of sections -->
-            <div class="terms-section mb-5">
-              <div class="d-flex align-items-center mb-3">
-                <div class="bg-label-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                  <h5 class="mb-0">6</h5>
-                </div>
-                <h4 class="ms-3 mb-0">Intellectual Property</h4>
-              </div>
-              <div class="ps-5 ms-2">
-                <div class="row">
-                  <div class="col-lg-8">
-                    <p>The Services and all content, features, and functionality provided through the Services (excluding Content provided by users) are owned by xLearning, Inc. or its licensors and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
-                  </div>
-                  <div class="col-lg-4 text-center">
-                    <div class="bg-label-primary p-4 rounded-4 mb-3">
-                      <i class="ti ti-copyright text-primary ti-3x"></i>
-                    </div>
-                  </div>
-                </div>
-                
-                <p>Our name, logo, product names, and all related trademarks and service marks are the property of xLearning, Inc. Nothing in these Terms grants you a right or license to use any of our trademarks, logos, or service marks without our prior written consent.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-         
+<!-- Main Content -->
+<section class="terms-content">
+  <div class="terms-container">
+    <!-- Section 1: Introduction -->
+    <div class="terms-section" data-aos="fade-up">
+      <div class="terms-section-header">
+        <h2>
+          <div class="section-number">1</div>
+          Introduction
+        </h2>
+      </div>
+      <div class="terms-section-content">
+        <p>Welcome to xLearning. These Terms and Conditions govern your use of the xLearning platform, website, and services (collectively, the "Services"). By accessing or using our Services, you agree to be bound by these Terms. If you disagree with any part of these terms, you may not access the Services.</p>
         
-        <!-- Acceptance -->
-        <div class="card shadow-sm mt-4 border-0 rounded-4 overflow-hidden position-relative">
-          <!-- Decorative shape -->
-          <div class="position-absolute end-0 top-0">
-            <svg width="120" height="120" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <path fill="rgba(105, 108, 255, 0.03)" d="M95.5,45.6C90.4,60.9,72.3,54.1,62.5,67.1c-9.8,13-8.2,34-24.4,34c-16.2,0-32.5-19.1-36.4-41.4 c-3.9-22.3,4.8-47.9,22.9-52.4c18.1-4.5,45.6,12.2,52.7,19C84.5,32.9,100.5,30.3,95.5,45.6z"></path>
-            </svg>
+        <p>Throughout these Terms, "we," "us," and "our" refer to xLearning, Inc. "You" refers to you, as a user of our Services. These Terms apply to all users of the Services, including without limitation users who are browsers, customers, educators, students, and content contributors.</p>
+      </div>
+    </div>
+    
+    <!-- Section 2: Account Terms -->
+    <div class="terms-section" data-aos="fade-up" data-aos-delay="100">
+      <div class="terms-section-header">
+        <h2>
+          <div class="section-number">2</div>
+          Account Terms
+        </h2>
+      </div>
+      <div class="terms-section-content">
+        <p>To access and use certain features of the Services, you must register for an account. When you register, you agree to provide accurate, current, and complete information about yourself as prompted by our registration form.</p>
+        
+        <div class="terms-highlight">
+          <h4>You are responsible for:</h4>
+          <div class="terms-info-card">
+            <h4>Account Security</h4>
+            <ul>
+              <li>Maintaining the confidentiality of your account and password</li>
+              <li>Restricting access to your computer or device</li>
+              <li>Assuming responsibility for all activities that occur under your account</li>
+            </ul>
           </div>
           
-          <div class="card-body p-4">
-            <div class="d-flex align-items-center">
-              <div class="bg-primary rounded-circle p-3 me-4">
-                <i class="ti ti-checkbox text-white ti-lg"></i>
-              </div>
-              <p class="mb-0 fs-5">By using xLearning, you acknowledge that you have read and understand these Terms and Conditions, and agree to be bound by them.</p>
-            </div>
+          <div class="terms-info-card">
+            <h4>Account Management</h4>
+            <ul>
+              <li>Providing accurate and complete registration information</li>
+              <li>Keeping your account information up to date</li>
+              <li>Notifying us immediately of any unauthorized access to your account</li>
+            </ul>
           </div>
         </div>
+        
+        <p>You agree to notify us immediately of any unauthorized access to or use of your account. We reserve the right to refuse service, terminate accounts, or remove content at our sole discretion.</p>
+      </div>
+    </div>
+    
+    <!-- Section 3: Subscription and Payments -->
+    <div class="terms-section" data-aos="fade-up" data-aos-delay="200">
+      <div class="terms-section-header">
+        <h2>
+          <div class="section-number">3</div>
+          Subscription and Payments
+        </h2>
+      </div>
+      <div class="terms-section-content">
+        <p>Some of our Services are offered on a subscription basis. By subscribing to our Services, you agree to pay the fees associated with your selected plan. All payments are processed securely through our third-party payment processors.</p>
+        
+        <div class="terms-highlight">
+          <h4>Payment Terms:</h4>
+          <p>Subscription fees are billed in advance on a monthly or annual basis, depending on the plan you select. You authorize us to charge your payment method for all fees incurred.</p>
+          <p>You may cancel your subscription at any time through your account settings. Upon cancellation, you will continue to have access to the Services until the end of your current billing period.</p>
+        </div>
+        
+        <p>If we are unable to process your payment, we may suspend or terminate your access to the Services. We do not provide refunds for partial subscription periods.</p>
+      </div>
+    </div>
+    
+    <!-- Section 4: Content and Conduct -->
+    <div class="terms-section" data-aos="fade-up" data-aos-delay="300">
+      <div class="terms-section-header">
+        <h2>
+          <div class="section-number">4</div>
+          Content and Conduct
+        </h2>
+      </div>
+      <div class="terms-section-content">
+        <p>Our Services allow you to create, upload, post, share, and store content, including text, images, videos, and other materials ("Content"). You retain all rights to your Content, but you grant us a non-exclusive, worldwide, royalty-free license to use, reproduce, modify, adapt, publish, and distribute your Content solely for the purpose of providing and improving the Services.</p>
+        
+        <div class="terms-highlight">
+          <h4>By posting Content, you represent and warrant that:</h4>
+          <ul>
+            <li>You own or have the necessary rights to use and authorize us to use your Content</li>
+            <li>Your Content does not violate the privacy rights, publicity rights, copyright, contractual rights, intellectual property rights, or any other rights of any person</li>
+            <li>Your Content does not contain material that is unlawful, obscene, defamatory, threatening, pornographic, harassing, hateful, or otherwise objectionable</li>
+          </ul>
+        </div>
+        
+        <p>We reserve the right to remove any Content that violates these Terms or that we determine is harmful, offensive, or otherwise unacceptable.</p>
+      </div>
+    </div>
+    
+    <!-- Section 5: Acceptable Use -->
+    <div class="terms-section" data-aos="fade-up" data-aos-delay="400">
+      <div class="terms-section-header">
+        <h2>
+          <div class="section-number">5</div>
+          Acceptable Use
+        </h2>
+      </div>
+      <div class="terms-section-content">
+        <p>You agree not to use the Services to:</p>
+        
+        <div class="terms-restriction-grid">
+          <div class="terms-restriction-card">
+            <div class="restriction-icon">
+              <i class="ti ti-ban"></i>
+            </div>
+            <h4>Legal Violations</h4>
+            <p>Violate any applicable laws, regulations, or third-party rights</p>
+          </div>
+          
+          <div class="terms-restriction-card">
+            <div class="restriction-icon">
+              <i class="ti ti-bug"></i>
+            </div>
+            <h4>Malicious Activities</h4>
+            <p>Distribute malware, viruses, or other harmful code</p>
+          </div>
+          
+          <div class="terms-restriction-card">
+            <div class="restriction-icon">
+              <i class="ti ti-shield-off"></i>
+            </div>
+            <h4>Unauthorized Access</h4>
+            <p>Attempt to gain unauthorized access to other accounts or systems</p>
+          </div>
+          
+          <div class="terms-restriction-card">
+            <div class="restriction-icon">
+              <i class="ti ti-user-exclamation"></i>
+            </div>
+            <h4>Impersonation</h4>
+            <p>Impersonate another person or entity</p>
+          </div>
+          
+          <div class="terms-restriction-card">
+            <div class="restriction-icon">
+              <i class="ti ti-alert-octagon"></i>
+            </div>
+            <h4>Harmful Content</h4>
+            <p>Post content that could harm minors or contains hate speech</p>
+          </div>
+          
+          <div class="terms-restriction-card">
+            <div class="restriction-icon">
+              <i class="ti ti-network-off"></i>
+            </div>
+            <h4>Service Disruption</h4>
+            <p>Interfere with or disrupt the Services or servers</p>
+          </div>
+        </div>
+        
+        <p>We reserve the right to terminate your access to the Services for violations of this acceptable use policy.</p>
+      </div>
+    </div>
+    
+    <!-- Section 6: Intellectual Property -->
+    <div class="terms-section" data-aos="fade-up" data-aos-delay="500">
+      <div class="terms-section-header">
+        <h2>
+          <div class="section-number">6</div>
+          Intellectual Property
+        </h2>
+      </div>
+      <div class="terms-section-content">
+        <p>The Services and all content, features, and functionality provided through the Services (excluding Content provided by users) are owned by xLearning, Inc. or its licensors and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
+        
+        <div class="terms-highlight">
+          <h4>You may not:</h4>
+          <ul>
+            <li>Reproduce, modify, distribute, or create derivative works of our Services</li>
+            <li>Reverse engineer, decompile, or attempt to extract the source code of our Services</li>
+            <li>Use our name, logo, or trademarks without our prior written consent</li>
+            <li>Remove or modify any proprietary notices on our Services</li>
+          </ul>
+        </div>
+        
+        <p>Our name, logo, product names, and all related trademarks and service marks are the property of xLearning, Inc. Nothing in these Terms grants you a right or license to use any of our trademarks, logos, or service marks without our prior written consent.</p>
+      </div>
+    </div>
+    
+    <!-- Section 7: User Rights -->
+    <div class="terms-section" data-aos="fade-up" data-aos-delay="600">
+      <div class="terms-section-header">
+        <h2>
+          <div class="section-number">7</div>
+          User Rights
+        </h2>
+      </div>
+      <div class="terms-section-content">
+        <p>Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable license to access and use the Services for your personal or business use.</p>
+        
+        <div class="terms-highlight">
+          <h4>This license includes the right to:</h4>
+          <ul>
+            <li>Access and use the Services according to the features of your account type</li>
+            <li>Create, upload, and share Content as permitted by the Services</li>
+            <li>Receive customer support in accordance with your plan</li>
+            <li>Export your Content and data in standard formats</li>
+          </ul>
+        </div>
+        
+        <p>This license automatically terminates if you violate these Terms or if your account is terminated for any reason.</p>
+      </div>
+    </div>
+    
+    <!-- Section 8: Contact Information -->
+    <div class="terms-section" data-aos="fade-up" data-aos-delay="700">
+      <div class="terms-section-header">
+        <h2>
+          <div class="section-number">8</div>
+          Contact Information
+        </h2>
+      </div>
+      <div class="terms-section-content">
+        <p>If you have any questions about these Terms, please contact us at:</p>
+        
+        <div class="terms-info-card">
+          <h4>Email Address</h4>
+          <p>legal@xlearning.com</p>
+        </div>
+        
+        <div class="terms-info-card">
+          <h4>Physical Address</h4>
+          <p>xLearning, Inc.<br>123 Tech Plaza<br>Boston, MA 02210<br>United States</p>
+        </div>
+        
+        <p>We will respond to all inquiries within 5 business days.</p>
+      </div>
+    </div>
+    
+    <!-- Acceptance Section -->
+    <div class="terms-acceptance" data-aos="fade-up" data-aos-delay="800">
+      <div class="terms-acceptance-content">
+        <div class="terms-acceptance-icon">
+          <i class="ti ti-check"></i>
+        </div>
+        <h3>By Using xLearning</h3>
+        <p>You acknowledge that you have read and understand these Terms and Conditions, and agree to be bound by them.</p>
       </div>
     </div>
   </div>
 </section>
-<!-- /Terms Content -->
 
-<!-- Related Links with Wave Shape Divider -->
-<section class="section-py bg-light position-relative mt-5">
-  <!-- Wave shape divider -->
-  <div class="position-absolute start-0 end-0 top-0 w-100" style="transform: translateY(-99%);">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none" class="w-100" style="height: 60px;">
-      <path fill="#f8f9fa" d="M0,32L48,37.3C96,43,192,53,288,58.7C384,64,480,64,576,58.7C672,53,768,43,864,42.7C960,43,1056,53,1152,58.7C1248,64,1344,64,1392,64L1440,64L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z"></path>
-    </svg>
-  </div>
-  
-  <!-- Decorative circles -->
-  <div class="position-absolute top-50 start-0 translate-middle-y d-none d-xl-block">
-    <svg width="120" height="120" viewBox="0 0 100 100">
-      <circle cx="20" cy="20" r="15" fill="rgba(105, 108, 255, 0.05)"></circle>
-      <circle cx="40" cy="60" r="20" fill="rgba(105, 108, 255, 0.07)"></circle>
-      <circle cx="70" cy="30" r="10" fill="rgba(105, 108, 255, 0.05)"></circle>
-    </svg>
-  </div>
-  
-  <div class="container position-relative">
-    <div class="row justify-content-center">
-      <div class="col-xl-8 text-center">
-        <h3 class="mb-4">Related Legal Documents</h3>
-        <div class="row g-4">
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 rounded-4 hover-elevate-up">
-              <div class="card-body text-center p-4">
-                <div class="bg-label-primary rounded-3 mx-auto mb-3 p-3" style="width: 60px; height: 60px;">
-                  <i class="ti ti-shield-lock text-primary ti-lg"></i>
-                </div>
-                <h5 class="mb-2">Privacy Policy</h5>
-                <p class="mb-4">How we collect, use, and protect your personal information.</p>
-                <a href="{% url 'front_pages:privacy-policy' %}" class="btn btn-primary rounded-pill">Read Privacy Policy</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 rounded-4 hover-elevate-up">
-              <div class="card-body text-center p-4">
-                <div class="bg-label-primary rounded-3 mx-auto mb-3 p-3" style="width: 60px; height: 60px;">
-                  <i class="ti ti-cookie text-primary ti-lg"></i>
-                </div>
-                <h5 class="mb-2">Cookie Policy</h5>
-                <p class="mb-4">Information about cookies and tracking technologies we use.</p>
-                <a href="#" class="btn btn-primary rounded-pill">Read Cookie Policy</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 rounded-4 hover-elevate-up">
-              <div class="card-body text-center p-4">
-                <div class="bg-label-primary rounded-3 mx-auto mb-3 p-3" style="width: 60px; height: 60px;">
-                  <i class="ti ti-license text-primary ti-lg"></i>
-                </div>
-                <h5 class="mb-2">Data Processing</h5>
-                <p class="mb-4">For educational institutions and organizations.</p>
-                <a href="#" class="btn btn-primary rounded-pill">View DPA</a>
-              </div>
-            </div>
-          </div>
+<!-- Terms Footer -->
+<section class="terms-footer">
+  <div class="container">
+    <div class="terms-footer-grid">
+      <div class="terms-footer-card" data-aos="fade-up">
+        <div class="icon-wrapper">
+          <i class="ti ti-shield-check"></i>
         </div>
+        <h4>Privacy Policy</h4>
+        <p>Learn how we collect, use, and protect your personal information.</p>
+        <a href="{% url 'front_pages:privacy-policy' %}" class="btn btn-primary">View Privacy Policy</a>
+      </div>
+      
+      <div class="terms-footer-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="icon-wrapper">
+          <i class="ti ti-cookie"></i>
+        </div>
+        <h4>Cookie Policy</h4>
+        <p>Information about cookies and tracking technologies we use.</p>
+        <a href="#" class="btn btn-primary">View Cookie Policy</a>
+      </div>
+      
+      <div class="terms-footer-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="icon-wrapper">
+          <i class="ti ti-file-document"></i>
+        </div>
+        <h4>Data Processing</h4>
+        <p>For educational institutions and organizations.</p>
+        <a href="#" class="btn btn-primary">View DPA</a>
       </div>
     </div>
   </div>
 </section>
 
+<!-- Update Notice -->
+<div class="terms-update-notice">
+  <i class="ti ti-info-circle"></i>
+  <span>Last updated: May 2025</span>
+</div>
 {% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize AOS
+  AOS.init({
+    duration: 800,
+    easing: 'ease-in-out',
+    once: true,
+    mirror: false,
+    offset: 100
+  });
+});
+</script>
+{% endblock page_js %}
