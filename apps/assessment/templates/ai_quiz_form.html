@@ -1,0 +1,297 @@
+
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/spinkit/spinkit.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{{ title }}</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info mb-4">
+          <h6 class="alert-heading mb-1"><i class="ti ti-info-circle me-1"></i> About AI-Enhanced Quizzes</h6>
+          <p class="mb-0">
+            Create a quiz with AI-generated questions. First, set up the quiz details, then specify the topic and parameters for AI to generate questions.
+          </p>
+        </div>
+
+        <!-- Step 1: Basic Quiz Info -->
+        <div id="step1" class="step-container">
+          <h6 class="fw-semibold mb-3">Step 1: Quiz Basic Information</h6>
+          <form method="post" id="quiz-form">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="{{ form.title.id_for_label }}" class="form-label">Quiz Title</label>
+              {{ form.title.errors }}
+              <input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" value="{{ form.title.value|default:'' }}" required>
+              <div class="form-text">Enter a descriptive title for the quiz.</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="{{ form.course.id_for_label }}" class="form-label">Course</label>
+              {{ form.course.errors }}
+              <select class="form-select" id="{{ form.course.id_for_label }}" name="{{ form.course.html_name }}" required>
+                <option value="">Select a course</option>
+                {% for choice in form.course.field.choices %}
+                <option value="{{ choice.0 }}" {% if form.course.value|stringformat:"s" == choice.0|stringformat:"s" or selected_course.id == choice.0 %}selected{% endif %}>{{ choice.1 }}</option>
+                {% endfor %}
+              </select>
+              <div class="form-text">Select the course this quiz belongs to.</div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'assessment:quiz_list' %}" class="btn btn-outline-secondary">
+                <i class="ti ti-arrow-left me-1"></i> Back to Quizzes
+              </a>
+              <button type="button" id="next-step-btn" class="btn btn-primary">
+                <i class="ti ti-arrow-right me-1"></i> Next Step
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 2: AI Question Generation -->
+        <div id="step2" class="step-container" style="display: none;">
+          <h6 class="fw-semibold mb-3">Step 2: Generate Questions with AI</h6>
+          
+          <div class="mb-3">
+            <label for="topic" class="form-label">Topic</label>
+            <input type="text" class="form-control" id="topic" name="topic" placeholder="e.g., Photosynthesis, World War II, Linear Algebra" required>
+            <div class="form-text">Enter the topic you want to generate questions about.</div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="num_questions" class="form-label">Number of Questions</label>
+                <select class="form-select" id="num_questions" name="num_questions">
+                  <option value="3">3 questions</option>
+                  <option value="5" selected>5 questions</option>
+                  <option value="7">7 questions</option>
+                  <option value="10">10 questions</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="difficulty" class="form-label">Difficulty Level</label>
+                <select class="form-select" id="difficulty" name="difficulty">
+                  <option value="easy">Easy</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <button type="button" id="back-step-btn" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i> Back
+            </button>
+            <button type="button" id="generate-btn" class="btn btn-primary">
+              <i class="ti ti-sparkles me-1"></i> Generate Questions
+            </button>
+          </div>
+          
+          <!-- Generation Loading Indicator -->
+          <div id="generation-loader" class="text-center my-5" style="display: none;">
+            <div class="sk-wave sk-primary mb-3">
+              <div class="sk-wave-rect"></div>
+              <div class="sk-wave-rect"></div>
+              <div class="sk-wave-rect"></div>
+              <div class="sk-wave-rect"></div>
+              <div class="sk-wave-rect"></div>
+            </div>
+            <p class="text-muted">Generating questions using AI. This may take a moment...</p>
+          </div>
+          
+          <!-- Generation Results -->
+          <div id="generation-results" class="mt-4" style="display: none;">
+            <h6 class="fw-semibold mb-3">Generated Questions Preview</h6>
+            <div id="questions-container"></div>
+            
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" id="regenerate-btn" class="btn btn-outline-secondary">
+                <i class="ti ti-refresh me-1"></i> Regenerate
+              </button>
+              <button type="button" id="create-quiz-btn" class="btn btn-success">
+                <i class="ti ti-device-floppy me-1"></i> Create Quiz with These Questions
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2
+    $('.select2').select2();
+    
+    // Step navigation
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const nextStepBtn = document.getElementById('next-step-btn');
+    const backStepBtn = document.getElementById('back-step-btn');
+    
+    nextStepBtn.addEventListener('click', function() {
+      // Validate form
+      const title = document.getElementById('{{ form.title.id_for_label }}').value;
+      const course = document.getElementById('{{ form.course.id_for_label }}').value;
+      
+      if (!title || !course) {
+        alert('Please fill out all required fields');
+        return;
+      }
+      
+      // Switch to step 2
+      step1.style.display = 'none';
+      step2.style.display = 'block';
+    });
+    
+    backStepBtn.addEventListener('click', function() {
+      // Switch to step 1
+      step2.style.display = 'none';
+      step1.style.display = 'block';
+    });
+    
+    // AI question generation
+    const generateBtn = document.getElementById('generate-btn');
+    const regenerateBtn = document.getElementById('regenerate-btn');
+    const createQuizBtn = document.getElementById('create-quiz-btn');
+    const generationLoader = document.getElementById('generation-loader');
+    const generationResults = document.getElementById('generation-results');
+    const questionsContainer = document.getElementById('questions-container');
+    
+    let generatedQuestions = [];
+    
+    generateBtn.addEventListener('click', function() {
+      // Validate form
+      const topic = document.getElementById('topic').value;
+      if (!topic) {
+        alert('Please enter a topic');
+        return;
+      }
+      
+      // Show loader
+      generationLoader.style.display = 'block';
+      generationResults.style.display = 'none';
+      generateBtn.disabled = true;
+      
+      // Get parameters
+      const numQuestions = document.getElementById('num_questions').value;
+      const difficulty = document.getElementById('difficulty').value;
+      
+      // Call API to generate questions
+      fetch('{% url "assessment:generate_questions" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+          topic: topic,
+          num_questions: parseInt(numQuestions),
+          difficulty: difficulty
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        generationLoader.style.display = 'none';
+        generateBtn.disabled = false;
+        
+        if (data.success) {
+          generatedQuestions = data.questions;
+          displayGeneratedQuestions(generatedQuestions);
+          generationResults.style.display = 'block';
+        } else {
+          alert('Failed to generate questions: ' + data.message);
+        }
+      })
+      .catch(error => {
+        generationLoader.style.display = 'none';
+        generateBtn.disabled = false;
+        alert('An error occurred: ' + error);
+      });
+    });
+    
+    // Display generated questions
+    function displayGeneratedQuestions(questions) {
+      questionsContainer.innerHTML = '';
+      
+      questions.forEach((question, index) => {
+        const questionElement = document.createElement('div');
+        questionElement.className = 'card mb-3';
+        
+        let optionsHtml = '';
+        question.options.forEach((option, optionIndex) => {
+          const isCorrect = optionIndex === question.correct_option;
+          optionsHtml += `
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" disabled ${isCorrect ? 'checked' : ''}>
+              <label class="form-check-label ${isCorrect ? 'text-success fw-bold' : ''}">
+                ${option}
+                ${isCorrect ? '<i class="ti ti-check text-success ms-1"></i>' : ''}
+              </label>
+            </div>
+          `;
+        });
+        
+        questionElement.innerHTML = `
+          <div class="card-body">
+            <h6 class="fw-semibold">Q${index + 1}: ${question.question}</h6>
+            <div class="mt-3">
+              ${optionsHtml}
+            </div>
+          </div>
+        `;
+        
+        questionsContainer.appendChild(questionElement);
+      });
+    }
+    
+    // Regenerate questions
+    regenerateBtn.addEventListener('click', function() {
+      generateBtn.click();
+    });
+    
+    // Create quiz with generated questions
+    createQuizBtn.addEventListener('click', function() {
+      // First submit the quiz form to create the quiz
+      const form = document.getElementById('quiz-form');
+      
+      // Create a new hidden input to store generated questions
+      const questionsInput = document.createElement('input');
+      questionsInput.type = 'hidden';
+      questionsInput.name = 'generated_questions';
+      questionsInput.value = JSON.stringify(generatedQuestions);
+      form.appendChild(questionsInput);
+      
+      // Submit the form
+      form.submit();
+    });
+  });
+</script>
+{% endblock %}

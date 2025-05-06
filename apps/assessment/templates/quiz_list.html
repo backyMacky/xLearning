@@ -23,12 +23,36 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">{% if request.user.is_teacher %}My Quizzes{% else %}Available Quizzes{% endif %}</h5>
         {% if request.user.is_teacher %}
-        <a href="{% url 'assessment:create_quiz' %}" class="btn btn-primary">
-          <i class="ti ti-plus me-1"></i> Create Quiz
-        </a>
+        <div>
+          <a href="{% url 'assessment:ai_create_quiz' %}" class="btn btn-primary me-2">
+            <i class="ti ti-sparkles me-1"></i> Create with AI
+          </a>
+          <a href="{% url 'assessment:create_quiz' %}" class="btn btn-outline-primary">
+            <i class="ti ti-plus me-1"></i> Create Manually
+          </a>
+        </div>
         {% endif %}
       </div>
       <div class="card-body">
+        <!-- AI Feature Highlight for Teachers -->
+        {% if request.user.is_teacher %}
+        <div class="alert alert-primary alert-dismissible mb-4" role="alert">
+          <div class="d-flex">
+            <i class="ti ti-sparkles fs-3 me-2"></i>
+            <div>
+              <h5 class="alert-heading mb-1">New: Create Quizzes with AI</h5>
+              <p class="mb-0">Generate high-quality quiz questions automatically with our new AI feature. Simply enter a topic and difficulty level, and our AI will create engaging multiple-choice questions for your students.</p>
+              <div class="mt-2">
+                <a href="{% url 'assessment:ai_create_quiz' %}" class="btn btn-sm btn-primary me-2">
+                  Try AI Quiz Creation
+                </a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
         <div class="row g-4 mb-4">
           {% if request.user.is_teacher %}
           <div class="col-sm-6 col-xl-3">
@@ -166,6 +190,7 @@
                 {% if request.user.is_teacher %}
                 <th>Questions</th>
                 <th>Created</th>
+                <th>Type</th>
                 {% else %}
                 <th>Status</th>
                 {% endif %}
@@ -184,6 +209,9 @@
                     </div>
                     <div>
                       <h6 class="mb-0">{{ quiz.title }}</h6>
+                      {% if quiz.is_ai_generated %}
+                      <span class="badge bg-label-info" title="Generated with AI">AI</span>
+                      {% endif %}
                     </div>
                   </div>
                 </td>
@@ -196,6 +224,13 @@
                 </td>
                 <td>
                   <span>{{ quiz.created_at|date:"M d, Y" }}</span>
+                </td>
+                <td>
+                  {% if quiz.is_ai_generated %}
+                  <span class="badge bg-label-info">AI-assisted</span>
+                  {% else %}
+                  <span class="badge bg-label-secondary">Manual</span>
+                  {% endif %}
                 </td>
                 {% else %}
                 <td>
@@ -252,9 +287,14 @@
             {% endif %}
           </p>
           {% if request.user.is_teacher %}
-          <a href="{% url 'assessment:create_quiz' %}" class="btn btn-primary">
-            <i class="ti ti-plus me-1"></i> Create Quiz
-          </a>
+          <div>
+            <a href="{% url 'assessment:ai_create_quiz' %}" class="btn btn-primary me-2">
+              <i class="ti ti-sparkles me-1"></i> Create with AI
+            </a>
+            <a href="{% url 'assessment:create_quiz' %}" class="btn btn-outline-primary">
+              <i class="ti ti-plus me-1"></i> Create Manually
+            </a>
+          </div>
           {% endif %}
         </div>
         {% endif %}

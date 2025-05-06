@@ -1,3 +1,4 @@
+
 from django.urls import path
 from . import views
 
@@ -26,4 +27,7 @@ urlpatterns = [
     path('collections/<int:collection_id>/', views.CollectionDetailView.as_view(), name='collection_detail'),
     path('collections/add-items/', views.AddToCollectionView.as_view(), name='add_to_collection'),
     path('collections/remove-item/', views.RemoveFromCollectionView.as_view(), name='remove_from_collection'),
+    
+    # AI services
+    path('ai/rewrite-text/', views.TextRewriteView.as_view(), name='rewrite_text'),
 ]

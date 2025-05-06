@@ -8,10 +8,13 @@ from django.contrib import messages
 from django.db.models import Count, Q
 from web_project import TemplateLayout
 from web_project.template_helpers.theme import TemplateHelper
-
+from django.http import JsonResponse
+from web_project.ai_services import AIContentService
+from django.views import View
 from .models import StudentFile, TeacherResource, ResourceAccess, ResourceCollection
 from apps.content.models import Course, Lesson
 import mimetypes
+import json
 import os
 
 
@@ -741,3 +744,26 @@ class TeacherResourceEditView(RepositoryBaseView, UserPassesTestMixin, UpdateVie
         })
         
         return context
+
+
+class TextRewriteView(LoginRequiredMixin, View):
+    """View for rewriting text using AI"""
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            text = data.get('text', '')
+            style = data.get('style', None)
+            
+            if not text:
+                return JsonResponse({'success': False, 'message': 'Text is required'})
+                
+            # Rewrite text using AI service
+            result = AIContentService.rewrite_text(text, style)
+            
+            return JsonResponse(result)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})        

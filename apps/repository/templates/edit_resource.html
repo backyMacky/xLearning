@@ -35,9 +35,15 @@
             <div class="invalid-feedback">Please provide a resource title.</div>
           </div>
           
-          <div class="mb-3">
+          <div class="mb-3 position-relative">
             <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3">{{ object.description }}</textarea>
+            <div class="input-group">
+              <textarea class="form-control" id="description" name="description" rows="3">{{ object.description }}</textarea>
+              <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+                <i class="ti ti-sparkles"></i>
+              </button>
+            </div>
+            <small class="form-text text-muted">Use the AI button to help rewrite or improve your text.</small>
           </div>
           
           <div class="mb-3">

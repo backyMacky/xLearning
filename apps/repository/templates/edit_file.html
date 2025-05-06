@@ -13,6 +13,8 @@
 {% block vendor_js %}
 {{ block.super }}
 <script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'js/ai-text-rewriter.js' %}"></script>
+
 {% endblock vendor_js %}
 
 {% block content %}
@@ -35,9 +37,15 @@
             <div class="invalid-feedback">Please provide a file title.</div>
           </div>
           
-          <div class="mb-3">
+          <div class="mb-3 position-relative">
             <label for="description" class="form-label">Description (Optional)</label>
-            <textarea class="form-control" id="description" name="description" rows="3">{{ object.description }}</textarea>
+            <div class="input-group">
+              <textarea class="form-control" id="description" name="description" rows="3">{{ object.description }}</textarea>
+              <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+                <i class="ti ti-sparkles"></i>
+              </button>
+            </div>
+            <small class="form-text text-muted">Use the AI button to help rewrite or improve your text.</small>
           </div>
           
           <div class="mb-3">

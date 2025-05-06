@@ -29,4 +29,10 @@ urlpatterns = [
     # API endpoints
     path('api/quizzes/<int:quiz_id>/questions/', views.get_quiz_questions, name='api_quiz_questions'),
     path('api/quizzes/<int:quiz_id>/order/', views.update_question_order, name='api_update_question_order'),
+    
+    # New AI-related endpoints
+    path('ai/generate-questions/', views.GenerateQuizQuestionsView.as_view(), name='generate_questions'),
+    path('ai/create-quiz/', views.AIEnhancedQuizCreateView.as_view(), name='ai_create_quiz'),
+    path('ai/create-quiz/<int:course_id>/', views.AIEnhancedQuizCreateView.as_view(), name='ai_create_course_quiz'),
+    path('ai/rewrite-text/', views.TextRewriteView.as_view(), name='rewrite_text'),
 ]

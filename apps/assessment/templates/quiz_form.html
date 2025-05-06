@@ -5,12 +5,27 @@
 
 {% block title %}{{ title }}{% endblock title %}
 
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+{% endblock vendor_js %}
+
 {% block content %}
 <div class="row">
   <div class="col-12 mb-4">
     <div class="card">
-      <div class="card-header">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">{{ title }}</h5>
+        <div>
+          <a href="{% url 'assessment:ai_create_quiz' %}" class="btn btn-sm btn-outline-primary me-2">
+            <i class="ti ti-sparkles me-1"></i> Create with AI
+          </a>
+        </div>
       </div>
       <div class="card-body">
         <form method="post">
@@ -47,7 +62,14 @@
         
         {% if object and questions %}
         <div class="mt-5">
-          <h6 class="fw-semibold mb-3">Questions ({{ questions|length }})</h6>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-semibold mb-0">Questions ({{ questions|length }})</h6>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#aiEnhanceModal">
+                <i class="ti ti-sparkles me-1"></i> Enhance with AI
+              </button>
+            </div>
+          </div>
           
           <div class="table-responsive">
             <table class="table table-hover">
@@ -63,14 +85,19 @@
                 {% for question in questions %}
                 <tr>
                   <td>{{ forloop.counter }}</td>
-                  <td>{{ question.text|truncatechars:50 }}</td>
+                  <td>
+                    {{ question.text|truncatechars:50 }}
+                    {% if question.is_ai_generated %}
+                    <span class="badge bg-label-info ms-1" title="Generated with AI">AI</span>
+                    {% endif %}
+                  </td>
                   <td><span class="badge bg-label-primary">{{ question.get_question_type_display }}</span></td>
                   <td>
                     <div class="d-flex">
-                      <a href="{% url 'assessment:edit_question' question_id=question.id %}" class="btn btn-sm btn-icon me-2">
+                      <a href="{% url 'assessment:edit_question' question_id=question.id %}" class="btn btn-sm btn-icon me-2" title="Edit">
                         <i class="ti ti-edit"></i>
                       </a>
-                      <a href="{% url 'assessment:delete_question' question_id=question.id %}" class="btn btn-sm btn-icon">
+                      <a href="{% url 'assessment:delete_question' question_id=question.id %}" class="btn btn-sm btn-icon" title="Delete">
                         <i class="ti ti-trash"></i>
                       </a>
                     </div>
@@ -92,4 +119,234 @@
     </div>
   </div>
 </div>
+
+<!-- AI Enhancement Modal -->
+{% if object %}
+<div class="modal fade" id="aiEnhanceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Enhance Quiz with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Generate additional questions for this quiz using AI.</p>
+        
+        <form id="ai-enhance-form">
+          <div class="mb-3">
+            <label for="enhance-topic" class="form-label">Topic</label>
+            <input type="text" class="form-control" id="enhance-topic" value="{{ object.title }}" required>
+            <div class="form-text">Enter the topic to generate questions about.</div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="enhance-num-questions" class="form-label">Number of Questions</label>
+                <select class="form-select" id="enhance-num-questions">
+                  <option value="3">3 questions</option>
+                  <option value="5" selected>5 questions</option>
+                  <option value="7">7 questions</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="enhance-difficulty" class="form-label">Difficulty</label>
+                <select class="form-select" id="enhance-difficulty">
+                  <option value="easy">Easy</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </form>
+        
+        <!-- Loading State -->
+        <div id="enhance-loading" class="text-center my-4" style="display: none;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2 mb-0">Generating questions...</p>
+        </div>
+        
+        <!-- Results Preview -->
+        <div id="enhance-results" style="display: none;">
+          <h6 class="fw-semibold mb-2">Generated Questions</h6>
+          <div id="enhance-questions-container" class="mb-3">
+            <!-- Questions will be added here -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="enhance-generate-btn">Generate Questions</button>
+        <button type="button" class="btn btn-success" id="enhance-add-btn" style="display: none;">Add to Quiz</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock content %}
+
+{% block page_js_extra %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Select2
+    if ($.fn.select2) {
+      $('.select2').select2();
+    }
+    
+    // AI Enhancement functionality
+    {% if object %}
+    const enhanceGenerateBtn = document.getElementById('enhance-generate-btn');
+    const enhanceAddBtn = document.getElementById('enhance-add-btn');
+    const enhanceLoading = document.getElementById('enhance-loading');
+    const enhanceResults = document.getElementById('enhance-results');
+    const enhanceQuestionsContainer = document.getElementById('enhance-questions-container');
+    
+    let generatedQuestions = [];
+    
+    if (enhanceGenerateBtn) {
+      enhanceGenerateBtn.addEventListener('click', function() {
+        // Validate form
+        const topic = document.getElementById('enhance-topic').value;
+        if (!topic) {
+          alert('Please enter a topic');
+          return;
+        }
+        
+        // Show loading
+        enhanceLoading.style.display = 'block';
+        enhanceResults.style.display = 'none';
+        enhanceGenerateBtn.disabled = true;
+        enhanceAddBtn.style.display = 'none';
+        
+        // Get parameters
+        const numQuestions = document.getElementById('enhance-num-questions').value;
+        const difficulty = document.getElementById('enhance-difficulty').value;
+        
+        // Call API to generate questions
+        fetch('{% url "assessment:generate_questions" %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({
+            topic: topic,
+            num_questions: parseInt(numQuestions),
+            difficulty: difficulty
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          enhanceLoading.style.display = 'none';
+          enhanceGenerateBtn.disabled = false;
+          
+          if (data.success) {
+            generatedQuestions = data.questions;
+            displayGeneratedQuestions(generatedQuestions);
+            enhanceResults.style.display = 'block';
+            enhanceAddBtn.style.display = 'inline-block';
+          } else {
+            alert('Failed to generate questions: ' + data.message);
+          }
+        })
+        .catch(error => {
+          enhanceLoading.style.display = 'none';
+          enhanceGenerateBtn.disabled = false;
+          alert('An error occurred: ' + error);
+        });
+      });
+    }
+    
+    // Display generated questions
+    function displayGeneratedQuestions(questions) {
+      enhanceQuestionsContainer.innerHTML = '';
+      
+      questions.forEach((question, index) => {
+        const questionCard = document.createElement('div');
+        questionCard.className = 'card mb-2';
+        
+        let optionsHtml = '';
+        question.options.forEach((option, optionIndex) => {
+          const isCorrect = optionIndex === question.correct_option;
+          optionsHtml += `
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="radio" disabled ${isCorrect ? 'checked' : ''}>
+              <label class="form-check-label ${isCorrect ? 'text-success' : ''}">
+                ${option}
+              </label>
+            </div>
+          `;
+        });
+        
+        questionCard.innerHTML = `
+          <div class="card-body p-3">
+            <div class="form-check mb-0">
+              <input class="form-check-input question-select" type="checkbox" value="${index}" id="question${index}" checked>
+              <label class="form-check-label" for="question${index}">
+                <strong>Q${index + 1}:</strong> ${question.question}
+              </label>
+            </div>
+            <div class="ps-4 mt-2 small">
+              ${optionsHtml}
+            </div>
+          </div>
+        `;
+        
+        enhanceQuestionsContainer.appendChild(questionCard);
+      });
+    }
+    
+    // Add selected questions to quiz
+    if (enhanceAddBtn) {
+      enhanceAddBtn.addEventListener('click', function() {
+        const selectedQuestions = Array.from(document.querySelectorAll('.question-select:checked'))
+          .map(checkbox => parseInt(checkbox.value));
+        
+        if (selectedQuestions.length === 0) {
+          alert('Please select at least one question to add');
+          return;
+        }
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('quiz_id', '{{ object.id }}');
+        formData.append('selected_questions', JSON.stringify(selectedQuestions.map(index => generatedQuestions[index])));
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        
+        // Show loading
+        enhanceAddBtn.disabled = true;
+        enhanceAddBtn.innerHTML = '<i class="ti ti-loader ti-spin me-1"></i> Adding...';
+        
+        // Call API to add questions to quiz
+        fetch('{% url "assessment:api_quiz_questions" quiz_id=object.id %}', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Close modal and reload page
+            $('#aiEnhanceModal').modal('hide');
+            window.location.reload();
+          } else {
+            alert('Failed to add questions: ' + data.message);
+            enhanceAddBtn.disabled = false;
+            enhanceAddBtn.innerHTML = 'Add to Quiz';
+          }
+        })
+        .catch(error => {
+          alert('An error occurred: ' + error);
+          enhanceAddBtn.disabled = false;
+          enhanceAddBtn.innerHTML = 'Add to Quiz';
+        });
+      });
+    }
+    {% endif %}
+  });
+</script>
+{% endblock %}

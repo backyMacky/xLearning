@@ -6,10 +6,15 @@ from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.db.models import Count, Q, Avg, Sum
 from web_project import TemplateLayout
 from web_project.template_helpers.theme import TemplateHelper
-
+from web_project.ai_services import AIContentService
+import json
 from .models import Quiz, Question, QuestionOption, Answer
 from apps.content.models import Course
 
@@ -186,7 +191,39 @@ class QuizCreateView(AssessmentBaseView, UserPassesTestMixin, CreateView):
     
     def form_valid(self, form):
         form.instance.teacher = self.request.user
-        return super().form_valid(form)
+        
+        # Check if this is an AI-generated quiz
+        generated_questions = self.request.POST.get('generated_questions')
+        if generated_questions:
+            form.instance.is_ai_generated = True
+        
+        response = super().form_valid(form)
+        
+        # If AI-generated questions are included, add them
+        if generated_questions:
+            try:
+                questions_data = json.loads(generated_questions)
+                
+                for q_data in questions_data:
+                    # Create question
+                    question = Question.objects.create(
+                        quiz=self.object,
+                        text=q_data['question'],
+                        question_type='multiple_choice',
+                        is_ai_generated=True
+                    )
+                    
+                    # Create options
+                    for i, option_text in enumerate(q_data['options']):
+                        QuestionOption.objects.create(
+                            question=question,
+                            text=option_text,
+                            is_correct=(i == q_data['correct_option'])
+                        )
+            except Exception as e:
+                messages.error(self.request, f"Error adding AI-generated questions: {str(e)}")
+        
+        return response
     
     def get_success_url(self):
         return reverse('assessment:edit_quiz', kwargs={'quiz_id': self.object.id})
@@ -618,57 +655,180 @@ class StudentResultsView(AssessmentBaseView, ListView):
         
         return context
 
-# Function-based views that might be used with the class-based views
+
 def get_quiz_questions(request, quiz_id):
-    """API to get questions for a quiz"""
+    """API to get questions for a quiz or add AI-generated questions"""
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Authentication required'}, status=401)
-        
-    quiz = get_object_or_404(Quiz, id=quiz_id)
     
+    quiz = get_object_or_404(Quiz, id=quiz_id)
     # Check permissions
     if request.user.is_teacher and quiz.teacher != request.user:
         return JsonResponse({'error': 'Permission denied'}, status=403)
-        
     if request.user.is_student and quiz.course not in request.user.enrolled_courses.all():
         return JsonResponse({'error': 'Permission denied'}, status=403)
-    
-    # Get questions with options
+
+    # Handle POST request for adding AI-generated questions
+    if request.method == 'POST' and request.user.is_teacher:
+        try:
+            selected_questions_json = request.POST.get('selected_questions')
+
+            if selected_questions_json:
+                selected_questions = json.loads(selected_questions_json)
+                # Add each question to the quiz
+                for q_data in selected_questions:
+                    # Create question
+                    question = Question.objects.create(
+                        quiz=quiz,
+                        text=q_data['question'],
+                        question_type='multiple_choice',
+                        is_ai_generated=True
+                    )
+                    # Create options
+                    for i, option_text in enumerate(q_data['options']):
+                        QuestionOption.objects.create(
+                            question=question,
+                            text=option_text,
+                            is_correct=(i == q_data['correct_option'])
+                        )
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Added {len(selected_questions)} questions to the quiz'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'No questions selected'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            })
+
+    # Handle GET request for getting quiz questions
     questions = []
     for question in quiz.questions.all().order_by('id'):
         q = {
             'id': question.id,
             'text': question.text,
             'type': question.question_type,
+            'is_ai_generated': question.is_ai_generated
         }
-        
         # Include options for multiple choice and true/false
         if question.question_type in ['multiple_choice', 'true_false']:
-            q['options'] = list(question.options.values('id', 'text'))
-        
+            q['options'] = list(question.options.values('id', 'text', 'is_correct'))
         questions.append(q)
-    
     return JsonResponse(questions, safe=False)
 
 def update_question_order(request, quiz_id):
     """API to update question order"""
     if not request.user.is_authenticated or not request.user.is_teacher:
         return JsonResponse({'error': 'Permission denied'}, status=403)
-        
-    quiz = get_object_or_404(Quiz, id=quiz_id, teacher=request.user)
     
+    quiz = get_object_or_404(Quiz, id=quiz_id, teacher=request.user)
+
     if request.method == 'POST':
         try:
             question_order = request.POST.getlist('question_order[]')
-            
             # Update order of questions
             for i, question_id in enumerate(question_order):
                 question = Question.objects.get(id=question_id, quiz=quiz)
                 question.order = i
                 question.save(update_fields=['order'])
-                
             return JsonResponse({'status': 'success'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
-    
+
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+class GenerateQuizQuestionsView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """View for generating quiz questions using AI"""
+    
+    def test_func(self):
+        return self.request.user.is_teacher or self.request.user.is_superuser
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            topic = data.get('topic', '')
+            num_questions = data.get('num_questions', 5)
+            difficulty = data.get('difficulty', 'medium')
+            
+            if not topic:
+                return JsonResponse({'success': False, 'message': 'Topic is required'})
+                
+            # Limit the number of questions to 10 to prevent abuse
+            num_questions = min(num_questions, 10)
+            
+            # Generate questions using AI service
+            result = AIContentService.generate_quiz_questions(topic, num_questions, difficulty)
+            
+            return JsonResponse(result)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+
+class AIEnhancedQuizCreateView(AssessmentBaseView, UserPassesTestMixin, CreateView):
+    """Create a new quiz with AI-generated questions (for teachers)"""
+    model = Quiz
+    template_name = 'ai_quiz_form.html'
+    fields = ['title', 'course']
+    
+    def test_func(self):
+        return self.request.user.is_teacher or self.request.user.is_superuser
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Filter courses to only show courses taught by this teacher
+        form.fields['course'].queryset = Course.objects.filter(teacher=self.request.user)
+        return form
+    
+    def form_valid(self, form):
+        form.instance.teacher = self.request.user
+        form.instance.is_ai_generated = True
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('assessment:edit_quiz', kwargs={'quiz_id': self.object.id})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Set course if provided in URL
+        course_id = self.kwargs.get('course_id')
+        if course_id:
+            course = get_object_or_404(Course, id=course_id, teacher=self.request.user)
+            context['selected_course'] = course
+            
+        context['title'] = 'Create AI-Enhanced Quiz'
+        context['submit_text'] = 'Create Quiz'
+        
+        return context
+
+
+class TextRewriteView(LoginRequiredMixin, View):
+    """View for rewriting text using AI"""
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            text = data.get('text', '')
+            style = data.get('style', None)
+            
+            if not text:
+                return JsonResponse({'success': False, 'message': 'Text is required'})
+                
+            # Rewrite text using AI service
+            result = AIContentService.rewrite_text(text, style)
+            
+            return JsonResponse(result)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})

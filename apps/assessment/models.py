@@ -1,7 +1,7 @@
-from django.db import models
-from django.conf import settings 
-from apps.content.models import Course
 
+from django.db import models
+from django.conf import settings
+from apps.content.models import Course
 
 class Quiz(models.Model):
     """Model for quizzes and assessments"""
@@ -9,6 +9,7 @@ class Quiz(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='quizzes')
     teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_quizzes')
     created_at = models.DateTimeField(auto_now_add=True)
+    is_ai_generated = models.BooleanField(default=False)  # New field to track AI-generated content
     
     def __str__(self):
         return f"{self.title} ({self.course.title})"
@@ -53,6 +54,7 @@ class Question(models.Model):
         ('short_answer', 'Short Answer'),
         ('essay', 'Essay'),
     ])
+    is_ai_generated = models.BooleanField(default=False)  # New field to track AI-generated content
     
     def __str__(self):
         return f"Question: {self.text[:50]}..."
@@ -88,7 +90,6 @@ class Question(models.Model):
     
     class Meta:
         app_label = 'assessment'
-
 
 class QuestionOption(models.Model):
     """Model for options in multiple choice and true/false questions"""

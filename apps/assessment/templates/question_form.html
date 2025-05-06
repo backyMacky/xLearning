@@ -22,8 +22,13 @@
           <div class="mb-3">
             <label for="{{ form.text.id_for_label }}" class="form-label">Question Text</label>
             {{ form.text.errors }}
-            <textarea class="form-control" id="{{ form.text.id_for_label }}" name="{{ form.text.html_name }}" rows="3" required>{{ form.text.value|default:'' }}</textarea>
-            <div class="form-text">The question to ask students.</div>
+            <div class="input-group">
+              <textarea class="form-control" id="{{ form.text.id_for_label }}" name="{{ form.text.html_name }}" rows="3" required>{{ form.text.value|default:'' }}</textarea>
+              <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+                <i class="ti ti-sparkles"></i>
+              </button>
+            </div>
+            <div class="form-text">The question to ask students. You can use the AI button to help improve the wording.</div>
           </div>
           
           <div class="mb-4">
@@ -50,7 +55,12 @@
                       Correct
                     </label>
                   </div>
-                  <input type="text" class="form-control" name="options[]" value="{{ option.text }}" placeholder="Option text" required>
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="options[]" value="{{ option.text }}" placeholder="Option text" required>
+                    <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+                      <i class="ti ti-sparkles"></i>
+                    </button>
+                  </div>
                   {% if forloop.counter > 2 %}
                   <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-option">
                     <i class="ti ti-x"></i>
@@ -66,7 +76,12 @@
                       Correct
                     </label>
                   </div>
-                  <input type="text" class="form-control" name="options[]" placeholder="Option 1" required>
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="options[]" placeholder="Option 1" required>
+                    <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+                      <i class="ti ti-sparkles"></i>
+                    </button>
+                  </div>
                 </div>
                 <div class="option-row mb-2 d-flex align-items-center">
                   <div class="form-check me-3">
@@ -75,7 +90,12 @@
                       Correct
                     </label>
                   </div>
-                  <input type="text" class="form-control" name="options[]" placeholder="Option 2" required>
+                  <div class="input-group">
+                    <input type="text" class="form-control" name="options[]" placeholder="Option 2" required>
+                    <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+                      <i class="ti ti-sparkles"></i>
+                    </button>
+                  </div>
                 </div>
               {% endif %}
             </div>
@@ -84,6 +104,7 @@
             </button>
           </div>
           
+          <!-- Rest of the form remains unchanged -->
           <!-- True/False Options -->
           <div id="true-false-options" class="mb-4" style="display: none;">
             <h6 class="fw-semibold mb-3">Correct Answer</h6>
@@ -113,7 +134,12 @@
                 {% for option in options %}
                   {% if option.is_correct %}
                   <div class="answer-row mb-2 d-flex align-items-center">
-                    <input type="text" class="form-control" name="correct_answers[]" value="{{ option.text }}" placeholder="Acceptable answer" required>
+                    <div class="input-group">
+                      <input type="text" class="form-control" name="correct_answers[]" value="{{ option.text }}" placeholder="Acceptable answer" required>
+                      <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+                        <i class="ti ti-sparkles"></i>
+                      </button>
+                    </div>
                     <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-answer">
                       <i class="ti ti-x"></i>
                     </button>
@@ -122,7 +148,12 @@
                 {% endfor %}
               {% else %}
               <div class="answer-row mb-2 d-flex align-items-center">
-                <input type="text" class="form-control" name="correct_answers[]" placeholder="Acceptable answer" required>
+                <div class="input-group">
+                  <input type="text" class="form-control" name="correct_answers[]" placeholder="Acceptable answer" required>
+                  <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+                    <i class="ti ti-sparkles"></i>
+                  </button>
+                </div>
                 <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-answer">
                   <i class="ti ti-x"></i>
                 </button>
@@ -215,7 +246,12 @@
               Correct
             </label>
           </div>
-          <input type="text" class="form-control" name="options[]" placeholder="Option ${optionCount + 1}" required>
+          <div class="input-group">
+            <input type="text" class="form-control" name="options[]" placeholder="Option ${optionCount + 1}" required>
+            <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+              <i class="ti ti-sparkles"></i>
+            </button>
+          </div>
           <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-option">
             <i class="ti ti-x"></i>
           </button>
@@ -258,7 +294,12 @@
         const newAnswer = document.createElement('div');
         newAnswer.className = 'answer-row mb-2 d-flex align-items-center';
         newAnswer.innerHTML = `
-          <input type="text" class="form-control" name="correct_answers[]" placeholder="Acceptable answer" required>
+          <div class="input-group">
+            <input type="text" class="form-control" name="correct_answers[]" placeholder="Acceptable answer" required>
+            <button type="button" class="btn btn-outline-primary ai-rewrite-btn" title="Rewrite with AI">
+              <i class="ti ti-sparkles"></i>
+            </button>
+          </div>
           <button type="button" class="btn btn-icon btn-sm btn-outline-danger ms-2 remove-answer">
             <i class="ti ti-x"></i>
           </button>
@@ -283,6 +324,7 @@
     // Form submission validation
     const questionForm = document.getElementById('question-form');
     
+    // Form submission validation (continued)
     if (questionForm) {
       questionForm.addEventListener('submit', function(e) {
         const selectedType = questionTypeSelect.value;
