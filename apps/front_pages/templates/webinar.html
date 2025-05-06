@@ -1,0 +1,1147 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Live Language Teaching Webinars - xLearning{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/bootstrap-datepicker/bootstrap-datepicker.css' %}" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+<script src="{% static 'vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<style>
+  /* Modern Font Stack */
+  body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.7;
+  }
+
+  /* Custom Webinar Page Styles */
+  .webinar-hero {
+    background: linear-gradient(125deg, 
+      rgba(102, 126, 234, 1) 0%, 
+      rgba(118, 75, 162, 1) 35%, 
+      rgba(220, 63, 181, 1) 100%);
+    padding: 140px 0;
+    position: relative;
+    overflow: hidden;
+    color: white;
+  }
+  
+  .webinar-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      url('{% static "img/front-pages/backgrounds/wave-pattern.png" %}'),
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+    animation: bgMove 15s ease infinite;
+    z-index: 0;
+  }
+  
+  @keyframes bgMove {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-20px, -20px); }
+  }
+  
+  .webinar-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .floating-element {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .floating-1, .floating-2, .floating-3, .floating-4 {
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .floating-1 {
+    top: 10%;
+    left: 5%;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float1 8s ease-in-out infinite;
+  }
+  
+  .floating-2 {
+    top: 60%;
+    right: 10%;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.15);
+    animation: float2 6s ease-in-out infinite;
+  }
+  
+  .floating-3 {
+    top: 30%;
+    left: 15%;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.08);
+    animation: float3 7s ease-in-out infinite;
+  }
+  
+  .floating-4 {
+    bottom: 20%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    animation: float4 9s ease-in-out infinite;
+  }
+  
+  @keyframes float1 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(30px, -30px) rotate(45deg); }
+  }
+  
+  @keyframes float2 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-20px, 20px) rotate(-30deg); }
+  }
+  
+  @keyframes float3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(20px, -15px) rotate(60deg); }
+  }
+  
+  @keyframes float4 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-25px, -25px) rotate(90deg); }
+  }
+  
+  .webinar-hero h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(45deg, #fff, rgba(255,255,255,0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .webinar-hero p {
+    font-size: 1.4rem;
+    opacity: 0.95;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  }
+  
+  .hero-stats {
+    display: flex;
+    gap: 60px;
+    justify-content: center;
+  }
+  
+  .stat-item {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 20px 30px;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+  }
+  
+  .stat-item:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 900;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+  
+  /* Enhanced Webinar Cards */
+  .webinar-card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s ease;
+    background: white;
+    margin-bottom: 40px;
+    border: 1px solid rgba(0,0,0,0.03);
+  }
+  
+  .webinar-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  }
+  
+  .webinar-image {
+    position: relative;
+    overflow: hidden;
+    height: 220px;
+  }
+  
+  .webinar-image::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.4));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .webinar-card:hover .webinar-image::after {
+    opacity: 1;
+  }
+  
+  .webinar-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .webinar-card:hover .webinar-image img {
+    transform: scale(1.15);
+  }
+  
+  .webinar-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 6px 18px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    backdrop-filter: blur(5px);
+  }
+  
+  .badge-live {
+    background: linear-gradient(45deg, #28c76f, #23d98b);
+    color: white;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(40, 199, 111, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 199, 111, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 199, 111, 0); }
+  }
+  
+  .badge-upcoming {
+    background: linear-gradient(45deg, #00cfe8, #00d4ff);
+    color: white;
+  }
+  
+  .badge-ondemand {
+    background: linear-gradient(45deg, #ff9f43, #ffc165);
+    color: white;
+  }
+  
+  .webinar-content {
+    padding: 35px;
+  }
+  
+  .webinar-category {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(45deg, #f8f9fa, #eef1f5);
+    border-radius: 20px;
+    font-size: 0.82rem;
+    color: #6c757d;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  
+  .webinar-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #2c2c54;
+    line-height: 1.4;
+  }
+  
+  .webinar-description {
+    color: #7f8c8d;
+    margin-bottom: 25px;
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+  
+  .webinar-meta {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 25px;
+    color: #8e8e93;
+    flex-wrap: wrap;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    padding: 5px 12px;
+    border-radius: 8px;
+  }
+  
+  .meta-item i {
+    font-size: 1.1rem;
+    color: #667eea;
+  }
+  
+  .webinar-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .webinar-btn {
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+  }
+  
+  .btn-register {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  
+  .btn-register:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+  }
+  
+  .btn-view {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #e9ecef;
+  }
+  
+  .btn-view:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+  }
+  
+  .price-tag {
+    font-weight: 700;
+    color: #28c76f;
+    background: rgba(40, 199, 111, 0.1);
+    padding: 5px 15px;
+    border-radius: 20px;
+  }
+  
+  /* Modern Filter Section */
+  .filter-section {
+    background: linear-gradient(45deg, #f8f9fa, #ffffff);
+    padding: 80px 0;
+  }
+  
+  .filter-card {
+    background: white;
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0,0,0,0.02);
+  }
+  
+  .filter-group {
+    margin-bottom: 30px;
+  }
+  
+  .filter-label {
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: block;
+    font-size: 1.1rem;
+    color: #2c2c54;
+  }
+  
+  .filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .filter-chip {
+    padding: 8px 20px;
+    border-radius: 25px;
+    border: 2px solid #e9ecef;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    background: white;
+  }
+  
+  .filter-chip:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
+  }
+  
+  .filter-chip.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  
+  /* Premium Calendar Section */
+  .calendar-section {
+    padding: 100px 0;
+    background: #ffffff;
+  }
+  
+  .calendar-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  
+  .calendar-header h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #2c2c54;
+    margin-bottom: 15px;
+  }
+  
+  .calendar-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .calendar-custom {
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0,0,0,0.03);
+  }
+  
+  /* Impressive CTA Section */
+  .cta-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 100px 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .cta-shape {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+  }
+  
+  .cta-shape-1 {
+    top: -150px;
+    left: -150px;
+    animation: rotate 15s linear infinite;
+  }
+  
+  .cta-shape-2 {
+    bottom: -150px;
+    right: -150px;
+    animation: rotate 15s linear infinite reverse;
+  }
+  
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  .cta-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .cta-title {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(45deg, #fff, rgba(255,255,255,0.8));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .cta-description {
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.95;
+  }
+  
+  .cta-btn {
+    padding: 18px 50px;
+    background: white;
+    color: #667eea;
+    border-radius: 50px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+  }
+  
+  .cta-btn:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Section Headers */
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c2c54;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+  }
+  
+  .section-subtitle {
+    text-align: center;
+    color: #6e6b7b;
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+    opacity: 0.9;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .webinar-hero h1 {
+      font-size: 2.5rem;
+    }
+    
+    .webinar-hero p {
+      font-size: 1.1rem;
+    }
+    
+    .hero-stats {
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .stat-item {
+      width: 100%;
+      max-width: 200px;
+      margin: 0 auto;
+    }
+    
+    .webinar-actions {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .filter-options {
+      flex-direction: column;
+    }
+    
+    .webinar-meta {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    
+    .cta-title {
+      font-size: 2rem;
+    }
+  }
+  
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<!-- Enhanced Hero Section -->
+<section class="webinar-hero">
+  <div class="floating-element floating-1"></div>
+  <div class="floating-element floating-2"></div>
+  <div class="floating-element floating-3"></div>
+  <div class="floating-element floating-4"></div>
+  
+  <div class="container">
+    <div class="webinar-hero-content text-center">
+      <h1 data-aos="fade-up">Professional Development Webinars</h1>
+      <p data-aos="fade-up" data-aos-delay="100">Join expert-led webinars to enhance your language teaching skills and stay updated with the latest teaching methodologies.</p>
+      
+      <div class="hero-stats" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-item">
+          <span class="stat-number">50+</span>
+          <span class="stat-label">Expert Presenters</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">200+</span>
+          <span class="stat-label">Live Sessions</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">10k+</span>
+          <span class="stat-label">Attendees</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced Featured Webinars -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">Upcoming Webinars</h2>
+    <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Don't miss out on these valuable learning opportunities</p>
+    
+    <div class="row">
+      <div class="col-lg-4 col-md-6" data-aos="fade-up">
+        <div class="webinar-card">
+          <div class="webinar-image">
+            <img src="{% static 'img/front-pages/webinars/webinar-1.jpg' %}" alt="Teaching Techniques">
+            <span class="webinar-badge badge-upcoming">Upcoming</span>
+          </div>
+          <div class="webinar-content">
+            <span class="webinar-category">Teaching Techniques</span>
+            <h3 class="webinar-title">Gamification in Language Learning</h3>
+            <p class="webinar-description">Learn innovative gamification strategies to boost student engagement and motivation in your virtual classroom.</p>
+            
+            <div class="webinar-meta">
+              <div class="meta-item">
+                <i class="ti ti-calendar"></i>
+                <span>May 15, 2025</span>
+              </div>
+              <div class="meta-item">
+                <i class="ti ti-clock"></i>
+                <span>2:00 PM EST</span>
+              </div>
+              <div class="meta-item">
+                <i class="ti ti-user"></i>
+                <span>Dr. Sarah Chen</span>
+              </div>
+            </div>
+            
+            <div class="webinar-actions">
+              <a href="#" class="webinar-btn btn-register">Register Now</a>
+              <span class="price-tag">Free</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="webinar-card">
+          <div class="webinar-image">
+            <img src="{% static 'img/front-pages/webinars/webinar-2.jpg' %}" alt="Assessment Methods">
+            <span class="webinar-badge badge-live">Live Now</span>
+          </div>
+          <div class="webinar-content">
+            <span class="webinar-category">Assessment</span>
+            <h3 class="webinar-title">Modern Assessment Techniques</h3>
+            <p class="webinar-description">Discover contemporary assessment methods that provide meaningful feedback and track student progress effectively.</p>
+            
+            <div class="webinar-meta">
+              <div class="meta-item">
+                <i class="ti ti-calendar"></i>
+                <span>May 6, 2025</span>
+              </div>
+              <div class="meta-item">
+                <i class="ti ti-clock"></i>
+                <span>11:00 AM EST</span>
+              </div>
+              <div class="meta-item">
+                <i class="ti ti-user"></i>
+                <span>Prof. Marc Laurent</span>
+              </div>
+            </div>
+            
+            <div class="webinar-actions">
+              <a href="#" class="webinar-btn btn-register">Join Live</a>
+              <span class="price-tag">Free</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+        <div class="webinar-card">
+          <div class="webinar-image">
+            <img src="{% static 'img/front-pages/webinars/webinar-3.jpg' %}" alt="Technology Integration">
+            <span class="webinar-badge badge-upcoming">Upcoming</span>
+          </div>
+          <div class="webinar-content">
+            <span class="webinar-category">Technology</span>
+            <h3 class="webinar-title">AI Tools for Language Teachers</h3>
+            <p class="webinar-description">Explore artificial intelligence tools that can enhance your teaching efficiency and create personalized learning experiences.</p>
+            
+            <div class="webinar-meta">
+              <div class="meta-item">
+                <i class="ti ti-calendar"></i>
+                <span>May 22, 2025</span>
+              </div>
+              <div class="meta-item">
+                <i class="ti ti-clock"></i>
+                <span>3:00 PM EST</span>
+              </div>
+              <div class="meta-item">
+                <i class="ti ti-user"></i>
+                <span>Dr. Kenji Yamamoto</span>
+              </div>
+            </div>
+            
+            <div class="webinar-actions">
+              <a href="#" class="webinar-btn btn-register">Register Now</a>
+              <span class="price-tag">Premium</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced On-Demand Library -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="section-title" data-aos="fade-up">On-Demand Webinar Library</h2>
+    <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Access our collection of recorded webinars anytime, anywhere</p>
+    
+    <div class="row">
+      <div class="col-lg-6" data-aos="fade-up">
+        <div class="webinar-card mb-4">
+          <div class="webinar-image">
+            <img src="{% static 'img/front-pages/webinars/ondemand-1.jpg' %}" alt="Cultural Sensitivity">
+            <span class="webinar-badge badge-ondemand">On-Demand</span>
+          </div>
+          <div class="webinar-content">
+            <span class="webinar-category">Cultural Awareness</span>
+            <h3 class="webinar-title">Cultural Sensitivity in Language Teaching</h3>
+            <p class="webinar-description">Understanding cultural nuances and integrating them into language instruction for more effective communication.</p>
+            
+            <div class="webinar-actions">
+              <a href="#" class="webinar-btn btn-view">Watch Now</a>
+              <span class="price-tag">Member Access</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="webinar-card mb-4">
+          <div class="webinar-image">
+            <img src="{% static 'img/front-pages/webinars/ondemand-2.jpg' %}" alt="Curriculum Design">
+            <span class="webinar-badge badge-ondemand">On-Demand</span>
+          </div>
+          <div class="webinar-content">
+            <span class="webinar-category">Curriculum</span>
+            <h3 class="webinar-title">Building Dynamic Language Curricula</h3>
+            <p class="webinar-description">Learn how to design flexible curricula that adapt to different learning styles and pace requirements.</p>
+            
+            <div class="webinar-actions">
+              <a href="#" class="webinar-btn btn-view">Watch Now</a>
+              <span class="price-tag">Free</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced Filter Section -->
+<section class="filter-section">
+  <div class="container">
+    <div class="filter-card" data-aos="fade-up">
+      <h3 class="mb-4">Find the Perfect Webinar</h3>
+      
+      <div class="filter-group">
+        <label class="filter-label">Category</label>
+        <div class="filter-options">
+          <div class="filter-chip active">All Categories</div>
+          <div class="filter-chip">Teaching Techniques</div>
+          <div class="filter-chip">Assessment</div>
+          <div class="filter-chip">Technology</div>
+          <div class="filter-chip">Cultural Awareness</div>
+          <div class="filter-chip">Professional Development</div>
+        </div>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">Language Focus</label>
+        <div class="filter-options">
+          <div class="filter-chip active">All Languages</div>
+          <div class="filter-chip">English</div>
+          <div class="filter-chip">Spanish</div>
+          <div class="filter-chip">French</div>
+          <div class="filter-chip">German</div>
+          <div class="filter-chip">Mandarin</div>
+          <div class="filter-chip">Japanese</div>
+        </div>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">Level</label>
+        <div class="filter-options">
+          <div class="filter-chip active">All Levels</div>
+          <div class="filter-chip">Beginner</div>
+          <div class="filter-chip">Intermediate</div>
+          <div class="filter-chip">Advanced</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced Calendar Section -->
+<section class="calendar-section">
+  <div class="container">
+    <div class="calendar-header">
+      <h2 data-aos="fade-up">Webinar Calendar</h2>
+      <p data-aos="fade-up" data-aos-delay="100" class="section-subtitle">View all upcoming webinars at a glance</p>
+    </div>
+    
+    <div class="calendar-wrapper" data-aos="fade-up" data-aos-delay="200">
+      <div id="webinar-calendar" class="calendar-custom"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced CTA Section -->
+<section class="cta-section">
+  <div class="cta-shape cta-shape-1"></div>
+  <div class="cta-shape cta-shape-2"></div>
+  
+  <div class="container">
+    <div class="cta-content text-center">
+      <h2 class="cta-title" data-aos="fade-up">Want to Host a Webinar?</h2>
+      <p class="cta-description" data-aos="fade-up" data-aos-delay="100">Share your expertise with the global language teaching community. Reach thousands of educators and make an impact.</p>
+      <a href="{% url 'front_pages:contact' %}" class="cta-btn" data-aos="fade-up" data-aos-delay="200">Apply to Host</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize AOS with enhanced settings
+  AOS.init({
+    duration: 1000,
+    once: true,
+    offset: 80,
+    easing: 'ease-out-cubic'
+  });
+  
+  // Add smooth scroll behavior for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+  
+  // Enhanced filter chips with animation
+  const filterChips = document.querySelectorAll('.filter-chip');
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', function() {
+      const siblings = this.parentElement.children;
+      Array.from(siblings).forEach(sibling => {
+        sibling.classList.remove('active');
+      });
+      this.classList.add('active');
+      
+      // Add ripple effect
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      this.appendChild(ripple);
+      
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = event.clientX - rect.left - size / 2;
+      const y = event.clientY - rect.top - size / 2;
+      
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+  
+  // Add ripple effect styles dynamically
+  const style = document.createElement('style');
+  style.textContent = `
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0);
+      animation: ripple-animation 0.6s linear;
+      pointer-events: none;
+    }
+    
+    @keyframes ripple-animation {
+      to {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Initialize Enhanced Bootstrap Datepicker
+  $('#webinar-calendar').datepicker({
+    inline: true,
+    format: 'yyyy-mm-dd',
+    startDate: 'today',
+    todayHighlight: true,
+    multidate: true,
+    multidateSeparator: ",",
+    templates: {
+      leftArrow: '<i class="ti ti-chevron-left"></i>',
+      rightArrow: '<i class="ti ti-chevron-right"></i>'
+    },
+    beforeShowDay: function(date) {
+      const dateString = date.toISOString().split('T')[0];
+      const hasWebinar = webinarDates.includes(dateString);
+      
+      return {
+        classes: hasWebinar ? 'has-webinar' : '',
+        tooltip: hasWebinar ? 'Webinar scheduled' : ''
+      };
+    }
+  });
+  
+  // Webinar dates with enhanced styling
+  const webinarDates = [
+    '2025-05-06', '2025-05-15', '2025-05-22',
+    '2025-05-29', '2025-06-05', '2025-06-12'
+  ];
+  
+  // Custom calendar styling
+  const calendarStyle = document.createElement('style');
+  calendarStyle.textContent = `
+    .has-webinar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      color: white !important;
+      font-weight: bold;
+      position: relative;
+    }
+    
+    .has-webinar::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      background: #fff;
+      border-radius: 50%;
+    }
+    
+    .datepicker table tr td.today {
+      border: 2px solid #667eea;
+      border-radius: 4px;
+    }
+    
+    .datepicker table tr td.selected {
+      background: #764ba2;
+      color: white;
+    }
+  `;
+  document.head.appendChild(calendarStyle);
+  
+  // Parallax effect for floating elements
+  window.addEventListener('scroll', function() {
+    const scrolled = window.pageYOffset;
+    const floatingElements = document.querySelectorAll('.floating-element');
+    
+    floatingElements.forEach((element, index) => {
+      const speed = (index + 1) * 0.05;
+      element.style.transform = `translateY(${scrolled * speed}px)`;
+    });
+  });
+  
+  // Add intersection observer for animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  
+  document.querySelectorAll('.webinar-card, .filter-card, .calendar-custom').forEach(element => {
+    observer.observe(element);
+  });
+  
+  // Enhanced button hover effects
+  document.querySelectorAll('.webinar-btn').forEach(button => {
+    button.addEventListener('mousemove', function(e) {
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      this.style.setProperty('--mouse-x', `${x}px`);
+      this.style.setProperty('--mouse-y', `${y}px`);
+    });
+  });
+  
+  // Add dynamic gradient background to buttons
+  const buttonStyle = document.createElement('style');
+  buttonStyle.textContent = `
+    .webinar-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .webinar-btn::before {
+      content: '';
+      position: absolute;
+      top: var(--mouse-y, 50%);
+      left: var(--mouse-x, 50%);
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .webinar-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+  `;
+  document.head.appendChild(buttonStyle);
+  
+  // Loading animation for cards
+  document.querySelectorAll('.webinar-card').forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    
+    setTimeout(() => {
+      card.style.transition = 'all 0.6s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 150);
+  });
+  
+  // Add tilt effect to webinar cards
+  document.querySelectorAll('.webinar-card').forEach(card => {
+    card.addEventListener('mousemove', function(e) {
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const rotateX = (y - centerY) / 10;
+      const rotateY = (centerX - x) / 10;
+      
+      this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+    });
+  });
+  
+  // Optimize performance with RAF
+  let ticking = false;
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      window.requestAnimationFrame(function() {
+        handleScroll();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+  
+  function handleScroll() {
+    const scrolled = window.pageYOffset;
+    const hero = document.querySelector('.webinar-hero');
+    if (hero) {
+      hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+    }
+  }
+});
+</script>
+{% endblock page_js %}

@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView, FormView, View
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
@@ -13,14 +13,20 @@ from django.utils import timezone
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
+from django.db.models import Sum
+import random
+import string
 
+# Additional imports needed
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 import uuid
 import datetime
 
 from web_project import TemplateLayout
 from web_project.template_helpers.theme import TemplateHelper
 from apps.account.services import NotificationService
-from .models import Notification, NotificationType, Role, UserRole, Profile, UserType
+from .models import Notification, NotificationType, Role, UserRole, Profile, UserType, CustomUser
 
 # Mixin for handling template layout (placeholder implementation)
 class TemplateLayoutMixin:
@@ -57,10 +63,10 @@ class SuperUserAccessMixin(UserPassesTestMixin):
 class AdminRequiredMixin(UserPassesTestMixin):
     """Mixin to ensure only admin users can access view"""
     def test_func(self):
-        return self.request.user.is_authenticated and (self.request.user.is_admin or self.request.user.is_superuser)
+        return self.request.user.is_authenticated and (self.request.user.is_admin() or self.request.user.is_superuser)
 
 # Authentication Views
-class RegisterView(BaseAccountView, FormView):
+class RegisterView(BaseAccountView, View):
     """Class-based view for user registration - all users register as students by default"""
     template_name = 'register.html'
     success_url = reverse_lazy('account:verify_email')
@@ -73,6 +79,9 @@ class RegisterView(BaseAccountView, FormView):
         })
         return context
     
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
+    
     def post(self, request, *args, **kwargs):
         username = request.POST.get('username')
         email = request.POST.get('email')
@@ -83,15 +92,15 @@ class RegisterView(BaseAccountView, FormView):
         learning_language = request.POST.get('learning_language', '')
         
         # Check if user already exists
-        if User.objects.filter(username=username).exists():
+        if CustomUser.objects.filter(username=username).exists():
             messages.error(request, "Username already exists")
             return redirect('account:register')
-        if User.objects.filter(email=email).exists():
+        if CustomUser.objects.filter(email=email).exists():
             messages.error(request, "Email already exists")
             return redirect('account:register')
         
         # Create user - always as student by default
-        user = User.objects.create_user(
+        user = CustomUser.objects.create_user(
             username=username, 
             email=email, 
             password=password,
@@ -152,9 +161,12 @@ class RegisterView(BaseAccountView, FormView):
             fail_silently=False
         )
 
-class LoginView(BaseAccountView, FormView):
+class LoginView(BaseAccountView, View):
     """Class-based view for user login"""
     template_name = 'login.html'
+    
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
     
     def post(self, request, *args, **kwargs):
         email_username = request.POST.get('email-username')
@@ -166,10 +178,10 @@ class LoginView(BaseAccountView, FormView):
         try:
             # Check if input is email
             if '@' in email_username:
-                user = User.objects.get(email=email_username)
+                user = CustomUser.objects.get(email=email_username)
             else:
                 # Otherwise use username
-                user = User.objects.get(username=email_username)
+                user = CustomUser.objects.get(username=email_username)
                 
             # Verify password
             if user.check_password(password):
@@ -190,14 +202,14 @@ class LoginView(BaseAccountView, FormView):
                 return redirect(next_url if next_url else 'dashboards:overview')
             else:
                 user = None
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist:
             pass
         
         if user is None:
             messages.error(request, "Invalid email/username or password")
             return render(request, 'login.html', self.get_context_data())
         
-        return super().form_invalid(None)
+        return HttpResponseRedirect(request.get_full_path())
 
 
 class LogoutView(View):
@@ -222,13 +234,13 @@ class VerifyEmailView(BaseAccountView):
         token = kwargs.get('token')
         if token:
             try:
-                user = User.objects.get(verification_token=token)
+                user = CustomUser.objects.get(verification_token=token)
                 user.is_verified = True
                 user.verification_token = None
                 user.save()
                 messages.success(request, "Email verification successful! You can now log in.")
                 return redirect('account:login')
-            except User.DoesNotExist:
+            except CustomUser.DoesNotExist:
                 messages.error(request, "Invalid verification token.")
         
         return super().get(request, *args, **kwargs)
@@ -238,7 +250,7 @@ class ResendVerificationEmailView(BaseAccountView, View):
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
         try:
-            user = User.objects.get(email=email)
+            user = CustomUser.objects.get(email=email)
             if user.is_verified:
                 messages.info(request, "Your email is already verified.")
                 return redirect('account:login')
@@ -261,12 +273,12 @@ class ResendVerificationEmailView(BaseAccountView, View):
             send_mail(subject, message, email_from, recipient_list)
             
             messages.success(request, "Verification email sent! Please check your inbox.")
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist:
             messages.error(request, "No account found with that email address.")
         
         return redirect('account:verify_email')
 
-class ForgotPasswordView(BaseAccountView, FormView):
+class ForgotPasswordView(BaseAccountView, View):
     """Class-based view for password recovery"""
     template_name = 'forgot_password.html'
     success_url = reverse_lazy('account:login')
@@ -279,14 +291,13 @@ class ForgotPasswordView(BaseAccountView, FormView):
         })
         return context
     
-    def get_form(self, form_class=None):
-        # Django forms would be better here, but keeping close to original code
-        return None
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
     
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
         try:
-            user = User.objects.get(email=email)
+            user = CustomUser.objects.get(email=email)
             
             # Generate reset token
             token = str(uuid.uuid4())
@@ -308,11 +319,11 @@ class ForgotPasswordView(BaseAccountView, FormView):
             
             messages.success(request, "Password reset instructions sent to your email")
             return redirect(self.success_url)
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist:
             messages.error(request, "Email not found in our system")
             return self.render_to_response(self.get_context_data())
 
-class ResetPasswordView(BaseAccountView, FormView):
+class ResetPasswordView(BaseAccountView, View):
     """Class-based view for resetting password with token validation"""
     template_name = 'reset_password.html'
     success_url = reverse_lazy('account:login')
@@ -326,30 +337,26 @@ class ResetPasswordView(BaseAccountView, FormView):
         })
         return context
     
-    def get_form(self, form_class=None):
-        # Django forms would be better here, but keeping close to original code
-        return None
-    
     def get(self, request, *args, **kwargs):
         token = kwargs.get('token')
         try:
-            user = User.objects.get(reset_password_token=token)
+            user = CustomUser.objects.get(reset_password_token=token)
             
             # Check if token has expired
             if user.reset_password_expiry < timezone.now():
                 messages.error(request, "Password reset link has expired. Please request a new one.")
                 return redirect('account:forgot_password')
                 
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist:
             messages.error(request, "Invalid password reset link.")
             return redirect('account:forgot_password')
             
-        return super().get(request, *args, **kwargs)
+        return render(request, self.template_name, self.get_context_data())
     
     def post(self, request, *args, **kwargs):
         token = kwargs.get('token')
         try:
-            user = User.objects.get(reset_password_token=token)
+            user = CustomUser.objects.get(reset_password_token=token)
             
             # Check if token has expired
             if user.reset_password_expiry < timezone.now():
@@ -361,7 +368,7 @@ class ResetPasswordView(BaseAccountView, FormView):
             
             if password != confirm_password:
                 messages.error(request, "Passwords do not match.")
-                return self.render_to_response(self.get_context_data())
+                return render(request, self.template_name, self.get_context_data())
             
             # Set new password
             user.set_password(password)
@@ -372,14 +379,14 @@ class ResetPasswordView(BaseAccountView, FormView):
             messages.success(request, "Password has been reset successfully! You can now log in.")
             return redirect(self.success_url)
             
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist:
             messages.error(request, "Invalid password reset link.")
             return redirect('account:forgot_password')
 
 # Profile Views
 class ProfileView(LoginRequiredMixin, BaseAccountView, DetailView):
     """Class-based view for viewing user profile"""
-    model = User
+    model = CustomUser
     template_name = 'profile.html'
     context_object_name = 'profile_user'
     
@@ -393,7 +400,7 @@ class ProfileView(LoginRequiredMixin, BaseAccountView, DetailView):
         })
         
         # Add statistics based on user type
-        if user.is_teacher:
+        if user.is_teacher():
             # Teacher statistics
             taught_courses = getattr(user, 'taught_courses', [])
             if hasattr(taught_courses, 'count'):
@@ -429,7 +436,7 @@ class ProfileView(LoginRequiredMixin, BaseAccountView, DetailView):
     def get_object(self, queryset=None):
         username = self.kwargs.get('username')
         if username:
-            return get_object_or_404(User, username=username)
+            return get_object_or_404(CustomUser, username=username)
         return self.request.user
 
 class UpdateProfileView(LoginRequiredMixin, BaseAccountView, UpdateView):
@@ -483,7 +490,7 @@ class ProfileAPIView(LoginRequiredMixin, View):
         profile = request.user.profile
         return JsonResponse(profile.get_profile())
 
-class TeacherRequestView(LoginRequiredMixin, BaseAccountView, FormView):
+class TeacherRequestView(LoginRequiredMixin, BaseAccountView, View):
     """View for students to request teacher privileges"""
     template_name = 'teacher_request.html'
     success_url = reverse_lazy('account:profile')
@@ -496,9 +503,8 @@ class TeacherRequestView(LoginRequiredMixin, BaseAccountView, FormView):
         })
         return context
     
-    def get_form(self, form_class=None):
-        # Django forms would be better here, but keeping close to original code
-        return None
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data())
     
     def post(self, request, *args, **kwargs):
         # Make sure the user is a student
@@ -522,7 +528,7 @@ class TeacherRequestView(LoginRequiredMixin, BaseAccountView, FormView):
         profile.save()
         
         # Create a notification for admins
-        admin_users = User.objects.filter(is_superuser=True) | User.objects.filter(user_type=UserType.ADMIN)
+        admin_users = CustomUser.objects.filter(is_superuser=True) | CustomUser.objects.filter(user_type=UserType.ADMIN)
         
         message_content = f"""
         User {request.user.username} ({request.user.email}) has requested teacher status.
@@ -551,7 +557,7 @@ class TeacherApprovalView(LoginRequiredMixin, AdminRequiredMixin, View):
     """View for admins to approve or reject teacher requests"""
     def post(self, request, *args, **kwargs):
         user_id = kwargs.get('user_id')
-        user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(CustomUser, id=user_id)
         action = request.POST.get('action')
         
         # Check if user is a student and has a pending request
@@ -820,7 +826,7 @@ class PreferencesView(LoginRequiredMixin, BaseAccountView):
 # Admin user management views
 class UserListView(LoginRequiredMixin, AdminRequiredMixin, BaseAccountView, ListView):
     """View for listing all users with filtering options"""
-    model = User
+    model = CustomUser
     template_name = 'user_list.html'
     context_object_name = 'users'
     paginate_by = 10
@@ -837,7 +843,7 @@ class UserListView(LoginRequiredMixin, AdminRequiredMixin, BaseAccountView, List
         return context
     
     def get_queryset(self):
-        queryset = User.objects.all().order_by('-date_joined')
+        queryset = CustomUser.objects.all().order_by('-date_joined')
         
         # Filter by search query
         search_query = self.request.GET.get('search', '')
@@ -858,7 +864,7 @@ class UserListView(LoginRequiredMixin, AdminRequiredMixin, BaseAccountView, List
 
 class UserCreateView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, CreateView):
     """View for creating a new user"""
-    model = User
+    model = CustomUser
     template_name = 'user_form.html'
     fields = ['username', 'email', 'first_name', 'last_name', 'user_type', 'is_active']
     success_url = reverse_lazy('account:user_list')
@@ -882,7 +888,7 @@ class UserCreateView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin
 
 class UserDetailView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, DetailView):
     """View for viewing user details"""
-    model = User
+    model = CustomUser
     template_name = 'user_detail.html'
     context_object_name = 'user_obj'
     
@@ -896,7 +902,7 @@ class UserDetailView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin
 
 class UserEditView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, UpdateView):
     """View for editing a user"""
-    model = User
+    model = CustomUser
     template_name = 'user_form.html'
     fields = ['username', 'email', 'first_name', 'last_name', 'user_type', 'is_active']
     context_object_name = 'user_obj'
@@ -917,7 +923,7 @@ class UserEditView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, 
 
 class UserDeleteView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, DeleteView):
     """View for deleting a user"""
-    model = User
+    model = CustomUser
     template_name = 'user_confirm_delete.html'
     success_url = reverse_lazy('account:user_list')
     context_object_name = 'user_obj'
@@ -931,7 +937,7 @@ class UserDeleteView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin
 # instructor
 class CreateInstructorView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """Admin-only view to create instructor accounts"""
-    model = User
+    model = CustomUser
     template_name = 'create_instructor.html'
     fields = ['username', 'email', 'first_name', 'last_name']
     success_url = reverse_lazy('account:user_list')
@@ -994,7 +1000,7 @@ class ApproveInstructorRequestView(LoginRequiredMixin, UserPassesTestMixin, View
     
     def post(self, request, *args, **kwargs):
         user_id = kwargs.get('user_id')
-        user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(CustomUser, id=user_id)
         
         if hasattr(user.profile, 'teacher_request_pending') and user.profile.teacher_request_pending:
             # Approve the request
@@ -1120,7 +1126,7 @@ class RoleEditView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, 
 
 class UserRoleRemoveView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, DetailView):
     """View for removing a role from a user"""
-    model = User
+    model = CustomUser
     template_name = 'user_role_remove.html'
     context_object_name = 'user_obj'
     
@@ -1203,7 +1209,7 @@ class PermissionListView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutM
 # User Roles Views (already class-based, keeping them the same)
 class UserRolesView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, DetailView):
     """View for managing user roles"""
-    model = User
+    model = CustomUser
     template_name = 'user_roles.html'
     context_object_name = 'user_obj'
     
@@ -1217,7 +1223,7 @@ class UserRolesView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin,
 
 class UserRoleAddView(LoginRequiredMixin, AdminRequiredMixin, TemplateLayoutMixin, UpdateView):
     """View for adding a role to a user"""
-    model = User
+    model = CustomUser
     template_name = 'user_role_add.html'
     fields = []
     
@@ -1300,7 +1306,7 @@ class PreferencesView(LoginRequiredMixin, TemplateView):
         # Handle preference updates
         # Example: language preference, notification settings, etc.
         messages.success(request, "Preferences updated successfully.")
-        return self.get(request, *args, **kwargs)  
+        return self.get(request, *args, **kwargs)
 
 
 # account settings
@@ -1322,7 +1328,7 @@ class AccountSettingsView(LoginRequiredMixin, BaseAccountView):
         
         # Get credit balance for students
         credit_balance = 0
-        if hasattr(self.request.user, 'is_student') and self.request.user.is_student:
+        if hasattr(self.request.user, 'is_student') and self.request.user.is_student():
             credit_balance = self.get_credit_balance(self.request.user)
         
         context.update({
@@ -1351,4 +1357,4 @@ class AccountSettingsView(LoginRequiredMixin, BaseAccountView):
             transaction_type='deduction'
         ).aggregate(Sum('amount'))['amount__sum'] or 0
         
-        return credits - debits          
+        return credits - debits

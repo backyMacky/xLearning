@@ -70,18 +70,7 @@ class LandingPageView(BaseFrontPageView):
             messages.error(request, 'This email is already subscribed or invalid.')
             return self.get(request, *args, **kwargs)
 
-class ContentManagementView(BaseFrontPageView):
-    """Feature page for content management capabilities"""
-    template_name = "front_pages/features/content_management.html"
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            "page_title": "Content Management System",
-            "page_description": "Create, organize, and share course materials with ease.",
-            "active_feature": "content-management"
-        })
-        return context
+ 
     
 class LiveSessionsView(BaseFrontPageView):
     """Feature page for live session capabilities"""
@@ -96,31 +85,7 @@ class LiveSessionsView(BaseFrontPageView):
         })
         return context
     
-class AssessmentToolsView(BaseFrontPageView):
-    """Feature page for assessment tools"""
-    template_name = "front_pages/features/assessment_tools.html"
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            "page_title": "Assessment Tools",
-            "page_description": "Create and manage custom assessments to track student progress.",
-            "active_feature": "assessment-tools"
-        })
-        return context
-    
-class StudentManagementView(BaseFrontPageView):
-    """Feature page for student management capabilities"""
-    template_name = "front_pages/features/student_management.html"
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            "page_title": "Student Repositories",
-            "page_description": "Organize and track student resources and engagement.",
-            "active_feature": "student-management"
-        })
-        return context
+ 
     
 class BookingPaymentView(BaseFrontPageView):
     """Feature page for booking and payment capabilities"""
@@ -312,29 +277,7 @@ class HelpCenterHomeView(BaseFrontPageView):
         })
         return context
 
-class HelpCenterArticleView(BaseFrontPageView):
-    """Individual help center article page"""
-    template_name = "help_center/article.html"
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        
-        # In a real implementation, you would fetch the article details here
-        # For now we'll use placeholder content
-        article = {
-            'title': 'Getting Started with Our Platform',
-            'category': 'Beginners Guide',
-            'last_updated': '2 weeks ago',
-            'content': 'This would be the full article content...'
-        }
-        
-        context.update({
-            "page_title": article['title'],
-            "page_description": f"Help article in {article['category']}",
-            "article": article
-        })
-        return context
-
+ 
 class PrivacyPolicyView(BaseFrontPageView):
     """Privacy policy page"""
     template_name = "privacy_policy.html"

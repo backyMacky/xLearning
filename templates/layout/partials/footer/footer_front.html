@@ -1,15 +1,15 @@
 <!-- Footer: Start -->
-<footer class="landing-footer bg-body footer-text" style="overflow-x: hidden; margin: 0; padding: 0;">
-  <div class="footer-top position-relative overflow-hidden z-1" style="overflow-x: hidden;">
+<footer class="landing-footer bg-body footer-text overflow-hidden">
+  <div class="footer-top position-relative overflow-hidden">
     <img src="{% static 'img/front-pages/backgrounds/footer-bg-' %}{{ COOKIES.style|default:style }}.png"
          alt="footer bg"
-         class="footer-bg banner-bg-img z-n1 w-100"
-         style="max-width: 100%; display: block;"
+         class="footer-bg banner-bg-img position-absolute w-100"
+         style="top: 0; left: 0; object-fit: cover; height: 100%;"
          data-app-light-img="front-pages/backgrounds/footer-bg-light.png"
          data-app-dark-img="front-pages/backgrounds/footer-bg-dark.png" />
 
-    <div class="container px-0 mx-0" style="max-width: 100%; overflow-x: hidden;">
-      <div class="row gx-0 gy-4 g-lg-5" style="margin-left: 0; margin-right: 0;">
+    <div class="container position-relative">
+      <div class="row gx-4 gy-4 g-lg-5">
         <div class="col-lg-5">
           <a href="/" class="app-brand-link mb-4 d-block">
             <span class="app-brand-logo demo">
@@ -20,11 +20,11 @@
           <p class="footer-text footer-logo-description mb-4">
             Empowering language teachers with innovative tools to create engaging learning experiences and track student progress effectively.
           </p>
-          <form id="footer-subscribe-form" class="footer-form">
+          <form id="footer-subscribe-form" class="footer-form" style="max-width: 100%;">
             {% csrf_token %}
             <label for="footer-email" class="small text-white">Subscribe to our newsletter</label>
             <div class="d-flex mt-1">
-              <input type="email" class="form-control rounded-0 rounded-start-bottom rounded-start-top text-white" id="footer-email" name="email" placeholder="Your email" required />
+              <input type="email" class="form-control rounded-0 rounded-start-bottom rounded-start-top" id="footer-email" name="email" placeholder="Your email" required />
               <button type="submit" id="footer-subscribe-btn" class="btn btn-primary shadow-none rounded-0 rounded-end-bottom rounded-end-top">
                 <span>Subscribe</span> 
                 <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
@@ -37,7 +37,6 @@
         <div class="col-lg-2 col-md-4 col-sm-6">
           <h6 class="footer-title mb-4">Platform</h6>
           <ul class="list-unstyled">
-           
             <li class="mb-2"><a href="{% url 'front_pages:pricing' %}" class="footer-link">Pricing</a></li>
             <li class="mb-2"><a href="{% url 'front_pages:about' %}" class="footer-link">About Us</a></li>
             <li class="mb-2"><a href="{% url 'front_pages:faq' %}" class="footer-link">FAQ</a></li>
@@ -50,8 +49,8 @@
           <ul class="list-unstyled">
             <li class="mb-2"><a href="{% url 'front_pages:blog' %}" class="footer-link">Blog</a></li>
             <li class="mb-2"><a href="{% url 'front_pages:help-center' %}" class="footer-link">Help Center</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Webinars</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Community</a></li>
+            <li class="mb-2"><a href="{% url 'front_pages:webinars' %}" class="footer-link">Webinars</a></li>
+            <li class="mb-2"><a href="{% url 'front_pages:community' %}" class="footer-link">Community</a></li>
           </ul>
         </div>
 
@@ -60,37 +59,35 @@
           <ul class="list-unstyled">
             <li class="mb-2"><a href="{% url 'front_pages:privacy-policy' %}" class="footer-link">Privacy Policy</a></li>
             <li class="mb-2"><a href="{% url 'front_pages:terms-of-service' %}" class="footer-link">Terms of Service</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Cookie Policy</a></li>
-          
+            <li class="mb-2"><a href="{% url 'front_pages:cookie-policy' %}" class="footer-link">Cookie Policy</a></li>
           </ul>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="footer-bottom py-3 py-md-4" style="overflow-x: hidden; margin: 0;">
+  <div class="footer-bottom py-3 py-md-4">
     <div class="container d-flex flex-wrap justify-content-between flex-md-row flex-column text-center text-md-start">
       <div class="mb-2 mb-md-0">
         <span class="footer-bottom-text">© <script>document.write(new Date().getFullYear());</script></span>
-        <a href="/" class="fw-medium text-white">xLearning</a>
+        <a href="/" class="fw-medium text-white text-decoration-none">xLearning</a>
         <span class="footer-bottom-text"> - Empowering Language Education</span>
       </div>
       <div>
         <a href="#" class="me-2" target="_blank">
-          <img src="{% static 'img/front-pages/icons/twitter.svg' %}" alt="twitter icon" />
+          <img src="{% static 'img/front-pages/icons/twitter.svg' %}" alt="twitter icon" class="footer-icon" />
         </a>
         <a href="#" class="me-2" target="_blank">
-          <img src="{% static 'img/front-pages/icons/facebook.svg' %}" alt="facebook icon" />
+          <img src="{% static 'img/front-pages/icons/facebook.svg' %}" alt="facebook icon" class="footer-icon" />
         </a>
         <a href="#" target="_blank">
-          <img src="{% static 'img/front-pages/icons/instagram.svg' %}" alt="instagram icon" />
+          <img src="{% static 'img/front-pages/icons/instagram.svg' %}" alt="instagram icon" class="footer-icon" />
         </a>
       </div>
     </div>
   </div>
 </footer>
 <!-- Footer: End -->
-
 
 {% block footer_js %}
 <script>

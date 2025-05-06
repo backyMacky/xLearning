@@ -3,93 +3,44 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Global Language Teacher Community - xLearning{% endblock %}
+{% block title %}Language Teacher Community - xLearning{% endblock %}
 
 {% block vendor_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
-<link rel="stylesheet" href="{% static 'vendor/libs/swiper/swiper-bundle.min.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
 {{ block.super }}
 <script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
-<script src="{% static 'vendor/libs/swiper/swiper-bundle.min.js' %}"></script>
 {% endblock vendor_js %}
 
 {% block page_css %}
 {{ block.super }}
 <style>
-  /* Modern Community Page Design */
+  :root {
+    --primary-color:rgb(208, 130, 198);
+    --secondary-color:rgb(150, 117, 183);
+    --text-primary: #2d3748;
+    --text-secondary: #64748b;
+    --background-light: #f8faff;
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
   body {
     overflow-x: hidden;
+    font-family: 'Inter', -apple-system, sans-serif;
   }
   
+  /* Hero Section */
   .community-hero {
-    background: linear-gradient(135deg, #4e54c8, #8f94fb);
-    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 120px 0;
     position: relative;
     overflow: hidden;
-    display: flex;
-    align-items: center;
     color: white;
-  }
-  
-  .community-hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
-    z-index: 1;
-  }
-  
-  .hero-shapes {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-  }
-  
-  .hero-shape {
-    position: absolute;
-    border-radius: 15px;
-    opacity: 0.6;
-    transform: rotate(-15deg);
-  }
-  
-  .shape-1 {
-    width: 300px;
-    height: 300px;
-    background: linear-gradient(45deg, #ffecd2, #fcb69f);
-    bottom: -100px;
-    left: -100px;
-    animation: float 8s ease-in-out infinite;
-  }
-  
-  .shape-2 {
-    width: 200px;
-    height: 200px;
-    background: linear-gradient(45deg, #a8edea, #fed6e3);
-    top: 10%;
-    right: 10%;
-    animation: float 6s ease-in-out infinite reverse;
-  }
-  
-  .shape-3 {
-    width: 150px;
-    height: 150px;
-    background: linear-gradient(45deg, #c3ec52, #0ba29d);
-    bottom: 20%;
-    left: 15%;
-    animation: float 7s ease-in-out infinite;
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(-15deg); }
-    50% { transform: translateY(-30px) rotate(-12deg); }
   }
   
   .hero-content {
@@ -98,18 +49,17 @@
   }
   
   .hero-title {
-    font-size: clamp(2.5rem, 8vw, 5rem);
-    font-weight: 900;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
     line-height: 1.1;
     margin-bottom: 1.5rem;
-    text-shadow: 0 5px 15px rgba(0,0,0,0.1);
   }
   
   .hero-subtitle {
-    font-size: clamp(1.1rem, 3vw, 1.5rem);
-    font-weight: 400;
-    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    opacity: 0.9;
     max-width: 600px;
+    margin-bottom: 2rem;
   }
   
   .hero-stats {
@@ -119,416 +69,263 @@
     margin-top: 4rem;
   }
   
-  .stat-item {
-    text-align: center;
-    padding: 1.5rem;
+  .stat-card {
     background: rgba(255,255,255,0.1);
-    border-radius: 15px;
     backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-  }
-  
-  .stat-item:hover {
-    transform: translateY(-10px);
-    background: rgba(255,255,255,0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.2);
   }
   
   .stat-number {
-    font-size: 3rem;
-    font-weight: 900;
+    font-size: 2.5rem;
+    font-weight: 800;
     display: block;
+    margin-bottom: 0.5rem;
   }
   
   .stat-label {
     font-size: 1rem;
-    opacity: 0.9;
+    opacity: 0.8;
   }
   
-  /* Community Features */
-  .community-features {
+  /* Features Section */
+  .features-section {
     padding: 120px 0;
-    background: #f8faff;
-    position: relative;
+    background: white;
+  }
+  
+  .section-title {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  
+  .section-title h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+  
+  .section-title p {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
   }
   
   .feature-card {
     background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
     height: 100%;
-    border: 1px solid #eef2f7;
   }
   
   .feature-card:hover {
-    transform: translateY(-15px);
-    box-shadow: 0 25px 50px rgba(78,84,200,0.1);
-    border-color: #4e54c8;
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
   }
   
   .feature-icon {
-    width: 90px;
-    height: 90px;
-    border-radius: 20px;
+    width: 60px;
+    height: 60px;
+    background: var(--background-light);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 30px;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .feature-icon::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
-    opacity: 0.1;
-    z-index: 1;
+    margin-bottom: 1.5rem;
   }
   
   .feature-icon i {
-    font-size: 2.5rem;
-    z-index: 2;
-    color: #4e54c8;
+    font-size: 1.875rem;
+    color: var(--primary-color);
   }
   
   .feature-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    color: #2d3748;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
   }
   
   .feature-description {
-    color: #64748b;
-    line-height: 1.7;
-  }
-  
-  /* Community Leaders */
-  .community-leaders {
-    padding: 120px 0;
-    background: linear-gradient(to bottom, #ffffff, #f8faff);
-  }
-  
-  .leader-card {
-    background: white;
-    border-radius: 25px;
-    overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
-    transition: all 0.4s ease;
-    position: relative;
-  }
-  
-  .leader-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.12);
-  }
-  
-  .leader-image {
-    position: relative;
-    height: 400px;
-    overflow: hidden;
-  }
-  
-  .leader-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-  
-  .leader-card:hover .leader-image img {
-    transform: scale(1.05);
-  }
-  
-  .leader-info {
-    padding: 30px;
-    text-align: center;
-  }
-  
-  .leader-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #2d3748;
-  }
-  
-  .leader-role {
-    color: #64748b;
-    margin-bottom: 20px;
-  }
-  
-  .leader-bio {
-    color: #64748b;
+    color: var(--text-secondary);
     line-height: 1.6;
-    margin-bottom: 20px;
-  }
-  
-  .leader-social {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-  }
-  
-  .social-link {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f8faff;
-    color: #4e54c8;
-    transition: all 0.3s ease;
-  }
-  
-  .social-link:hover {
-    background: #4e54c8;
-    color: white;
-    transform: translateY(-5px);
   }
   
   /* Success Stories */
-  .success-stories {
+  .success-section {
     padding: 120px 0;
-    background: #4e54c8;
-    color: white;
-    position: relative;
-    overflow: hidden;
+    background: var(--background-light);
   }
   
-  .story-card {
-    background: rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 40px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
+  .testimonial-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    height: 100%;
+    box-shadow: var(--shadow-sm);
   }
   
-  .story-card:hover {
-    transform: translateY(-10px);
-    background: rgba(255,255,255,0.15);
+  .testimonial-text {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
   }
   
-  .story-text {
-    font-size: 1.25rem;
-    line-height: 1.8;
-    margin-bottom: 30px;
-    font-style: italic;
-  }
-  
-  .story-author {
+  .testimonial-author {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1rem;
   }
   
-  .author-image {
-    width: 60px;
-    height: 60px;
+  .author-avatar {
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    border: 3px solid white;
     overflow: hidden;
   }
   
-  .author-details {
-    h4 {
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-    
-    p {
-      opacity: 0.8;
-      margin: 0;
-    }
+  .author-info h4 {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
   }
   
-  /* Forum Section */
-  .forum-preview {
+  .author-info p {
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  
+  /* Events Section */
+  .events-section {
     padding: 120px 0;
     background: white;
   }
   
-  .forum-header {
-    text-align: center;
-    margin-bottom: 60px;
-  }
-  
-  .forum-header h2 {
-    color: #2d3748;
-    margin-bottom: 15px;
-  }
-  
-  .forum-header p {
-    color: #64748b;
-  }
-  
-  .forum-topic {
-    background: #f8faff;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
+  .event-card {
+    background: white;
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    height: 100%;
+    transition: all 0.3s ease;
   }
   
-  .forum-topic:hover {
-    border-color: #4e54c8;
-    transform: translateX(10px);
+  .event-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-5px);
   }
   
-  .topic-header {
+  .event-date {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    gap: 1rem;
+    margin-bottom: 1rem;
   }
   
-  .topic-title {
+  .date-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--background-light);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .date-icon i {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+  }
+  
+  .event-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
   }
   
-  .topic-category {
-    background: #eef2f7;
-    color: #4e54c8;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.9rem;
+  .event-description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
   }
   
-  .topic-meta {
-    display: flex;
-    gap: 20px;
-    color: #64748b;
-  }
-  
-  .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  /* Join Community CTA */
-  .join-community {
+  /* CTA Section */
+  .cta-section {
     padding: 120px 0;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .join-particles {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-  }
-  
-  .particle {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: white;
-    border-radius: 50%;
-    animation: particle-animation 20s linear infinite;
-    opacity: 0.1;
-  }
-  
-  .particle:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
-  .particle:nth-child(2) { top: 20%; left: 80%; animation-delay: 5s; }
-  .particle:nth-child(3) { top: 80%; left: 20%; animation-delay: 10s; }
-  .particle:nth-child(4) { top: 50%; left: 50%; animation-delay: 15s; }
-  
-  @keyframes particle-animation {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(-100px, -100px); }
-  }
-  
-  .join-content {
-    position: relative;
-    z-index: 2;
     text-align: center;
   }
   
-  .join-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 900;
-    margin-bottom: 20px;
-    line-height: 1.2;
+  .cta-content h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
   }
   
-  .join-subtitle {
+  .cta-content p {
     font-size: 1.25rem;
-    margin-bottom: 40px;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto 2rem;
   }
   
-  .join-buttons {
+  .cta-buttons {
     display: flex;
-    gap: 20px;
+    gap: 1rem;
     justify-content: center;
     flex-wrap: wrap;
   }
   
-  .join-btn {
-    padding: 15px 40px;
-    border-radius: 50px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  .btn-primary-white {
+    background: white;
+    color: var(--primary-color);
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-weight: 600;
     transition: all 0.3s ease;
   }
   
-  .join-btn.primary {
-    background: white;
-    color: #4e54c8;
+  .btn-primary-white:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(255,255,255,0.2);
+    color: var(--primary-color);
   }
   
-  .join-btn.primary:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(255,255,255,0.2);
-  }
-  
-  .join-btn.secondary {
-    background: transparent;
+  .btn-outline-white {
     border: 2px solid white;
     color: white;
+    background: transparent;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
   }
   
-  .join-btn.secondary:hover {
+  .btn-outline-white:hover {
     background: rgba(255,255,255,0.1);
-    transform: translateY(-5px);
+    color: white;
+    transform: translateY(-2px);
   }
   
   /* Responsive Design */
   @media (max-width: 768px) {
     .hero-stats {
       grid-template-columns: 1fr;
+      gap: 1rem;
     }
     
-    .hero-title {
-      font-size: 2.5rem;
+    .section-title h2 {
+      font-size: 2rem;
     }
     
-    .topic-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    
-    .join-buttons {
+    .cta-buttons {
       flex-direction: column;
     }
   }
@@ -538,45 +335,41 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="community-hero">
-  <div class="hero-shapes">
-    <div class="hero-shape shape-1"></div>
-    <div class="hero-shape shape-2"></div>
-    <div class="hero-shape shape-3"></div>
-  </div>
-  
   <div class="container">
     <div class="hero-content">
-      <div class="row align-items-center">
-        <div class="col-lg-10">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
           <h1 class="hero-title" data-aos="fade-up">
-            Connect with Language Teachers Worldwide
+            Global Language Teacher Community
           </h1>
           <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
-            Join a vibrant community of passionate educators sharing knowledge, resources, and innovative teaching methods across the globe.
+            Connect, learn, and grow with passionate language educators from around the world
           </p>
-          <a href="#join" class="btn btn-light btn-lg mt-3 me-3" data-aos="fade-up" data-aos-delay="200">
-            <i class="ti ti-users me-2"></i> Join Community
-          </a>
-          <a href="#features" class="btn btn-outline-light btn-lg mt-3" data-aos="fade-up" data-aos-delay="300">
-            <i class="ti ti-chevron-down me-2"></i> Explore Features
-          </a>
+          <div class="d-flex gap-3 justify-content-center" data-aos="fade-up" data-aos-delay="200">
+            <a href="#join" class="btn btn-light btn-lg px-4">
+              <i class="ti ti-users me-2"></i> Join Community
+            </a>
+            <a href="#features" class="btn btn-outline-light btn-lg px-4">
+              <i class="ti ti-arrow-down me-2"></i> Learn More
+            </a>
+          </div>
         </div>
       </div>
       
-      <div class="hero-stats" data-aos="fade-up" data-aos-delay="400">
-        <div class="stat-item">
+      <div class="hero-stats" data-aos="fade-up" data-aos-delay="300">
+        <div class="stat-card">
           <span class="stat-number">15,000+</span>
           <span class="stat-label">Active Teachers</span>
         </div>
-        <div class="stat-item">
+        <div class="stat-card">
           <span class="stat-number">120+</span>
           <span class="stat-label">Countries</span>
         </div>
-        <div class="stat-item">
+        <div class="stat-card">
           <span class="stat-number">8,000+</span>
           <span class="stat-label">Resources Shared</span>
         </div>
-        <div class="stat-item">
+        <div class="stat-card">
           <span class="stat-number">50+</span>
           <span class="stat-label">Languages</span>
         </div>
@@ -585,13 +378,13 @@
   </div>
 </section>
 
-<!-- Community Features -->
-<section id="features" class="community-features">
+<!-- Features Section -->
+<section id="features" class="features-section">
   <div class="container">
-    <div class="text-center mb-5">
-      <h2 data-aos="fade-up">What Makes Our Community Unique</h2>
-      <p class="lead text-muted" data-aos="fade-up" data-aos-delay="100">
-        We've built a platform where language educators can truly thrive
+    <div class="section-title">
+      <h2 data-aos="fade-up">Why Join Our Community</h2>
+      <p data-aos="fade-up" data-aos-delay="100">
+        Discover the benefits of being part of a global teaching network
       </p>
     </div>
     
@@ -602,7 +395,7 @@
             <i class="ti ti-world"></i>
           </div>
           <h3 class="feature-title">Global Network</h3>
-          <p class="feature-description">Connect with teachers from over 120 countries, sharing diverse perspectives and culturally-rich teaching approaches.</p>
+          <p class="feature-description">Connect with teachers worldwide, sharing diverse perspectives and innovative teaching methods.</p>
         </div>
       </div>
       
@@ -612,7 +405,7 @@
             <i class="ti ti-books"></i>
           </div>
           <h3 class="feature-title">Resource Library</h3>
-          <p class="feature-description">Access thousands of lesson plans, teaching materials, and innovative resources contributed by fellow educators.</p>
+          <p class="feature-description">Access thousands of lesson plans and teaching materials shared by fellow educators.</p>
         </div>
       </div>
       
@@ -622,7 +415,7 @@
             <i class="ti ti-message-circle"></i>
           </div>
           <h3 class="feature-title">Expert Discussions</h3>
-          <p class="feature-description">Engage in meaningful conversations about teaching methodologies, challenges, and breakthrough innovations.</p>
+          <p class="feature-description">Engage in meaningful conversations about teaching methodologies and innovations.</p>
         </div>
       </div>
       
@@ -632,7 +425,7 @@
             <i class="ti ti-certificate"></i>
           </div>
           <h3 class="feature-title">Professional Growth</h3>
-          <p class="feature-description">Access exclusive webinars, workshops, and certification programs designed to advance your teaching career.</p>
+          <p class="feature-description">Access exclusive workshops and certification programs to advance your career.</p>
         </div>
       </div>
       
@@ -641,8 +434,8 @@
           <div class="feature-icon">
             <i class="ti ti-users-group"></i>
           </div>
-          <h3 class="feature-title">Mentorship Program</h3>
-          <p class="feature-description">Learn from experienced educators through our structured mentorship program and peer-to-peer learning initiatives.</p>
+          <h3 class="feature-title">Mentorship</h3>
+          <p class="feature-description">Learn from experienced educators through our structured mentorship program.</p>
         </div>
       </div>
       
@@ -652,75 +445,7 @@
             <i class="ti ti-calendar-event"></i>
           </div>
           <h3 class="feature-title">Exclusive Events</h3>
-          <p class="feature-description">Participate in virtual conferences, language teaching summits, and networking events throughout the year.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Community Leaders -->
-<section class="community-leaders">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 data-aos="fade-up">Meet Our Community Champions</h2>
-      <p class="lead text-muted" data-aos="fade-up" data-aos-delay="100">
-        Inspiring educators who shape the future of language teaching
-      </p>
-    </div>
-    
-    <div class="row g-4">
-      <div class="col-lg-4 col-md-6" data-aos="fade-up">
-        <div class="leader-card">
-          <div class="leader-image">
-            <img src="{% static 'img/front-pages/community/leader-1.jpg' %}" alt="Community Leader">
-          </div>
-          <div class="leader-info">
-            <h3 class="leader-name">Dr. Maria Fernandez</h3>
-            <p class="leader-role">Spanish Language Innovation Expert</p>
-            <p class="leader-bio">Pioneering immersive teaching methods for over 15 years, specializing in virtual classroom engagement.</p>
-            <div class="leader-social">
-              <a href="#" class="social-link"><i class="ti ti-brand-linkedin"></i></a>
-              <a href="#" class="social-link"><i class="ti ti-brand-twitter"></i></a>
-              <a href="#" class="social-link"><i class="ti ti-world"></i></a>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-        <div class="leader-card">
-          <div class="leader-image">
-            <img src="{% static 'img/front-pages/community/leader-2.jpg' %}" alt="Community Leader">
-          </div>
-          <div class="leader-info">
-            <h3 class="leader-name">Professor David Wong</h3>
-            <p class="leader-role">AI & Language Technology Pioneer</p>
-            <p class="leader-bio">Integrating artificial intelligence with traditional teaching methods to create breakthrough learning experiences.</p>
-            <div class="leader-social">
-              <a href="#" class="social-link"><i class="ti ti-brand-linkedin"></i></a>
-              <a href="#" class="social-link"><i class="ti ti-brand-github"></i></a>
-              <a href="#" class="social-link"><i class="ti ti-mail"></i></a>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-        <div class="leader-card">
-          <div class="leader-image">
-            <img src="{% static 'img/front-pages/community/leader-3.jpg' %}" alt="Community Leader">
-          </div>
-          <div class="leader-info">
-            <h3 class="leader-name">Sarah Dubois</h3>
-            <p class="leader-role">Cultural Immersion Specialist</p>
-            <p class="leader-bio">Creating authentic cultural experiences in language learning, bridging the gap between classroom and real-world application.</p>
-            <div class="leader-social">
-              <a href="#" class="social-link"><i class="ti ti-brand-twitter"></i></a>
-              <a href="#" class="social-link"><i class="ti ti-brand-instagram"></i></a>
-              <a href="#" class="social-link"><i class="ti ti-world"></i></a>
-            </div>
-          </div>
+          <p class="feature-description">Participate in virtual conferences and networking events throughout the year.</p>
         </div>
       </div>
     </div>
@@ -728,24 +453,24 @@
 </section>
 
 <!-- Success Stories -->
-<section class="success-stories">
+<section class="success-section">
   <div class="container">
-    <div class="text-center mb-5">
-      <h2 data-aos="fade-up">Success Stories</h2>
-      <p class="lead" style="opacity: 0.9;" data-aos="fade-up" data-aos-delay="100">
-        Real experiences from our community members
+    <div class="section-title">
+      <h2 data-aos="fade-up">Teacher Success Stories</h2>
+      <p data-aos="fade-up" data-aos-delay="100">
+        Hear from our community members
       </p>
     </div>
     
     <div class="row g-4">
       <div class="col-lg-4" data-aos="fade-up">
-        <div class="story-card">
-          <p class="story-text">"This community transformed my teaching practice. The collaborative environment and shared resources helped me triple my student success rate in just one year."</p>
-          <div class="story-author">
-            <div class="author-image">
-              <img src="{% static 'img/avatars/11.png' %}" alt="Teacher">
+        <div class="testimonial-card">
+          <p class="testimonial-text">"This community transformed my teaching practice. The shared resources helped me triple my student success rate in just one year."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <img src="{% static 'img/avatars/11.png' %}" alt="Teacher" class="w-100 h-100 object-fit-cover">
             </div>
-            <div class="author-details">
+            <div class="author-info">
               <h4>Elena Rodriguez</h4>
               <p>Spanish Teacher, Argentina</p>
             </div>
@@ -754,13 +479,13 @@
       </div>
       
       <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="story-card">
-          <p class="story-text">"The mentorship program connected me with experienced educators who guided me through innovative teaching methods I never knew existed."</p>
-          <div class="story-author">
-            <div class="author-image">
-              <img src="{% static 'img/avatars/12.png' %}" alt="Teacher">
+        <div class="testimonial-card">
+          <p class="testimonial-text">"The mentorship program connected me with experienced educators who guided me through innovative teaching methods."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <img src="{% static 'img/avatars/12.png' %}" alt="Teacher" class="w-100 h-100 object-fit-cover">
             </div>
-            <div class="author-details">
+            <div class="author-info">
               <h4>Kenji Tanaka</h4>
               <p>English Teacher, Japan</p>
             </div>
@@ -769,13 +494,13 @@
       </div>
       
       <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
-        <div class="story-card">
-          <p class="story-text">"From sharing resources to collaborative lesson planning, this community has become my professional home and catalyst for growth."</p>
-          <div class="story-author">
-            <div class="author-image">
-              <img src="{% static 'img/avatars/13.png' %}" alt="Teacher">
+        <div class="testimonial-card">
+          <p class="testimonial-text">"This community has become my professional home and catalyst for growth. The collaborative environment is amazing."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <img src="{% static 'img/avatars/13.png' %}" alt="Teacher" class="w-100 h-100 object-fit-cover">
             </div>
-            <div class="author-details">
+            <div class="author-info">
               <h4>Sophie Martin</h4>
               <p>French Teacher, Canada</p>
             </div>
@@ -786,183 +511,87 @@
   </div>
 </section>
 
-<!-- Forum Preview -->
-<section class="forum-preview">
+<!-- Upcoming Events -->
+<section class="events-section">
   <div class="container">
-    <div class="forum-header">
-      <h2 data-aos="fade-up">Active Discussions</h2>
-      <p data-aos="fade-up" data-aos-delay="100">Join the conversation and share your insights</p>
-    </div>
-    
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="forum-topic" data-aos="fade-up">
-          <div class="topic-header">
-            <h3 class="topic-title">Integrating AI Tools in Language Assessment</h3>
-            <span class="topic-category">Technology</span>
-          </div>
-          <div class="topic-meta">
-            <div class="meta-item">
-              <i class="ti ti-message"></i>
-              <span>82 replies</span>
-            </div>
-            <div class="meta-item">
-              <i class="ti ti-eye"></i>
-              <span>1.2k views</span>
-            </div>
-            <div class="meta-item">
-              <i class="ti ti-clock"></i>
-              <span>3 hours ago</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="forum-topic" data-aos="fade-up" data-aos-delay="100">
-          <div class="topic-header">
-            <h3 class="topic-title">Best Practices for Teaching Pronunciation Online</h3>
-            <span class="topic-category">Methodology</span>
-          </div>
-          <div class="topic-meta">
-            <div class="meta-item">
-              <i class="ti ti-message"></i>
-              <span>45 replies</span>
-            </div>
-            <div class="meta-item">
-              <i class="ti ti-eye"></i>
-              <span>678 views</span>
-            </div>
-            <div class="meta-item">
-              <i class="ti ti-clock"></i>
-              <span>5 hours ago</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="forum-topic" data-aos="fade-up" data-aos-delay="200">
-          <div class="topic-header">
-            <h3 class="topic-title">Cultural Integration in Digital Language Classrooms</h3>
-            <span class="topic-category">Culture</span>
-          </div>
-          <div class="topic-meta">
-            <div class="meta-item">
-              <i class="ti ti-message"></i>
-              <span>67 replies</span>
-            </div>
-            <div class="meta-item">
-              <i class="ti ti-eye"></i>
-              <span>934 views</span>
-            </div>
-            <div class="meta-item">
-              <i class="ti ti-clock"></i>
-              <span>1 day ago</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="text-center mt-5">
-          <a href="#" class="btn btn-primary btn-lg">
-            <i class="ti ti-messages me-2"></i> Explore All Discussions
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Community Events -->
-<section class="py-5 bg-light">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 data-aos="fade-up">Upcoming Community Events</h2>
-      <p class="lead text-muted" data-aos="fade-up" data-aos-delay="100">
-        Connect, learn, and grow together
+    <div class="section-title">
+      <h2 data-aos="fade-up">Upcoming Events</h2>
+      <p data-aos="fade-up" data-aos-delay="100">
+        Join our community events and workshops
       </p>
     </div>
     
     <div class="row g-4">
       <div class="col-lg-4 col-md-6" data-aos="fade-up">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body p-4">
-            <div class="d-flex align-items-center mb-3">
-              <div class="rounded-3 p-3 me-3" style="background: #e8e5ff;">
-                <i class="ti ti-video text-primary fs-4"></i>
-              </div>
-              <div>
-                <h6 class="mb-0">May 15, 2025</h6>
-                <p class="mb-0 text-muted small">3:00 PM EST</p>
-              </div>
+        <div class="event-card">
+          <div class="event-date">
+            <div class="date-icon">
+              <i class="ti ti-video"></i>
             </div>
-            <h4 class="mb-3">Virtual Teaching Summit 2025</h4>
-            <p class="text-muted mb-4">Connect with 1000+ educators worldwide in our annual virtual event featuring expert speakers and practical workshops.</p>
-            <a href="#" class="btn btn-primary w-100">Register Now</a>
+            <div>
+              <h6 class="mb-0">May 15, 2025</h6>
+              <p class="mb-0 text-muted small">3:00 PM EST</p>
+            </div>
           </div>
+          <h4 class="event-title">Virtual Teaching Summit 2025</h4>
+          <p class="event-description">Connect with 1000+ educators worldwide in our annual event featuring expert speakers.</p>
+          <a href="#" class="btn btn-primary w-100">Register Now</a>
         </div>
       </div>
       
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body p-4">
-            <div class="d-flex align-items-center mb-3">
-              <div class="rounded-3 p-3 me-3" style="background: #fff3e0;">
-                <i class="ti ti-book text-warning fs-4"></i>
-              </div>
-              <div>
-                <h6 class="mb-0">May 22, 2025</h6>
-                <p class="mb-0 text-muted small">10:00 AM EST</p>
-              </div>
+        <div class="event-card">
+          <div class="event-date">
+            <div class="date-icon">
+              <i class="ti ti-book"></i>
             </div>
-            <h4 class="mb-3">AI in Language Teaching Workshop</h4>
-            <p class="text-muted mb-4">Learn practical applications of AI tools for lesson planning, assessment, and student engagement.</p>
-            <a href="#" class="btn btn-outline-warning w-100">Save Your Spot</a>
+            <div>
+              <h6 class="mb-0">May 22, 2025</h6>
+              <p class="mb-0 text-muted small">10:00 AM EST</p>
+            </div>
           </div>
+          <h4 class="event-title">AI in Language Teaching Workshop</h4>
+          <p class="event-description">Learn practical applications of AI tools for lesson planning and assessment.</p>
+          <a href="#" class="btn btn-outline-primary w-100">Save Your Spot</a>
         </div>
       </div>
       
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body p-4">
-            <div class="d-flex align-items-center mb-3">
-              <div class="rounded-3 p-3 me-3" style="background: #e8f5e9;">
-                <i class="ti ti-users text-success fs-4"></i>
-              </div>
-              <div>
-                <h6 class="mb-0">June 1, 2025</h6>
-                <p class="mb-0 text-muted small">All day event</p>
-              </div>
+        <div class="event-card">
+          <div class="event-date">
+            <div class="date-icon">
+              <i class="ti ti-users"></i>
             </div>
-            <h4 class="mb-3">Global Collaboration Day</h4>
-            <p class="text-muted mb-4">24-hour collaborative event connecting teachers worldwide for knowledge exchange and project collaboration.</p>
-            <a href="#" class="btn btn-outline-success w-100">Join the Event</a>
+            <div>
+              <h6 class="mb-0">June 1, 2025</h6>
+              <p class="mb-0 text-muted small">All day event</p>
+            </div>
           </div>
+          <h4 class="event-title">Global Collaboration Day</h4>
+          <p class="event-description">24-hour event connecting teachers worldwide for knowledge exchange.</p>
+          <a href="#" class="btn btn-outline-primary w-100">Join the Event</a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Join Community CTA -->
-<section id="join" class="join-community">
-  <div class="join-particles">
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-  </div>
-  
+<!-- Call to Action -->
+<section id="join" class="cta-section">
   <div class="container">
-    <div class="join-content">
-      <h2 class="join-title" data-aos="fade-up">
-        Ready to Elevate Your Teaching?
+    <div class="cta-content">
+      <h2 data-aos="fade-up">
+        Ready to Transform Your Teaching?
       </h2>
-      <p class="join-subtitle" data-aos="fade-up" data-aos-delay="100">
-        Join our global community of passionate language educators who are transforming the way languages are taught and learned.
+      <p data-aos="fade-up" data-aos-delay="100">
+        Join our community of passionate language educators and take your teaching to the next level.
       </p>
-      <div class="join-buttons" data-aos="fade-up" data-aos-delay="200">
-        <a href="{% url 'account:register' %}" class="join-btn primary">
+      <div class="cta-buttons" data-aos="fade-up" data-aos-delay="200">
+        <a href="{% url 'account:register' %}" class="btn btn-primary-white">
           <i class="ti ti-rocket me-2"></i> Join for Free
         </a>
-        <a href="{% url 'front_pages:about' %}" class="join-btn secondary">
-          <i class="ti ti-info-circle me-2"></i> Learn More
+        <a href="{% url 'front_pages:contact' %}" class="btn btn-outline-white">
+          <i class="ti ti-message me-2"></i> Contact Us
         </a>
       </div>
     </div>
@@ -992,27 +621,6 @@ document.addEventListener('DOMContentLoaded', function() {
           block: 'start'
         });
       }
-    });
-  });
-  
-  // Add parallax effect to hero shapes
-  window.addEventListener('scroll', function() {
-    const scrolled = window.pageYOffset;
-    const shapes = document.querySelectorAll('.hero-shape');
-    shapes.forEach((shape, index) => {
-      const speed = (index + 1) * 0.1;
-      shape.style.transform = `translateY(${scrolled * speed}px) rotate(-15deg)`;
-    });
-  });
-  
-  // Forum topics hover effect
-  const forumTopics = document.querySelectorAll('.forum-topic');
-  forumTopics.forEach(topic => {
-    topic.addEventListener('mouseenter', function() {
-      this.style.borderColor = '#4e54c8';
-    });
-    topic.addEventListener('mouseleave', function() {
-      this.style.borderColor = '#e2e8f0';
     });
   });
 });
