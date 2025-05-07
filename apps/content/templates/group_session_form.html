@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/spinkit/spinkit.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
@@ -33,6 +34,11 @@
         <!-- Form for group session -->
         <form method="post" id="groupSessionForm" action="{% if is_update %}{% url 'content:update_group_session' session_id=form.instance.id %}{% else %}{% url 'content:create_group_session' %}{% endif %}">
           {% csrf_token %}
+          
+          <!-- Hidden AI fields -->
+          {{ form.use_ai }}
+          {{ form.ai_prompt }}
+          {{ form.ai_tone }}
           
           {% if form.errors %}
           <div class="alert alert-danger">
@@ -59,15 +65,30 @@
             <!-- Group Session Title and Description -->
             <div class="col-12">
               <label for="id_title" class="form-label">Session Title</label>
-              <input type="text" id="id_title" name="title" class="form-control" placeholder="Enter a descriptive title for your session" 
-                value="{% if form.title.value %}{{ form.title.value }}{% elif form.instance.title %}{{ form.instance.title }}{% endif %}" 
-                required>
+              <div class="input-group">
+                <input type="text" id="id_title" name="title" class="form-control" placeholder="Enter a descriptive title for your session" 
+                  value="{% if form.title.value %}{{ form.title.value }}{% elif form.instance.title %}{{ form.instance.title }}{% endif %}" 
+                  required>
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#aiTitleModal">
+                  <i class="ti ti-bulb me-1"></i> AI Assist
+                </button>
+              </div>
             </div>
             
             <div class="col-12">
-              <label for="id_description" class="form-label">Session Description</label>
-              <textarea id="id_description" name="description" class="form-control" rows="3" placeholder="Describe what students will learn in this session" required>{% if form.description.value %}{{ form.description.value }}{% elif form.instance.description %}{{ form.instance.description }}{% endif %}</textarea>
-              <small class="text-muted">Describe what students will learn in this session</small>
+              <label for="description-editor" class="form-label">Session Description</label>
+              <div class="d-flex align-items-center mb-1">
+                <div class="flex-grow-1">
+                  <div class="editor-toolbar"></div>
+                </div>
+                <div>
+                  <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#aiDescriptionModal">
+                    <i class="ti ti-bulb me-1"></i> AI Assist
+                  </button>
+                </div>
+              </div>
+              <div id="description-editor" style="height: 150px;"></div>
+              <textarea id="id_description" name="description" class="form-control d-none" rows="3" placeholder="Describe what students will learn in this session" required>{% if form.description.value %}{{ form.description.value }}{% elif form.instance.description %}{{ form.instance.description }}{% endif %}</textarea>
             </div>
             
             <!-- Group Language and Level Selections -->
@@ -117,23 +138,23 @@
                   required>
               </div>
             </div>
-            
+
             <!-- Group Time Input -->
             <div class="col-md-6">
               <label for="session_time" class="form-label">Session Time</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="ti ti-clock"></i></span>
                 <input type="text" id="session_time" name="session_time" class="form-control p-4 flatpickr-time" 
-                  placeholder="HH:MM"
-                  {% if form.instance.start_time %}
-                  value="{{ form.instance.start_time|time:'H:i' }}"
-                  {% endif %}
-                  required>
+                       placeholder="HH:MM" 
+                       {% if form.instance.start_time %}
+                       value="{{ form.instance.start_time|time:'H:i' }}"
+                       {% endif %}
+                       required>
               </div>
             </div>
             
             <!-- Group Duration and Capacity -->
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label for="id_duration_minutes" class="form-label">Session Duration</label>
               <select id="id_duration_minutes" name="duration_minutes" class="form-select" required>
                 <option value="30" {% if form.duration_minutes.value == 30 or form.instance.duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
@@ -144,7 +165,7 @@
               </select>
             </div>
             
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label for="id_max_students" class="form-label">Maximum Students</label>
               <select id="id_max_students" name="max_students" class="form-select">
                 <option value="5" {% if form.max_students.value == 5 or form.instance.max_students == 5 %}selected{% endif %}>5 students</option>
@@ -156,7 +177,7 @@
             </div>
             
             <!-- Minimum Students -->
-            <div class="col-md-6">
+            <div class="col-md-4">
               <label for="id_min_students" class="form-label">Minimum Students</label>
               <select id="id_min_students" name="min_students" class="form-select">
                 <option value="1" {% if form.min_students.value == 1 or form.instance.min_students == 1 %}selected{% endif %}>1 student (no minimum)</option>
@@ -167,11 +188,57 @@
             </div>
             
             <!-- Tags for Group Session -->
-            <div class="col-md-6">
+            <div class="col-12">
               <label for="id_tags" class="form-label">Tags (optional)</label>
-              <input type="text" id="id_tags" name="tags" class="form-control" placeholder="e.g. conversation, grammar, business"
-                value="{% if form.tags.value %}{{ form.tags.value }}{% elif form.instance.tags %}{{ form.instance.tags }}{% endif %}">
+              <div class="input-group">
+                <input type="text" id="id_tags" name="tags" class="form-control" placeholder="e.g. conversation, grammar, business"
+                  value="{% if form.tags.value %}{{ form.tags.value }}{% elif form.instance.tags %}{{ form.instance.tags }}{% endif %}">
+                <button type="button" class="btn btn-outline-primary" id="generateTagsBtn">
+                  <i class="ti ti-tag me-1"></i> Auto-Generate
+                </button>
+              </div>
               <small class="text-muted">Comma-separated tags to help students find your session</small>
+            </div>
+          </div>
+          
+          <!-- Preview Card -->
+          <div class="card bg-light my-4">
+            <div class="card-header">
+              <h6 class="card-title mb-0">Session Preview</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="mb-2">
+                    <span class="fw-semibold">Title:</span> <span id="preview-title">{{ form.instance.title|default:"New Group Session" }}</span>
+                  </div>
+                  <div class="mb-2">
+                    <span class="fw-semibold">Description:</span> <span id="preview-description" class="d-block text-muted">{{ form.instance.description|default:"Enter a description to see preview" }}</span>
+                  </div>
+                  <div>
+                    <span class="fw-semibold">Format:</span> 
+                    <span id="preview-format">
+                      <span class="badge bg-label-success">Group</span>
+                      <span class="badge bg-label-primary" id="preview-language">{{ form.instance.get_language_display|default:"Select language" }}</span>
+                      <span class="badge bg-label-info" id="preview-level">{{ form.instance.get_level_display|default:"Select level" }}</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="col-md-4 border-start ps-4">
+                  <div class="mb-2">
+                    <span class="fw-semibold">Date:</span> <span id="preview-date">{{ form.instance.start_time|date:"M d, Y"|default:"Select date" }}</span>
+                  </div>
+                  <div class="mb-2">
+                    <span class="fw-semibold">Time:</span> <span id="preview-time">{{ form.instance.start_time|time:"g:i A"|default:"Select time" }}</span>
+                  </div>
+                  <div class="mb-2">
+                    <span class="fw-semibold">Duration:</span> <span id="preview-duration">{{ form.instance.duration_minutes|default:"60" }} minutes</span>
+                  </div>
+                  <div>
+                    <span class="fw-semibold">Capacity:</span> <span id="preview-capacity">{{ form.instance.max_students|default:"10" }} students</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -200,11 +267,128 @@
     </div>
   </div>
 </div>
+
+<!-- AI Title Generator Modal -->
+<div class="modal fade" id="aiTitleModal" tabindex="-1" aria-labelledby="aiTitleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiTitleModalLabel">Generate Session Title with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="titlePrompt" class="form-label">Describe your session</label>
+          <textarea id="titlePrompt" class="form-control" rows="3" placeholder="Briefly describe what your group session will cover (topics, activities, goals)"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="titleTone" class="form-label">Tone</label>
+          <select id="titleTone" class="form-select">
+            <option value="professional">Professional</option>
+            <option value="academic">Academic</option>
+            <option value="friendly">Friendly</option>
+            <option value="enthusiastic" selected>Enthusiastic</option>
+            <option value="concise">Concise</option>
+          </select>
+        </div>
+        
+        <div id="titleGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating title suggestions...</p>
+        </div>
+        
+        <div id="titleResults" class="d-none">
+          <label class="form-label">Choose a title:</label>
+          <div class="title-suggestions"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="generateTitleBtn">Generate Titles</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Description Generator Modal -->
+<div class="modal fade" id="aiDescriptionModal" tabindex="-1" aria-labelledby="aiDescriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiDescriptionModalLabel">Generate Session Description with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="descriptionPrompt" class="form-label">What would you like to generate?</label>
+          <textarea id="descriptionPrompt" class="form-control" rows="4" placeholder="Describe the content you'd like to include in your session description. Include goals, activities, target audience, etc."></textarea>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="descriptionTone" class="form-label">Tone</label>
+            <select id="descriptionTone" class="form-select">
+              <option value="professional">Professional</option>
+              <option value="academic">Academic</option>
+              <option value="friendly">Friendly</option>
+              <option value="enthusiastic" selected>Enthusiastic</option>
+              <option value="concise">Concise</option>
+            </select>
+          </div>
+          
+          <div class="col-md-6">
+            <label for="descriptionLength" class="form-label">Length</label>
+            <select id="descriptionLength" class="form-select">
+              <option value="150">Short</option>
+              <option value="250" selected>Medium</option>
+              <option value="400">Long</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="descriptionGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating description... This may take a moment.</p>
+        </div>
+        
+        <div id="descriptionResults" class="d-none">
+          <label class="form-label">Generated Description:</label>
+          <div class="card">
+            <div class="card-body">
+              <div id="descriptionPreview" class="border p-3 rounded bg-light" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success d-none" id="useDescriptionBtn">Use This Description</button>
+        <button type="button" class="btn btn-primary" id="generateDescriptionBtn">Generate Description</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block page_js_extra %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token for API requests
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
     // Initialize Select2 for dropdowns
     $('.select2').select2({
       placeholder: "Select an option",
@@ -219,7 +403,15 @@
         dateFormat: "Y-m-d",
         minDate: "today",
         altInput: true,
-        altFormat: "F j, Y"
+        altFormat: "F j, Y",
+        onChange: function(selectedDates, dateStr) {
+          // Update preview
+          if (selectedDates.length > 0) {
+            const date = new Date(selectedDates[0]);
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            document.getElementById('preview-date').textContent = date.toLocaleDateString('en-US', options);
+          }
+        }
       });
     });
   
@@ -233,15 +425,80 @@
         time_24hr: true,
         minuteIncrement: 15,
         altInput: true,
-        altFormat: "h:i K"
+        altFormat: "h:i K",
+        onChange: function(selectedDates, timeStr) {
+          // Update preview
+          if (timeStr) {
+            const time = new Date();
+            const [hours, minutes] = timeStr.split(':');
+            time.setHours(parseInt(hours, 10));
+            time.setMinutes(parseInt(minutes, 10));
+            const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+            document.getElementById('preview-time').textContent = time.toLocaleTimeString('en-US', options);
+          }
+        }
       });
     });
-  
+    
+    // Initialize Quill for description editor
+    const quill = new Quill('#description-editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline'],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+          ['link'],
+          ['clean']
+        ]
+      },
+      placeholder: 'Describe what students will learn in this session...'
+    });
+    
+    // Set initial content if available
+    const descriptionField = document.getElementById('id_description');
+    if (descriptionField.value) {
+      quill.root.innerHTML = descriptionField.value;
+      // Also update preview
+      document.getElementById('preview-description').innerHTML = quill.getText().substring(0, 150) + (quill.getText().length > 150 ? '...' : '');
+    }
+    
+    // Update hidden field when quill content changes
+    quill.on('text-change', function() {
+      descriptionField.value = quill.root.innerHTML;
+      // Update preview
+      document.getElementById('preview-description').innerHTML = quill.getText().substring(0, 150) + (quill.getText().length > 150 ? '...' : '');
+    });
+    
+    // Update preview when form fields change
+    document.getElementById('id_title').addEventListener('input', function() {
+      document.getElementById('preview-title').textContent = this.value || 'New Group Session';
+    });
+    
+    document.getElementById('id_language').addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      document.getElementById('preview-language').textContent = selectedOption.textContent || 'Select language';
+    });
+    
+    document.getElementById('id_level').addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      document.getElementById('preview-level').textContent = selectedOption.textContent || 'Select level';
+    });
+    
+    document.getElementById('id_duration_minutes').addEventListener('change', function() {
+      document.getElementById('preview-duration').textContent = this.value + ' minutes';
+    });
+    
+    document.getElementById('id_max_students').addEventListener('change', function() {
+      document.getElementById('preview-capacity').textContent = this.value + ' students';
+    });
+    
     // Validate form before submission
     const sessionForm = document.getElementById('groupSessionForm');
     sessionForm.addEventListener('submit', function(e) {
+      // Update the description field with Quill content
+      descriptionField.value = quill.root.innerHTML;
+      
       const title = document.getElementById('id_title');
-      const description = document.getElementById('id_description');
       const languageInput = document.getElementById('id_language');
       const levelInput = document.getElementById('id_level');
       const dateInput = document.getElementById('session_date');
@@ -253,7 +510,7 @@
         return false;
       }
       
-      if (!description.value || description.value.trim() === '') {
+      if (!quill.getText().trim()) {
         e.preventDefault();
         alert('Please provide a description for your group session');
         return false;
@@ -285,6 +542,206 @@
       
       // Allow the form to submit if validation passes
       return true;
+    });
+    
+    // Generate AI Title
+    const generateTitleBtn = document.getElementById('generateTitleBtn');
+    generateTitleBtn.addEventListener('click', function() {
+      const prompt = document.getElementById('titlePrompt').value;
+      const tone = document.getElementById('titleTone').value;
+      
+      if (!prompt) {
+        alert('Please enter a description of your session.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('titleGenerating').classList.remove('d-none');
+      document.getElementById('titleResults').classList.add('d-none');
+      generateTitleBtn.disabled = true;
+      
+      // Prepare the actual prompt
+      const titlePrompt = `Generate 3 engaging, catchy titles for a group language learning session about: ${prompt}. Each title should be concise, appealing to students, and clearly communicate the session focus.`;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_suggestions" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          text: titlePrompt,
+          suggestion_count: 3,
+          max_tokens: 100
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('titleGenerating').classList.add('d-none');
+        document.getElementById('titleResults').classList.remove('d-none');
+        generateTitleBtn.disabled = false;
+        
+        if (data.error) {
+          document.querySelector('.title-suggestions').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        const suggestionsContainer = document.querySelector('.title-suggestions');
+        suggestionsContainer.innerHTML = '';
+        
+        // Create buttons for each suggestion
+        data.suggestions.forEach((title, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-outline-primary w-100 mb-2 text-start';
+          btn.innerHTML = title;
+          btn.addEventListener('click', function() {
+            // Set the title in the form
+            document.getElementById('id_title').value = title;
+            // Update preview
+            document.getElementById('preview-title').textContent = title;
+            // Close the modal
+            bootstrap.Modal.getInstance(document.getElementById('aiTitleModal')).hide();
+          });
+          suggestionsContainer.appendChild(btn);
+        });
+      })
+      .catch(error => {
+        document.getElementById('titleGenerating').classList.add('d-none');
+        document.querySelector('.title-suggestions').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        generateTitleBtn.disabled = false;
+      });
+    });
+    
+    // Generate AI Description
+    const generateDescriptionBtn = document.getElementById('generateDescriptionBtn');
+    const useDescriptionBtn = document.getElementById('useDescriptionBtn');
+    let generatedDescription = '';
+    
+    generateDescriptionBtn.addEventListener('click', function() {
+      const prompt = document.getElementById('descriptionPrompt').value;
+      const tone = document.getElementById('descriptionTone').value;
+      const maxTokens = document.getElementById('descriptionLength').value;
+      
+      if (!prompt) {
+        alert('Please describe what content you would like to generate.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('descriptionGenerating').classList.remove('d-none');
+      document.getElementById('descriptionResults').classList.add('d-none');
+      useDescriptionBtn.classList.add('d-none');
+      generateDescriptionBtn.disabled = true;
+      
+      // Prepare the actual prompt
+      const descriptionPrompt = `Write a compelling description for a group language learning session with the following details: ${prompt}. The description should be engaging, clearly explain what students will learn, and motivate them to join. Include what they'll gain from the session and any specific activities if mentioned.`;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_text" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          prompt: descriptionPrompt,
+          tone: tone,
+          max_tokens: parseInt(maxTokens)
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('descriptionGenerating').classList.add('d-none');
+        document.getElementById('descriptionResults').classList.remove('d-none');
+        generateDescriptionBtn.disabled = false;
+        useDescriptionBtn.classList.remove('d-none');
+        
+        if (data.error) {
+          document.getElementById('descriptionPreview').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        // Store the generated content
+        generatedDescription = data.text;
+        
+        // Display the generated content
+        document.getElementById('descriptionPreview').innerHTML = generatedDescription.replace(/\n/g, '<br>');
+      })
+      .catch(error => {
+        document.getElementById('descriptionGenerating').classList.add('d-none');
+        document.getElementById('descriptionPreview').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        generateDescriptionBtn.disabled = false;
+      });
+    });
+    
+    // Use the generated description
+    useDescriptionBtn.addEventListener('click', function() {
+      // Set the content in Quill
+      quill.setText(''); // Clear first
+      quill.clipboard.dangerouslyPasteHTML(0, generatedDescription.replace(/\n/g, '<br>'));
+      
+      // Update the hidden field
+      document.getElementById('id_description').value = quill.root.innerHTML;
+      
+      // Update preview
+      document.getElementById('preview-description').innerHTML = quill.getText().substring(0, 150) + (quill.getText().length > 150 ? '...' : '');
+      
+      // Close the modal
+      bootstrap.Modal.getInstance(document.getElementById('aiDescriptionModal')).hide();
+    });
+    
+    // Auto-generate tags from description
+    document.getElementById('generateTagsBtn').addEventListener('click', function() {
+      const description = quill.getText();
+      const title = document.getElementById('id_title').value;
+      
+      if ((!description || description.trim().length < 30) && (!title || title.trim().length < 5)) {
+        alert('Please add a title and description before generating tags.');
+        return;
+      }
+      
+      this.disabled = true;
+      this.innerHTML = '<i class="ti ti-loader ti-spin me-1"></i> Generating...';
+      
+      // Prepare prompt based on available content
+      let prompt = 'Extract 5-8 key keywords or tags for a language learning session, separated by commas.';
+      if (title) prompt += `\nTitle: ${title}`;
+      if (description) prompt += `\nDescription: ${description.substring(0, 500)}`;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_text" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          tone: 'concise',
+          max_tokens: 100
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        this.disabled = false;
+        this.innerHTML = '<i class="ti ti-tag me-1"></i> Auto-Generate';
+        
+        if (data.error) {
+          alert(`Error generating tags: ${data.error}`);
+          return;
+        }
+        
+        // Set the tags in the form
+        document.getElementById('id_tags').value = data.text.replace(/\n/g, '').trim();
+      })
+      .catch(error => {
+        this.disabled = false;
+        this.innerHTML = '<i class="ti ti-tag me-1"></i> Auto-Generate';
+        alert(`Error: ${error.message}`);
+      });
     });
   });
 </script>

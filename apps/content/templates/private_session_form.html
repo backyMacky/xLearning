@@ -9,6 +9,7 @@
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/spinkit/spinkit.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
@@ -32,6 +33,11 @@
         <form method="post" id="privateSessionForm" action="{% if is_update %}{% url 'content:update_private_session' session_id=form.instance.id %}{% else %}{% url 'content:create_private_session' %}{% endif %}">
           {% csrf_token %}
           
+          <!-- Hidden AI fields -->
+          {{ form.use_ai }}
+          {{ form.ai_prompt }}
+          {{ form.ai_tone }}
+          
           {% if form.errors %}
           <div class="alert alert-danger">
             <div class="alert-body">
@@ -54,87 +60,172 @@
           {% endif %}
 
           <div class="row g-3">
-            <!-- Language and Level Selections -->
-            <div class="col-md-6">
-              <label for="id_language" class="form-label">Teaching Language</label>
-              <select id="id_language" name="language" class="form-select select2" required>
-                <option value="">Select language</option>
-                <option value="en" {% if form.language.value == 'en' or form.instance.language == 'en' %}selected{% endif %}>English</option>
-                <option value="fr" {% if form.language.value == 'fr' or form.instance.language == 'fr' %}selected{% endif %}>French</option>
-                <option value="es" {% if form.language.value == 'es' or form.instance.language == 'es' %}selected{% endif %}>Spanish</option>
-                <option value="de" {% if form.language.value == 'de' or form.instance.language == 'de' %}selected{% endif %}>German</option>
-                <option value="it" {% if form.language.value == 'it' or form.instance.language == 'it' %}selected{% endif %}>Italian</option>
-                <option value="pt" {% if form.language.value == 'pt' or form.instance.language == 'pt' %}selected{% endif %}>Portuguese</option>
-                <option value="ru" {% if form.language.value == 'ru' or form.instance.language == 'ru' %}selected{% endif %}>Russian</option>
-                <option value="zh" {% if form.language.value == 'zh' or form.instance.language == 'zh' %}selected{% endif %}>Chinese</option>
-                <option value="ja" {% if form.language.value == 'ja' or form.instance.language == 'ja' %}selected{% endif %}>Japanese</option>
-                <option value="ko" {% if form.language.value == 'ko' or form.instance.language == 'ko' %}selected{% endif %}>Korean</option>
-                <option value="ar" {% if form.language.value == 'ar' or form.instance.language == 'ar' %}selected{% endif %}>Arabic</option>
-                <option value="hi" {% if form.language.value == 'hi' or form.instance.language == 'hi' %}selected{% endif %}>Hindi</option>
-                <option value="sw" {% if form.language.value == 'sw' or form.instance.language == 'sw' %}selected{% endif %}>Swahili</option>
-              </select>
-            </div>
-            
-            <div class="col-md-6">
-              <label for="id_level" class="form-label">Proficiency Level</label>
-              <select id="id_level" name="level" class="form-select select2" required>
-                <option value="">Select level</option>
-                <option value="A1" {% if form.level.value == 'A1' or form.instance.level == 'A1' %}selected{% endif %}>A1 - Beginner</option>
-                <option value="A2" {% if form.level.value == 'A2' or form.instance.level == 'A2' %}selected{% endif %}>A2 - Elementary</option>
-                <option value="B1" {% if form.level.value == 'B1' or form.instance.level == 'B1' %}selected{% endif %}>B1 - Intermediate</option>
-                <option value="B2" {% if form.level.value == 'B2' or form.instance.level == 'B2' %}selected{% endif %}>B2 - Upper Intermediate</option>
-                <option value="C1" {% if form.level.value == 'C1' or form.instance.level == 'C1' %}selected{% endif %}>C1 - Advanced</option>
-                <option value="C2" {% if form.level.value == 'C2' or form.instance.level == 'C2' %}selected{% endif %}>C2 - Proficient</option>
-              </select>
-            </div>
-            
-            <!-- Date Input -->
-            <div class="col-md-6">
-              <label for="session_date" class="form-label">Session Date</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="ti ti-calendar"></i></span>
-                <input type="date" id="session_date" name="session_date" class="form-control flatpickr-date" 
-                  placeholder="YYYY-MM-DD" 
-                  {% if form.instance.start_time %}
-                  value="{{ form.instance.start_time|date:'Y-m-d' }}"
-                  {% endif %}
-                  required>
-              </div>
-            </div>
+            <!-- Session Details Tabs -->
+            <div class="col-12 mb-3">
+              <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="session-details-tab" data-bs-toggle="tab" data-bs-target="#session-details" type="button" role="tab" aria-controls="session-details" aria-selected="true">
+                    Session Details
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="session-description-tab" data-bs-toggle="tab" data-bs-target="#session-description" type="button" role="tab" aria-controls="session-description" aria-selected="false">
+                    Session Description
+                  </button>
+                </li>
+              </ul>
+              
+              <div class="tab-content">
+                <!-- Session Details Tab -->
+                <div class="tab-pane fade show active pt-3" id="session-details" role="tabpanel" aria-labelledby="session-details-tab">
+                  <!-- Language and Level Selections -->
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label for="id_language" class="form-label">Teaching Language</label>
+                      <select id="id_language" name="language" class="form-select select2" required>
+                        <option value="">Select language</option>
+                        <option value="en" {% if form.language.value == 'en' or form.instance.language == 'en' %}selected{% endif %}>English</option>
+                        <option value="fr" {% if form.language.value == 'fr' or form.instance.language == 'fr' %}selected{% endif %}>French</option>
+                        <option value="es" {% if form.language.value == 'es' or form.instance.language == 'es' %}selected{% endif %}>Spanish</option>
+                        <option value="de" {% if form.language.value == 'de' or form.instance.language == 'de' %}selected{% endif %}>German</option>
+                        <option value="it" {% if form.language.value == 'it' or form.instance.language == 'it' %}selected{% endif %}>Italian</option>
+                        <option value="pt" {% if form.language.value == 'pt' or form.instance.language == 'pt' %}selected{% endif %}>Portuguese</option>
+                        <option value="ru" {% if form.language.value == 'ru' or form.instance.language == 'ru' %}selected{% endif %}>Russian</option>
+                        <option value="zh" {% if form.language.value == 'zh' or form.instance.language == 'zh' %}selected{% endif %}>Chinese</option>
+                        <option value="ja" {% if form.language.value == 'ja' or form.instance.language == 'ja' %}selected{% endif %}>Japanese</option>
+                        <option value="ko" {% if form.language.value == 'ko' or form.instance.language == 'ko' %}selected{% endif %}>Korean</option>
+                        <option value="ar" {% if form.language.value == 'ar' or form.instance.language == 'ar' %}selected{% endif %}>Arabic</option>
+                        <option value="hi" {% if form.language.value == 'hi' or form.instance.language == 'hi' %}selected{% endif %}>Hindi</option>
+                        <option value="sw" {% if form.language.value == 'sw' or form.instance.language == 'sw' %}selected{% endif %}>Swahili</option>
+                      </select>
+                    </div>
+                    
+                    <div class="col-md-6">
+                      <label for="id_level" class="form-label">Proficiency Level</label>
+                      <select id="id_level" name="level" class="form-select select2" required>
+                        <option value="">Select level</option>
+                        <option value="A1" {% if form.level.value == 'A1' or form.instance.level == 'A1' %}selected{% endif %}>A1 - Beginner</option>
+                        <option value="A2" {% if form.level.value == 'A2' or form.instance.level == 'A2' %}selected{% endif %}>A2 - Elementary</option>
+                        <option value="B1" {% if form.level.value == 'B1' or form.instance.level == 'B1' %}selected{% endif %}>B1 - Intermediate</option>
+                        <option value="B2" {% if form.level.value == 'B2' or form.instance.level == 'B2' %}selected{% endif %}>B2 - Upper Intermediate</option>
+                        <option value="C1" {% if form.level.value == 'C1' or form.instance.level == 'C1' %}selected{% endif %}>C1 - Advanced</option>
+                        <option value="C2" {% if form.level.value == 'C2' or form.instance.level == 'C2' %}selected{% endif %}>C2 - Proficient</option>
+                      </select>
+                    </div>
+                    
+                    <!-- Date Input -->
+                    <div class="col-md-6">
+                      <label for="session_date" class="form-label">Session Date</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="ti ti-calendar"></i></span>
+                        <input type="date" id="session_date" name="session_date" class="form-control flatpickr-date" 
+                          placeholder="YYYY-MM-DD" 
+                          {% if form.instance.start_time %}
+                          value="{{ form.instance.start_time|date:'Y-m-d' }}"
+                          {% endif %}
+                          required>
+                      </div>
+                    </div>
 
-            <!-- Time Input -->
-            <div class="col-md-6">
-              <label for="session_time" class="form-label">Session Time</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="ti ti-clock"></i></span>
-                <input type="text" id="session_time" name="session_time" class="form-control p-4 flatpickr-time" 
-                       placeholder="HH:MM" 
-                       {% if form.instance.start_time %}
-                       value="{{ form.instance.start_time|time:'H:i' }}"
-                       {% endif %}
-                       required>
+                    <!-- Time Input -->
+                    <div class="col-md-6">
+                      <label for="session_time" class="form-label">Session Time</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="ti ti-clock"></i></span>
+                        <input type="text" id="session_time" name="session_time" class="form-control p-4 flatpickr-time" 
+                               placeholder="HH:MM" 
+                               {% if form.instance.start_time %}
+                               value="{{ form.instance.start_time|time:'H:i' }}"
+                               {% endif %}
+                               required>
+                      </div>
+                    </div>
+                    
+                    <!-- Duration Selection -->
+                    <div class="col-md-6">
+                      <label for="id_duration_minutes" class="form-label">Session Duration</label>
+                      <select id="id_duration_minutes" name="duration_minutes" class="form-select" required>
+                        <option value="30" {% if form.duration_minutes.value == 30 or form.instance.duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
+                        <option value="45" {% if form.duration_minutes.value == 45 or form.instance.duration_minutes == 45 %}selected{% endif %}>45 minutes</option>
+                        <option value="60" {% if form.duration_minutes.value == 60 or form.instance.duration_minutes == 60 or not form.instance.duration_minutes %}selected{% endif %}>1 hour</option>
+                        <option value="90" {% if form.duration_minutes.value == 90 or form.instance.duration_minutes == 90 %}selected{% endif %}>1.5 hours</option>
+                        <option value="120" {% if form.duration_minutes.value == 120 or form.instance.duration_minutes == 120 %}selected{% endif %}>2 hours</option>
+                      </select>
+                    </div>
+                    
+                    <!-- Trial Session Checkbox -->
+                    <div class="col-md-6">
+                      <div class="form-check form-switch mt-4">
+                        <input type="checkbox" class="form-check-input" id="id_is_trial" name="is_trial" {% if form.is_trial.value %}checked{% endif %}>
+                        <label class="form-check-label" for="id_is_trial">Trial Session</label>
+                      </div>
+                      <small class="text-muted">Mark as a trial session for new students</small>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Session Description Tab -->
+                <div class="tab-pane fade pt-3" id="session-description" role="tabpanel" aria-labelledby="session-description-tab">
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label for="session_description" class="form-label">Session Description (Optional)</label>
+                      <div class="input-group">
+                        <textarea id="session_description" name="session_description" class="form-control" rows="4" placeholder="Describe what you'll cover in this session...">{{ form.instance.description|default:"" }}</textarea>
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#aiDescriptionModal">
+                          <i class="ti ti-bulb me-1"></i> AI Assist
+                        </button>
+                      </div>
+                      <small class="text-muted">Provide details about what will be covered in this private session.</small>
+                    </div>
+                    
+                    <div class="col-12">
+                      <label for="session_goals" class="form-label">Learning Goals (Optional)</label>
+                      <div class="input-group">
+                        <textarea id="session_goals" name="session_goals" class="form-control" rows="3" placeholder="What will students learn in this session?">{{ form.instance.learning_goals|default:"" }}</textarea>
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#aiGoalsModal">
+                          <i class="ti ti-bulb me-1"></i> AI Assist
+                        </button>
+                      </div>
+                      <small class="text-muted">Bullet points are fine. These will be shared with the student when they book.</small>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <!-- Duration Selection -->
-            <div class="col-md-6">
-              <label for="id_duration_minutes" class="form-label">Session Duration</label>
-              <select id="id_duration_minutes" name="duration_minutes" class="form-select" required>
-                <option value="30" {% if form.duration_minutes.value == 30 or form.instance.duration_minutes == 30 %}selected{% endif %}>30 minutes</option>
-                <option value="45" {% if form.duration_minutes.value == 45 or form.instance.duration_minutes == 45 %}selected{% endif %}>45 minutes</option>
-                <option value="60" {% if form.duration_minutes.value == 60 or form.instance.duration_minutes == 60 or not form.instance.duration_minutes %}selected{% endif %}>1 hour</option>
-                <option value="90" {% if form.duration_minutes.value == 90 or form.instance.duration_minutes == 90 %}selected{% endif %}>1.5 hours</option>
-                <option value="120" {% if form.duration_minutes.value == 120 or form.instance.duration_minutes == 120 %}selected{% endif %}>2 hours</option>
-              </select>
+          </div>
+          
+          <!-- Session Preview Card -->
+          <div class="card bg-light my-4">
+            <div class="card-header">
+              <h6 class="card-title mb-0">Session Preview</h6>
             </div>
-            
-            <!-- Trial Session Checkbox -->
-            <div class="col-md-6">
-              <div class="form-check form-switch mt-4">
-                <input type="checkbox" class="form-check-input" id="id_is_trial" name="is_trial" {% if form.is_trial.value %}checked{% endif %}>
-                <label class="form-check-label" for="id_is_trial">Trial Session</label>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="mb-2">
+                    <span class="fw-semibold">Type:</span> 
+                    <span id="preview-type">Private 1-on-1 Session</span>
+                  </div>
+                  <div class="mb-2">
+                    <span class="fw-semibold">Format:</span> 
+                    <span id="preview-format">
+                      <span class="badge bg-label-primary" id="preview-language">{{ form.instance.get_language_display|default:"Select language" }}</span>
+                      <span class="badge bg-label-info" id="preview-level">{{ form.instance.get_level_display|default:"Select level" }}</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="col-md-4 border-start ps-4">
+                  <div class="mb-2">
+                    <span class="fw-semibold">Date:</span> <span id="preview-date">{{ form.instance.start_time|date:"M d, Y"|default:"Select date" }}</span>
+                  </div>
+                  <div class="mb-2">
+                    <span class="fw-semibold">Time:</span> <span id="preview-time">{{ form.instance.start_time|time:"g:i A"|default:"Select time" }}</span>
+                  </div>
+                  <div class="mb-2">
+                    <span class="fw-semibold">Duration:</span> <span id="preview-duration">{{ form.instance.duration_minutes|default:"60" }} minutes</span>
+                  </div>
+                </div>
               </div>
-              <small class="text-muted">Mark as a trial session for new students</small>
             </div>
           </div>
           
@@ -163,11 +254,121 @@
     </div>
   </div>
 </div>
+
+<!-- AI Description Generator Modal -->
+<div class="modal fade" id="aiDescriptionModal" tabindex="-1" aria-labelledby="aiDescriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiDescriptionModalLabel">Generate Session Description with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="descriptionPrompt" class="form-label">What would you like to include in your session description?</label>
+          <textarea id="descriptionPrompt" class="form-control" rows="3" placeholder="Describe the topics, activities, or focus areas for this private session"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="descriptionTone" class="form-label">Tone</label>
+          <select id="descriptionTone" class="form-select">
+            <option value="professional">Professional</option>
+            <option value="academic">Academic</option>
+            <option value="friendly" selected>Friendly</option>
+            <option value="enthusiastic">Enthusiastic</option>
+            <option value="concise">Concise</option>
+          </select>
+        </div>
+        
+        <div id="descriptionGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating description...</p>
+        </div>
+        
+        <div id="descriptionResults" class="d-none">
+          <label class="form-label">Generated Description:</label>
+          <div class="card">
+            <div class="card-body">
+              <div id="descriptionPreview" class="border p-3 rounded bg-light" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success d-none" id="useDescriptionBtn">Use This Description</button>
+        <button type="button" class="btn btn-primary" id="generateDescriptionBtn">Generate Description</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Learning Goals Generator Modal -->
+<div class="modal fade" id="aiGoalsModal" tabindex="-1" aria-labelledby="aiGoalsModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiGoalsModalLabel">Generate Learning Goals with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="goalsPrompt" class="form-label">What will students learn in this session?</label>
+          <textarea id="goalsPrompt" class="form-control" rows="3" placeholder="Describe the key learning outcomes or skills students will gain from this session"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="goalsTone" class="form-label">Tone</label>
+          <select id="goalsTone" class="form-select">
+            <option value="professional">Professional</option>
+            <option value="academic">Academic</option>
+            <option value="friendly" selected>Friendly</option>
+            <option value="concise">Concise</option>
+          </select>
+        </div>
+        
+        <div id="goalsGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating learning goals...</p>
+        </div>
+        
+        <div id="goalsResults" class="d-none">
+          <label class="form-label">Generated Learning Goals:</label>
+          <div class="card">
+            <div class="card-body">
+              <div id="goalsPreview" class="border p-3 rounded bg-light" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success d-none" id="useGoalsBtn">Use These Goals</button>
+        <button type="button" class="btn btn-primary" id="generateGoalsBtn">Generate Goals</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block page_js_extra %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token for API requests
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
     // Initialize Select2 for dropdowns
     $('.select2').select2({
       placeholder: "Select an option",
@@ -182,7 +383,14 @@
         dateFormat: "Y-m-d",
         minDate: "today",
         altInput: true,
-        altFormat: "F j, Y"
+        altFormat: "F j, Y",
+        onChange: function(selectedDates) {
+          if (selectedDates.length > 0) {
+            const date = new Date(selectedDates[0]);
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            document.getElementById('preview-date').textContent = date.toLocaleDateString('en-US', options);
+          }
+        }
       });
     });
   
@@ -196,10 +404,35 @@
         time_24hr: true,
         minuteIncrement: 15,
         altInput: true,
-        altFormat: "h:i K"
+        altFormat: "h:i K",
+        onChange: function(selectedDates, timeStr) {
+          if (timeStr) {
+            const time = new Date();
+            const [hours, minutes] = timeStr.split(':');
+            time.setHours(parseInt(hours, 10));
+            time.setMinutes(parseInt(minutes, 10));
+            const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+            document.getElementById('preview-time').textContent = time.toLocaleTimeString('en-US', options);
+          }
+        }
       });
     });
   
+    // Update preview when form fields change
+    document.getElementById('id_language').addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      document.getElementById('preview-language').textContent = selectedOption.textContent || 'Select language';
+    });
+    
+    document.getElementById('id_level').addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      document.getElementById('preview-level').textContent = selectedOption.textContent || 'Select level';
+    });
+    
+    document.getElementById('id_duration_minutes').addEventListener('change', function() {
+      document.getElementById('preview-duration').textContent = this.value + ' minutes';
+    });
+    
     // Validate form before submission
     const sessionForm = document.getElementById('privateSessionForm');
     sessionForm.addEventListener('submit', function(e) {
@@ -234,6 +467,148 @@
       
       // Allow the form to submit if validation passes
       return true;
+    });
+    
+    // Generate AI Description
+    const generateDescriptionBtn = document.getElementById('generateDescriptionBtn');
+    const useDescriptionBtn = document.getElementById('useDescriptionBtn');
+    let generatedDescription = '';
+    
+    generateDescriptionBtn.addEventListener('click', function() {
+      const prompt = document.getElementById('descriptionPrompt').value;
+      const tone = document.getElementById('descriptionTone').value;
+      
+      if (!prompt) {
+        alert('Please describe what you would like to include in your session description.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('descriptionGenerating').classList.remove('d-none');
+      document.getElementById('descriptionResults').classList.add('d-none');
+      useDescriptionBtn.classList.add('d-none');
+      generateDescriptionBtn.disabled = true;
+      
+      // Prepare the actual prompt
+      const descriptionPrompt = `Write a brief description for a private 1-on-1 language learning session with the following details: ${prompt}. The description should be engaging, clear, and help students understand what to expect in this session.`;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_text" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          prompt: descriptionPrompt,
+          tone: tone,
+          max_tokens: 250
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('descriptionGenerating').classList.add('d-none');
+        document.getElementById('descriptionResults').classList.remove('d-none');
+        generateDescriptionBtn.disabled = false;
+        useDescriptionBtn.classList.remove('d-none');
+        
+        if (data.error) {
+          document.getElementById('descriptionPreview').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        // Store the generated content
+        generatedDescription = data.text;
+        
+        // Display the generated content
+        document.getElementById('descriptionPreview').innerHTML = generatedDescription.replace(/\n/g, '<br>');
+      })
+      .catch(error => {
+        document.getElementById('descriptionGenerating').classList.add('d-none');
+        document.getElementById('descriptionPreview').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        generateDescriptionBtn.disabled = false;
+      });
+    });
+    
+    // Use the generated description
+    useDescriptionBtn.addEventListener('click', function() {
+      // Set the description in the form
+      document.getElementById('session_description').value = generatedDescription;
+      
+      // Close the modal
+      bootstrap.Modal.getInstance(document.getElementById('aiDescriptionModal')).hide();
+    });
+    
+    // Generate AI Learning Goals
+    const generateGoalsBtn = document.getElementById('generateGoalsBtn');
+    const useGoalsBtn = document.getElementById('useGoalsBtn');
+    let generatedGoals = '';
+    
+    generateGoalsBtn.addEventListener('click', function() {
+      const prompt = document.getElementById('goalsPrompt').value;
+      const tone = document.getElementById('goalsTone').value;
+      
+      if (!prompt) {
+        alert('Please describe what students will learn in this session.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('goalsGenerating').classList.remove('d-none');
+      document.getElementById('goalsResults').classList.add('d-none');
+      useGoalsBtn.classList.add('d-none');
+      generateGoalsBtn.disabled = true;
+      
+      // Prepare the actual prompt
+      const goalsPrompt = `Create a clear, concise list of 3-5 learning goals or outcomes for a language learning session focused on: ${prompt}. Format each goal as a bullet point starting with "•" and use action verbs to describe what students will be able to do after the session.`;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_text" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          prompt: goalsPrompt,
+          tone: tone,
+          max_tokens: 200
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('goalsGenerating').classList.add('d-none');
+        document.getElementById('goalsResults').classList.remove('d-none');
+        generateGoalsBtn.disabled = false;
+        useGoalsBtn.classList.remove('d-none');
+        
+        if (data.error) {
+          document.getElementById('goalsPreview').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        // Store the generated content
+        generatedGoals = data.text;
+        
+        // Display the generated content
+        document.getElementById('goalsPreview').innerHTML = generatedGoals.replace(/\n/g, '<br>');
+      })
+      .catch(error => {
+        document.getElementById('goalsGenerating').classList.add('d-none');
+        document.getElementById('goalsPreview').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        generateGoalsBtn.disabled = false;
+      });
+    });
+    
+    // Use the generated goals
+    useGoalsBtn.addEventListener('click', function() {
+      // Set the goals in the form
+      document.getElementById('session_goals').value = generatedGoals;
+      
+      // Close the modal
+      bootstrap.Modal.getInstance(document.getElementById('aiGoalsModal')).hide();
     });
   });
 </script>

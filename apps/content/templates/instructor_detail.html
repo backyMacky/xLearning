@@ -5,16 +5,6 @@
 
 {% block title %}{{ instructor.user.username }} - Instructor Profile{% endblock title %}
 
-{% block vendor_css %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
-{% endblock vendor_css %}
-
-{% block vendor_js %}
-{{ block.super }}
-<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
-{% endblock vendor_js %}
-
 {% block content %}
 <div class="row">
   <!-- Instructor Information -->
@@ -302,7 +292,7 @@
                   </div>
                 </div>
                 <small class="text-muted mb-2 d-block">{{ review.created_at|date:"M d, Y" }}</small>
-                <p class="mb-0">{{ review.comment }}</p>
+                <p class="mb-0">{{ review.comment|safe }}</p>
               </div>
             </div>
           {% endfor %}
@@ -366,7 +356,7 @@
       </div>
       <div class="card-body">
         {% if instructor.teaching_style %}
-          <p>{{ instructor.teaching_style }}</p>
+          <p>{{ instructor.teaching_style|safe }}</p>
         {% else %}
           <div class="text-center py-3">
             <p class="mb-0">No teaching style information available</p>

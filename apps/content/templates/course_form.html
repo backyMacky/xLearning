@@ -3,13 +3,14 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% if course %}Edit Session: {{ course.title }}{% else %}Create New Session{% endif %} - Learning Platform{% endblock title %}
+{% block title %}{% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %} - Learning Platform{% endblock title %}
 
 {% block vendor_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/dropzone/dropzone.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/spinkit/spinkit.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
@@ -28,8 +29,13 @@
     </a>
   </div>
   <div class="card-body">
-    <form method="post" enctype="multipart/form-data" id="sessionForm">
+    <form method="post" enctype="multipart/form-data" id="courseForm">
       {% csrf_token %}
+      
+      <!-- Hidden AI fields -->
+      {{ form.use_ai }}
+      {{ form.ai_prompt }}
+      {{ form.ai_tone }}
       
       <!-- Form errors -->
       {% if form.errors %}
@@ -53,16 +59,21 @@
       {% endif %}
       
       <div class="row g-4">
-        <!-- Session Title -->
+        <!-- Course Title -->
         <div class="col-12">
-          <label for="{{ form.title.id_for_label }}" class="form-label">Session Title</label>
-          {{ form.title }}
+          <label for="{{ form.title.id_for_label }}" class="form-label">Course Title</label>
+          <div class="input-group">
+            {{ form.title }}
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#aiTitleModal">
+              <i class="ti ti-bulb me-1"></i> AI Assist
+            </button>
+          </div>
           {% if form.title.help_text %}
           <small class="form-text text-muted">{{ form.title.help_text }}</small>
           {% endif %}
         </div>
         
-        <!-- Session Language and Level -->
+        <!-- Course Language and Level -->
         <div class="col-md-6">
           <label for="{{ form.language.id_for_label }}" class="form-label">Language</label>
           <select name="language" id="{{ form.language.id_for_label }}" class="form-select" required>
@@ -88,9 +99,9 @@
           {% endif %}
         </div>
         
-        <!-- Session Duration -->
+        <!-- Course Duration -->
         <div class="col-md-6">
-          <label for="session_duration" class="form-label">Duration</label>
+          <label for="course_duration" class="form-label">Duration</label>
           <div class="row">
             <div class="col-6">
               <select name="duration_hours" id="duration_hours" class="form-select">
@@ -117,11 +128,11 @@
         
         <!-- Instructor Image -->
         <div class="col-md-6">
-          <label for="{{ form.image.id_for_label }}" class="form-label">Instructor Image</label>
+          <label for="{{ form.image.id_for_label }}" class="form-label">Course Image</label>
           <div class="input-group">
             {{ form.image }}
           </div>
-          <small class="form-text text-muted">Upload your profile image or a session-relevant image</small>
+          <small class="form-text text-muted">Upload a course image (recommended size: 1200x600px)</small>
           
           {% if course and course.image %}
           <div class="mt-2">
@@ -131,25 +142,36 @@
           {% endif %}
         </div>
         
-        <!-- Session Description -->
+        <!-- Course Description -->
         <div class="col-12">
-          <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
-          {{ form.description }}
+          <label for="description-editor" class="form-label">Description</label>
+          <div class="d-flex align-items-center mb-1">
+            <div class="flex-grow-1">
+              <div class="editor-toolbar"></div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#aiDescriptionModal">
+                <i class="ti ti-bulb me-1"></i> AI Assist
+              </button>
+            </div>
+          </div>
+          <div id="description-editor" style="height: 200px;"></div>
+          <textarea id="id_description" name="description" class="form-control d-none" rows="5" placeholder="Course Description" required>{% if form.description.value %}{{ form.description.value }}{% elif form.instance.description %}{{ form.instance.description }}{% endif %}</textarea>
           {% if form.description.help_text %}
           <small class="form-text text-muted">{{ form.description.help_text }}</small>
           {% endif %}
         </div>
         
-        <!-- Session Settings -->
+        <!-- Course Settings -->
         <div class="col-12">
-          <h6 class="fw-semibold">Session Settings</h6>
+          <h6 class="fw-semibold">Course Settings</h6>
           <div class="row">
             <div class="col-md-6">
               <div class="form-check form-switch mb-2">
                 {{ form.is_published }}
                 <label class="form-check-label" for="{{ form.is_published.id_for_label }}">
                   Published
-                  <small class="d-block text-muted">Make this session visible to students</small>
+                  <small class="d-block text-muted">Make this course visible to students</small>
                 </label>
               </div>
             </div>
@@ -158,7 +180,7 @@
                 {{ form.is_featured }}
                 <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
                   Featured
-                  <small class="d-block text-muted">Highlight this session on the platform</small>
+                  <small class="d-block text-muted">Highlight this course on the platform</small>
                 </label>
               </div>
             </div>
@@ -249,16 +271,133 @@
   </div>
 </div>
 {% endif %}
+
+<!-- AI Title Generator Modal -->
+<div class="modal fade" id="aiTitleModal" tabindex="-1" aria-labelledby="aiTitleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiTitleModalLabel">Generate Course Title with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="titlePrompt" class="form-label">Describe your course</label>
+          <textarea id="titlePrompt" class="form-control" rows="3" placeholder="Briefly describe what your course will cover, the language, level, and target audience"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="titleTone" class="form-label">Tone</label>
+          <select id="titleTone" class="form-select">
+            <option value="professional">Professional</option>
+            <option value="academic">Academic</option>
+            <option value="friendly" selected>Friendly</option>
+            <option value="enthusiastic">Enthusiastic</option>
+            <option value="concise">Concise</option>
+          </select>
+        </div>
+        
+        <div id="titleGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating title suggestions...</p>
+        </div>
+        
+        <div id="titleResults" class="d-none">
+          <label class="form-label">Choose a title:</label>
+          <div class="title-suggestions"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="generateTitleBtn">Generate Titles</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Description Generator Modal -->
+<div class="modal fade" id="aiDescriptionModal" tabindex="-1" aria-labelledby="aiDescriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiDescriptionModalLabel">Generate Course Description with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="descriptionPrompt" class="form-label">What would you like to generate?</label>
+          <textarea id="descriptionPrompt" class="form-control" rows="4" placeholder="Describe the content of your course, target audience, learning outcomes, teaching style, etc."></textarea>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="descriptionTone" class="form-label">Tone</label>
+            <select id="descriptionTone" class="form-select">
+              <option value="professional">Professional</option>
+              <option value="academic">Academic</option>
+              <option value="friendly" selected>Friendly</option>
+              <option value="enthusiastic">Enthusiastic</option>
+              <option value="concise">Concise</option>
+            </select>
+          </div>
+          
+          <div class="col-md-6">
+            <label for="descriptionLength" class="form-label">Length</label>
+            <select id="descriptionLength" class="form-select">
+              <option value="150">Short</option>
+              <option value="300" selected>Medium</option>
+              <option value="500">Long</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="descriptionGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating description... This may take a moment.</p>
+        </div>
+        
+        <div id="descriptionResults" class="d-none">
+          <label class="form-label">Generated Description:</label>
+          <div class="card">
+            <div class="card-body">
+              <div id="descriptionPreview" class="border p-3 rounded bg-light" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success d-none" id="useDescriptionBtn">Use This Description</button>
+        <button type="button" class="btn btn-primary" id="generateDescriptionBtn">Generate Description</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block page_js_extra %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token for API requests
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
     // Initialize select2 for dropdowns
     $('.form-select').select2();
     
     // Initialize rich text editor for description
-    var quill = new Quill('#{{ form.description.id_for_label }}', {
+    var quill = new Quill('#description-editor', {
       modules: {
         toolbar: [
           [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -272,8 +411,14 @@
       theme: 'snow'
     });
     
+    // Set initial content if available
+    const descriptionField = document.querySelector('#id_description');
+    if (descriptionField.value) {
+      quill.root.innerHTML = descriptionField.value;
+    }
+    
     // Sync Quill editor with hidden textarea for form submission
-    var form = document.getElementById('sessionForm');
+    var form = document.getElementById('courseForm');
     form.addEventListener('submit', function() {
       var descriptionInput = document.querySelector('textarea[name="description"]');
       descriptionInput.value = quill.root.innerHTML;
@@ -297,6 +442,149 @@
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Generate AI Title
+    const generateTitleBtn = document.getElementById('generateTitleBtn');
+    generateTitleBtn.addEventListener('click', function() {
+      const prompt = document.getElementById('titlePrompt').value;
+      const tone = document.getElementById('titleTone').value;
+      
+      if (!prompt) {
+        alert('Please enter a description of your course.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('titleGenerating').classList.remove('d-none');
+      document.getElementById('titleResults').classList.add('d-none');
+      generateTitleBtn.disabled = true;
+      
+      // Prepare the actual prompt
+      const titlePrompt = `Generate 3 engaging, catchy titles for a language learning course about: ${prompt}. Each title should be concise, appealing to students, and clearly communicate the course focus.`;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_suggestions" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          text: titlePrompt,
+          suggestion_count: 3,
+          max_tokens: 100
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('titleGenerating').classList.add('d-none');
+        document.getElementById('titleResults').classList.remove('d-none');
+        generateTitleBtn.disabled = false;
+        
+        if (data.error) {
+          document.querySelector('.title-suggestions').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        const suggestionsContainer = document.querySelector('.title-suggestions');
+        suggestionsContainer.innerHTML = '';
+        
+        // Create buttons for each suggestion
+        data.suggestions.forEach((title, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-outline-primary w-100 mb-2 text-start';
+          btn.innerHTML = title;
+          btn.addEventListener('click', function() {
+            // Set the title in the form
+            document.getElementById('{{ form.title.id_for_label }}').value = title;
+            // Close the modal
+            bootstrap.Modal.getInstance(document.getElementById('aiTitleModal')).hide();
+          });
+          suggestionsContainer.appendChild(btn);
+        });
+      })
+      .catch(error => {
+        document.getElementById('titleGenerating').classList.add('d-none');
+        document.querySelector('.title-suggestions').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        generateTitleBtn.disabled = false;
+      });
+    });
+    
+    // Generate AI Description
+    const generateDescriptionBtn = document.getElementById('generateDescriptionBtn');
+    const useDescriptionBtn = document.getElementById('useDescriptionBtn');
+    let generatedDescription = '';
+    
+    generateDescriptionBtn.addEventListener('click', function() {
+      const prompt = document.getElementById('descriptionPrompt').value;
+      const tone = document.getElementById('descriptionTone').value;
+      const maxTokens = document.getElementById('descriptionLength').value;
+      
+      if (!prompt) {
+        alert('Please describe what content you would like to generate.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('descriptionGenerating').classList.remove('d-none');
+      document.getElementById('descriptionResults').classList.add('d-none');
+      useDescriptionBtn.classList.add('d-none');
+      generateDescriptionBtn.disabled = true;
+      
+      // Prepare the actual prompt
+      const descriptionPrompt = `Write a compelling description for a language learning course with the following details: ${prompt}. The description should be engaging, clearly explain what students will learn, and motivate them to enroll. Include the learning outcomes, course structure, and benefits of taking this course.`;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_text" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          prompt: descriptionPrompt,
+          tone: tone,
+          max_tokens: parseInt(maxTokens)
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('descriptionGenerating').classList.add('d-none');
+        document.getElementById('descriptionResults').classList.remove('d-none');
+        generateDescriptionBtn.disabled = false;
+        useDescriptionBtn.classList.remove('d-none');
+        
+        if (data.error) {
+          document.getElementById('descriptionPreview').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        // Store the generated content
+        generatedDescription = data.text;
+        
+        // Display the generated content
+        document.getElementById('descriptionPreview').innerHTML = generatedDescription.replace(/\n/g, '<br>');
+      })
+      .catch(error => {
+        document.getElementById('descriptionGenerating').classList.add('d-none');
+        document.getElementById('descriptionPreview').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        generateDescriptionBtn.disabled = false;
+      });
+    });
+    
+    // Use the generated description
+    useDescriptionBtn.addEventListener('click', function() {
+      // Set the content in Quill
+      quill.root.innerHTML = generatedDescription.replace(/\n/g, '<br>');
+      
+      // Update the hidden field
+      document.querySelector('#id_description').value = quill.root.innerHTML;
+      
+      // Close the modal
+      bootstrap.Modal.getInstance(document.getElementById('aiDescriptionModal')).hide();
     });
   });
 </script>

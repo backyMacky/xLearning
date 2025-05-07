@@ -60,6 +60,43 @@
       ]
     },
     {
+      "name": "Content Management",
+      "icon": "menu-icon tf-icons ti ti-book",
+      "slug": "content",
+      "submenu": [
+        {
+          "url": "/content/courses/",
+          "external": true,
+          "name": "Courses",
+          "slug": "course-list"
+        },
+        {
+          "url": "/content/courses/create/",
+          "external": true,
+          "name": "Create Course",
+          "slug": "create-course"
+        },
+        {
+          "url": "/content/lessons/",
+          "external": true,
+          "name": "Lessons",
+          "slug": "lesson-list"
+        },
+        {
+          "url": "/content/resources/",
+          "external": true,
+          "name": "Resources",
+          "slug": "resource-list"
+        },
+        {
+          "url": "/content/resources/create/",
+          "external": true,
+          "name": "Upload Resource",
+          "slug": "create-resource"
+        }
+      ]
+    },
+    {
       "name": "Assessments",
       "icon": "menu-icon tf-icons ti ti-file-text",
       "slug": "assessment",

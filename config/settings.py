@@ -135,6 +135,10 @@ DATABASES = {
     }
 }
 
+#Api key
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+
 # REDIS CONFIGURATION
 REDIS_URL = os.environ.get("REDIS_URL")
 
