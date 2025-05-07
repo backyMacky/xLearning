@@ -9,11 +9,14 @@
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/quill/typography.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/quill/editor.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/spinkit/spinkit.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
 {{ block.super }}
 <script src="{% static 'vendor/libs/quill/quill.js' %}"></script>
+<script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
 {% endblock vendor_js %}
 
 {% block content %}
@@ -27,7 +30,7 @@
         <h5 class="card-title mb-0">{{ title }}</h5>
       </div>
       <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" id="lessonForm">
           {% csrf_token %}
           
           {% if form.errors %}
@@ -42,9 +45,19 @@
           </div>
           {% endif %}
           
+          <!-- Hidden AI fields -->
+          {{ form.use_ai }}
+          {{ form.ai_prompt }}
+          {{ form.ai_tone }}
+          
           <div class="mb-3">
             <label for="{{ form.title.id_for_label }}" class="form-label">Lesson Title</label>
-            {{ form.title }}
+            <div class="input-group">
+              {{ form.title }}
+              <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#aiTitleModal">
+                <i class="ti ti-bulb me-1"></i> AI Assist
+              </button>
+            </div>
             {% if form.title.errors %}
               <div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>
             {% endif %}
@@ -52,6 +65,16 @@
           
           <div class="mb-3">
             <label for="editor" class="form-label">Content</label>
+            <div class="d-flex align-items-center mb-1">
+              <div class="flex-grow-1">
+                <div class="editor-toolbar"></div>
+              </div>
+              <div>
+                <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#aiContentModal">
+                  <i class="ti ti-bulb me-1"></i> AI Assist
+                </button>
+              </div>
+            </div>
             <div id="editor" style="height: 300px"></div>
             {{ form.content }}
             {% if form.content.errors %}
@@ -111,6 +134,20 @@
             </div>
           </div>
           
+          <div class="mb-3">
+            <label for="{{ form.tags.id_for_label }}" class="form-label">Tags</label>
+            <div class="input-group">
+              {{ form.tags }}
+              <button type="button" class="btn btn-outline-primary" id="generateTagsBtn">
+                <i class="ti ti-tag me-1"></i> Auto-Generate
+              </button>
+            </div>
+            {% if form.tags.errors %}
+              <div class="invalid-feedback d-block">{{ form.tags.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">Comma-separated tags for better discoverability</small>
+          </div>
+          
           <div class="d-flex justify-content-between mt-4">
             <a href="{% url 'content:course_detail' slug=module.course.slug %}" class="btn btn-outline-secondary">Cancel</a>
             <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
@@ -120,13 +157,183 @@
     </div>
   </div>
 </div>
+
+<!-- AI Title Generator Modal -->
+<div class="modal fade" id="aiTitleModal" tabindex="-1" aria-labelledby="aiTitleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiTitleModalLabel">Generate Title with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="titlePrompt" class="form-label">Describe your lesson</label>
+          <textarea id="titlePrompt" class="form-control" rows="3" placeholder="Briefly describe what your lesson will cover"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label for="titleTone" class="form-label">Tone</label>
+          <select id="titleTone" class="form-select">
+            <option value="professional">Professional</option>
+            <option value="academic">Academic</option>
+            <option value="friendly">Friendly</option>
+            <option value="enthusiastic">Enthusiastic</option>
+            <option value="concise">Concise</option>
+          </select>
+        </div>
+        
+        <div id="titleGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating title suggestions...</p>
+        </div>
+        
+        <div id="titleResults" class="d-none">
+          <label class="form-label">Choose a title:</label>
+          <div class="title-suggestions"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="generateTitleBtn">Generate Titles</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Content Generator Modal -->
+<div class="modal fade" id="aiContentModal" tabindex="-1" aria-labelledby="aiContentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiContentModalLabel">Generate Content with AI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="contentPrompt" class="form-label">What would you like to generate?</label>
+          <textarea id="contentPrompt" class="form-control" rows="4" placeholder="Describe the content you'd like to generate. Be specific about topics, points to cover, and any specific requirements."></textarea>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="contentTone" class="form-label">Tone</label>
+            <select id="contentTone" class="form-select">
+              <option value="professional">Professional</option>
+              <option value="academic">Academic</option>
+              <option value="friendly">Friendly</option>
+              <option value="enthusiastic">Enthusiastic</option>
+              <option value="technical">Technical</option>
+              <option value="simple">Simple</option>
+            </select>
+          </div>
+          
+          <div class="col-md-6">
+            <label for="contentLength" class="form-label">Length</label>
+            <select id="contentLength" class="form-select">
+              <option value="300">Short</option>
+              <option value="500" selected>Medium</option>
+              <option value="800">Long</option>
+              <option value="1200">Very Long</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="contentGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating content... This may take a moment.</p>
+        </div>
+        
+        <div id="contentResults" class="d-none">
+          <label class="form-label">Generated Content Preview:</label>
+          <div class="card">
+            <div class="card-body">
+              <div id="contentPreview" class="border p-3 rounded bg-light" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success d-none" id="useContentBtn">Use This Content</button>
+        <button type="button" class="btn btn-primary" id="generateContentBtn">Generate Content</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Text Rephraser Modal -->
+<div class="modal fade" id="aiRephraseModal" tabindex="-1" aria-labelledby="aiRephraseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiRephraseModalLabel">Rephrase Selected Text</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Original Text</label>
+          <div id="originalText" class="border p-3 rounded bg-light"></div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="rephraseTone" class="form-label">Tone</label>
+          <select id="rephraseTone" class="form-select">
+            <option value="professional">Professional</option>
+            <option value="academic">Academic</option>
+            <option value="friendly">Friendly</option>
+            <option value="enthusiastic">Enthusiastic</option>
+            <option value="concise">Concise</option>
+            <option value="technical">Technical</option>
+            <option value="simple">Simple</option>
+          </select>
+        </div>
+        
+        <div id="rephraseGenerating" class="d-none text-center py-3">
+          <div class="sk-wave sk-primary">
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+            <div class="sk-wave-rect"></div>
+          </div>
+          <p class="mt-2">Generating alternatives...</p>
+        </div>
+        
+        <div id="rephraseResults" class="d-none">
+          <label class="form-label">Choose an alternative:</label>
+          <div id="suggestionsList"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="rephraseBtn">Generate Alternatives</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block page_js_extra %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token for API requests
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
     // Initialize Quill for rich text editor
-    var quill = new Quill('#editor', {
+    const quill = new Quill('#editor', {
       theme: 'snow',
       modules: {
         toolbar: [
@@ -154,5 +361,332 @@
     form.addEventListener('submit', function() {
       contentField.value = quill.root.innerHTML;
     });
-    <script>
+    
+    // Context menu for text selection (for rephrasing)
+    let currentSelection = '';
+    let selectionRange = null;
+    
+    quill.on('selection-change', function(range, oldRange, source) {
+      if (range && range.length > 0) {
+        currentSelection = quill.getText(range.index, range.length);
+        selectionRange = range;
+        
+        // Only show the floating button if there's a meaningful selection
+        if (currentSelection.trim().length > 10) {
+          showFloatingButton(quill.getBounds(range.index, range.length));
+        } else {
+          hideFloatingButton();
+        }
+      } else {
+        hideFloatingButton();
+      }
+    });
+    
+    // Floating button for text selection
+    const floatingButton = document.createElement('div');
+    floatingButton.className = 'floating-rephrase-btn';
+    floatingButton.innerHTML = '<button class="btn btn-sm btn-primary"><i class="ti ti-wand me-1"></i> Rephrase</button>';
+    floatingButton.style.position = 'absolute';
+    floatingButton.style.zIndex = '1000';
+    floatingButton.style.display = 'none';
+    document.body.appendChild(floatingButton);
+    
+    floatingButton.addEventListener('click', function() {
+      openRephraseModal(currentSelection);
+    });
+    
+    function showFloatingButton(bounds) {
+      const editorContainer = document.querySelector('#editor');
+      const editorRect = editorContainer.getBoundingClientRect();
+      
+      floatingButton.style.top = (editorRect.top + bounds.top + bounds.height + window.scrollY + 10) + 'px';
+      floatingButton.style.left = (editorRect.left + bounds.left + window.scrollX) + 'px';
+      floatingButton.style.display = 'block';
+    }
+    
+    function hideFloatingButton() {
+      floatingButton.style.display = 'none';
+    }
+    
+    function openRephraseModal(text) {
+      // Set the text in the modal
+      document.getElementById('originalText').textContent = text;
+      
+      // Reset previous results
+      document.getElementById('rephraseResults').classList.add('d-none');
+      document.getElementById('suggestionsList').innerHTML = '';
+      
+      // Show the modal
+      const rephraseModal = new bootstrap.Modal(document.getElementById('aiRephraseModal'));
+      rephraseModal.show();
+    }
+    
+    // Generate AI Title
+    const generateTitleBtn = document.getElementById('generateTitleBtn');
+    generateTitleBtn.addEventListener('click', function() {
+      const prompt = document.getElementById('titlePrompt').value;
+      const tone = document.getElementById('titleTone').value;
+      
+      if (!prompt) {
+        alert('Please enter a description of your lesson.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('titleGenerating').classList.remove('d-none');
+      document.getElementById('titleResults').classList.add('d-none');
+      generateTitleBtn.disabled = true;
+      
+      // Prepare the actual prompt
+      const titlePrompt = `Generate 3 concise, engaging titles for a lesson about: ${prompt}`;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_suggestions" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          text: titlePrompt,
+          suggestion_count: 3,
+          max_tokens: 100
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('titleGenerating').classList.add('d-none');
+        document.getElementById('titleResults').classList.remove('d-none');
+        generateTitleBtn.disabled = false;
+        
+        if (data.error) {
+          document.querySelector('.title-suggestions').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        const suggestionsContainer = document.querySelector('.title-suggestions');
+        suggestionsContainer.innerHTML = '';
+        
+        // Create buttons for each suggestion
+        data.suggestions.forEach((title, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-outline-primary w-100 mb-2 text-start';
+          btn.innerHTML = title;
+          btn.addEventListener('click', function() {
+            // Set the title in the form
+            document.getElementById('{{ form.title.id_for_label }}').value = title;
+            // Close the modal
+            bootstrap.Modal.getInstance(document.getElementById('aiTitleModal')).hide();
+          });
+          suggestionsContainer.appendChild(btn);
+        });
+      })
+      .catch(error => {
+        document.getElementById('titleGenerating').classList.add('d-none');
+        document.querySelector('.title-suggestions').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        generateTitleBtn.disabled = false;
+      });
+    });
+    
+    // Generate AI Content
+    const generateContentBtn = document.getElementById('generateContentBtn');
+    const useContentBtn = document.getElementById('useContentBtn');
+    let generatedContent = '';
+    
+    generateContentBtn.addEventListener('click', function() {
+      const prompt = document.getElementById('contentPrompt').value;
+      const tone = document.getElementById('contentTone').value;
+      const maxTokens = document.getElementById('contentLength').value;
+      
+      if (!prompt) {
+        alert('Please enter what content you would like to generate.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('contentGenerating').classList.remove('d-none');
+      document.getElementById('contentResults').classList.add('d-none');
+      useContentBtn.classList.add('d-none');
+      generateContentBtn.disabled = true;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_text" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          tone: tone,
+          max_tokens: parseInt(maxTokens)
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('contentGenerating').classList.add('d-none');
+        document.getElementById('contentResults').classList.remove('d-none');
+        generateContentBtn.disabled = false;
+        useContentBtn.classList.remove('d-none');
+        
+        if (data.error) {
+          document.getElementById('contentPreview').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        // Store the generated content
+        generatedContent = data.text;
+        
+        // Display the generated content
+        document.getElementById('contentPreview').innerHTML = generatedContent.replace(/\n/g, '<br>');
+      })
+      .catch(error => {
+        document.getElementById('contentGenerating').classList.add('d-none');
+        document.getElementById('contentPreview').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        generateContentBtn.disabled = false;
+      });
+    });
+    
+    // Use the generated content
+    useContentBtn.addEventListener('click', function() {
+      // Insert at cursor position or append to existing content
+      const cursorPosition = quill.getSelection();
+      if (cursorPosition) {
+        quill.insertText(cursorPosition.index, generatedContent);
+      } else {
+        quill.setText(generatedContent);
+      }
+      
+      // Close the modal
+      bootstrap.Modal.getInstance(document.getElementById('aiContentModal')).hide();
+    });
+    
+    // Rephrase Text
+    const rephraseBtn = document.getElementById('rephraseBtn');
+    
+    rephraseBtn.addEventListener('click', function() {
+      const text = document.getElementById('originalText').textContent;
+      const tone = document.getElementById('rephraseTone').value;
+      
+      if (!text) {
+        alert('No text to rephrase.');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('rephraseGenerating').classList.remove('d-none');
+      document.getElementById('rephraseResults').classList.add('d-none');
+      rephraseBtn.disabled = true;
+      
+      // Call the API
+      fetch('{% url "content:api_generate_suggestions" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          text: text,
+          suggestion_count: 3,
+          max_tokens: 300
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Hide loading, show results
+        document.getElementById('rephraseGenerating').classList.add('d-none');
+        document.getElementById('rephraseResults').classList.remove('d-none');
+        rephraseBtn.disabled = false;
+        
+        if (data.error) {
+          document.getElementById('suggestionsList').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          return;
+        }
+        
+        const suggestionsContainer = document.getElementById('suggestionsList');
+        suggestionsContainer.innerHTML = '';
+        
+        // Create cards for each suggestion
+        data.suggestions.forEach((suggestion, index) => {
+          const card = document.createElement('div');
+          card.className = 'card mb-3 border-hover cursor-pointer';
+          card.innerHTML = `
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <h6 class="card-subtitle mb-2 text-muted">Option ${index + 1}</h6>
+                <button class="btn btn-sm btn-outline-primary use-suggestion-btn" data-suggestion="${index}">Use This</button>
+              </div>
+              <p class="card-text">${suggestion}</p>
+            </div>
+          `;
+          suggestionsContainer.appendChild(card);
+          
+          // Add event listener to the Use This button
+          card.querySelector('.use-suggestion-btn').addEventListener('click', function() {
+            // Replace the selected text in the editor
+            if (selectionRange) {
+              quill.deleteText(selectionRange.index, selectionRange.length);
+              quill.insertText(selectionRange.index, suggestion);
+            }
+            
+            // Close the modal
+            bootstrap.Modal.getInstance(document.getElementById('aiRephraseModal')).hide();
+          });
+        });
+      })
+      .catch(error => {
+        document.getElementById('rephraseGenerating').classList.add('d-none');
+        document.getElementById('suggestionsList').innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        rephraseBtn.disabled = false;
+      });
+    });
+    
+    // Auto-generate tags from content
+    document.getElementById('generateTagsBtn').addEventListener('click', function() {
+      const content = quill.getText();
+      
+      if (!content || content.trim().length < 50) {
+        alert('Please add more content before generating tags.');
+        return;
+      }
+      
+      this.disabled = true;
+      this.innerHTML = '<i class="ti ti-loader ti-spin me-1"></i> Generating...';
+      
+      // Call the API
+      fetch('{% url "content:api_generate_text" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+          prompt: `Extract 5-8 key keywords or phrases from this text, separated by commas:\n\n${content.substring(0, 1500)}`,
+          tone: 'concise',
+          max_tokens: 100
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        this.disabled = false;
+        this.innerHTML = '<i class="ti ti-tag me-1"></i> Auto-Generate';
+        
+        if (data.error) {
+          alert(`Error generating tags: ${data.error}`);
+          return;
+        }
+        
+        // Set the tags in the form
+        document.getElementById('{{ form.tags.id_for_label }}').value = data.text;
+      })
+      .catch(error => {
+        this.disabled = false;
+        this.innerHTML = '<i class="ti ti-tag me-1"></i> Auto-Generate';
+        alert(`Error: ${error.message}`);
+      });
+    });
+  });
+</script>
 {% endblock %}

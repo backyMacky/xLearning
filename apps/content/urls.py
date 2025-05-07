@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import api_views
 
 app_name = 'content'
 
@@ -67,4 +68,9 @@ urlpatterns = [
     path('api/courses/<int:course_id>/lessons/', views.get_course_lessons, name='api_course_lessons'),
     path('api/session-preview/', views.session_preview_data, name='session_preview_data'),
     path('api/meeting-link/<str:session_type>/<int:session_id>/', views.get_meeting_link, name='get_meeting_link'),
+    
+    # AI Text Generation API Endpoints
+    path('api/ai/generate-text/', api_views.generate_text, name='api_generate_text'),
+    path('api/ai/rephrase-text/', api_views.rephrase_text, name='api_rephrase_text'),
+    path('api/ai/generate-suggestions/', api_views.generate_suggestions, name='api_generate_suggestions'),
 ]

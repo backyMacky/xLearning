@@ -8,6 +8,47 @@ from .models import (
     Resource, Instructor, InstructorReview, SessionFeedback
 )
 
+class AIGenerationMixin:
+    """
+    Form mixin that adds fields for AI-powered text generation.
+    This can be applied to any form that has text content fields.
+    """
+    AI_TONES = [
+        ('professional', 'Professional'),
+        ('casual', 'Casual'),
+        ('academic', 'Academic'),
+        ('concise', 'Concise'),
+        ('enthusiastic', 'Enthusiastic'),
+        ('friendly', 'Friendly'),
+        ('technical', 'Technical'),
+        ('simple', 'Simple'),
+    ]
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Add hidden fields for AI generation if they don't already exist
+        if not hasattr(self, 'use_ai'):
+            self.fields['use_ai'] = forms.BooleanField(
+                required=False,
+                widget=forms.HiddenInput(),
+                initial=False
+            )
+        
+        if not hasattr(self, 'ai_prompt'):
+            self.fields['ai_prompt'] = forms.CharField(
+                required=False,
+                widget=forms.HiddenInput()
+            )
+        
+        if not hasattr(self, 'ai_tone'):
+            self.fields['ai_tone'] = forms.ChoiceField(
+                required=False,
+                choices=self.AI_TONES,
+                widget=forms.HiddenInput(),
+                initial='professional'
+            )
+
 
 class CourseFilterForm(forms.Form):
     """Form for filtering courses"""
@@ -33,7 +74,7 @@ class CourseFilterForm(forms.Form):
     )
 
 
-class CourseForm(forms.ModelForm):
+class CourseForm(AIGenerationMixin, forms.ModelForm):
     """Form for creating and editing courses"""
     class Meta:
         model = Course
@@ -68,7 +109,7 @@ class CourseForm(forms.ModelForm):
         return title
 
 
-class ModuleForm(forms.ModelForm):
+class ModuleForm(AIGenerationMixin, forms.ModelForm):
     """Form for creating and editing learning modules"""
     class Meta:
         model = LearningModule
@@ -80,7 +121,7 @@ class ModuleForm(forms.ModelForm):
         }
 
 
-class LessonForm(forms.ModelForm):
+class LessonForm(AIGenerationMixin, forms.ModelForm):
     """Form for creating and editing lessons"""
     class Meta:
         model = Lesson
@@ -121,7 +162,7 @@ class LessonForm(forms.ModelForm):
             self.instance.generate_keywords()
 
 
-class ResourceForm(forms.ModelForm):
+class ResourceForm(AIGenerationMixin, forms.ModelForm):
     """Form for creating and editing resources"""
     class Meta:
         model = Resource
@@ -205,7 +246,7 @@ class ResourceFilterForm(forms.Form):
     )
 
 
-class InstructorProfileForm(forms.ModelForm):
+class InstructorProfileForm(AIGenerationMixin, forms.ModelForm):
     """Form for creating and updating instructor profiles"""
     class Meta:
         model = Instructor
@@ -315,7 +356,7 @@ class PrivateSessionForm(forms.ModelForm):
         return instance
 
 
-class GroupSessionForm(forms.ModelForm):
+class GroupSessionForm(AIGenerationMixin, forms.ModelForm):
     """Form for creating group sessions"""
     class Meta:
         model = GroupSession
@@ -423,7 +464,7 @@ class GroupSessionForm(forms.ModelForm):
         return instance
     
 
-class SessionFeedbackForm(forms.ModelForm):
+class SessionFeedbackForm(AIGenerationMixin, forms.ModelForm):
     """Form for students to provide feedback after a session"""
     class Meta:
         model = SessionFeedback
@@ -444,7 +485,7 @@ class SessionFeedbackForm(forms.ModelForm):
         }
 
 
-class InstructorReviewForm(forms.ModelForm):
+class InstructorReviewForm(AIGenerationMixin, forms.ModelForm):
     """Form for students to review instructors"""
     class Meta:
         model = InstructorReview
