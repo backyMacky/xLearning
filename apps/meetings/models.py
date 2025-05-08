@@ -13,7 +13,12 @@ logger = logging.getLogger(__name__)
 
 class Meeting(models.Model):
     """Model for virtual meetings and sessions"""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # Remove UUID primary key and let Django use its default auto-incrementing primary key
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Add a UUID field that's not a primary key for public identification
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    
     title = models.CharField(max_length=255)
     teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='teacher_meetings')
     students = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='student_meetings')
@@ -39,7 +44,7 @@ class Meeting(models.Model):
         """Override save to generate meeting code and link if not provided"""
         if not self.meeting_code:
             # Generate a short unique code from the UUID
-            self.meeting_code = str(self.id).replace('-', '')[:12]
+            self.meeting_code = str(self.uuid).replace('-', '')[:12]
             
         if not self.meeting_link:
             # Generate a Google Meet link with the unique code
@@ -76,7 +81,6 @@ class Meeting(models.Model):
         location = self.meeting_link if self.meeting_link else "Online Meeting"
         
         # Format parameters for URL
-        
         params = {
             'action': 'TEMPLATE',
             'text': urllib.parse.quote(title),
@@ -93,22 +97,21 @@ class Meeting(models.Model):
         return calendar_url
     
     def generate_meeting_link(self):
-        """Generate an improved Google Meet link for this meeting using UUID"""
+        """Generate a properly formatted Google Meet link for this meeting"""
         # Format the meeting code from the UUID if not already set
         if not self.meeting_code:
-            self.meeting_code = str(uuid.uuid4()).replace('-', '')[:12]
+            # Generate a meeting code that follows Google Meet's format
+            # Google Meet codes are typically 10 characters with two hyphens
+            # Format: xxx-xxxx-xxx
+            uuid_str = str(self.uuid).replace('-', '')
+            self.meeting_code = f"{uuid_str[:3]}-{uuid_str[3:7]}-{uuid_str[7:10]}"
         
         # Create a properly formatted Google Meet link
-        # The 'lookup' format is more robust in development environments
-        self.meeting_link = f"https://meet.google.com/lookup/{self.meeting_code}?authuser=0&hs=179"
-        
-        # Alternative formats that might work better in production:
-        # Standard meet format: https://meet.google.com/abc-defg-hij
-        # hyphenated_code = f"{self.meeting_code[:3]}-{self.meeting_code[3:7]}-{self.meeting_code[7:10]}"
-        # self.meeting_link = f"https://meet.google.com/{hyphenated_code}"
+        self.meeting_link = f"https://meet.google.com/{self.meeting_code}"
         
         return self.meeting_link
     
+    # Other methods remain the same
     def send_reminders(self):
         """Send email reminders to all participants"""
         
@@ -238,9 +241,7 @@ class Meeting(models.Model):
             models.Index(fields=['teacher']),
         ]
 
-
-
-
+# TeacherAvailability class remains unchanged
 class TeacherAvailability(models.Model):
     """Model for teacher availability slots"""
     teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='availability_slots')
@@ -272,4 +273,4 @@ class TeacherAvailability(models.Model):
         return False
     
     class Meta:
-        app_label = 'meetings'        
+        app_label = 'meetings'
