@@ -5,8 +5,12 @@ from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.html import strip_tags
+from django.core.mail import send_mail
 from django.contrib import messages
 from datetime import datetime, timedelta
+from django.template.loader import render_to_string
+from config import settings
 from web_project import TemplateLayout
 
 from .models import Meeting, TeacherAvailability
@@ -244,6 +248,7 @@ class CancelMeetingView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         messages.success(request, "Meeting cancelled successfully.")
         return response
 
+
 class SendReminderView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     """View for sending reminders for a meeting"""
     model = Meeting
@@ -260,12 +265,53 @@ class SendReminderView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def get(self, request, *args, **kwargs):
         meeting = self.get_object()
         
-        # Send reminder
-        meeting.send_reminders()
+        # Send reminder to all students
+        sent_count = 0
+        for student in meeting.students.all():
+            try:
+                self.send_reminder_email(meeting, student, request)
+                sent_count += 1
+            except Exception as e:
+                messages.error(request, f"Failed to send reminder to {student.username}: {str(e)}")
         
-        messages.success(request, "Reminders sent successfully!")
+        if sent_count > 0:
+            messages.success(request, f"Reminders sent successfully to {sent_count} participant(s)!")
+        
         return redirect('meetings:meeting_detail', meeting_id=meeting.id)
-
+    
+    def send_reminder_email(self, meeting, user, request):
+        """Send a formatted reminder email to the user"""
+        # Format session details
+        session_date = meeting.start_time.strftime('%A, %B %d, %Y')
+        session_time = meeting.start_time.strftime('%I:%M %p')
+        instructor_name = meeting.teacher.username
+        
+        # Prepare context for the email template
+        context = {
+            'user': user,
+            'instructor': instructor_name,
+            'session_date': session_date,
+            'session_time': session_time,
+            'session_duration': meeting.duration,
+            'meeting_link': meeting.meeting_link,
+            'site_name': 'Learning Platform',
+            'site_url': request.build_absolute_uri('/'),
+        }
+        
+        # Render the email template
+        html_message = render_to_string('email/session_reminder.html', context)
+        plain_message = strip_tags(html_message)
+        
+        # Send the email
+        send_mail(
+            subject=f"Reminder: Your session with {instructor_name} starts in 1 hour",
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            html_message=html_message,
+            fail_silently=False
+        )
+        
 class AvailabilityListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """View for listing teacher availability slots"""
     model = TeacherAvailability

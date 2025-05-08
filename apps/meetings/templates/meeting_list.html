@@ -3,12 +3,13 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}Meetings - Learning Platform{% endblock title %}
+{% block title %}My Meetings - Learning Platform{% endblock title %}
 
 {% block vendor_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/animate-css/animate.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
@@ -17,43 +18,245 @@
 {% endblock vendor_js %}
 
 {% block content %}
-<div class="card mb-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">My Meetings</h5>
-    {% if request.user.is_teacher %}
-    <div>
-      <a href="{% url 'meetings:create_meeting' %}" class="btn btn-primary">
-        <i class="ti ti-plus me-1"></i> Schedule Meeting
-      </a>
-      <a href="{% url 'meetings:calendar' %}" class="btn btn-outline-primary ms-2">
-        <i class="ti ti-calendar me-1"></i> View Calendar
-      </a>
+<!-- Header with Statistics Cards -->
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card shadow-none bg-transparent border-0">
+      <div class="card-body d-flex flex-column flex-md-row justify-content-between p-0">
+        <div>
+          <h4 class="fw-bold mb-2">
+            <span class="text-primary">My</span> Meetings
+          </h4>
+          <p class="mb-0">Manage all your scheduled meetings in one place</p>
+        </div>
+        
+        {% if request.user.is_teacher %}
+        <div class="d-flex align-items-center mt-3 mt-md-0">
+          <a href="{% url 'meetings:create_meeting' %}" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i> Schedule Meeting
+          </a>
+          <a href="{% url 'meetings:calendar' %}" class="btn btn-outline-primary ms-2">
+            <i class="ti ti-calendar me-1"></i> View Calendar
+          </a>
+        </div>
+        {% endif %}
+      </div>
     </div>
-    {% endif %}
   </div>
-  <div class="card-body">
-    <ul class="nav nav-tabs mb-3" role="tablist">
+  
+  {% if request.user.is_teacher %}
+  <!-- Statistics Cards for Teachers -->
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between">
+          <div class="content-left">
+            <span class="fw-medium d-block mb-1 text-muted">Total Meetings</span>
+            <div class="d-flex align-items-center my-2">
+              <h3 class="fw-bold mb-0 me-2">{{ upcoming_meetings|length|add:past_meetings|length }}</h3>
+              <span class="badge bg-label-success rounded-pill">+{{ upcoming_meetings|length }}</span>
+            </div>
+            <span class="text-success fw-semibold d-block">
+              <i class="ti ti-calendar me-1"></i> {{ upcoming_meetings|length }} Upcoming
+            </span>
+          </div>
+          <div class="avatar">
+            <span class="avatar-initial rounded bg-label-primary">
+              <i class="ti ti-calendar-event ti-md"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between">
+          <div class="content-left">
+            <span class="fw-medium d-block mb-1 text-muted">Students</span>
+            <div class="d-flex align-items-center my-2">
+              <h3 class="fw-bold mb-0">{{ total_students|default:"0" }}</h3>
+            </div>
+            <span class="fw-semibold d-block text-primary">
+              <i class="ti ti-users me-1"></i> Active participants
+            </span>
+          </div>
+          <div class="avatar">
+            <span class="avatar-initial rounded bg-label-success">
+              <i class="ti ti-users ti-md"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between">
+          <div class="content-left">
+            <span class="fw-medium d-block mb-1 text-muted">Teaching Hours</span>
+            <div class="d-flex align-items-center my-2">
+              <h3 class="fw-bold mb-0">{{ total_hours_booked|default:"0"|floatformat:1 }}</h3>
+            </div>
+            <span class="fw-semibold d-block text-info">
+              <i class="ti ti-clock me-1"></i> Scheduled this month
+            </span>
+          </div>
+          <div class="avatar">
+            <span class="avatar-initial rounded bg-label-info">
+              <i class="ti ti-clock ti-md"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-3 col-sm-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between">
+          <div class="content-left">
+            <span class="fw-medium d-block mb-1 text-muted">Availability</span>
+            <div class="d-flex align-items-center my-2">
+              <a href="{% url 'meetings:availability_list' %}" class="btn btn-sm btn-outline-primary">
+                <i class="ti ti-plus me-1"></i> Manage
+              </a>
+            </div>
+            <span class="fw-semibold d-block text-warning">
+              <i class="ti ti-calendar-time me-1"></i> Set your schedule
+            </span>
+          </div>
+          <div class="avatar">
+            <span class="avatar-initial rounded bg-label-warning">
+              <i class="ti ti-calendar-time ti-md"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- Statistics Cards for Students -->
+  <div class="col-lg-4 col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between">
+          <div class="content-left">
+            <span class="fw-medium d-block mb-1 text-muted">My Sessions</span>
+            <div class="d-flex align-items-center my-2">
+              <h3 class="fw-bold mb-0 me-2">{{ upcoming_meetings|length }}</h3>
+              <span class="badge bg-label-success rounded-pill">Upcoming</span>
+            </div>
+            <span class="text-primary fw-semibold d-block">
+              <i class="ti ti-calendar me-1"></i> {{ past_meetings|length }} Past sessions
+            </span>
+          </div>
+          <div class="avatar">
+            <span class="avatar-initial rounded bg-label-primary">
+              <i class="ti ti-calendar-event ti-md"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4 col-md-6 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between">
+          <div class="content-left">
+            <span class="fw-medium d-block mb-1 text-muted">Next Session</span>
+            {% if upcoming_meetings %}
+              {% with next_meeting=upcoming_meetings.0 %}
+                <div class="d-flex align-items-center my-2">
+                  <h3 class="fw-bold mb-0">{{ next_meeting.start_time|date:"M d" }}</h3>
+                </div>
+                <span class="fw-semibold d-block text-success">
+                  <i class="ti ti-clock me-1"></i> {{ next_meeting.start_time|date:"h:i A" }} with {{ next_meeting.teacher.username }}
+                </span>
+              {% endwith %}
+            {% else %}
+              <div class="d-flex align-items-center my-2">
+                <h3 class="fw-bold mb-0">-</h3>
+              </div>
+              <span class="fw-semibold d-block text-muted">
+                <i class="ti ti-calendar-off me-1"></i> No upcoming sessions
+              </span>
+            {% endif %}
+          </div>
+          <div class="avatar">
+            <span class="avatar-initial rounded bg-label-success">
+              <i class="ti ti-calendar-time ti-md"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4 col-md-12 mb-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between">
+          <div class="content-left">
+            <span class="fw-medium d-block mb-1 text-muted">Find Sessions</span>
+            <div class="d-flex align-items-center gap-2 my-2">
+              <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-outline-primary">
+                <i class="ti ti-search me-1"></i> Browse
+              </a>
+              <a href="{% url 'meetings:calendar' %}" class="btn btn-sm btn-outline-info">
+                <i class="ti ti-calendar me-1"></i> Calendar
+              </a>
+            </div>
+            <span class="fw-semibold d-block text-info">
+              <i class="ti ti-book me-1"></i> Book new learning sessions
+            </span>
+          </div>
+          <div class="avatar">
+            <span class="avatar-initial rounded bg-label-info">
+              <i class="ti ti-book ti-md"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Main Content Card with Tabs -->
+<div class="card">
+  <div class="card-header">
+    <ul class="nav nav-tabs card-header-tabs" role="tablist">
       <li class="nav-item">
         <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#upcoming-meetings" aria-controls="upcoming-meetings" aria-selected="true">
-          Upcoming Meetings
+          <i class="ti ti-calendar-event me-1"></i> Upcoming Meetings
         </button>
       </li>
       <li class="nav-item">
         <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#past-meetings" aria-controls="past-meetings" aria-selected="false">
-          Past Meetings
+          <i class="ti ti-history me-1"></i> Past Meetings
         </button>
       </li>
     </ul>
-    
-    <div class="tab-content">
-      <!-- Upcoming Meetings Tab -->
-      <div class="tab-pane fade show active" id="upcoming-meetings" role="tabpanel">
+  </div>
+  
+  <div class="tab-content">
+    <!-- Upcoming Meetings Tab -->
+    <div class="tab-pane fade show active" id="upcoming-meetings" role="tabpanel">
+      <div class="card-body">
         {% if upcoming_meetings %}
           <div class="table-responsive">
-            <table class="table table-bordered table-hover meetings-table">
+            <table class="table table-bordered table-hover dt-responsive nowrap meetings-table">
               <thead>
                 <tr>
-                  <th>Title</th>
+                  <th>Meeting</th>
                   <th>Date</th>
                   <th>Time</th>
                   {% if request.user.is_teacher %}
@@ -62,41 +265,93 @@
                     <th>Teacher</th>
                   {% endif %}
                   <th>Duration</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {% for meeting in upcoming_meetings %}
                   <tr>
-                    <td>{{ meeting.title }}</td>
+                    <td class="text-nowrap fw-semibold">
+                      <div class="d-flex align-items-center">
+                        <span class="avatar avatar-sm rounded-circle me-2 bg-label-primary">
+                          <i class="ti ti-video"></i>
+                        </span>
+                        <span>{{ meeting.title }}</span>
+                      </div>
+                    </td>
                     <td>{{ meeting.start_time|date:"M d, Y" }}</td>
                     <td>{{ meeting.start_time|date:"h:i A" }}</td>
                     {% if request.user.is_teacher %}
-                      <td>{{ meeting.students.count }}</td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="avatar-group">
+                            {% for student in meeting.students.all %}
+                              <div class="avatar avatar-xs" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ student.username }}">
+                                <span class="avatar-initial rounded-circle bg-label-info">
+                                  {{ student.username|slice:":1" }}
+                                </span>
+                              </div>
+                            {% endfor %}
+                          </div>
+                          <span class="ms-1">{{ meeting.students.count }}</span>
+                        </div>
+                      </td>
                     {% else %}
-                      <td>{{ meeting.teacher.username }}</td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="avatar avatar-xs me-2">
+                            <span class="avatar-initial rounded-circle bg-label-success">
+                              {{ meeting.teacher.username|slice:":1" }}
+                            </span>
+                          </div>
+                          <span>{{ meeting.teacher.username }}</span>
+                        </div>
+                      </td>
                     {% endif %}
-                    <td>{{ meeting.duration }} minutes</td>
+                    <td>{{ meeting.duration }} min</td>
                     <td>
-                      <div class="d-flex">
-                        <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-sm btn-icon btn-primary me-1">
-                          <i class="ti ti-eye"></i>
-                        </a>
-                        
-                        {% if request.user.is_teacher and meeting.teacher == request.user %}
-                          <a href="{% url 'meetings:edit_meeting' meeting_id=meeting.id %}" class="btn btn-sm btn-icon btn-info me-1">
-                            <i class="ti ti-edit"></i>
-                          </a>
-                          <a href="{% url 'meetings:cancel_meeting' meeting_id=meeting.id %}" class="btn btn-sm btn-icon btn-danger">
-                            <i class="ti ti-trash"></i>
-                          </a>
+                      {% with time_diff=meeting.start_time|date:"U"|add:"0"|add:"-"|add:now|date:"U"|add:"0" %}
+                        {% if time_diff < 900 and time_diff > -3600 %}
+                          <span class="badge bg-label-success">Active Now</span>
+                        {% elif time_diff < 3600 %}
+                          <span class="badge bg-label-warning">Starting Soon</span>
+                        {% else %}
+                          <span class="badge bg-label-primary">Scheduled</span>
                         {% endif %}
-                        
-                        {% if meeting.start_time|date:"U"|add:"0" < now|date:"U"|add:"300" %}
-                          <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-success ms-1">
-                            <i class="ti ti-video me-1"></i> Join
+                      {% endwith %}
+                    </td>
+                    <td>
+                      <div class="dropdown">
+                        <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown">
+                          <i class="ti ti-dots-vertical"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}">
+                            <i class="ti ti-eye me-1"></i> View Details
                           </a>
-                        {% endif %}
+                          
+                          {% if meeting.start_time|date:"U"|add:"0"|add:"-"|add:now|date:"U"|add:"0" < 900 %}
+                            {% if meeting.meeting_link %}
+                              <a class="dropdown-item text-success" href="{{ meeting.meeting_link }}" target="_blank">
+                                <i class="ti ti-video me-1"></i> Join Meeting
+                              </a>
+                            {% endif %}
+                          {% endif %}
+                          
+                          {% if request.user.is_teacher and meeting.teacher == request.user %}
+                            <a class="dropdown-item" href="{% url 'meetings:edit_meeting' meeting_id=meeting.id %}">
+                              <i class="ti ti-edit me-1"></i> Edit Meeting
+                            </a>
+                            <a class="dropdown-item" href="{% url 'meetings:send_reminder' meeting_id=meeting.id %}">
+                              <i class="ti ti-bell me-1"></i> Send Reminder
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="{% url 'meetings:cancel_meeting' meeting_id=meeting.id %}">
+                              <i class="ti ti-trash me-1"></i> Cancel Meeting
+                            </a>
+                          {% endif %}
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -105,7 +360,7 @@
             </table>
           </div>
         {% else %}
-          <div class="text-center p-5">
+          <div class="text-center py-5">
             <div class="mb-3">
               <i class="ti ti-calendar-off ti-3x text-primary opacity-50"></i>
             </div>
@@ -123,15 +378,17 @@
           </div>
         {% endif %}
       </div>
-      
-      <!-- Past Meetings Tab -->
-      <div class="tab-pane fade" id="past-meetings" role="tabpanel">
+    </div>
+    
+    <!-- Past Meetings Tab -->
+    <div class="tab-pane fade" id="past-meetings" role="tabpanel">
+      <div class="card-body">
         {% if past_meetings %}
           <div class="table-responsive">
-            <table class="table table-bordered table-hover meetings-table">
+            <table class="table table-bordered table-hover dt-responsive nowrap meetings-table">
               <thead>
                 <tr>
-                  <th>Title</th>
+                  <th>Meeting</th>
                   <th>Date</th>
                   <th>Time</th>
                   {% if request.user.is_teacher %}
@@ -140,25 +397,74 @@
                     <th>Teacher</th>
                   {% endif %}
                   <th>Duration</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {% for meeting in past_meetings %}
                   <tr>
-                    <td>{{ meeting.title }}</td>
+                    <td class="text-nowrap fw-semibold">
+                      <div class="d-flex align-items-center">
+                        <span class="avatar avatar-sm rounded-circle me-2 bg-label-secondary">
+                          <i class="ti ti-video"></i>
+                        </span>
+                        <span>{{ meeting.title }}</span>
+                      </div>
+                    </td>
                     <td>{{ meeting.start_time|date:"M d, Y" }}</td>
                     <td>{{ meeting.start_time|date:"h:i A" }}</td>
                     {% if request.user.is_teacher %}
-                      <td>{{ meeting.students.count }}</td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="avatar-group">
+                            {% for student in meeting.students.all %}
+                              <div class="avatar avatar-xs" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ student.username }}">
+                                <span class="avatar-initial rounded-circle bg-label-info">
+                                  {{ student.username|slice:":1" }}
+                                </span>
+                              </div>
+                            {% endfor %}
+                          </div>
+                          <span class="ms-1">{{ meeting.students.count }}</span>
+                        </div>
+                      </td>
                     {% else %}
-                      <td>{{ meeting.teacher.username }}</td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="avatar avatar-xs me-2">
+                            <span class="avatar-initial rounded-circle bg-label-success">
+                              {{ meeting.teacher.username|slice:":1" }}
+                            </span>
+                          </div>
+                          <span>{{ meeting.teacher.username }}</span>
+                        </div>
+                      </td>
                     {% endif %}
-                    <td>{{ meeting.duration }} minutes</td>
+                    <td>{{ meeting.duration }} min</td>
                     <td>
-                      <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-sm btn-icon btn-primary">
-                        <i class="ti ti-eye"></i>
-                      </a>
+                      <span class="badge bg-label-secondary">Completed</span>
+                    </td>
+                    <td>
+                      <div class="dropdown">
+                        <button type="button" class="btn btn-sm dropdown-toggle hide-arrow p-0" data-bs-toggle="dropdown">
+                          <i class="ti ti-dots-vertical"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}">
+                            <i class="ti ti-eye me-1"></i> View Details
+                          </a>
+                          {% if request.user.is_teacher %}
+                            <a class="dropdown-item" href="#">
+                              <i class="ti ti-report me-1"></i> Create Report
+                            </a>
+                          {% else %}
+                            <a class="dropdown-item" href="#">
+                              <i class="ti ti-message-circle me-1"></i> Leave Feedback
+                            </a>
+                          {% endif %}
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 {% endfor %}
@@ -166,12 +472,12 @@
             </table>
           </div>
         {% else %}
-          <div class="text-center p-5">
+          <div class="text-center py-5">
             <div class="mb-3">
               <i class="ti ti-history ti-3x text-primary opacity-50"></i>
             </div>
             <h5>No past meetings</h5>
-            <p>Your completed meetings will appear here.</p>
+            <p class="mb-0">Your completed meetings will appear here.</p>
           </div>
         {% endif %}
       </div>
@@ -180,16 +486,27 @@
 </div>
 
 {% if request.user.is_teacher %}
-<!-- Quick Link to Availability -->
-<div class="card">
-  <div class="card-header">
-    <h5 class="mb-0">Availability Management</h5>
-  </div>
-  <div class="card-body">
-    <p>Manage your availability slots to let students know when you're available for bookings.</p>
-    <a href="{% url 'meetings:availability_list' %}" class="btn btn-primary">
-      <i class="ti ti-clock me-1"></i> Manage Availability
-    </a>
+<!-- Quick Link to Availability Management -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-lg-8 col-md-7">
+            <h5 class="mb-0">Manage Your Availability Schedule</h5>
+            <p class="mb-0 mt-1">Set up your availability slots to let students know when you're free for sessions</p>
+          </div>
+          <div class="col-lg-4 col-md-5 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'meetings:availability_list' %}" class="btn btn-primary me-2">
+              <i class="ti ti-clock me-1"></i> Manage Availability
+            </a>
+            <a href="{% url 'meetings:calendar' %}" class="btn btn-outline-primary">
+              <i class="ti ti-calendar me-1"></i> View Calendar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endif %}
@@ -199,15 +516,38 @@
 {{ block.super }}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Initialize DataTables
+    // Initialize DataTables with improved UI
     $('.meetings-table').DataTable({
       responsive: true,
       lengthMenu: [5, 10, 25, 50],
       pageLength: 10,
+      order: [[1, 'asc'], [2, 'asc']],
       language: {
         searchPlaceholder: 'Search meetings...',
-        search: ''
+        search: '',
+        paginate: {
+          previous: '<i class="ti ti-chevron-left"></i>',
+          next: '<i class="ti ti-chevron-right"></i>'
+        }
+      },
+      drawCallback: function() {
+        // Initialize tooltips
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(function(tooltip) {
+          new bootstrap.Tooltip(tooltip);
+        });
       }
+    });
+    
+    // Highlight rows on hover with animation
+    const tableRows = document.querySelectorAll('.meetings-table tbody tr');
+    tableRows.forEach(row => {
+      row.addEventListener('mouseenter', function() {
+        this.classList.add('animate__animated', 'animate__pulse', 'animate__faster');
+      });
+      row.addEventListener('mouseleave', function() {
+        this.classList.remove('animate__animated', 'animate__pulse', 'animate__faster');
+      });
     });
   });
 </script>

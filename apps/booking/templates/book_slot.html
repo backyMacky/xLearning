@@ -5,111 +5,235 @@
 
 {% block title %}Book Session - Learning Platform{% endblock title %}
 
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/animate-css/animate.css' %}" />
+{% endblock vendor_css %}
+
 {% block content %}
 <div class="row">
-  <div class="col-md-8 col-lg-6 mx-auto">
-    <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Book Learning Session</h5>
-        <a href="{% url 'booking:dashboard' %}" class="btn btn-secondary btn-sm">
+  <div class="col-lg-8 col-md-10 mx-auto">
+    <div class="card mb-4 shadow-lg border-0">
+      <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+        <h5 class="mb-0 text-white">Book Private Session</h5>
+        <a href="{% url 'booking:dashboard' %}" class="btn btn-light btn-sm">
           <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
         </a>
       </div>
       <div class="card-body">
-        <div class="mb-4">
-          <div class="alert alert-primary">
-            <div class="d-flex">
-              <i class="ti ti-info-circle me-2 mt-1"></i>
-              <div>
-                <h6 class="alert-heading mb-1">Session Details</h6>
-                <p class="mb-0">
-                  You are about to book a session with <strong>{{ slot.instructor.user.username }}</strong>
-                </p>
+        <!-- Teacher Information -->
+        <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
+          <div class="avatar avatar-md me-3">
+            {% if slot.instructor.profile_image %}
+              <img src="{{ slot.instructor.profile_image.url }}" alt="{{ slot.instructor.user.username }}" class="rounded-circle">
+            {% else %}
+              <div class="avatar-initial rounded-circle bg-primary">
+                <span class="text-white">{{ slot.instructor.user.username|slice:":1" }}</span>
+              </div>
+            {% endif %}
+          </div>
+          <div>
+            <h5 class="mb-1">{{ slot.instructor.user.username }}</h5>
+            <div class="d-flex align-items-center">
+              <div class="d-flex me-2">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= slot.instructor.rating %}
+                    <i class="ti ti-star-filled text-warning text-sm"></i>
+                  {% else %}
+                    <i class="ti ti-star text-muted text-sm"></i>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <small class="text-muted">({{ slot.instructor.review_count|default:"0" }} reviews)</small>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Session Details Card -->
+        <div class="card bg-light border-0 mb-4">
+          <div class="card-header bg-primary bg-opacity-10 border-0">
+            <h6 class="card-title mb-0">Session Details</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <ul class="list-unstyled mb-0">
+                  <li class="mb-3">
+                    <div class="d-flex align-items-center">
+                      <i class="ti ti-calendar text-primary me-2"></i>
+                      <div>
+                        <small class="text-muted d-block">Date</small>
+                        <span class="fw-semibold">{{ slot.start_time|date:"l, F j, Y" }}</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="mb-3">
+                    <div class="d-flex align-items-center">
+                      <i class="ti ti-clock text-primary me-2"></i>
+                      <div>
+                        <small class="text-muted d-block">Time</small>
+                        <span class="fw-semibold">{{ slot.start_time|date:"h:i A" }}</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="d-flex align-items-center">
+                      <i class="ti ti-hourglass text-primary me-2"></i>
+                      <div>
+                        <small class="text-muted d-block">Duration</small>
+                        <span class="fw-semibold">{{ slot.duration_minutes }} minutes</span>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <ul class="list-unstyled mb-0">
+                  <li class="mb-3">
+                    <div class="d-flex align-items-center">
+                      <i class="ti ti-language text-primary me-2"></i>
+                      <div>
+                        <small class="text-muted d-block">Language</small>
+                        <span class="badge bg-label-primary">{{ slot.get_language_display }}</span>
+                        <span class="badge bg-label-info">{{ slot.get_level_display }}</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="mb-3">
+                    <div class="d-flex align-items-center">
+                      <i class="ti ti-coins text-primary me-2"></i>
+                      <div>
+                        <small class="text-muted d-block">Cost</small>
+                        <div class="d-flex align-items-center">
+                          <span class="fw-semibold me-2">2 credits</span>
+                          <span class="badge bg-label-secondary">${{ session_price_usd }} USD</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="d-flex align-items-center">
+                      <i class="ti ti-wallet text-primary me-2"></i>
+                      <div>
+                        <small class="text-muted d-block">Your Balance</small>
+                        <div>
+                          {% if credit_balance >= required_credits %}
+                          <span class="badge bg-label-success p-1">{{ credit_balance }} credits available</span>
+                          {% else %}
+                          <span class="badge bg-label-danger p-1">{{ credit_balance }} credits available</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
         </div>
         
-        <div class="mb-4">
-          <div class="table-responsive">
-            <table class="table table-borderless">
-              <tbody>
-                <tr>
-                  <th class="ps-0" width="30%">Date:</th>
-                  <td>{{ slot.start_time|date:"l, F j, Y" }}</td>
-                </tr>
-                <tr>
-                  <th class="ps-0">Time:</th>
-                  <td>{{ slot.start_time|date:"h:i A" }}</td>
-                </tr>
-                <tr>
-                  <th class="ps-0">Duration:</th>
-                  <td>{{ slot.duration_minutes }} minutes</td>
-                </tr>
-                <tr>
-                  <th class="ps-0">Cost:</th>
-                  <td>2 credits ($6.00 USD)</td>
-                </tr>
-                <tr>
-                  <th class="ps-0">Your Balance:</th>
-                  <td>
-                    {% if credit_balance >= 2 %}
-                    <span class="badge bg-label-success">{{ credit_balance }} credits</span>
-                    {% else %}
-                    <span class="badge bg-label-danger">{{ credit_balance }} credits</span>
-                    {% endif %}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        {% if credit_balance < 2 %}
-        <div class="mb-4">
-          <div class="alert alert-danger">
+        {% if credit_balance < required_credits %}
+        <!-- Insufficient Credits Warning -->
+        <div class="card bg-danger bg-opacity-10 border-danger mb-4 animate__animated animate__headShake">
+          <div class="card-body">
             <div class="d-flex">
-              <i class="ti ti-alert-triangle me-2 mt-1"></i>
+              <div class="me-3">
+                <i class="ti ti-alert-triangle text-danger ti-lg"></i>
+              </div>
               <div>
-                <h6 class="alert-heading mb-1">Insufficient Credits</h6>
-                <p class="mb-0">
-                  You don't have enough credits to book this session. You need 2 credits for a private session.
+                <h6 class="text-danger mb-1">Insufficient Credits</h6>
+                <p class="mb-2">
+                  You don't have enough credits to book this session. You need {{ required_credits }} credits (worth ${{ session_price_usd }} USD) for a private session.
                 </p>
+                <a href="{% url 'booking:purchase_credits' %}" class="btn btn-danger">
+                  <i class="ti ti-credit-card me-1"></i> Purchase Credits
+                </a>
               </div>
             </div>
           </div>
-          
-          <a href="{% url 'booking:purchase_credits' %}" class="btn btn-primary">
-            <i class="ti ti-credit-card me-1"></i> Purchase Credits
-          </a>
         </div>
         {% else %}
+        <!-- Booking Confirmation Form -->
         <form method="post">
           {% csrf_token %}
           
-          <div class="mb-4">
-            <div class="alert alert-warning">
+          <!-- Cancellation Policy Notice -->
+          <div class="card bg-warning bg-opacity-10 border-0 mb-4">
+            <div class="card-body">
               <div class="d-flex">
-                <i class="ti ti-alert-circle me-2 mt-1"></i>
+                <i class="ti ti-info-circle text-warning me-2 mt-1"></i>
                 <div>
-                  <h6 class="alert-heading mb-1">Booking Confirmation</h6>
+                  <h6 class="text-warning mb-1">Booking Confirmation</h6>
                   <p class="mb-0">
-                    By confirming this booking, 2 credits will be deducted from your account.
-                    You can cancel this booking up to 24 hours before the scheduled time to receive a refund.
+                    By confirming this booking, {{ required_credits }} credits (${{ session_price_usd }} USD) will be deducted from your account.
+                    You can cancel this booking up to 24 hours before the scheduled time to receive a full refund.
                   </p>
                 </div>
               </div>
             </div>
           </div>
           
-          <div class="d-flex justify-content-between">
-            <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">
+          <!-- Booking Submit -->
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg animate__animated animate__pulse animate__infinite">
               <i class="ti ti-calendar-plus me-1"></i> Confirm Booking
             </button>
+            <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
           </div>
         </form>
         {% endif %}
+      </div>
+    </div>
+    
+    <!-- What to Expect Card -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">What to Expect</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="d-flex">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-primary">
+                  <i class="ti ti-calendar-check"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-1">Confirmation Email</h6>
+                <p class="text-muted mb-0">You'll receive an email with all session details and instructions.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="d-flex">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-success">
+                  <i class="ti ti-bell"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-1">Session Reminder</h6>
+                <p class="text-muted mb-0">We'll send you a reminder 1 hour before your session starts.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="d-flex">
+              <div class="avatar flex-shrink-0 me-3">
+                <div class="avatar-initial rounded bg-label-info">
+                  <i class="ti ti-video"></i>
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-1">Meeting Link</h6>
+                <p class="text-muted mb-0">A secure video meeting link will be provided to join your session.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

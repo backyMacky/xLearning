@@ -9,309 +9,208 @@
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/swiper/swiper.css' %}" />
-<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
-<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/fullcalendar/fullcalendar.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
 {{ block.super }}
 <script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
 <script src="{% static 'vendor/libs/swiper/swiper.js' %}"></script>
-<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/fullcalendar/fullcalendar.js' %}"></script>
 {% endblock vendor_js %}
-
-{% block page_js %}
-{{ block.super }}
-<script src="{% static 'js/dashboards-student.js' %}"></script>
-{% endblock page_js %}
 
 {% block content %}
 
 {% if admin_view %}
-<div class="alert alert-info">
-  <div class="d-flex">
-    <i class="ti ti-info-circle me-2"></i>
+<div class="alert alert-info mb-4">
+  <div class="d-flex align-items-start">
+    <i class="ti ti-info-circle me-2 mt-1"></i>
     <div>
+      <h6 class="alert-heading mb-1">Admin View</h6>
       {% if viewing_as_student %}
-        <strong>Admin View:</strong> You are viewing the student dashboard as {{ viewing_as_student }}.
+        <p class="mb-0">You are viewing the student dashboard as <strong>{{ viewing_as_student }}</strong>.</p>
       {% else %}
-        <strong>Admin View:</strong> You are viewing sample dashboard data.
+        <p class="mb-0">You are viewing sample dashboard data.</p>
       {% endif %}
     </div>
   </div>
 </div>
 {% endif %}
 
-<!-- Student Stats Overview -->
+<!-- Hero stats section with gradient background -->
 <div class="row">
-  <div class="col-lg-8 mb-4">
-    <div class="card">
-      <div class="d-flex align-items-center row">
-        <div class="col-sm-7">
-          <div class="card-body">
-            <h4 class="card-title mb-1">Welcome back, {{request.user.username}} 👋</h4>
-            <p class="mb-4">Track your learning progress</p>
-            
-            <div class="d-flex align-items-center pt-1 mb-3">
-              <div class="d-flex justify-content-between flex-grow-1 flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="avatar">
-                    <div class="avatar-initial bg-label-primary rounded">
-                      <i class="ti ti-book ti-md"></i>
-                    </div>
-                  </div>
-                  <div>
-                    <h5 class="mb-0">{{enrolled_courses|default:"0"}}</h5>
-                    <span>Enrolled Courses</span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                  <div class="avatar">
-                    <div class="avatar-initial bg-label-success rounded">
-                      <i class="ti ti-checkbox ti-md"></i>
-                    </div>
-                  </div>
-                  <div>
-                    <h5 class="mb-0">{{completed_lessons|default:"0"}}</h5>
-                    <span>Completed Lessons</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="d-flex align-items-center">
-              <div class="d-flex justify-content-between flex-grow-1 flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="avatar">
-                    <div class="avatar-initial bg-label-info rounded">
-                      <i class="ti ti-credit-card ti-md"></i>
-                    </div>
-                  </div>
-                  <div>
-                    <h5 class="mb-0">{{credit_balance|default:"0"}}</h5>
-                    <span>Credits Available</span>
-                  </div>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                  <div class="avatar">
-                    <div class="avatar-initial bg-label-warning rounded">
-                      <i class="ti ti-chart-pie ti-md"></i>
-                    </div>
-                  </div>
-                  <div>
-                    <h5 class="mb-0">{{avg_score|default:"0"}}%</h5>
-                    <span>Average Score</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="d-flex align-items-center mt-4">
-              <a href="{% url 'content:course_list' %}" class="btn btn-primary me-2">
-                <i class="ti ti-book me-1"></i> Browse Courses
-              </a>
-              <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-primary">
-                <i class="ti ti-calendar-event me-1"></i> Book a Session
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-5 text-center text-sm-left">
-          <div class="card-body pb-0 px-0 px-md-4">
-            <img src="{% static 'img/illustrations/student-illustration.png' %}" height="140" alt="Student Illustration" class="img-fluid">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Upcoming Sessions -->
-  <div class="col-lg-4 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <h5 class="card-title m-0 me-2">Upcoming Sessions</h5>
-        <a href="{% url 'meetings:meeting_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
-      </div>
-      <div class="card-body">
-        {% if upcoming_meetings %}
-          {% for meeting in upcoming_meetings %}
-          <div class="d-flex mb-3 pb-1 {% if not forloop.last %}border-bottom{% endif %}">
-            <div class="flex-shrink-0 me-3">
-              <div class="avatar">
-                <div class="avatar-initial rounded bg-label-primary">
-                  <i class="ti ti-video ti-md"></i>
-                </div>
-              </div>
-            </div>
-            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-              <div class="me-2">
-                <h6 class="mb-0">{{ meeting.title }}</h6>
-                <small class="text-muted">
-                  {{ meeting.start_time|date:"M d, h:i A" }}
-                  {% if meeting.teacher %}
-                  • {{ meeting.teacher.username }}
-                  {% endif %}
-                </small>
-              </div>
-              {% if meeting.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" %}
-              <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">Join</a>
-              {% endif %}
-            </div>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div class="text-center py-5">
-            <div class="avatar avatar-md mb-3">
-              <div class="avatar-initial rounded-circle bg-label-primary">
-                <i class="ti ti-calendar-off ti-md"></i>
-              </div>
-            </div>
-            <h6 class="mb-1">No upcoming sessions</h6>
-            <p class="mb-4">You don't have any scheduled sessions</p>
-            <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-primary">Book a Session</a>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Course Progress Section -->
-<div class="row">
-  <!-- Course Progress -->
   <div class="col-12 mb-4">
-    <div class="card">
-      <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title mb-0">My Course Progress</h5>
-        <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-outline-primary">All Courses</a>
-      </div>
+    <div class="card bg-primary text-white border-0">
       <div class="card-body">
         <div class="row">
-          {% if course_progress %}
-            {% for course in course_progress %}
-              <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-none bg-transparent border">
-                  <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                      {% if course.image %}
-                        <img src="{{ course.image.url }}" class="me-3 rounded" width="40" alt="{{ course.title }}">
-                      {% else %}
-                        <div class="avatar me-3">
-                          <div class="avatar-initial rounded bg-label-{{ forloop.counter|divisibleby:3|yesno:"success,info,primary" }}">
-                            <i class="ti ti-book ti-sm"></i>
-                          </div>
-                        </div>
-                      {% endif %}
-                      <div>
-                        <h6 class="mb-0">{{ course.title }}</h6>
-                        <small class="text-muted">{{ course.teacher }}</small>
-                      </div>
-                    </div>
-                    
+          <div class="col-lg-8 col-12">
+            <h2 class="fw-bold mb-3">Welcome to Your Learning Journey</h2>
+            
+            <div class="row g-3">
+              <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-none bg-white bg-opacity-20 border-0 text-white">
+                  <div class="card-body p-3">
                     <div class="d-flex align-items-center mb-2">
-                      <div class="progress w-100" style="height: 8px;">
-                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ course.progress }}%" aria-valuenow="{{ course.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                      <div class="avatar me-2">
+                        <div class="avatar-initial rounded bg-white bg-opacity-20">
+                          <i class="ti ti-books ti-md"></i>
+                        </div>
                       </div>
-                      <span class="ms-3">{{ course.progress }}%</span>
+                      <span>Courses</span>
                     </div>
-                    
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                      <small class="text-muted">{{ course.completed_lessons }}/{{ course.lessons_count }} lessons</small>
-                      {% if course.next_lesson %}
-                        <a href="{% url 'content:lesson_detail' lesson_id=course.next_lesson.id %}" class="btn btn-sm btn-primary">Continue</a>
-                      {% endif %}
-                    </div>
-                    
-                    <div class="text-end">
-                      <a href="{% url 'content:course_detail' course_id=course.id %}" class="text-primary">View Course</a>
-                    </div>
+                    <h4 class="mb-0">{{ enrolled_courses }}</h4>
+                    <div class="text-white text-opacity-75 mt-1">Enrolled Courses</div>
                   </div>
                 </div>
               </div>
-            {% endfor %}
-            {% if course_progress|length == 0 %}
-              <div class="col-12">
-                <div class="text-center py-5">
-                  <div class="avatar avatar-md mb-3">
-                    <div class="avatar-initial rounded-circle bg-label-primary">
-                      <i class="ti ti-books ti-md"></i>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-none bg-white bg-opacity-20 border-0 text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar me-2">
+                        <div class="avatar-initial rounded bg-white bg-opacity-20">
+                          <i class="ti ti-checkbox ti-md"></i>
+                        </div>
+                      </div>
+                      <span>Lessons</span>
                     </div>
+                    <h4 class="mb-0">{{ completed_lessons }}</h4>
+                    <div class="text-white text-opacity-75 mt-1">Completed</div>
                   </div>
-                  <h6 class="mb-1">No courses enrolled</h6>
-                  <p class="mb-3">Browse available courses to start your learning journey</p>
-                  <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">Browse Courses</a>
                 </div>
               </div>
-            {% endif %}
-          {% else %}
-            <div class="col-12">
-              <div class="text-center py-5">
-                <div class="avatar avatar-md mb-3">
-                  <div class="avatar-initial rounded-circle bg-label-primary">
-                    <i class="ti ti-books ti-md"></i>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-none bg-white bg-opacity-20 border-0 text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar me-2">
+                        <div class="avatar-initial rounded bg-white bg-opacity-20">
+                          <i class="ti ti-credit-card ti-md"></i>
+                        </div>
+                      </div>
+                      <span>Credits</span>
+                    </div>
+                    <h4 class="mb-0">{{ credit_balance }}</h4>
+                    <div class="text-white text-opacity-75 mt-1">Available</div>
                   </div>
                 </div>
-                <h6 class="mb-1">No courses enrolled</h6>
-                <p class="mb-3">Browse available courses to start your learning journey</p>
-                <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">Browse Courses</a>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-none bg-white bg-opacity-20 border-0 text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar me-2">
+                        <div class="avatar-initial rounded bg-white bg-opacity-20">
+                          <i class="ti ti-chart-pie ti-md"></i>
+                        </div>
+                      </div>
+                      <span>Scores</span>
+                    </div>
+                    <h4 class="mb-0">{{ avg_score }}%</h4>
+                    <div class="text-white text-opacity-75 mt-1">Avg. Score</div>
+                  </div>
+                </div>
               </div>
             </div>
-          {% endif %}
+            
+            <div class="mt-4">
+              <a href="{% url 'content:course_list' %}" class="btn btn-light me-2">
+                <i class="ti ti-book me-1"></i> Browse Courses
+              </a>
+              <a href="{% url 'booking:dashboard' %}" class="btn btn-light bg-opacity-20 text-white">
+                <i class="ti ti-calendar-event me-1"></i> Book Session
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-4 d-none d-lg-block text-center">
+            <img src="{% static 'img/illustrations/student-learning.png' %}" height="220" alt="Student Learning" class="img-fluid">
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Course Progress and Learning Activity -->
 <div class="row">
-  <!-- Assessment Results -->
-  <div class="col-md-6 col-lg-4 mb-4">
+  <!-- Left: Course Progress -->
+  <div class="col-lg-8 mb-4">
     <div class="card h-100">
-      <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title mb-0">Recent Assessment Results</h5>
-        <a href="{% url 'assessment:quiz_list' %}" class="btn btn-sm btn-outline-primary">All Quizzes</a>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">My Course Progress</h5>
+        <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">All Courses</a>
       </div>
       <div class="card-body">
-        {% if assessment_results %}
-          {% for result in assessment_results %}
-            <div class="d-flex mb-3 pb-1 {% if not forloop.last %}border-bottom{% endif %}">
-              <div class="avatar flex-shrink-0 me-3">
-                <div class="avatar-initial rounded bg-label-{% if result.score >= 70 %}success{% elif result.score >= 50 %}warning{% else %}danger{% endif %}">
-                  <i class="ti ti-file-text ti-md"></i>
-                </div>
-              </div>
-              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                <div>
-                  <h6 class="mb-0">{{ result.title }}</h6>
-                  <small class="text-muted">{{ result.course_title }}</small>
-                </div>
-                <div class="d-flex align-items-center">
-                  <div>
-                    <h6 class="mb-0 text-{% if result.score >= 70 %}success{% elif result.score >= 50 %}warning{% else %}danger{% endif %}">{{ result.score }}%</h6>
-                    <small class="text-muted">{{ result.correct_answers }}/{{ result.total_questions }}</small>
+        {% if course_progress %}
+        <div class="swiper" id="course-progress-swiper">
+          <div class="swiper-wrapper pb-3">
+            {% for course in course_progress %}
+            <div class="swiper-slide">
+              <div class="card shadow-sm h-100 border">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    {% if course.image %}
+                    <img src="{{ course.image.url }}" class="me-3 rounded" width="48" alt="{{ course.title }}">
+                    {% else %}
+                    <div class="avatar me-3">
+                      <div class="avatar-initial rounded bg-label-{{ forloop.counter|divisibleby:3|yesno:"success,info,primary" }}">
+                        <i class="ti ti-book ti-md"></i>
+                      </div>
+                    </div>
+                    {% endif %}
+                    <div>
+                      <h6 class="mb-0">{{ course.title }}</h6>
+                      <small class="text-muted">{{ course.teacher }}</small>
+                    </div>
+                  </div>
+                  
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="progress w-100 me-3" style="height: 8px;">
+                      <div class="progress-bar bg-primary" role="progressbar" style="width: {{ course.progress }}%"></div>
+                    </div>
+                    <span class="text-body fw-semibold">{{ course.progress }}%</span>
+                  </div>
+                  
+                  <div class="d-flex justify-content-between mb-3">
+                    <small class="text-muted">{{ course.completed_lessons }}/{{ course.lessons_count }} lessons</small>
+                  </div>
+                  
+                  <div class="d-grid gap-2">
+                    {% if course.next_lesson %}
+                    <a href="{% url 'content:lesson_detail' lesson_id=course.next_lesson.id %}" class="btn btn-primary">
+                      <i class="ti ti-player-play me-1"></i> Continue Learning
+                    </a>
+                    {% else %}
+                    <a href="{% url 'content:course_detail' course_id=course.id %}" class="btn btn-primary">
+                      <i class="ti ti-eye me-1"></i> View Course
+                    </a>
+                    {% endif %}
                   </div>
                 </div>
               </div>
             </div>
-          {% endfor %}
-        {% else %}
-          <div class="text-center py-5">
-            <div class="avatar avatar-md mb-3">
-              <div class="avatar-initial rounded-circle bg-label-primary">
-                <i class="ti ti-report ti-md"></i>
-              </div>
-            </div>
-            <h6 class="mb-1">No assessment results yet</h6>
-            <p class="mb-3">Take quizzes to test your knowledge</p>
-            <a href="{% url 'assessment:quiz_list' %}" class="btn btn-sm btn-primary">Browse Quizzes</a>
+            {% endfor %}
           </div>
+          <div class="swiper-pagination"></div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <div class="avatar avatar-md mb-3">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-books ti-md"></i>
+            </div>
+          </div>
+          <h6 class="mb-1">No courses enrolled</h6>
+          <p class="mb-3">Start your learning journey by enrolling in courses</p>
+          <a href="{% url 'content:course_list' %}" class="btn btn-primary">Browse Courses</a>
+        </div>
         {% endif %}
       </div>
     </div>
   </div>
   
-  <!-- Learning Statistics -->
-  <div class="col-md-6 col-lg-4 mb-4">
+  <!-- Right: Learning Activity Chart -->
+  <div class="col-lg-4 mb-4">
     <div class="card h-100">
       <div class="card-header">
         <h5 class="card-title mb-0">Learning Activity</h5>
@@ -342,7 +241,7 @@
               </div>
               <div>
                 <h6 class="mb-0">{{ total_completed|default:"0" }}</h6>
-                <small>Lessons Completed</small>
+                <small>Lessons</small>
               </div>
             </div>
           </div>
@@ -355,7 +254,7 @@
               </div>
               <div>
                 <h6 class="mb-0">{{ assessments_taken|default:"0" }}</h6>
-                <small>Quizzes Taken</small>
+                <small>Quizzes</small>
               </div>
             </div>
           </div>
@@ -368,65 +267,9 @@
               </div>
               <div>
                 <h6 class="mb-0">{{ total_sessions|default:"0" }}</h6>
-                <small>Sessions Attended</small>
+                <small>Sessions</small>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Available Booking Slots -->
-  <div class="col-md-6 col-lg-4 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title mb-0">Available Booking Slots</h5>
-        <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-outline-primary">View All</a>
-      </div>
-      <div class="card-body">
-        {% if available_slots %}
-          {% for slot in available_slots %}
-            <div class="d-flex mb-3 pb-1 {% if not forloop.last %}border-bottom{% endif %}">
-              <div class="flex-shrink-0 me-3">
-                <div class="avatar">
-                  <div class="avatar-initial rounded bg-label-primary">
-                    <i class="ti ti-calendar-event ti-md"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                <div class="me-2">
-                  <h6 class="mb-0">{{ slot.day_of_week }}, {{ slot.date }}</h6>
-                  <small class="text-muted">{{ slot.time }} ({{ slot.duration }} min) • {{ slot.teacher }}</small>
-                </div>
-                <a href="#" class="btn btn-sm btn-primary">Book</a>
-              </div>
-            </div>
-          {% endfor %}
-        {% else %}
-          <div class="text-center py-5">
-            <div class="avatar avatar-md mb-3">
-              <div class="avatar-initial rounded-circle bg-label-primary">
-                <i class="ti ti-calendar-off ti-md"></i>
-              </div>
-            </div>
-            <h6 class="mb-1">No available slots</h6>
-            <p class="mb-3">Check back later for available booking slots</p>
-            <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-primary">View Booking</a>
-          </div>
-        {% endif %}
-        
-        <div class="d-flex align-items-center justify-content-between mt-4 pt-1 border-top">
-          <div>
-            <h6 class="mb-1">Your Credit Balance</h6>
-            <p class="mb-0 text-muted">For booking sessions</p>
-          </div>
-          <div class="d-flex align-items-center">
-            <h5 class="mb-0 text-primary me-2">{{ credit_balance|default:"0" }}</h5>
-            <a href="{% url 'booking:purchase_credits' %}" class="btn btn-sm btn-outline-primary">
-              <i class="ti ti-plus me-1"></i> Add Credits
-            </a>
           </div>
         </div>
       </div>
@@ -434,133 +277,548 @@
   </div>
 </div>
 
-<!-- Learning Resources Section -->
+<!-- Upcoming Sessions -->
 <div class="row">
-  <!-- Learning Resources -->
-  <div class="col-md-6 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title mb-0">Learning Resources</h5>
-        <a href="{% url 'repository:dashboard' %}" class="btn btn-sm btn-outline-primary">View All</a>
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Upcoming Sessions</h5>
+        <a href="{% url 'meetings:meeting_list' %}" class="btn btn-sm btn-primary">View All</a>
       </div>
       <div class="card-body">
-        {% if resources %}
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Resource</th>
-                  <th>Course</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for resource in resources %}
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-meetings" aria-selected="true" role="tab">
+              <i class="ti ti-video me-1"></i> Meetings
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-private-sessions" aria-selected="false" role="tab">
+              <i class="ti ti-user me-1"></i> Private Sessions
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-group-sessions" aria-selected="false" role="tab">
+              <i class="ti ti-users me-1"></i> Group Sessions
+            </button>
+          </li>
+        </ul>
+        
+        <div class="tab-content pt-3">
+          <!-- Meetings Tab -->
+          <div class="tab-pane fade show active" id="tab-meetings" role="tabpanel">
+            {% if upcoming_meetings %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Date & Time</th>
+                    <th>Duration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for meeting in upcoming_meetings %}
                   <tr>
                     <td>
                       <div class="d-flex align-items-center">
-                        <div class="avatar avatar-sm me-2">
-                          <div class="avatar-initial rounded bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
-                            <i class="ti ti-{{ resource.icon|default:"file" }} ti-sm"></i>
+                        <div class="avatar me-2">
+                          <span class="avatar-initial rounded bg-label-primary">
+                            <i class="ti ti-video"></i>
+                          </span>
+                        </div>
+                        <span>{{ meeting.title }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span>{{ meeting.start_time|date:"M d, Y" }}</span>
+                        <small class="text-muted">{{ meeting.start_time|date:"h:i A" }}</small>
+                      </div>
+                    </td>
+                    <td>{{ meeting.duration }} min</td>
+                    <td>
+                      {% if meeting.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" %}
+                      <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">
+                        <i class="ti ti-video me-1"></i> Join
+                      </a>
+                      {% else %}
+                      <span class="badge bg-label-info">Upcoming</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-calendar-off ti-md"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No upcoming meetings</h6>
+              <p class="mb-0">You don't have any scheduled meetings yet</p>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Private Sessions Tab -->
+          <div class="tab-pane fade" id="tab-private-sessions" role="tabpanel">
+            {% if upcoming_private_sessions %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Instructor</th>
+                    <th>Date & Time</th>
+                    <th>Duration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for session in upcoming_private_sessions %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-xs me-2">
+                          <div class="avatar-initial rounded-circle bg-label-primary">
+                            <span>{{ session.instructor.user.username|slice:":1" }}</span>
                           </div>
                         </div>
-                        <div>
-                          <h6 class="mb-0">{{ resource.title }}</h6>
-                          <small class="text-muted">{{ resource.file_type }}</small>
+                        <span>{{ session.instructor.user.username }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span>{{ session.start_time|date:"M d, Y" }}</span>
+                        <small class="text-muted">{{ session.start_time|date:"h:i A" }}</small>
+                      </div>
+                    </td>
+                    <td>{{ session.duration_minutes }} min</td>
+                    <td>
+                      {% if session.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" and session.end_time|date:"U"|add:"0" > now|date:"U"|add:"0" %}
+                      <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">
+                        <i class="ti ti-video me-1"></i> Join
+                      </a>
+                      {% else %}
+                      <a href="{% url 'booking:cancel_booking' booking_id=session.id %}" class="btn btn-sm btn-outline-danger">
+                        <i class="ti ti-x me-1"></i> Cancel
+                      </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-calendar-off ti-md"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No private sessions</h6>
+              <p class="mb-0">You haven't booked any private sessions yet</p>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Group Sessions Tab -->
+          <div class="tab-pane fade" id="tab-group-sessions" role="tabpanel">
+            {% if upcoming_group_sessions %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Session</th>
+                    <th>Date & Time</th>
+                    <th>Instructor</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for session in upcoming_group_sessions %}
+                  <tr>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span class="fw-medium">{{ session.title }}</span>
+                        <div class="d-flex gap-1 mt-1">
+                          <span class="badge bg-label-primary">{{ session.get_language_display }}</span>
+                          <span class="badge bg-label-info">{{ session.get_level_display }}</span>
                         </div>
                       </div>
                     </td>
-                    <td>{{ resource.course_title }}</td>
                     <td>
-                      <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon">
-                        <i class="ti ti-download"></i>
+                      <div class="d-flex flex-column">
+                        <span>{{ session.start_time|date:"M d, Y" }}</span>
+                        <small class="text-muted">{{ session.start_time|date:"h:i A" }}</small>
+                      </div>
+                    </td>
+                    <td>{{ session.instructor.user.username }}</td>
+                    <td>
+                      {% if session.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" and session.end_time|date:"U"|add:"0" > now|date:"U"|add:"0" %}
+                      <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">
+                        <i class="ti ti-video me-1"></i> Join
                       </a>
+                      {% else %}
+                      <a href="{% url 'booking:cancel_group_enrollment' session_id=session.id %}" class="btn btn-sm btn-outline-danger">
+                        <i class="ti ti-x me-1"></i> Leave
+                      </a>
+                      {% endif %}
                     </td>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-users-off ti-md"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No group sessions</h6>
+              <p class="mb-0">You haven't enrolled in any group sessions yet</p>
+            </div>
+            {% endif %}
           </div>
-        {% else %}
-          <div class="text-center py-5">
-            <div class="avatar avatar-md mb-3">
-              <div class="avatar-initial rounded-circle bg-label-primary">
-                <i class="ti ti-file ti-md"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assessment Results & Learning Resources -->
+<div class="row">
+  <!-- Assessment Results -->
+  <div class="col-lg-6 mb-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Recent Assessment Results</h5>
+        <a href="{% url 'assessment:quiz_list' %}" class="btn btn-sm btn-primary">All Quizzes</a>
+      </div>
+      <div class="card-body">
+        {% if assessment_results %}
+        <div class="list-group list-group-flush">
+          {% for result in assessment_results %}
+          <div class="list-group-item border-0 px-0">
+            <div class="d-flex align-items-start mb-2">
+              <div class="avatar flex-shrink-0 me-3">
+                <span class="avatar-initial rounded-circle bg-label-{% if result.score >= 70 %}success{% elif result.score >= 50 %}warning{% else %}danger{% endif %}">
+                  <i class="ti ti-file-text"></i>
+                </span>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-1">{{ result.title }}</h6>
+                <small class="text-muted d-block">{{ result.course_title }}</small>
+                <div class="d-flex align-items-center mt-1">
+                  <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                    <div class="progress-bar bg-{% if result.score >= 70 %}success{% elif result.score >= 50 %}warning{% else %}danger{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ result.score }}%"></div>
+                  </div>
+                  <span class="fw-semibold">{{ result.score }}%</span>
+                </div>
+                <small class="text-muted">{{ result.correct_answers }}/{{ result.total_questions }} correct</small>
               </div>
             </div>
-            <h6 class="mb-1">No resources yet</h6>
-            <p class="mb-3">Resources will appear when you enroll in courses</p>
-            <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">Browse Courses</a>
           </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <div class="avatar avatar-md mb-3">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-file-text ti-md"></i>
+            </div>
+          </div>
+          <h6 class="mb-1">No assessment results</h6>
+          <p class="mb-3">Take quizzes to test your knowledge</p>
+          <a href="{% url 'assessment:quiz_list' %}" class="btn btn-primary">Browse Quizzes</a>
+        </div>
         {% endif %}
       </div>
     </div>
   </div>
   
-  <!-- My Files -->
-  <div class="col-md-6 mb-4">
+  <!-- Learning Resources -->
+  <div class="col-lg-6 mb-4">
     <div class="card h-100">
-      <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title mb-0">My Files</h5>
-        <a href="{% url 'repository:upload_file' %}" class="btn btn-sm btn-primary">
-          <i class="ti ti-upload me-1"></i> Upload
-        </a>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Learning Resources</h5>
+        <a href="{% url 'repository:dashboard' %}" class="btn btn-sm btn-primary">View All</a>
       </div>
       <div class="card-body">
-        {% if student_files %}
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>File</th>
-                  <th>Course</th>
-                  <th>Views</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for file in student_files %}
-                  <tr>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="avatar avatar-sm me-2">
-                          <div class="avatar-initial rounded bg-label-{{ file.file_type|lower|cut:" "|default:"primary" }}">
-                            <i class="ti ti-{{ file.icon|default:"file" }} ti-sm"></i>
-                          </div>
-                        </div>
-                        <span>{{ file.title }}</span>
-                      </div>
-                    </td>
-                    <td>{{ file.course_title }}</td>
-                    <td>{{ file.view_count }}</td>
-                    <td>
-                      <div class="d-flex">
-                        <a href="{% url 'repository:download_file' file_id=file.id %}" class="btn btn-sm btn-icon">
-                          <i class="ti ti-download"></i>
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <div class="text-center py-5">
-            <div class="avatar avatar-md mb-3">
-              <div class="avatar-initial rounded-circle bg-label-primary">
-                <i class="ti ti-upload ti-md"></i>
+        {% if resources %}
+        <div class="list-group list-group-flush">
+          {% for resource in resources %}
+          <div class="list-group-item border-0 px-0">
+            <div class="d-flex align-items-center mb-2">
+              <div class="avatar me-3">
+                <div class="avatar-initial rounded bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
+                  <i class="ti ti-{{ resource.icon|default:"file" }} ti-md"></i>
+                </div>
               </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-0 text-truncate">{{ resource.title }}</h6>
+                <div class="d-flex align-items-center">
+                  <span class="badge bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }} me-2">
+                    {{ resource.file_type }}
+                  </span>
+                  <small class="text-muted">{{ resource.course_title }}</small>
+                </div>
+              </div>
+              <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon btn-label-primary">
+                <i class="ti ti-download"></i>
+              </a>
             </div>
-            <h6 class="mb-1">No files uploaded</h6>
-            <p class="mb-3">Upload your assignment files and documents</p>
-            <a href="{% url 'repository:upload_file' %}" class="btn btn-sm btn-primary">Upload Files</a>
           </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <div class="avatar avatar-md mb-3">
+            <div class="avatar-initial rounded-circle bg-label-primary">
+              <i class="ti ti-file ti-md"></i>
+            </div>
+          </div>
+          <h6 class="mb-1">No resources available</h6>
+          <p class="mb-3">Resources will appear as you enroll in courses</p>
+          <a href="{% url 'repository:dashboard' %}" class="btn btn-primary">Browse Resources</a>
+        </div>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+
+<!-- Available Booking Options -->
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Available Booking Options</h5>
+        <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-primary">View All</a>
+      </div>
+      <div class="card-body">
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#available-private" role="tab" aria-selected="true">
+              <i class="ti ti-user me-1"></i> Private Sessions
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#available-group" role="tab" aria-selected="false">
+              <i class="ti ti-users me-1"></i> Group Sessions
+            </button>
+          </li>
+        </ul>
+        
+        <div class="tab-content">
+          <!-- Available Private Sessions -->
+          <div class="tab-pane fade show active" id="available-private" role="tabpanel">
+            {% if available_private_sessions %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Instructor</th>
+                    <th>Date & Time</th>
+                    <th>Duration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for slot in available_private_sessions %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-xs me-2">
+                          <div class="avatar-initial rounded-circle bg-label-primary">
+                            <span>{{ slot.instructor.user.username|slice:":1" }}</span>
+                          </div>
+                        </div>
+                        <span>{{ slot.instructor.user.username }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span>{{ slot.start_time|date:"M d, Y" }}</span>
+                        <small class="text-muted">{{ slot.start_time|date:"h:i A" }}</small>
+                      </div>
+                    </td>
+                    <td>{{ slot.duration_minutes }} min</td>
+                    <td>
+                      {% if credit_balance >= 1 %}
+                      <a href="{% url 'booking:book_private_session' slot_id=slot.id %}" class="btn btn-sm btn-primary">
+                        <i class="ti ti-calendar-plus me-1"></i> Book
+                      </a>
+                      {% else %}
+                      <a href="{% url 'booking:purchase_credits' %}" class="btn btn-sm btn-warning">
+                        <i class="ti ti-credit-card me-1"></i> Need Credits
+                      </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-calendar-off ti-md"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No available sessions</h6>
+              <p class="mb-3">There are no available private sessions at the moment</p>
+              <a href="{% url 'booking:dashboard' %}" class="btn btn-primary">Refresh</a>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Available Group Sessions -->
+          <div class="tab-pane fade" id="available-group" role="tabpanel">
+            {% if available_group_sessions %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Session</th>
+                    <th>Date & Time</th>
+                    <th>Enrollment</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for session in available_group_sessions %}
+                  <tr>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span class="fw-medium">{{ session.title }}</span>
+                        <div class="d-flex gap-1 mt-1">
+                          <span class="badge bg-label-primary">{{ session.get_language_display }}</span>
+                          <span class="badge bg-label-info">{{ session.get_level_display }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span>{{ session.start_time|date:"M d, Y" }}</span>
+                        <small class="text-muted">{{ session.start_time|date:"h:i A" }}</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
+                          <div class="progress-bar bg-primary" style="width: {{ session.enrollment_percentage }}%"></div>
+                        </div>
+                        <span>{{ session.students.count }}/{{ session.max_students }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      {% if session.is_full %}
+                      <button disabled class="btn btn-sm btn-outline-secondary">
+                        <i class="ti ti-users-off me-1"></i> Full
+                      </button>
+                      {% elif credit_balance >= 1 %}
+                      <a href="{% url 'booking:enroll_group_session' session_id=session.id %}" class="btn btn-sm btn-primary">
+                        <i class="ti ti-user-plus me-1"></i> Join
+                      </a>
+                      {% else %}
+                      <a href="{% url 'booking:purchase_credits' %}" class="btn btn-sm btn-warning">
+                        <i class="ti ti-credit-card me-1"></i> Need Credits
+                      </a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-label-primary">
+                  <i class="ti ti-users-off ti-md"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No group sessions</h6>
+              <p class="mb-3">There are no available group sessions at the moment</p>
+              <a href="{% url 'booking:dashboard' %}" class="btn btn-primary">Refresh</a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Featured Teachers -->
+{% if featured_instructors %}
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Featured Teachers</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-4">
+          {% for instructor in featured_instructors %}
+          <div class="col-md-3 col-sm-6">
+            <div class="card shadow-none border h-100">
+              <div class="card-body text-center p-3">
+                <div class="avatar avatar-lg mx-auto mb-3">
+                  {% if instructor.profile_image %}
+                  <img src="{{ instructor.profile_image.url }}" alt="{{ instructor.user.username }}" class="rounded-circle">
+                  {% else %}
+                  <div class="avatar-initial rounded-circle bg-label-primary">
+                    <span>{{ instructor.user.username|slice:":1" }}</span>
+                  </div>
+                  {% endif %}
+                </div>
+                <h6 class="mb-1">{{ instructor.user.username }}</h6>
+                
+                <div class="d-flex justify-content-center mb-2">
+                  {% for i in "12345" %}
+                  {% if forloop.counter <= instructor.rating %}
+                  <i class="ti ti-star-filled text-warning ti-xs"></i>
+                  {% else %}
+                  <i class="ti ti-star text-muted ti-xs"></i>
+                  {% endif %}
+                  {% endfor %}
+                </div>
+                
+                <p class="text-muted small mb-3">{{ instructor.bio|truncatechars:80 }}</p>
+                
+                <div class="d-flex gap-1 justify-content-center mb-3">
+                  {% if instructor.teaching_languages %}
+                  {% for lang in instructor.teaching_languages.split %}
+                  <span class="badge bg-label-info">{{ lang }}</span>
+                  {% endfor %}
+                  {% endif %}
+                </div>
+                
+                <a href="{% url 'content:instructor_detail' username=instructor.user.username %}" class="btn btn-primary w-100">
+                  <i class="ti ti-user me-1"></i> View Profile
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 
 <!-- Recommended Courses -->
 {% if recommended_courses %}
@@ -568,34 +826,36 @@
   <div class="col-12 mb-4">
     <div class="card">
       <div class="card-header">
-        <h5 class="card-title mb-0">Recommended for You</h5>
+        <h5 class="card-title mb-0">Recommended For You</h5>
       </div>
       <div class="card-body">
-        <div class="row">
+        <div class="row g-4">
           {% for course in recommended_courses %}
-            <div class="col-md-4 mb-4 mb-md-0">
-              <div class="card shadow-none bg-transparent border h-100">
-                <div class="card-body">
-                  <div class="d-flex align-items-center mb-3">
-                    {% if course.image %}
-                      <img src="{{ course.image.url }}" class="me-3 rounded" width="46" alt="{{ course.title }}">
-                    {% else %}
-                      <div class="avatar me-3">
-                        <div class="avatar-initial rounded bg-label-{{ forloop.counter|divisibleby:3|yesno:"success,info,primary" }}">
-                          <i class="ti ti-book ti-md"></i>
-                        </div>
-                      </div>
-                    {% endif %}
-                    <div>
-                      <h6 class="mb-0">{{ course.title }}</h6>
-                      <small class="text-muted">{{ course.teacher }}</small>
+          <div class="col-md-4">
+            <div class="card shadow-none border h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  {% if course.image %}
+                  <img src="{{ course.image.url }}" class="me-3 rounded" width="48" alt="{{ course.title }}">
+                  {% else %}
+                  <div class="avatar me-3">
+                    <div class="avatar-initial rounded bg-label-{{ forloop.counter|divisibleby:3|yesno:"success,primary,info" }}">
+                      <i class="ti ti-book ti-md"></i>
                     </div>
                   </div>
-                  <p class="mb-3">{{ course.description }}</p>
-                  <a href="{% url 'content:course_detail' course_id=course.id %}" class="btn btn-primary w-100">View Course</a>
+                  {% endif %}
+                  <div>
+                    <h6 class="mb-0">{{ course.title }}</h6>
+                    <small class="text-muted">{{ course.teacher }}</small>
+                  </div>
                 </div>
+                <p class="card-text mb-3">{{ course.description }}</p>
+                <a href="{% url 'content:course_detail' course_id=course.id %}" class="btn btn-primary w-100">
+                  <i class="ti ti-eye me-1"></i> View Course
+                </a>
               </div>
             </div>
+          </div>
           {% endfor %}
         </div>
       </div>
@@ -609,6 +869,24 @@
 {% block page_js_extra %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize course progress swiper
+    const courseProgressSwiper = new Swiper('#course-progress-swiper', {
+      slidesPerView: 1,
+      spaceBetween: 20,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true
+      },
+      breakpoints: {
+        640: {
+          slidesPerView: 1
+        },
+        992: {
+          slidesPerView: 2
+        }
+      }
+    });
+    
     // Learning Activity Chart
     const learningActivityOptions = {
       series: [{
@@ -653,7 +931,7 @@
         }
       },
       xaxis: {
-        categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        categories: {{ weekly_categories|default:"['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"|safe }},
         axisBorder: {
           show: false
         },
@@ -688,6 +966,24 @@
         learningActivityOptions
       );
       learningActivityChart.render();
+    }
+    
+    // Initialize calendar if needed
+    if (document.querySelector("#studentCalendar")) {
+      const calendarEl = document.querySelector("#studentCalendar");
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        events: {{ calendar_events|default:"[]"|safe }},
+        eventClick: function(info) {
+          // Handle event click if needed
+        }
+      });
+      calendar.render();
     }
   });
 </script>

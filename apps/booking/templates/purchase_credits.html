@@ -8,86 +8,182 @@
 {% block vendor_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/animate-css/animate.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
 {{ block.super }}
 <script src="{% static 'vendor/libs/select2/select2.js' %}"></script>
+<script src="{% static 'vendor/libs/cleave/cleave.js' %}"></script>
+<script src="{% static 'vendor/libs/cleave/cleave-phone.js' %}"></script>
 {% endblock vendor_js %}
 
 {% block content %}
 <div class="row">
-  <!-- Credit Balance Card -->
+  <!-- Header Card -->
+  <div class="col-12 mb-4">
+    <div class="card bg-primary text-white">
+      <div class="card-body">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
+          <div>
+            <h3 class="fw-bold mb-1 text-white">Get More Credits</h3>
+            <p class="mb-0">Purchase credits to book sessions with our expert teachers</p>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="border border-white rounded p-3 me-3 text-center">
+              <h4 class="mb-0 text-white">{{ credit_balance }}</h4>
+              <small class="text-white">Your Balance</small>
+            </div>
+            <a href="{% url 'booking:transaction_history' %}" class="btn btn-light">
+              <i class="ti ti-history me-1"></i> Transaction History
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Credits Pricing -->
   <div class="col-md-4 order-md-2 mb-4">
     <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Credit Balance</h5>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Credits Pricing</h5>
+        <span class="badge bg-label-primary">$3 per credit</span>
       </div>
-      <div class="card-body text-center">
+      <div class="card-body">
         <div class="mb-4">
-          <div class="avatar avatar-lg mb-3 mx-auto">
-            <div class="avatar-initial rounded-circle bg-label-primary">
-              <i class="ti ti-coins"></i>
+          <h6>Private Sessions</h6>
+          <div class="d-flex align-items-center mb-2">
+            <div class="avatar me-2 bg-label-primary">
+              <span class="avatar-initial rounded-circle bg-label-primary">
+                <i class="ti ti-user"></i>
+              </span>
+            </div>
+            <div>
+              <span class="fw-semibold">2 Credits</span>
+              <small class="d-block text-muted">${{ private_session_price }} USD</small>
             </div>
           </div>
-          <h3 class="mb-0">{{ credit_balance }}</h3>
-          <p class="text-muted">Credits Available</p>
+          <p class="text-muted small mb-0">One-on-one sessions with a teacher of your choice</p>
         </div>
         
-        <div class="card bg-label-primary bg-opacity-10 border-0 mb-3">
-          <div class="card-body">
-            <h6 class="card-title">Credit Pricing</h6>
-            <p class="mb-0">1 Credit = $3.00 USD</p>
-            <small class="text-muted">
-              Private Session: 2 Credits ($6.00)<br>
-              Group Session: 1 Credit ($3.00)
-            </small>
+        <div class="mb-4">
+          <h6>Group Sessions</h6>
+          <div class="d-flex align-items-center mb-2">
+            <div class="avatar me-2">
+              <span class="avatar-initial rounded-circle bg-label-success">
+                <i class="ti ti-users"></i>
+              </span>
+            </div>
+            <div>
+              <span class="fw-semibold">1 Credit</span>
+              <small class="d-block text-muted">${{ group_session_price }} USD</small>
+            </div>
+          </div>
+          <p class="text-muted small mb-0">Learn together with other students in a group environment</p>
+        </div>
+        
+        <div class="alert alert-info mb-0">
+          <div class="d-flex">
+            <i class="ti ti-info-circle me-2 mt-1"></i>
+            <div>
+              <p class="mb-0">Credits never expire and can be used anytime for booking sessions.</p>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+    
+    <!-- Credit Usage Guide -->
+    <div class="card mb-0 mt-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">How To Use Credits</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="avatar me-2">
+              <span class="avatar-initial rounded bg-label-primary">1</span>
+            </div>
+            <span class="fw-semibold">Purchase Credits</span>
+          </div>
+          <p class="text-muted small ps-4 mb-0">
+            Select a credit package that suits your needs
+          </p>
+        </div>
         
-        <a href="{% url 'booking:transaction_history' %}" class="btn btn-outline-primary btn-sm">
-          <i class="ti ti-history me-1"></i> Transaction History
-        </a>
+        <div class="mb-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="avatar me-2">
+              <span class="avatar-initial rounded bg-label-primary">2</span>
+            </div>
+            <span class="fw-semibold">Book Sessions</span>
+          </div>
+          <p class="text-muted small ps-4 mb-0">
+            Use your credits to book private or group sessions
+          </p>
+        </div>
+        
+        <div>
+          <div class="d-flex align-items-center mb-2">
+            <div class="avatar me-2">
+              <span class="avatar-initial rounded bg-label-primary">3</span>
+            </div>
+            <span class="fw-semibold">Learn & Grow</span>
+          </div>
+          <p class="text-muted small ps-4 mb-0">
+            Join your sessions and enhance your skills
+          </p>
+        </div>
       </div>
     </div>
   </div>
   
   <!-- Purchase Form -->
   <div class="col-md-8 order-md-1 mb-4">
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card shadow-lg">
+      <div class="card-header border-bottom">
         <h5 class="card-title mb-0">Purchase Credits</h5>
-        <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-primary btn-sm">
-          <i class="ti ti-arrow-left me-1"></i> Back to Dashboard
-        </a>
       </div>
+      
       <div class="card-body">
-        <form method="post">
+        <form method="post" id="purchase-form">
           {% csrf_token %}
           
+          <!-- Credit Packages -->
           <div class="mb-4">
             <label class="form-label">{{ form.credit_package.label }}</label>
             
             <div class="row row-cols-1 row-cols-md-2 g-3">
               {% for value, text in form.credit_package.field.choices %}
                 <div class="col">
-                  <div class="card border h-100">
+                  <div class="card border credit-package-card h-100 {% if forloop.first %}border-primary selected{% endif %}">
                     <div class="form-check card-body">
                       <input class="form-check-input" type="radio" name="{{ form.credit_package.name }}" id="credit_package_{{ value }}" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
                       <label class="form-check-label w-100" for="credit_package_{{ value }}">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                          <h6 class="mb-0">{{ value }} Credits</h6>
-                          <span class="badge bg-label-primary">${{ value|multiply:3 }}</span>
+                          <h5 class="mb-0">{{ value }} Credits</h5>
+                          <span class="badge bg-label-primary fs-6">${{ value|multiply:credit_price_usd }}</span>
                         </div>
+                        
+                        <div class="d-flex align-items-center mb-2">
+                          <span class="badge bg-label-secondary me-2">${{ credit_price_usd }}/credit</span>
+                          {% if value == 50 %}
+                            <span class="badge bg-label-success">Best Value!</span>
+                          {% elif value == 20 %}
+                            <span class="badge bg-label-info">Popular</span>
+                          {% endif %}
+                        </div>
+                        
                         <p class="mb-0 text-muted small">
                           {% if value == 5 %}
-                            Great for getting started
+                            Perfect for trying out our platform
                           {% elif value == 10 %}
-                            Most popular option
+                            Ideal for occasional learners
                           {% elif value == 20 %}
-                            Best value for regular users
+                            Great for regular students
                           {% elif value == 50 %}
-                            Perfect for intensive learning
+                            Best value for committed learners
                           {% endif %}
                         </p>
                       </label>
@@ -102,16 +198,32 @@
             {% endif %}
           </div>
           
+          <!-- Payment Method -->
           <div class="mb-4">
-            <label class="form-label">{{ form.payment_method.label }}</label>
+            <label class="d-block form-label">{{ form.payment_method.label }}</label>
             
-            <div class="d-flex gap-3">
+            <div class="d-flex flex-wrap gap-3">
               {% for value, text in form.payment_method.field.choices %}
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="{{ form.payment_method.name }}" id="payment_method_{{ value }}" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
-                  <label class="form-check-label" for="payment_method_{{ value }}">
-                    {{ text }}
-                  </label>
+                <div class="payment-method-card cursor-pointer p-2 border rounded {% if forloop.first %}border-primary selected{% endif %}" data-payment-method="{{ value }}">
+                  <div class="form-check mb-0">
+                    <input class="form-check-input" type="radio" name="{{ form.payment_method.name }}" id="payment_method_{{ value }}" value="{{ value }}" {% if forloop.first %}checked{% endif %}>
+                    <label class="form-check-label d-flex align-items-center" for="payment_method_{{ value }}">
+                      <div class="avatar avatar-sm me-2">
+                        <div class="avatar-initial rounded bg-label-primary">
+                          {% if value == 'credit_card' %}
+                            <i class="ti ti-credit-card"></i>
+                          {% elif value == 'debit_card' %}
+                            <i class="ti ti-credit-card"></i>
+                          {% elif value == 'master_card' %}
+                            <i class="ti ti-brand-mastercard"></i>
+                          {% elif value == 'paypal' %}
+                            <i class="ti ti-brand-paypal"></i>
+                          {% endif %}
+                        </div>
+                      </div>
+                      {{ text }}
+                    </label>
+                  </div>
                 </div>
               {% endfor %}
             </div>
@@ -121,105 +233,242 @@
             {% endif %}
           </div>
           
-          <!-- This would be where payment details would go in a real app -->
-          <div class="card bg-label-warning bg-opacity-10 border-0 mb-4">
+          <!-- Card Details Section -->
+          <div id="card-details-section" class="card mb-4">
+            <div class="card-header bg-light py-2">
+              <h6 class="mb-0">Card Details</h6>
+            </div>
             <div class="card-body">
-              <h6 class="d-flex align-items-center mb-2">
-                <i class="ti ti-info-circle me-2"></i>
-                Demo Mode
-              </h6>
-              <p class="mb-0">This is a demo version. In a real application, you would enter payment details here.</p>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label" for="{{ form.card_number.id_for_label }}">{{ form.card_number.label }}</label>
+                  <div class="input-group input-group-merge">
+                    <span class="input-group-text"><i class="ti ti-credit-card"></i></span>
+                    <input type="text" id="{{ form.card_number.id_for_label }}" name="{{ form.card_number.name }}" class="form-control credit-card-mask" placeholder="{{ form.card_number.field.widget.attrs.placeholder }}">
+                  </div>
+                </div>
+                
+                <div class="col-12">
+                  <label class="form-label" for="{{ form.card_holder.id_for_label }}">{{ form.card_holder.label }}</label>
+                  <input type="text" id="{{ form.card_holder.id_for_label }}" name="{{ form.card_holder.name }}" class="form-control" placeholder="{{ form.card_holder.field.widget.attrs.placeholder }}">
+                </div>
+                
+                <div class="col-6">
+                  <label class="form-label" for="{{ form.expiry_date.id_for_label }}">{{ form.expiry_date.label }}</label>
+                  <input type="text" id="{{ form.expiry_date.id_for_label }}" name="{{ form.expiry_date.name }}" class="form-control expiry-date-mask" placeholder="{{ form.expiry_date.field.widget.attrs.placeholder }}">
+                </div>
+                
+                <div class="col-6">
+                  <label class="form-label" for="{{ form.cvc.id_for_label }}">{{ form.cvc.label }}</label>
+                  <div class="input-group input-group-merge">
+                    <input type="text" id="{{ form.cvc.id_for_label }}" name="{{ form.cvc.name }}" class="form-control cvv-code-mask" placeholder="{{ form.cvc.field.widget.attrs.placeholder }}">
+                    <span class="input-group-text cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Card Verification Value">
+                      <i class="ti ti-help text-muted"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
+          <!-- PayPal Section -->
+          <div id="paypal-section" class="card mb-4 d-none">
+            <div class="card-header bg-light py-2">
+              <h6 class="mb-0">PayPal Details</h6>
+            </div>
+            <div class="card-body">
+              <p class="card-text">
+                You'll be redirected to PayPal to complete your purchase securely.
+              </p>
+              <div class="d-flex justify-content-center my-2">
+                <img src="{% static 'img/icons/payments/paypal.png' %}" alt="PayPal" height="40">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Order Summary -->
+          <div class="card bg-light border-0 mb-4">
+            <div class="card-body">
+              <h6 class="mb-3">Order Summary</h6>
+              <div class="d-flex justify-content-between mb-2">
+                <span>5 Credits</span>
+                <span>$15.00</span>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Processing Fee</span>
+                <span>$0.00</span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between fw-bold">
+                <span>Total</span>
+                <span>$15.00</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Demo Mode Notice -->
+          <div class="alert alert-warning border-warning mb-4">
+            <div class="d-flex">
+              <i class="ti ti-alert-circle me-2 mt-1"></i>
+              <div>
+                <h6 class="alert-heading mb-1">Demo Mode</h6>
+                <p class="mb-0">This is a demo version. No actual payment will be processed. In a real application, you would be connected to a secure payment gateway.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Submit Button -->
           <div class="d-grid">
-            <button type="submit" class="btn btn-primary">
-              <i class="ti ti-shopping-cart me-1"></i> Purchase Credits
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="ti ti-shopping-cart me-1"></i> Complete Purchase
             </button>
           </div>
         </form>
       </div>
     </div>
   </div>
-  
-  <!-- Information Card -->
-  <div class="col-12 mb-4">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">About Credits</h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-4 mb-3 mb-md-0">
-            <div class="d-flex">
-              <div class="avatar flex-shrink-0 me-3">
-                <div class="avatar-initial rounded bg-label-primary">
-                  <i class="ti ti-calendar-stats"></i>
-                </div>
-              </div>
-              <div>
-                <h6>Book Sessions</h6>
-                <p class="mb-0">Use credits to book private sessions with instructors or join group sessions.</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-md-4 mb-3 mb-md-0">
-            <div class="d-flex">
-              <div class="avatar flex-shrink-0 me-3">
-                <div class="avatar-initial rounded bg-label-success">
-                  <i class="ti ti-discount-2"></i>
-                </div>
-              </div>
-              <div>
-                <h6>Better Value</h6>
-                <p class="mb-0">Purchase larger credit packages for better value. Save up to 20% with our largest package.</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-md-4">
-            <div class="d-flex">
-              <div class="avatar flex-shrink-0 me-3">
-                <div class="avatar-initial rounded bg-label-info">
-                  <i class="ti ti-history"></i>
-                </div>
-              </div>
-              <div>
-                <h6>No Expiration</h6>
-                <p class="mb-0">Your credits never expire. Use them whenever you're ready to book a session.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 {% endblock %}
 
-{% block page_js_extra %}
+{% block page_js %}
+{{ block.super }}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Highlight the selected credit package card
-    const packageInputs = document.querySelectorAll('input[name="{{ form.credit_package.name }}"]');
+    // Initialize credit card masking
+    if (document.querySelector('.credit-card-mask')) {
+      new Cleave('.credit-card-mask', {
+        creditCard: true,
+        onCreditCardTypeChanged: function (type) {
+          // Update card icon based on type if needed
+          console.log('Credit card type changed to: ', type);
+        }
+      });
+    }
+
+    // Initialize expiry date masking
+    if (document.querySelector('.expiry-date-mask')) {
+      new Cleave('.expiry-date-mask', {
+        date: true,
+        datePattern: ['m', 'y']
+      });
+    }
+
+    // Initialize CVV code masking
+    if (document.querySelector('.cvv-code-mask')) {
+      new Cleave('.cvv-code-mask', {
+        numeral: true,
+        numeralPositiveOnly: true,
+        blocks: [3],
+        uppercase: false
+      });
+    }
     
-    packageInputs.forEach(input => {
-      input.addEventListener('change', function() {
-        // Remove highlight from all cards
-        document.querySelectorAll('.card.border').forEach(card => {
-          card.classList.remove('border-primary');
+    // Initialize tooltips
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(function(tooltip) {
+      new bootstrap.Tooltip(tooltip);
+    });
+    
+    // Credit package selection
+    const packageCards = document.querySelectorAll('.credit-package-card');
+    packageCards.forEach(card => {
+      card.addEventListener('click', function() {
+        // Clear previous selections
+        packageCards.forEach(c => {
+          c.classList.remove('border-primary', 'selected');
         });
         
-        // Add highlight to selected card
-        if (this.checked) {
-          this.closest('.card').classList.add('border-primary');
+        // Select clicked card
+        this.classList.add('border-primary', 'selected');
+        
+        // Check the radio input
+        const input = this.querySelector('input[type="radio"]');
+        input.checked = true;
+        
+        // Update order summary
+        updateOrderSummary(input.value);
+      });
+    });
+    
+    // Payment method selection
+    const paymentMethods = document.querySelectorAll('.payment-method-card');
+    const cardDetailsSection = document.getElementById('card-details-section');
+    const paypalSection = document.getElementById('paypal-section');
+    
+    paymentMethods.forEach(method => {
+      method.addEventListener('click', function() {
+        // Clear previous selections
+        paymentMethods.forEach(m => {
+          m.classList.remove('border-primary', 'selected');
+        });
+        
+        // Select clicked method
+        this.classList.add('border-primary', 'selected');
+        
+        // Check the radio input
+        const input = this.querySelector('input[type="radio"]');
+        input.checked = true;
+        
+        // Show/hide appropriate section
+        const paymentMethod = this.dataset.paymentMethod;
+        if (paymentMethod === 'paypal') {
+          cardDetailsSection.classList.add('d-none');
+          paypalSection.classList.remove('d-none');
+        } else {
+          cardDetailsSection.classList.remove('d-none');
+          paypalSection.classList.add('d-none');
         }
       });
     });
     
-    // Trigger change on the checked input to highlight it initially
-    document.querySelector('input[name="{{ form.credit_package.name }}"]:checked').dispatchEvent(new Event('change'));
+    // Update order summary
+    function updateOrderSummary(credits) {
+      const amount = credits * {{ credit_price_usd }};
+      
+      // Update DOM
+      const summaryItems = document.querySelector('.card.bg-light .card-body');
+      summaryItems.innerHTML = `
+        <h6 class="mb-3">Order Summary</h6>
+        <div class="d-flex justify-content-between mb-2">
+          <span>${credits} Credits</span>
+          <span>${amount.toFixed(2)}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>Processing Fee</span>
+          <span>$0.00</span>
+        </div>
+        <hr>
+        <div class="d-flex justify-content-between fw-bold">
+          <span>Total</span>
+          <span>${amount.toFixed(2)}</span>
+        </div>
+      `;
+    }
+    
+    // Handle form submission with validation
+    const purchaseForm = document.getElementById('purchase-form');
+    if (purchaseForm) {
+      purchaseForm.addEventListener('submit', function(e) {
+        const selectedPaymentMethod = document.querySelector('input[name="{{ form.payment_method.name }}"]:checked').value;
+        
+        // If credit card payment method selected, do basic validation
+        if (selectedPaymentMethod !== 'paypal' && cardDetailsSection.classList.contains('d-none') === false) {
+          const cardNumber = document.getElementById('{{ form.card_number.id_for_label }}').value;
+          const cardHolder = document.getElementById('{{ form.card_holder.id_for_label }}').value;
+          const expiryDate = document.getElementById('{{ form.expiry_date.id_for_label }}').value;
+          const cvc = document.getElementById('{{ form.cvc.id_for_label }}').value;
+          
+          // Very basic validation for demo
+          if (!cardNumber || !cardHolder || !expiryDate || !cvc) {
+            e.preventDefault();
+            alert('Please fill in all card details');
+            return false;
+          }
+        }
+        
+        // In a real app, you would do much more validation and perhaps use a payment gateway's client SDK
+      });
+    }
   });
 </script>
 {% endblock %}

@@ -359,8 +359,10 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
         # Get credit balance
         credit_balance = self.get_credit_balance(request.user)
         
-        # Check required credits - Private sessions cost 2 credits
+        # UPDATED: Check required credits - Private sessions cost 2 credits
         required_credits = 2
+        credit_price_usd = 3  # 1 credit = $3 USD
+        session_price_usd = required_credits * credit_price_usd  # $6 USD
         
         # Check if user has enough credits
         if credit_balance < required_credits:
@@ -368,6 +370,8 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
             context = {
                 'credit_balance': credit_balance,
                 'required_credits': required_credits,
+                'credit_price_usd': credit_price_usd,
+                'session_price_usd': session_price_usd,
                 'slot': slot,
                 'session_type': 'private',
                 'active_menu': 'booking',
@@ -386,6 +390,8 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
             'from_content_app': from_content_app,
             'credit_balance': credit_balance,
             'required_credits': required_credits,
+            'credit_price_usd': credit_price_usd,
+            'session_price_usd': session_price_usd,
             'active_menu': 'booking',
             'active_submenu': 'dashboard',
         }
@@ -432,14 +438,12 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
                             print(f"Deleting {len(duplicate_pks)} duplicate slots: {duplicate_pks}")
                             PrivateSessionSlot.objects.filter(pk__in=duplicate_pks).delete()
                 
-                # Check credit balance
+                # UPDATED: Check credit balance and required credits
                 credit_balance = self.get_credit_balance(request.user)
-                
-                # Set required credits - Private sessions cost 2 credits
-                required_credits = 2
+                required_credits = 2  # Private sessions cost 2 credits
                 
                 if credit_balance < required_credits:
-                    messages.error(request, f"Insufficient credits. You need {required_credits} credits for a private session.")
+                    messages.error(request, f"Insufficient credits. You need {required_credits} credits (${required_credits * 3} USD) for a private session.")
                     return redirect('booking:purchase_credits')
                 
                 # Process the booking
@@ -457,56 +461,18 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
                     CreditTransaction.objects.create(
                         student=request.user,
                         amount=required_credits,
-                        description=f"Private session with {slot.instructor.user.username}",
+                        description=f"Private session with {slot.instructor.user.username} (${required_credits * 3} USD)",
                         transaction_type='deduction',
                         private_session=None if from_content_app else slot
                     )
                     
-                    # Prepare for email notification
-                    instructor_name = slot.instructor.user.username
-                    session_date = slot.start_time.strftime('%A, %B %d, %Y')
-                    session_time = slot.start_time.strftime('%I:%M %p')
-                    
-                    # Get meeting link if available
-                    meeting_link = None
-                    if hasattr(slot, 'meeting') and slot.meeting:
-                        meeting_link = slot.meeting.meeting_link
-                    
-                    # Create Google Calendar link
-                    from datetime import datetime
-                    start_time = slot.start_time.strftime('%Y%m%dT%H%M%S')
-                    end_time = slot.end_time.strftime('%Y%m%dT%H%M%S')
-                    title = f"Language Session with {instructor_name}"
-                    details = f"Your language learning session with {instructor_name}"
-                    location = meeting_link if meeting_link else "Online"
-                    google_calendar_link = f"https://calendar.google.com/calendar/render?action=TEMPLATE&text={title}&dates={start_time}/{end_time}&details={details}&location={location}"
-                    
-                    # Send email confirmation
-                    context = {
-                        'user': request.user,
-                        'instructor': instructor_name,
-                        'session_date': session_date,
-                        'session_time': session_time,
-                        'session_duration': slot.duration_minutes,
-                        'meeting_link': meeting_link,
-                        'google_calendar_link': google_calendar_link
-                    }
-                    
+                    # Send booking confirmation email
                     try:
-                        html_message = render_to_string('email/booking_confirmation.html', context)
-                        plain_message = strip_tags(html_message)
-                        
-                        send_mail(
-                            subject=f"Your session with {instructor_name} is confirmed!",
-                            message=plain_message,
-                            from_email=settings.DEFAULT_FROM_EMAIL,
-                            recipient_list=[request.user.email],
-                            html_message=html_message,
-                            fail_silently=True
-                        )
+                        from .utilities import send_booking_confirmation_email
+                        send_booking_confirmation_email(slot, request.user)
                     except Exception as e:
                         # Log but continue if email fails
-                        print(f"Error sending confirmation email: {e}")
+                        print(f"Error sending booking confirmation email: {e}")
                     
                     messages.success(request, "Session booked successfully! Check your email for details.")
                 else:
@@ -519,7 +485,8 @@ class BookPrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
                 print(f"Booking error: {e}")
                 messages.error(request, f"An error occurred while booking: {str(e)}")
                 return redirect('booking:dashboard')
-            
+
+
 class CancelPrivateSessionView(LoginRequiredMixin, View):
     """View to cancel a booked private session"""
     
@@ -732,14 +699,18 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
         # Get student's credit balance
         credit_balance = self.get_credit_balance(request.user)
         
-        # Check if user has enough credits (1 credit required for group session)
-        required_credits = 1  # Group sessions cost 1 credit ($3 USD)
+        # UPDATED: Check if user has enough credits (1 credit required for group session)
+        required_credits = 1  # Group sessions cost 1 credit
+        credit_price_usd = 3  # 1 credit = $3 USD
+        session_price_usd = required_credits * credit_price_usd  # $3 USD
         
         if credit_balance < required_credits:
             # Initialize template context
             context = {
                 'credit_balance': credit_balance,
                 'required_credits': required_credits,
+                'credit_price_usd': credit_price_usd,
+                'session_price_usd': session_price_usd,
                 'session': session,
                 'session_type': 'group',
                 'active_menu': 'booking',
@@ -758,6 +729,8 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
             'instructor': session.instructor,
             'credit_balance': credit_balance,
             'required_credits': required_credits,
+            'credit_price_usd': credit_price_usd,
+            'session_price_usd': session_price_usd,
             'from_content_app': from_content_app,
             'active_menu': 'booking',
             'active_submenu': 'group_sessions',
@@ -789,12 +762,14 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
             messages.error(request, "This session is full.")
             return redirect('content:group_session_detail', session_id=session.id) if from_content_app else redirect('booking:dashboard')
         
-        # Check if student has enough credits (1 credit for group session)
+        # UPDATED: Check if student has enough credits and setup pricing
         credit_balance = self.get_credit_balance(request.user)
-        required_credits = 1  # Group sessions cost 1 credit ($3 USD)
+        required_credits = 1  # Group sessions cost 1 credit
+        credit_price_usd = 3  # $3 USD per credit
+        session_price_usd = required_credits * credit_price_usd  # $3 USD total
         
         if credit_balance < required_credits:
-            messages.error(request, "You don't have enough credits to enroll in this session.")
+            messages.error(request, f"You don't have enough credits to enroll in this session. You need {required_credits} credit (${session_price_usd} USD).")
             return redirect('booking:purchase_credits')
         
         # Enroll in the session
@@ -809,21 +784,21 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
         
         if success:
             # Deduct credits (1 credit for group session)
-            if from_content_app:
-                CreditTransaction.objects.create(
-                    student=request.user,
-                    amount=required_credits,
-                    description=f"Enrollment in group session '{session.title}' on {session.start_time}",
-                    transaction_type='deduction',
-                )
-            else:
-                CreditTransaction.objects.create(
-                    student=request.user,
-                    amount=required_credits,
-                    description=f"Enrollment in group session '{session.title}' on {session.start_time}",
-                    transaction_type='deduction',
-                    group_session=session
-                )
+            CreditTransaction.objects.create(
+                student=request.user,
+                amount=required_credits,
+                description=f"Enrollment in group session '{session.title}' (${session_price_usd} USD)",
+                transaction_type='deduction',
+                group_session=None if from_content_app else session
+            )
+            
+            # Send booking confirmation email
+            try:
+                from .utilities import send_booking_confirmation_email
+                send_booking_confirmation_email(session, request.user)
+            except Exception as e:
+                # Log but continue if email fails
+                print(f"Error sending booking confirmation email: {e}")
             
             messages.success(request, "Successfully enrolled in the group session!")
             return redirect('content:group_session_detail', session_id=session.id) if from_content_app else redirect('booking:my_sessions')
@@ -831,6 +806,7 @@ class EnrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
             messages.error(request, message)
             return redirect('content:group_session_detail', session_id=session.id) if from_content_app else redirect('booking:dashboard')
         
+
 class UnenrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
     """View to unenroll from a group session"""
     
@@ -881,12 +857,19 @@ class UnenrollGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class PurchaseCreditsForm(forms.Form):
-    """Form for purchasing credits with updated pricing ($3 USD per credit)"""
+    """Form for purchasing credits ($3 USD per credit)"""
     CREDIT_CHOICES = [
         (5, '5 Credits - $15'),
         (10, '10 Credits - $30'),
         (20, '20 Credits - $60'),
         (50, '50 Credits - $150'),
+    ]
+    
+    PAYMENT_CHOICES = [
+        ('credit_card', 'Credit Card'),
+        ('debit_card', 'Debit Card'),
+        ('master_card', 'Master Card'),
+        ('paypal', 'PayPal'),
     ]
     
     credit_package = forms.ChoiceField(
@@ -896,16 +879,39 @@ class PurchaseCreditsForm(forms.Form):
     )
     
     payment_method = forms.ChoiceField(
-        choices=[
-            ('credit_card', 'Credit Card'),
-            ('paypal', 'PayPal'),
-        ],
+        choices=PAYMENT_CHOICES,
         widget=forms.RadioSelect(),
         label="Payment Method"
     )
     
-    # In a real application, you would add fields for payment information
-    # such as credit card details or redirect to a payment gateway
+    # Credit Card Information (for demo purposes only)
+    card_number = forms.CharField(
+        required=False,
+        max_length=19,
+        widget=forms.TextInput(attrs={'placeholder': '1234 5678 9012 3456'}),
+        label="Card Number"
+    )
+    
+    card_holder = forms.CharField(
+        required=False,
+        max_length=100,
+        widget=forms.TextInput(attrs={'placeholder': 'Name on card'}),
+        label="Card Holder"
+    )
+    
+    expiry_date = forms.CharField(
+        required=False,
+        max_length=5,
+        widget=forms.TextInput(attrs={'placeholder': 'MM/YY'}),
+        label="Expiry Date"
+    )
+    
+    cvc = forms.CharField(
+        required=False,
+        max_length=4,
+        widget=forms.TextInput(attrs={'placeholder': 'CVC'}),
+        label="CVC/CVV"
+    )
 
 class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     """View for students to purchase credits"""
@@ -923,13 +929,31 @@ class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         # Get student's current credit balance
         credit_balance = 0
         if CreditTransaction.objects.filter(student=self.request.user).exists():
-            last_transaction = CreditTransaction.objects.filter(student=self.request.user).latest('created_at')
-            credit_balance = last_transaction.get_balance()
+            # Calculate current balance properly
+            transactions = CreditTransaction.objects.filter(student=self.request.user)
+            
+            # Sum credits from purchases and refunds
+            credits = transactions.filter(
+                transaction_type__in=['purchase', 'refund', 'bonus']
+            ).aggregate(models.Sum('amount'))['amount__sum'] or 0
+            
+            # Calculate debits from deductions
+            debits = transactions.filter(
+                transaction_type='deduction'
+            ).aggregate(models.Sum('amount'))['amount__sum'] or 0
+            
+            credit_balance = credits - debits
         
         context['credit_balance'] = credit_balance
         
         # Add pricing information
         context['credit_price_usd'] = 3  # $3 USD per credit
+        
+        # Add info about session pricing
+        context['private_session_credits'] = 2
+        context['group_session_credits'] = 1
+        context['private_session_price'] = 2 * 3  # $6 USD
+        context['group_session_price'] = 1 * 3  # $3 USD
         
         # Set active menu attributes
         context['active_menu'] = 'booking'
@@ -944,6 +968,7 @@ class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     def form_valid(self, form):
         # Get the selected credit package
         credit_package = int(form.cleaned_data['credit_package'])
+        payment_method = form.cleaned_data['payment_method']
         
         # In a real application, you would integrate with a payment gateway here
         # For this demo, we'll assume the payment was successful
@@ -952,12 +977,13 @@ class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         CreditTransaction.objects.create(
             student=self.request.user,
             amount=credit_package,
-            description=f"Purchase of {credit_package} credits (${credit_package * 3} USD)",
+            description=f"Purchase of {credit_package} credits (${credit_package * 3} USD) using {dict(form.fields['payment_method'].choices)[payment_method]}",
             transaction_type='purchase'
         )
         
         messages.success(self.request, f"Successfully purchased {credit_package} credits for ${credit_package * 3} USD!")
         return super().form_valid(form)
+    
     
 class TransactionHistoryView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """View for students to view their credit transaction history"""
