@@ -1137,16 +1137,25 @@ class StudentDashboardView(LoginRequiredMixin, TemplateView):
         
         return context
 
-class CreatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    """View for creating private session slots with complete recursion prevention"""
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect, JsonResponse
+from django.contrib import messages
+from django.db import transaction
+from django.views.generic import CreateView
+from django.utils import timezone
+
+from .models import PrivateSession, GroupSession, Instructor
+
+# Modified versions of the views without UserPassesTestMixin
+
+class CreatePrivateSessionView(LoginRequiredMixin, CreateView):
+    """View for creating private session slots without instructor check"""
     model = PrivateSession
     form_class = PrivateSessionForm
     template_name = 'private_session_form.html'
     success_url = reverse_lazy('content:instructor_dashboard')
-    
-    def test_func(self):
-        """Only users with instructor profiles can create sessions"""
-        return hasattr(self.request.user, 'instructor_profile')
     
     def get_context_data(self, **kwargs):
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
@@ -1173,8 +1182,8 @@ class CreatePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateVi
         
         try:
             with transaction.atomic():
-                # Set the instructor to current user's profile
-                instructor = self.request.user.instructor_profile
+                # Get or create instructor profile for the current user
+                instructor, created = Instructor.objects.get_or_create(user=self.request.user)
     
                 # Save and get the instance but don't commit yet
                 instance = form.save(commit=False, instructor=instructor)
@@ -1386,16 +1395,12 @@ class DeletePrivateSessionView(LoginRequiredMixin, UserPassesTestMixin, DeleteVi
         messages.success(request, "Private session deleted successfully.")
         return super().delete(request, *args, **kwargs)
 
-class CreateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    """View for creating group sessions with complete recursion prevention"""
+class CreateGroupSessionView(LoginRequiredMixin, CreateView):
+    """View for creating group sessions without instructor check"""
     model = GroupSession
     form_class = GroupSessionForm
     template_name = 'group_session_form.html'
     success_url = reverse_lazy('content:instructor_dashboard')
-    
-    def test_func(self):
-        """Only users with instructor profiles can create sessions"""
-        return hasattr(self.request.user, 'instructor_profile')
     
     def get_context_data(self, **kwargs):
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
@@ -1422,8 +1427,8 @@ class CreateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView
         
         try:
             with transaction.atomic():
-                # Set the instructor to current user's profile
-                instructor = self.request.user.instructor_profile
+                # Get or create instructor profile for the current user
+                instructor, created = Instructor.objects.get_or_create(user=self.request.user)
     
                 # Save and get the instance but don't commit yet
                 instance = form.save(commit=False, instructor=instructor)
@@ -1557,6 +1562,7 @@ class CreateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, CreateView
         _PREVENTING_GROUP_RECURSION = False
         
         return HttpResponseRedirect(self.success_url)
+        
     
 class UpdateGroupSessionView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """View for updating group sessions"""

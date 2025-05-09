@@ -22,4 +22,9 @@ urlpatterns = [
     # Credit management
     path('credits/purchase/', views.PurchaseCreditsView.as_view(), name='purchase_credits'),
     path('credits/history/', views.TransactionHistoryView.as_view(), name='transaction_history'),
+
+    #slot management
+    path('slots/create/', views.CreateSlotView.as_view(), name='create_slot'),
+    path('slots/cancel/<int:slot_id>/', views.CancelBookingView.as_view(), name='cancel_booking'),
+    path('slots/late-cancel/<int:slot_id>/', views.LateCancellationView.as_view(), name='late_cancellation'),
 ]

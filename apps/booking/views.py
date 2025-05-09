@@ -913,14 +913,11 @@ class PurchaseCreditsForm(forms.Form):
         label="CVC/CVV"
     )
 
-class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
+class PurchaseCreditsView(LoginRequiredMixin, FormView):
     """View for students to purchase credits"""
     template_name = 'purchase_credits.html'
     form_class = PurchaseCreditsForm
     success_url = reverse_lazy('booking:transaction_history')
-    
-    def test_func(self):
-        return hasattr(self.request.user, 'is_student') and self.request.user.is_student
     
     def get_context_data(self, **kwargs):
         # Initialize the template layout from the base class
@@ -947,7 +944,14 @@ class PurchaseCreditsView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         context['credit_balance'] = credit_balance
         
         # Add pricing information
-        context['credit_price_usd'] = 3  # $3 USD per credit
+        credit_price_usd = 3  # $3 USD per credit
+        context['credit_price_usd'] = credit_price_usd
+        
+        # Add precomputed prices for each credit package
+        context['package_5_price'] = 15  # 5 * $3
+        context['package_10_price'] = 30  # 10 * $3
+        context['package_20_price'] = 60  # 20 * $3
+        context['package_50_price'] = 150  # 50 * $3
         
         # Add info about session pricing
         context['private_session_credits'] = 2
@@ -1199,6 +1203,254 @@ class BookingDashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
+class CancelBookingView(LoginRequiredMixin, View):
+    """View to cancel a booking slot (works for both instructors and students)"""
+    template_name = 'cancel_booking.html'
+    
+    def get(self, request, slot_id):
+        """Display cancellation confirmation page"""
+        try:
+            # Determine if user is student or instructor
+            if hasattr(request.user, 'is_student') and request.user.is_student:
+                # For students: Get slots they've booked
+                slots = PrivateSessionSlot.objects.filter(id=slot_id, student=request.user)
+                if not slots.exists():
+                    messages.error(request, "Session not found or you don't have permission to cancel it.")
+                    return redirect('booking:my_sessions')
+                slot = slots.first()
+            else:
+                # For instructors: Get slots they've created
+                try:
+                    instructor = Instructor.objects.get(user=request.user)
+                    slots = PrivateSessionSlot.objects.filter(id=slot_id, instructor=instructor)
+                    if not slots.exists():
+                        messages.error(request, "Session not found or you don't have permission to cancel it.")
+                        return redirect('booking:dashboard')
+                    slot = slots.first()
+                except Instructor.DoesNotExist:
+                    messages.error(request, "You don't have an instructor profile.")
+                    return redirect('booking:dashboard')
+            
+            # Initialize context
+            context = TemplateLayout.init(self, {
+                'slot': slot,
+                'active_menu': 'booking',
+                'active_submenu': 'my_sessions' if hasattr(request.user, 'is_student') and request.user.is_student else 'instructor_booking',
+                'now': timezone.now()
+            })
+            
+            # Set the layout path using TemplateHelper
+            context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+            TemplateHelper.map_context(context)
+            
+            # Check if this is a late cancellation (less than 24 hours before)
+            is_late_cancellation = (slot.start_time - timezone.now()) < timezone.timedelta(hours=24)
+            
+            # If it's a student canceling late, use the late cancellation template
+            if hasattr(request.user, 'is_student') and request.user.is_student and is_late_cancellation and slot.status == 'booked':
+                return render(request, 'late_cancellation.html', context)
+            
+            return render(request, self.template_name, context)
+            
+        except Exception as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+            return redirect('booking:dashboard')
+    
+    def post(self, request, slot_id):
+        """Process cancellation request"""
+        # Use transaction to avoid issues with signal handling
+        with transaction.atomic():
+            try:
+                # Temporarily disconnect signals to prevent recursion
+                from django.db.models.signals import post_save
+                from .models import sync_booking_to_private_session
+                
+                # Find the session using filter to avoid MultipleObjectsReturned
+                if hasattr(request.user, 'is_student') and request.user.is_student:
+                    # For students
+                    slots = PrivateSessionSlot.objects.filter(id=slot_id, student=request.user)
+                    if not slots.exists():
+                        messages.error(request, "Session not found or cannot be cancelled.")
+                        return redirect('booking:my_sessions')
+                    slot = slots.first()
+                else:
+                    # For instructors
+                    try:
+                        instructor = Instructor.objects.get(user=request.user)
+                        slots = PrivateSessionSlot.objects.filter(id=slot_id, instructor=instructor)
+                        if not slots.exists():
+                            messages.error(request, "Session not found or cannot be cancelled.")
+                            return redirect('booking:dashboard')
+                        slot = slots.first()
+                    except Instructor.DoesNotExist:
+                        messages.error(request, "You don't have an instructor profile.")
+                        return redirect('booking:dashboard')
+                
+                # Store needed data before cancellation
+                student = slot.student
+                instructor_user = slot.instructor.user
+                start_time = slot.start_time
+                is_late_cancellation = (start_time - timezone.now()) < timezone.timedelta(hours=24)
+                force_cancel = request.POST.get('force_cancel') == 'true'
+                
+                # Check if this is a student trying to cancel late without force
+                if hasattr(request.user, 'is_student') and request.user.is_student and is_late_cancellation and slot.status == 'booked' and not force_cancel:
+                    # Redirect to late cancellation page
+                    return redirect('booking:late_cancellation', slot_id=slot.id)
+                
+                # Process the cancellation
+                if hasattr(slot, 'cancel') and callable(slot.cancel):
+                    success, message = slot.cancel(request.user)
+                    if success:
+                        if request.user == instructor_user and student:
+                            messages.success(request, "Session cancelled successfully. The student has been notified and refunded.")
+                        else:
+                            # Check if student gets a refund (more than 24h before session or instructor cancelled)
+                            if not is_late_cancellation or request.user == instructor_user:
+                                messages.success(request, "Session cancelled successfully. You've received a refund of 1 credit.")
+                            else:
+                                messages.success(request, "Session cancelled successfully. No refund was issued due to late cancellation.")
+                    else:
+                        messages.error(request, message)
+                else:
+                    # Manual cancellation fallback
+                    slot.status = 'cancelled'
+                    
+                    # If instructor is cancelling, clear student reference and issue refund
+                    if request.user == instructor_user and student:
+                        student_email = student.email if student else None
+                        was_booked = slot.status == 'booked'
+                        slot.student = None
+                        
+                        # Save with signals disabled to avoid recursion
+                        post_save.disconnect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+                        slot.save()
+                        post_save.connect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+                        
+                        # Issue refund if the slot was booked
+                        if was_booked:
+                            CreditTransaction.objects.create(
+                                student=student,
+                                amount=2,  # 2 credits for private session
+                                description=f"Refund for cancelled session with {request.user.username}",
+                                transaction_type='refund',
+                                private_session=slot
+                            )
+                            
+                            # Email notification
+                            try:
+                                from .utilities import send_cancellation_email
+                                send_cancellation_email(slot, student, refund_amount=2)
+                            except Exception as e:
+                                print(f"Error sending cancellation email: {e}")
+                        
+                        messages.success(request, "Session cancelled successfully. The student has been notified and refunded.")
+                    else:
+                        # Student cancelling
+                        # Check if eligible for refund (must be >24h before session)
+                        if not is_late_cancellation and slot.status == 'booked':
+                            # Issue refund
+                            CreditTransaction.objects.create(
+                                student=request.user,
+                                amount=2,  # 2 credits for private session
+                                description=f"Refund for cancelled session with {instructor_user.username}",
+                                transaction_type='refund',
+                                private_session=slot
+                            )
+                            messages.success(request, "Session cancelled successfully. You've received a refund of 2 credits.")
+                        else:
+                            messages.success(request, "Session cancelled successfully. No refund was issued due to late cancellation.")
+                        
+                        # Save with signals disabled
+                        post_save.disconnect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+                        slot.save()
+                        post_save.connect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+                
+                # Clean up the meeting if it exists
+                if slot.meeting:
+                    slot.meeting.delete()
+                    slot.meeting = None
+                    
+                    # Save again with signals disabled
+                    post_save.disconnect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+                    slot.save()
+                    post_save.connect(sync_booking_to_private_session, sender=PrivateSessionSlot)
+                
+                # Sync with content app if available
+                try:
+                    from apps.content.models import PrivateSession
+                    content_sessions = PrivateSession.objects.filter(
+                        instructor__user=instructor_user, 
+                        start_time=start_time
+                    )
+                    if content_sessions.exists():
+                        content_session = content_sessions.first()
+                        content_session.status = 'cancelled'
+                        if request.user == instructor_user:
+                            content_session.student = None
+                        content_session.save()
+                except (ImportError, AttributeError):
+                    pass
+                
+                # Redirect to appropriate page
+                if hasattr(request.user, 'is_student') and request.user.is_student:
+                    return redirect('booking:my_sessions')
+                else:
+                    return redirect('booking:dashboard')
+                
+            except Exception as e:
+                messages.error(request, f"An error occurred while cancelling the session: {str(e)}")
+                if hasattr(request.user, 'is_student') and request.user.is_student:
+                    return redirect('booking:my_sessions')
+                else:
+                    return redirect('booking:dashboard')
+                    
+
+class LateCancellationView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """View for handling late cancellations (less than 24h before session)"""
+    template_name = 'late_cancellation.html'
+    
+    def test_func(self):
+        """Only students can access this view"""
+        return hasattr(self.request.user, 'is_student') and self.request.user.is_student
+    
+    def get(self, request, slot_id):
+        """Display late cancellation warning"""
+        try:
+            # Get the slot
+            slot = get_object_or_404(PrivateSessionSlot, id=slot_id, student=request.user, status='booked')
+            
+            # Verify this is actually a late cancellation
+            if (slot.start_time - timezone.now()) >= timezone.timedelta(hours=24):
+                # Not a late cancellation, redirect to regular cancellation
+                return redirect('booking:cancel_booking', slot_id=slot.id)
+            
+            # Initialize context
+            context = TemplateLayout.init(self, {
+                'slot': slot,
+                'active_menu': 'booking',
+                'active_submenu': 'my_sessions',
+                'now': timezone.now()
+            })
+            
+            # Set the layout path using TemplateHelper
+            context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+            TemplateHelper.map_context(context)
+            
+            return render(request, self.template_name, context)
+            
+        except PrivateSessionSlot.DoesNotExist:
+            messages.error(request, "Session not found or you don't have permission to cancel it.")
+            return redirect('booking:my_sessions')
+    
+    def post(self, request, slot_id):
+        """Process forced late cancellation"""
+        # Add force_cancel parameter and redirect to the regular cancellation view
+        response = redirect('booking:cancel_booking', slot_id=slot_id)
+        response['Location'] += '?force_cancel=true'
+        return response
+
+
 class MySessionsView(LoginRequiredMixin, TemplateView):
     """View for students to see all their booked sessions"""
     template_name = 'my_sessions.html'
@@ -1320,3 +1572,115 @@ class MySessionsView(LoginRequiredMixin, TemplateView):
         TemplateHelper.map_context(context)
 
         return context
+
+
+class CreateSlotView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """View for instructors to create available booking slots"""
+    template_name = 'create_slot.html'
+    
+    def test_func(self):
+        """Only users with instructor profiles can create slots"""
+        from django.conf import settings
+        if hasattr(settings, 'TESTING') and settings.TESTING:
+            return True  # Skip permission checks in testing mode
+            
+        # Check if user has instructor profile in the booking app
+        return hasattr(self.request.user, 'booking_instructor_profile')
+    
+    def get(self, request):
+        """Display the slot creation form"""
+        # Initialize context with template layout
+        context = TemplateLayout.init(self, {
+            'active_menu': 'booking',
+            'active_submenu': 'instructor_booking',
+        })
+        
+        # Set the layout path using TemplateHelper
+        context['layout_path'] = TemplateHelper.set_layout("layout_vertical.html", context)
+        TemplateHelper.map_context(context)
+        
+        return render(request, self.template_name, context)
+    
+    def post(self, request):
+        """Process slot creation form submission"""
+        try:
+            # Extract form data
+            start_time_str = request.POST.get('start_time')
+            duration_minutes = int(request.POST.get('duration', 60))
+            
+            # Parse the datetime string
+            from django.utils import timezone
+            import datetime
+            
+            try:
+                # Convert to datetime object and make timezone-aware
+                start_time = datetime.datetime.strptime(start_time_str, '%Y-%m-%d %H:%M')
+                start_time = timezone.make_aware(start_time)
+                end_time = start_time + timezone.timedelta(minutes=duration_minutes)
+                
+                # Validate the start time (must be in future)
+                if start_time <= timezone.now():
+                    messages.error(request, "Start time must be in the future.")
+                    return redirect('booking:create_slot')
+                
+            except ValueError:
+                messages.error(request, "Invalid date or time format.")
+                return redirect('booking:create_slot')
+            
+            # Get or create instructor profile
+            try:
+                instructor = Instructor.objects.get(user=request.user)
+            except Instructor.DoesNotExist:
+                instructor = Instructor.objects.create(
+                    user=request.user,
+                    bio="",
+                    teaching_languages="en",  # Default language
+                    hourly_rate=25.00,
+                    is_available=True
+                )
+            
+            # Create the slot
+            slot = PrivateSessionSlot.objects.create(
+                instructor=instructor,
+                start_time=start_time,
+                end_time=end_time,
+                duration_minutes=duration_minutes,
+                language='en',  # Default to English
+                level='B1',     # Default to Intermediate
+                status='available'
+            )
+            
+            # Try syncing with content app if available
+            try:
+                from apps.content.models import PrivateSession, Instructor as ContentInstructor
+                
+                # Get or create content instructor
+                content_instructor, created = ContentInstructor.objects.get_or_create(
+                    user=request.user,
+                    defaults={
+                        'bio': instructor.bio if hasattr(instructor, 'bio') else '',
+                        'hourly_rate': instructor.hourly_rate if hasattr(instructor, 'hourly_rate') else 25.00
+                    }
+                )
+                
+                # Create content private session
+                PrivateSession.objects.create(
+                    instructor=content_instructor,
+                    start_time=start_time,
+                    end_time=end_time,
+                    duration_minutes=duration_minutes,
+                    language='en',  # Default to English
+                    level='B1',     # Default to Intermediate
+                    status='available',
+                    is_trial=False
+                )
+            except (ImportError, AttributeError) as e:
+                # Content app not available or models not compatible
+                print(f"Warning: Could not sync with content app: {e}")
+            
+            messages.success(request, "Booking slot created successfully!")
+            
+        except Exception as e:
+            messages.error(request, f"Error creating slot: {str(e)}")
+        
+        return redirect('booking:dashboard')

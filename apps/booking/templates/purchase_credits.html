@@ -163,7 +163,9 @@
                       <label class="form-check-label w-100" for="credit_package_{{ value }}">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                           <h5 class="mb-0">{{ value }} Credits</h5>
-                          <span class="badge bg-label-primary fs-6">${{ value|multiply:credit_price_usd }}</span>
+                          <span class="badge bg-label-primary fs-6">
+                          {% if value == 5 %}${{ package_5_price }}{% elif value == 10 %}${{ package_10_price }}{% elif value == 20 %}${{ package_20_price }}{% elif value == 50 %}${{ package_50_price }}{% endif %}
+                            </span>
                         </div>
                         
                         <div class="d-flex align-items-center mb-2">
