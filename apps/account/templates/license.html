@@ -1,0 +1,309 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}License Information - xLearning{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+<style>
+  .license-hero {
+    background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%);
+    padding: 80px 0 60px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .license-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.1;
+    z-index: 0;
+  }
+  
+  .license-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .license-content {
+    padding: 80px 0;
+  }
+  
+  .license-card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+  }
+  
+  .license-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .license-card-header {
+    background-color: #f8f9fa;
+    padding: 20px 25px;
+    border-radius: 15px 15px 0 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .license-card-body {
+    padding: 25px;
+  }
+  
+  .license-badge {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  
+  .badge-mit {
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+  }
+  
+  .license-faq {
+    margin-top: 60px;
+  }
+  
+  .accordion-button:not(.collapsed) {
+    color: #7367f0;
+    background-color: rgba(115, 103, 240, 0.1);
+  }
+  
+  .accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(115, 103, 240, 0.25);
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="license-hero">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center license-hero-content" data-aos="fade-up">
+        <h1 class="display-5 fw-bold mb-3">License Information</h1>
+        <p class="lead mb-4">Learn about the xLearning platform's licensing terms and how you can use our software.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- License Content -->
+<section class="license-content">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <!-- Platform License -->
+        <div class="license-card" data-aos="fade-up">
+          <div class="license-card-header">
+            <h2 class="h4 mb-0">xLearning Platform License</h2>
+          </div>
+          <div class="license-card-body">
+            <span class="license-badge badge-mit">MIT License</span>
+            <p>The xLearning platform is licensed under the MIT License, which is a permissive free software license originating at the Massachusetts Institute of Technology (MIT).</p>
+            
+            <div class="bg-light p-4 rounded-3 mt-4 mb-4">
+              <p class="mb-2">Copyright (c) {% now "Y" %} xLearning</p>
+              <p class="mb-3">Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+              <p class="mb-3">The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+              <p class="mb-0">THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+            </div>
+            
+            <h4>What this means:</h4>
+            <ul>
+              <li>You can use the xLearning platform in your own projects, commercially or non-commercially.</li>
+              <li>You can modify the xLearning platform to suit your needs.</li>
+              <li>You can distribute the xLearning platform.</li>
+              <li>You must include the copyright notice and license in all copies or substantial portions of the software.</li>
+              <li>The authors provide no warranties about the xLearning platform, and are not liable for any damages related to its use.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Third-Party Components -->
+        <div class="license-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="license-card-header">
+            <h2 class="h4 mb-0">Third-Party Components</h2>
+          </div>
+          <div class="license-card-body">
+            <p>The xLearning platform includes several third-party components, each with its own license. Here's a summary of the major components:</p>
+            
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Component</th>
+                    <th>License</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Django Framework</td>
+                    <td>BSD 3-Clause License</td>
+                  </tr>
+                  <tr>
+                    <td>Bootstrap</td>
+                    <td>MIT License</td>
+                  </tr>
+                  <tr>
+                    <td>Tabler Icons</td>
+                    <td>MIT License</td>
+                  </tr>
+                  <tr>
+                    <td>jQuery</td>
+                    <td>MIT License</td>
+                  </tr>
+                  <tr>
+                    <td>AOS (Animate On Scroll)</td>
+                    <td>MIT License</td>
+                  </tr>
+                  <tr>
+                    <td>Select2</td>
+                    <td>MIT License</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <p class="mt-3">For a complete list of all third-party components and their licenses, please refer to the documentation or contact our support team.</p>
+          </div>
+        </div>
+        
+        <!-- Commercial Usage -->
+        <div class="license-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="license-card-header">
+            <h2 class="h4 mb-0">Commercial Usage</h2>
+          </div>
+          <div class="license-card-body">
+            <p>While the xLearning platform itself is licensed under the MIT License and can be used commercially, there are some considerations:</p>
+            
+            <ul>
+              <li>Commercial usage of the platform may require additional licenses for third-party components or services.</li>
+              <li>If you modify the platform, you may need to comply with additional licensing requirements.</li>
+              <li>Certain features or extensions may have separate licensing terms.</li>
+            </ul>
+            
+            <div class="alert alert-info mt-3">
+              <h5 class="alert-heading">Looking for extended commercial support?</h5>
+              <p class="mb-0">We offer commercial support and customization services for businesses. Please contact our sales team for more information.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- License FAQ -->
+        <div class="license-faq" data-aos="fade-up" data-aos-delay="300">
+          <h3 class="mb-4">Frequently Asked Questions</h3>
+          
+          <div class="accordion" id="licenseFAQ">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="faq1">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                  Can I use xLearning in a commercial product?
+                </button>
+              </h2>
+              <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#licenseFAQ">
+                <div class="accordion-body">
+                  Yes, you can use xLearning in a commercial product. The MIT License allows for commercial use. However, if you're using any premium themes or extensions, you'll need to check their individual licenses.
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="faq2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                  Do I need to credit xLearning in my project?
+                </button>
+              </h2>
+              <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#licenseFAQ">
+                <div class="accordion-body">
+                  Yes, while using the MIT License, you need to include the original copyright notice and the license text in your project. This can be in a credits section, about page, or in your documentation.
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="faq3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                  Can I modify and redistribute xLearning?
+                </button>
+              </h2>
+              <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#licenseFAQ">
+                <div class="accordion-body">
+                  Yes, the MIT License allows you to modify and redistribute the software. You can create derivative works and even sell them. Just remember to include the original copyright notice and license in your distribution.
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="faq4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                  Are there any restrictions on how I can use xLearning?
+                </button>
+              </h2>
+              <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faq4" data-bs-parent="#licenseFAQ">
+                <div class="accordion-body">
+                  The MIT License is very permissive and places minimal restrictions on reuse. The main requirement is that you include the original copyright notice and license text. Additionally, the license includes a disclaimer of warranty, so the authors are not liable for any issues that may arise from using the software.
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="faq5">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                  How do I handle third-party components included in xLearning?
+                </button>
+              </h2>
+              <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faq5" data-bs-parent="#licenseFAQ">
+                <div class="accordion-body">
+                  Each third-party component included in xLearning has its own license. Most are MIT or similarly permissive, but you should review each license to ensure compliance. A comprehensive list of components and their licenses is available in our documentation.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contact Section -->
+        <div class="text-center mt-5 pt-3" data-aos="fade-up" data-aos-delay="400">
+          <h3 class="mb-4">Still have questions?</h3>
+          <p class="mb-4">If you have any questions about licensing that aren't answered here, please feel free to contact our support team.</p>
+          <a href="{% url 'account:support' %}" class="btn btn-primary btn-lg">Contact Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animation
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 50
+    });
+  });
+</script>
+{% endblock %}

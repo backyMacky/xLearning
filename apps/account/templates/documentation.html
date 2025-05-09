@@ -1,0 +1,794 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Documentation - xLearning{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+<style>
+  .docs-hero {
+    background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%);
+    padding: 80px 0 60px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .docs-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.1;
+    z-index: 0;
+  }
+  
+  .docs-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .docs-search {
+    max-width: 600px;
+    margin: 30px auto 0;
+  }
+  
+  .docs-search .input-group {
+    background-color: white;
+    border-radius: 50px;
+    padding: 5px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .docs-search .form-control {
+    border: none;
+    box-shadow: none;
+    padding: 15px 20px;
+    height: auto;
+    background: transparent;
+    font-size: 1.1rem;
+  }
+  
+  .docs-search .btn {
+    border-radius: 50px;
+    padding: 10px 25px;
+    margin-right: 5px;
+  }
+  
+  .docs-content {
+    padding: 80px 0;
+  }
+  
+  .docs-sidebar {
+    position: sticky;
+    top: 30px;
+  }
+  
+  .docs-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .docs-menu-title {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 1px solid #e9ecef;
+    margin: 0;
+  }
+  
+  .docs-menu-item {
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .docs-menu-item:last-child {
+    border-bottom: none;
+  }
+  
+  .docs-menu-link {
+    display: block;
+    padding: 15px 20px;
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .docs-menu-link:hover {
+    background-color: rgba(115, 103, 240, 0.05);
+    color: #7367f0;
+  }
+  
+  .docs-menu-link.active {
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+    font-weight: 600;
+    border-left: 3px solid #7367f0;
+  }
+  
+  .docs-card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    overflow: hidden;
+  }
+  
+  .docs-card-header {
+    background-color: #f8f9fa;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .docs-card-body {
+    padding: 25px;
+  }
+  
+  .docs-content h2 {
+    color: #333;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .docs-content h3 {
+    color: #444;
+    margin-top: 30px;
+    margin-bottom: 15px;
+  }
+  
+  .docs-content p {
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+  
+  .docs-content ul, .docs-content ol {
+    margin-bottom: 20px;
+    padding-left: 20px;
+  }
+  
+  .docs-content li {
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+  
+  .docs-content code {
+    background-color: #f8f9fa;
+    color: #e83e8c;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  
+  .docs-content pre {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: auto;
+  }
+  
+  .docs-content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: #333;
+  }
+  
+  .docs-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .docs-content .alert {
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .docs-content .table {
+    margin-bottom: 30px;
+  }
+  
+  .docs-content .table th {
+    background-color: #f8f9fa;
+  }
+  
+  .docs-content blockquote {
+    border-left: 4px solid #7367f0;
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    margin-bottom: 20px;
+    border-radius: 0 10px 10px 0;
+  }
+  
+  .docs-content blockquote p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .docs-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .docs-footer a {
+    display: inline-flex;
+    align-items: center;
+    color: #7367f0;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .docs-footer a:hover {
+    text-decoration: underline;
+  }
+  
+  .docs-footer a.prev i {
+    margin-right: 8px;
+  }
+  
+  .docs-footer a.next i {
+    margin-left: 8px;
+  }
+  
+  .category-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+  
+  .category-card-header {
+    background-color: #f8f9fa;
+    padding: 25px;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+  }
+  
+  .category-card-icon {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 28px;
+  }
+  
+  .category-card-body {
+    padding: 25px;
+    flex-grow: 1;
+  }
+  
+  .category-card-footer {
+    padding: 15px 25px;
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="docs-hero">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center docs-hero-content" data-aos="fade-up">
+        <h1 class="display-5 fw-bold mb-3">xLearning Documentation</h1>
+        <p class="lead mb-4">Comprehensive guides to help you make the most of our platform</p>
+        
+        <div class="docs-search">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search the documentation..." aria-label="Search documentation">
+            <button class="btn btn-primary" type="button">Search</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Documentation Categories -->
+<section class="docs-content">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Browse by Category</h2>
+        <p class="lead">Find the information you need by exploring our documentation categories</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Getting Started -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up">
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-card-icon">
+              <i class="ti ti-rocket"></i>
+            </div>
+            <h3 class="h5 mb-0">Getting Started</h3>
+          </div>
+          <div class="category-card-body">
+            <p class="text-muted">Everything you need to know to get up and running with xLearning quickly.</p>
+            <ul class="list-unstyled">
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Introduction to xLearning</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Creating Your Account</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Platform Navigation</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">First Steps Guide</a></li>
+            </ul>
+          </div>
+          <div class="category-card-footer">
+            <a href="#" class="btn btn-outline-primary">View All</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Student Guide -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-card-icon">
+              <i class="ti ti-users"></i>
+            </div>
+            <h3 class="h5 mb-0">Student Guide</h3>
+          </div>
+          <div class="category-card-body">
+            <p class="text-muted">Learn how to find courses, track progress, and make the most of your learning experience.</p>
+            <ul class="list-unstyled">
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Finding Courses</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Enrollment Process</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Progress Tracking</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Taking Notes</a></li>
+            </ul>
+          </div>
+          <div class="category-card-footer">
+            <a href="#" class="btn btn-outline-primary">View All</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Teacher Guide -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-card-icon">
+              <i class="ti ti-chalkboard"></i>
+            </div>
+            <h3 class="h5 mb-0">Teacher Guide</h3>
+          </div>
+          <div class="category-card-body">
+            <p class="text-muted">Resources for educators on creating courses, managing students, and effective teaching.</p>
+            <ul class="list-unstyled">
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Course Creation</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Student Management</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Assessment Tools</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Scheduling Sessions</a></li>
+            </ul>
+          </div>
+          <div class="category-card-footer">
+            <a href="#" class="btn btn-outline-primary">View All</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Account Management -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up">
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-card-icon">
+              <i class="ti ti-user-circle"></i>
+            </div>
+            <h3 class="h5 mb-0">Account Management</h3>
+          </div>
+          <div class="category-card-body">
+            <p class="text-muted">Learn how to manage your profile, settings, and account preferences.</p>
+            <ul class="list-unstyled">
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Profile Settings</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Security Options</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Notification Preferences</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Teacher Application Process</a></li>
+            </ul>
+          </div>
+          <div class="category-card-footer">
+            <a href="#" class="btn btn-outline-primary">View All</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Administration -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-card-icon">
+              <i class="ti ti-shield"></i>
+            </div>
+            <h3 class="h5 mb-0">Administration</h3>
+          </div>
+          <div class="category-card-body">
+            <p class="text-muted">Guides for administrators on user management, roles, and permissions.</p>
+            <ul class="list-unstyled">
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">User Management</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Roles & Permissions</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Teacher Approval Workflow</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">System Settings</a></li>
+            </ul>
+          </div>
+          <div class="category-card-footer">
+            <a href="#" class="btn btn-outline-primary">View All</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Payments & Credits -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-card-icon">
+              <i class="ti ti-credit-card"></i>
+            </div>
+            <h3 class="h5 mb-0">Payments & Credits</h3>
+          </div>
+          <div class="category-card-body">
+            <p class="text-muted">Information about payment methods, credit system, and booking sessions.</p>
+            <ul class="list-unstyled">
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Credit System Explained</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Purchasing Credits</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Payment Methods</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Refund Policy</a></li>
+            </ul>
+          </div>
+          <div class="category-card-footer">
+            <a href="#" class="btn btn-outline-primary">View All</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Troubleshooting -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up">
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-card-icon">
+              <i class="ti ti-help"></i>
+            </div>
+            <h3 class="h5 mb-0">Troubleshooting</h3>
+          </div>
+          <div class="category-card-body">
+            <p class="text-muted">Solutions to common issues and problems you might encounter.</p>
+            <ul class="list-unstyled">
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Login Issues</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Account Verification</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Payment Problems</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Common Error Messages</a></li>
+            </ul>
+          </div>
+          <div class="category-card-footer">
+            <a href="#" class="btn btn-outline-primary">View All</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- API Documentation -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="category-card">
+          <div class="category-card-header">
+            <div class="category-card-icon">
+              <i class="ti ti-code"></i>
+            </div>
+            <h3 class="h5 mb-0">API Documentation</h3>
+          </div>
+          <div class="category-card-body">
+            <p class="text-muted">Technical documentation for developers integrating with our platform.</p>
+            <ul class="list-unstyled">
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">API Overview</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Authentication</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Endpoints Reference</a></li>
+              <li><i class="ti ti-arrow-right text-primary me-2"></i> <a href="#">Code Examples</a></li>
+            </ul>
+          </div>
+          <div class="category-card-footer">
+            <a href="#" class="btn btn-outline-primary">View All</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Documentation -->
+<section class="bg-light py-5">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Featured Documentation</h2>
+        <p class="lead">Popular guides and frequently accessed documentation</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <!-- Featured Doc 1: Account Management -->
+        <div class="docs-card" data-aos="fade-up">
+          <div class="docs-card-header">
+            <h2 class="h4 mb-0">Account Management Guide</h2>
+          </div>
+          <div class="docs-card-body">
+            <h3>Managing Your User Profile</h3>
+            <p>Your profile on xLearning contains important information about your account and learning preferences. Keeping this information up-to-date ensures the best experience on our platform.</p>
+            
+            <h4>Accessing Your Profile</h4>
+            <p>To access your profile settings:</p>
+            <ol>
+              <li>Log in to your xLearning account</li>
+              <li>Click on your profile picture in the top-right corner</li>
+              <li>Select "My Profile" from the dropdown menu</li>
+              <li>On your profile page, click "Edit Profile" to make changes</li>
+            </ol>
+            
+            <h4>Profile Information You Can Update</h4>
+            <p>From your profile settings, you can update the following information:</p>
+            <ul>
+              <li><strong>Profile Picture:</strong> Upload a photo to personalize your account</li>
+              <li><strong>Personal Information:</strong> Update your name, username, and email address</li>
+              <li><strong>Language Settings:</strong> Set your native language and the language you're learning</li>
+              <li><strong>Contact Information:</strong> Update your phone number and date of birth</li>
+              <li><strong>Bio:</strong> Add information about yourself that teachers and other students can see</li>
+            </ul>
+            
+            <div class="alert alert-info">
+              <h5 class="alert-heading">Pro Tip</h5>
+              <p class="mb-0">Adding a complete profile with a photo helps teachers get to know you better and can enhance your learning experience!</p>
+            </div>
+            
+            <div class="docs-footer">
+              <a href="#" class="prev"><i class="ti ti-arrow-left"></i> Getting Started</a>
+              <a href="#" class="next">Security Settings <i class="ti ti-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Featured Doc 2: Teacher Application -->
+        <div class="docs-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="docs-card-header">
+            <h2 class="h4 mb-0">Teacher Application Process</h2>
+          </div>
+          <div class="docs-card-body">
+            <h3>Becoming a Teacher on xLearning</h3>
+            <p>If you have language teaching experience and want to share your expertise with students worldwide, you can apply to become a teacher on xLearning.</p>
+            
+            <h4>Eligibility Requirements</h4>
+            <p>To become a teacher on xLearning, you should have:</p>
+            <ul>
+              <li>Fluency in the language you want to teach</li>
+              <li>Teaching experience (formal or informal)</li>
+              <li>A verified xLearning account</li>
+              <li>The ability to conduct online classes</li>
+            </ul>
+            
+            <h4>Application Steps</h4>
+            <ol>
+              <li><strong>Submit Application:</strong> Go to your profile and select "Request Teacher Status"</li>
+              <li><strong>Provide Information:</strong> Fill out the form with your qualifications, teaching experience, and the subjects you want to teach</li>
+              <li><strong>Application Review:</strong> Our administration team will review your application</li>
+              <li><strong>Approval Process:</strong> If approved, you'll receive a notification and your account will be upgraded to teacher status</li>
+            </ol>
+            
+            <h4>After Approval</h4>
+            <p>Once approved as a teacher, you'll gain access to:</p>
+            <ul>
+              <li>Teacher dashboard with course creation tools</li>
+              <li>Student management features</li>
+              <li>Scheduling and calendar functionalities</li>
+              <li>Payment processing for your classes</li>
+            </ul>
+            
+            <div class="alert alert-warning">
+              <h5 class="alert-heading">Important Note</h5>
+              <p class="mb-0">The teacher approval process typically takes 2-3 business days. You'll receive a notification when your application is reviewed.</p>
+            </div>
+            
+            <div class="docs-footer">
+              <a href="#" class="prev"><i class="ti ti-arrow-left"></i> Student Guide</a>
+              <a href="#" class="next">Creating Your First Course <i class="ti ti-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-5" data-aos="fade-up">
+      <a href="#" class="btn btn-primary btn-lg">View Full Documentation</a>
+    </div>
+  </div>
+</section>
+
+<!-- Documentation Videos -->
+<section class="docs-content">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Video Tutorials</h2>
+        <p class="lead">Learn visually with our step-by-step video guides</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Video 1 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up">
+        <div class="card">
+          <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 200px;">
+            <i class="ti ti-player-play text-white" style="font-size: 48px;"></i>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Getting Started with xLearning</h5>
+            <p class="card-text">A complete walkthrough of the xLearning platform and its core features.</p>
+            <a href="#" class="btn btn-primary">Watch Now</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Video 2 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="card">
+          <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 200px;">
+            <i class="ti ti-player-play text-white" style="font-size: 48px;"></i>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Managing Your Profile</h5>
+            <p class="card-text">Learn how to update your profile information and account settings.</p>
+            <a href="#" class="btn btn-primary">Watch Now</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Video 3 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="card">
+          <div class="card-img-top bg-dark d-flex align-items-center justify-content-center" style="height: 200px;">
+            <i class="ti ti-player-play text-white" style="font-size: 48px;"></i>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Becoming a Teacher</h5>
+            <p class="card-text">A step-by-step guide to applying for and becoming a teacher on xLearning.</p>
+            <a href="#" class="btn btn-primary">Watch Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Documentation FAQ -->
+<section class="bg-light py-5">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Frequently Asked Questions</h2>
+        <p class="lead">Quick answers to common documentation questions</p>
+      </div>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8" data-aos="fade-up">
+        <div class="accordion" id="documentationFAQ">
+          <!-- FAQ 1 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq1">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                How do I reset my password?
+              </button>
+            </h2>
+            <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#documentationFAQ">
+              <div class="accordion-body">
+                To reset your password, click on the "Forgot Password" link on the login page. Enter your email address and follow the instructions sent to your email. You'll receive a link to create a new password. This link is valid for 24 hours.
+              </div>
+            </div>
+          </div>
+          
+          <!-- FAQ 2 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq2">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                How do I verify my email address?
+              </button>
+            </h2>
+            <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#documentationFAQ">
+              <div class="accordion-body">
+                After registration, a verification link is sent to your email address. Simply click on this link to verify your account. If you didn't receive the email, you can request a new verification link from the "Verify Email" page. Make sure to check your spam folder if you don't see the email in your inbox.
+              </div>
+            </div>
+          </div>
+          
+          <!-- FAQ 3 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq3">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                How long does the teacher approval process take?
+              </button>
+            </h2>
+            <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#documentationFAQ">
+              <div class="accordion-body">
+                The teacher approval process typically takes 2-3 business days. Our administration team reviews each application carefully to ensure all teachers meet our quality standards. You'll receive a notification when your application has been reviewed, regardless of the outcome.
+              </div>
+            </div>
+          </div>
+          
+          <!-- FAQ 4 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq4">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                How do I update my notification preferences?
+              </button>
+            </h2>
+            <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faq4" data-bs-parent="#documentationFAQ">
+              <div class="accordion-body">
+                To update your notification preferences, go to your Account Settings and select the "Preferences" tab. From there, you can customize which notifications you receive via email and in-app. You can toggle notifications for messages, course updates, reminders, and promotional content.
+              </div>
+            </div>
+          </div>
+          
+          <!-- FAQ 5 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="faq5">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                What roles and permissions are available on the platform?
+              </button>
+            </h2>
+            <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faq5" data-bs-parent="#documentationFAQ">
+              <div class="accordion-body">
+                xLearning has three main user types: Students, Teachers, and Administrators. Each has different permissions and capabilities. Additionally, administrators can create custom roles with specific permission sets. Check the Roles & Permissions section in the Administration documentation for full details on available permissions.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-5" data-aos="fade-up">
+      <p>Still have questions?</p>
+      <a href="{% url 'account:support' %}" class="btn btn-primary">Contact Support</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animation
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 50
+    });
+  });
+</script>
+{% endblock %}

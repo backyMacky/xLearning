@@ -145,9 +145,10 @@ class PrivateSessionSlot(models.Model):
         self.student = student
         self.status = 'booked'
     
-        # Generate a proper Google Meet link
-        
-        meeting_code = str(uuid.uuid4()).replace('-', '')[:10]  # Generate random code
+        # Generate a proper Google Meet link with the format xxx-xxxx-xxx
+        # This format is used by Google Meet for valid meeting codes
+        uuid_str = str(uuid.uuid4()).replace('-', '')
+        meeting_code = f"{uuid_str[:3]}-{uuid_str[3:7]}-{uuid_str[7:10]}"
         meeting_link = f"https://meet.google.com/{meeting_code}"
 
         # Create a meeting for this session
@@ -156,7 +157,8 @@ class PrivateSessionSlot(models.Model):
             teacher=self.instructor.user,
             start_time=self.start_time,
             duration=self.duration_minutes,
-            meeting_link=meeting_link
+            meeting_link=meeting_link,
+            meeting_code=meeting_code  # Store the meeting code for future reference
         )
         meeting.students.add(self.student)
 
@@ -165,7 +167,7 @@ class PrivateSessionSlot(models.Model):
         self.save()
 
         return True, "Session booked successfully"
-    
+
     def cancel(self, user):
         """Cancel a booked private session"""
         if self.status != 'booked':
@@ -283,36 +285,39 @@ class GroupSession(models.Model):
         """Enroll a student in the group session"""
         if self.is_full:
             return False, "This session is full"
-
+    
         if student in self.students.all():
             return False, "You are already enrolled in this session"
-
+    
         if self.start_time < timezone.now():
             return False, "Cannot enroll in a past session"
-
+    
         self.students.add(student)
-
+    
         # Create meeting if it doesn't exist yet
         if not self.meeting:
             import uuid
-            meeting_code = str(uuid.uuid4()).replace('-', '')[:10]  # Generate random code
+            # Generate a proper Google Meet link with the format xxx-xxxx-xxx
+            uuid_str = str(uuid.uuid4()).replace('-', '')
+            meeting_code = f"{uuid_str[:3]}-{uuid_str[3:7]}-{uuid_str[7:10]}"
             meeting_link = f"https://meet.google.com/{meeting_code}"
-
+    
             meeting = Meeting.objects.create(
                 title=f"Group Session: {self.title}",
                 teacher=self.instructor.user,
                 start_time=self.start_time,
                 duration=self.duration_minutes,
-                meeting_link=meeting_link
+                meeting_link=meeting_link,
+                meeting_code=meeting_code  # Store the meeting code
             )
             self.meeting = meeting
             self.save()
-
+    
         # Add student to meeting participants
         self.meeting.students.add(student)
-
-        return True, "Successfully enrolled in the group session"
     
+        return True, "Successfully enrolled in the group session"
+
     def unenroll_student(self, student):
         """Remove a student from the group session"""
         if student not in self.students.all():

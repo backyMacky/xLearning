@@ -172,7 +172,7 @@ class LoginView(BaseAccountView, View):
         email_username = request.POST.get('email-username')
         password = request.POST.get('password')
         next_url = request.POST.get('next', '')
-        
+
         # Try to authenticate with email or username
         user = None
         try:
@@ -182,22 +182,22 @@ class LoginView(BaseAccountView, View):
             else:
                 # Otherwise use username
                 user = CustomUser.objects.get(username=email_username)
-                
+
             # Verify password
             if user.check_password(password):
-                # Check if email is verified
-                if not user.is_verified and user.user_type != UserType.ADMIN:
+                # Check if email is verified (skip for superusers)
+                if not user.is_verified and user.user_type != UserType.ADMIN and not user.is_superuser:
                     messages.warning(request, "Please verify your email address before logging in.")
                     return redirect('account:verify_email')
-                
+
                 login(request, user)
-                
-                # Check if this is the first login and user needs to purchase credits
-                if user.first_login and user.user_type == UserType.STUDENT:
+
+                # Check if this is first login for student who registered through the normal form
+                if user.first_login and user.user_type == UserType.STUDENT and not user.created_by_admin:
                     user.first_login = False
                     user.save()
                     return redirect('booking:purchase_credits')
-                
+
                 # Normal redirection
                 return redirect(next_url if next_url else 'dashboards:overview')
             else:
@@ -208,9 +208,8 @@ class LoginView(BaseAccountView, View):
         if user is None:
             messages.error(request, "Invalid email/username or password")
             return render(request, 'login.html', self.get_context_data())
-        
-        return HttpResponseRedirect(request.get_full_path())
 
+        return HttpResponseRedirect(request.get_full_path())
 
 class LogoutView(View):
     """Class-based view for user logout"""
@@ -1358,3 +1357,86 @@ class AccountSettingsView(LoginRequiredMixin, BaseAccountView):
         ).aggregate(Sum('amount'))['amount__sum'] or 0
         
         return credits - debits
+
+
+
+
+class LicenseView(TemplateView):
+    """View for license information"""
+    template_name = 'license.html'
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set consistent layout properties
+        context.update({
+            "layout": "front",
+            "layout_path": context['theme'].set_layout("layout_front.html", context),
+            "active_url": self.request.path,
+            "is_front": True,
+            "page_title": "License Information",
+            "page_description": "License information for xLearning platform and its components.",
+        })
+        
+        return context
+
+class MoreThemesView(TemplateView):
+    """View for more themes"""
+    template_name = 'more_themes.html'
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set consistent layout properties
+        context.update({
+            "layout": "front",
+            "layout_path": context['theme'].set_layout("layout_front.html", context),
+            "active_url": self.request.path,
+            "is_front": True,
+            "page_title": "More Themes",
+            "page_description": "Explore additional themes and visual options for your xLearning experience.",
+        })
+        
+        return context
+
+class DocumentationView(TemplateView):
+    """View for documentation"""
+    template_name = 'documentation.html'
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set consistent layout properties
+        context.update({
+            "layout": "front",
+            "layout_path": context['theme'].set_layout("layout_front.html", context),
+            "active_url": self.request.path,
+            "is_front": True,
+            "page_title": "Documentation",
+            "page_description": "Comprehensive documentation and guides for using the xLearning platform.",
+        })
+        
+        return context
+
+class SupportView(TemplateView):
+    """View for support"""
+    template_name = 'support.html'
+    
+    def get_context_data(self, **kwargs):
+        # Initialize the template layout
+        context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        
+        # Set consistent layout properties
+        context.update({
+            "layout": "front",
+            "layout_path": context['theme'].set_layout("layout_front.html", context),
+            "active_url": self.request.path,
+            "is_front": True,
+            "page_title": "Support",
+            "page_description": "Get help and support for your xLearning experience.",
+        })
+        
+        return context        

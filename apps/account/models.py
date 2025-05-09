@@ -21,7 +21,8 @@ class UserType(models.TextChoices):
 class CustomUser(AbstractUser):
     """Custom User model extending Django's AbstractUser"""
     user_type = models.CharField(max_length=20, choices=UserType.choices, default=UserType.STUDENT)
-    is_verified = models.BooleanField(default=False)
+    is_verified = models.BooleanField(
+    default=False, help_text="Indicates if the user's email has been verified. Superusers are automatically verified.")
     verification_token = models.CharField(max_length=100, blank=True, null=True)
     reset_password_token = models.CharField(max_length=100, blank=True, null=True)
     reset_password_expiry = models.DateTimeField(blank=True, null=True)
@@ -34,14 +35,6 @@ class CustomUser(AbstractUser):
         blank=True, 
         related_name='approved_instructors'
     )
-
-    class Meta:
-        swappable = 'AUTH_USER_MODEL'
-        permissions = (
-            ("can_manage_instructors", "Can manage instructor accounts"),
-            ("can_view_all_users", "Can view all users"),
-            ("can_approve_instructor_requests", "Can approve instructor applications"),
-        )
     
     def is_teacher(self):
         return self.user_type == UserType.TEACHER
@@ -54,8 +47,20 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    def get_verified_status(self):
+        """Get the verification status, considering superuser status"""
+        return self.is_verified or self.is_superuser
 
+    class Meta:
+        swappable = 'AUTH_USER_MODEL'
+        permissions = (
+            ("can_manage_instructors", "Can manage instructor accounts"),
+            ("can_view_all_users", "Can view all users"),
+            ("can_approve_instructor_requests", "Can approve instructor applications"),
+        )
 
+        
 class Profile(models.Model):
     """Extended user profile information"""
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
@@ -269,6 +274,18 @@ def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, 'profile'):
         instance.profile.save()
 
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def set_superuser_verified(sender, instance, created, **kwargs):
+    """Ensure superusers are automatically verified"""
+    if instance.is_superuser and not instance.is_verified:
+        # Update is_verified without triggering the full save
+        # to avoid potential recursion with other signals
+        type(instance).objects.filter(pk=instance.pk).update(is_verified=True)
+        
+        # If this is a new superuser, also clear any verification token
+        if created and instance.verification_token:
+            type(instance).objects.filter(pk=instance.pk).update(verification_token=None)
 
 # Password generation utility
 def generate_random_password(length=12):

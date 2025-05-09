@@ -1,0 +1,659 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}More Themes - xLearning{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+<style>
+  .themes-hero {
+    background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%);
+    padding: 80px 0 60px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .themes-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.1;
+    z-index: 0;
+  }
+  
+  .themes-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .themes-content {
+    padding: 80px 0;
+    background-color: #f8f9fa;
+  }
+  
+  .theme-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    background-color: white;
+  }
+  
+  .theme-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+  
+  .theme-img {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .theme-img img {
+    width: 100%;
+    height: auto;
+    transition: all 0.5s ease;
+  }
+  
+  .theme-img:hover img {
+    transform: scale(1.05);
+  }
+  
+  .theme-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    padding: 20px;
+    color: white;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .theme-img:hover .theme-overlay {
+    opacity: 1;
+  }
+  
+  .theme-body {
+    padding: 25px;
+  }
+  
+  .theme-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 2;
+  }
+  
+  .badge-free {
+    background-color: #28c76f;
+    color: white;
+  }
+  
+  .badge-premium {
+    background-color: #7367f0;
+    color: white;
+  }
+  
+  .theme-features {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .theme-features li {
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .theme-features li i {
+    margin-right: 10px;
+    color: #7367f0;
+  }
+  
+  .pricing-section {
+    background-color: white;
+    padding: 80px 0;
+  }
+  
+  .pricing-card {
+    border-radius: 15px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+  }
+  
+  .pricing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pricing-header {
+    padding: 30px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    text-align: center;
+  }
+  
+  .pricing-body {
+    padding: 30px;
+  }
+  
+  .pricing-price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #7367f0;
+    margin-bottom: 20px;
+  }
+  
+  .pricing-price small {
+    font-size: 1rem;
+    color: #6c757d;
+    font-weight: 400;
+  }
+  
+  .pricing-features {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .pricing-features li {
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+  }
+  
+  .pricing-features li:last-child {
+    border-bottom: none;
+  }
+  
+  .pricing-features i {
+    margin-right: 10px;
+    color: #28c76f;
+  }
+  
+  .pricing-action {
+    padding: 20px 30px 30px;
+    text-align: center;
+  }
+  
+  .testimonial-section {
+    background-color: #f8f9fa;
+    padding: 80px 0;
+  }
+  
+  .testimonial-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    position: relative;
+    margin-top: 40px;
+    height: calc(100% - 40px);
+  }
+  
+  .testimonial-avatar {
+    position: absolute;
+    top: -25px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .testimonial-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .testimonial-content {
+    margin-top: 40px;
+  }
+  
+  .testimonial-content p {
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+  
+  .testimonial-rating {
+    color: #ffc107;
+    margin-bottom: 15px;
+  }
+  
+  .cta-section {
+    background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%);
+    padding: 80px 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .cta-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.1;
+    z-index: 0;
+  }
+  
+  .cta-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="themes-hero">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center themes-hero-content" data-aos="fade-up">
+        <h1 class="display-5 fw-bold mb-3">Explore Beautiful Themes</h1>
+        <p class="lead mb-4">Customize your xLearning experience with our wide range of professionally designed themes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Themes Grid -->
+<section class="themes-content">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Featured Themes</h2>
+        <p class="lead">Handpicked themes to enhance your learning experience</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Theme 1 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up">
+        <div class="theme-card">
+          <div class="theme-img">
+            <img src="{% static 'img/front-pages/themes/theme-1.jpg' %}" alt="Modern Light Theme">
+            <div class="theme-overlay">
+              <h5>Easy customization & modern UI elements</h5>
+            </div>
+            <span class="theme-badge badge-free">Free</span>
+          </div>
+          <div class="theme-body">
+            <h4>Modern Light</h4>
+            <p class="text-muted">Clean, modern, and highly intuitive interface design.</p>
+            <ul class="theme-features">
+              <li><i class="ti ti-check"></i> Customizable color schemes</li>
+              <li><i class="ti ti-check"></i> Responsive layout</li>
+              <li><i class="ti ti-check"></i> Light & dark mode</li>
+            </ul>
+            <div class="d-grid mt-3">
+              <button class="btn btn-outline-primary">View Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Theme 2 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="theme-card">
+          <div class="theme-img">
+            <img src="{% static 'img/front-pages/themes/theme-2.jpg' %}" alt="Dark Pro Theme">
+            <div class="theme-overlay">
+              <h5>Sleek dark interfaces with stunning contrast</h5>
+            </div>
+            <span class="theme-badge badge-premium">Premium</span>
+          </div>
+          <div class="theme-body">
+            <h4>Dark Pro</h4>
+            <p class="text-muted">Elegant dark theme with vibrant accent colors.</p>
+            <ul class="theme-features">
+              <li><i class="ti ti-check"></i> Eye-friendly dark mode</li>
+              <li><i class="ti ti-check"></i> Custom UI components</li>
+              <li><i class="ti ti-check"></i> Advanced animations</li>
+            </ul>
+            <div class="d-grid mt-3">
+              <button class="btn btn-primary">View Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Theme 3 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="theme-card">
+          <div class="theme-img">
+            <img src="{% static 'img/front-pages/themes/theme-3.jpg' %}" alt="Gradient Fusion Theme">
+            <div class="theme-overlay">
+              <h5>Beautiful gradients and modern design language</h5>
+            </div>
+            <span class="theme-badge badge-premium">Premium</span>
+          </div>
+          <div class="theme-body">
+            <h4>Gradient Fusion</h4>
+            <p class="text-muted">Stunning gradient-based design with smooth transitions.</p>
+            <ul class="theme-features">
+              <li><i class="ti ti-check"></i> Custom gradient generator</li>
+              <li><i class="ti ti-check"></i> Unique page transitions</li>
+              <li><i class="ti ti-check"></i> Interactive elements</li>
+            </ul>
+            <div class="d-grid mt-3">
+              <button class="btn btn-primary">View Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Theme 4 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
+        <div class="theme-card">
+          <div class="theme-img">
+            <img src="{% static 'img/front-pages/themes/theme-4.jpg' %}" alt="Minimalist Theme">
+            <div class="theme-overlay">
+              <h5>Clean, minimal design with focus on content</h5>
+            </div>
+            <span class="theme-badge badge-free">Free</span>
+          </div>
+          <div class="theme-body">
+            <h4>Minimalist</h4>
+            <p class="text-muted">Simple, clean design that puts focus on content.</p>
+            <ul class="theme-features">
+              <li><i class="ti ti-check"></i> Distraction-free UI</li>
+              <li><i class="ti ti-check"></i> Fast loading times</li>
+              <li><i class="ti ti-check"></i> Reading optimized</li>
+            </ul>
+            <div class="d-grid mt-3">
+              <button class="btn btn-outline-primary">View Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Theme 5 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="theme-card">
+          <div class="theme-img">
+            <img src="{% static 'img/front-pages/themes/theme-5.jpg' %}" alt="Educational Pro Theme">
+            <div class="theme-overlay">
+              <h5>Designed specifically for educational content</h5>
+            </div>
+            <span class="theme-badge badge-premium">Premium</span>
+          </div>
+          <div class="theme-body">
+            <h4>Educational Pro</h4>
+            <p class="text-muted">Optimized for learning with education-specific features.</p>
+            <ul class="theme-features">
+              <li><i class="ti ti-check"></i> Specialized course layouts</li>
+              <li><i class="ti ti-check"></i> Note-taking integration</li>
+              <li><i class="ti ti-check"></i> Focus mode</li>
+            </ul>
+            <div class="d-grid mt-3">
+              <button class="btn btn-primary">View Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Theme 6 -->
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="theme-card">
+          <div class="theme-img">
+            <img src="{% static 'img/front-pages/themes/theme-6.jpg' %}" alt="Vibrant Theme">
+            <div class="theme-overlay">
+              <h5>Colorful and engaging user experience</h5>
+            </div>
+            <span class="theme-badge badge-premium">Premium</span>
+          </div>
+          <div class="theme-body">
+            <h4>Vibrant</h4>
+            <p class="text-muted">Bold colors and playful elements for an engaging experience.</p>
+            <ul class="theme-features">
+              <li><i class="ti ti-check"></i> Colorful UI components</li>
+              <li><i class="ti ti-check"></i> Playful animations</li>
+              <li><i class="ti ti-check"></i> Engaging interactive elements</li>
+            </ul>
+            <div class="d-grid mt-3">
+              <button class="btn btn-primary">View Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4" data-aos="fade-up">
+      <a href="#" class="btn btn-lg btn-primary">View All Themes</a>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="pricing-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Choose Your Perfect Plan</h2>
+        <p class="lead">Get access to premium themes with our flexible pricing plans</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Free Plan -->
+      <div class="col-md-4" data-aos="fade-up">
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h4>Free</h4>
+            <p class="text-muted mb-0">Get started with basic themes</p>
+          </div>
+          <div class="pricing-body">
+            <div class="pricing-price">
+              $0<small>/forever</small>
+            </div>
+            <ul class="pricing-features">
+              <li><i class="ti ti-check"></i> Access to free themes</li>
+              <li><i class="ti ti-check"></i> Basic customization</li>
+              <li><i class="ti ti-check"></i> Community support</li>
+              <li><i class="ti ti-x text-danger"></i> Premium themes</li>
+              <li><i class="ti ti-x text-danger"></i> Priority support</li>
+              <li><i class="ti ti-x text-danger"></i> Theme updates</li>
+            </ul>
+          </div>
+          <div class="pricing-action">
+            <button class="btn btn-outline-primary btn-lg w-100">Current Plan</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pro Plan -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="pricing-card" style="border: 2px solid #7367f0;">
+          <div class="pricing-header" style="background-color: #7367f0; color: white;">
+            <span class="badge bg-white text-primary mb-2">Most Popular</span>
+            <h4>Pro</h4>
+            <p class="mb-0">Complete theme collection</p>
+          </div>
+          <div class="pricing-body">
+            <div class="pricing-price">
+              $29<small>/month</small>
+            </div>
+            <ul class="pricing-features">
+              <li><i class="ti ti-check"></i> Access to all themes</li>
+              <li><i class="ti ti-check"></i> Advanced customization</li>
+              <li><i class="ti ti-check"></i> Email support</li>
+              <li><i class="ti ti-check"></i> Premium themes</li>
+              <li><i class="ti ti-check"></i> Priority support</li>
+              <li><i class="ti ti-check"></i> Monthly theme updates</li>
+            </ul>
+          </div>
+          <div class="pricing-action">
+            <button class="btn btn-primary btn-lg w-100">Choose Plan</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Enterprise Plan -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h4>Enterprise</h4>
+            <p class="text-muted mb-0">For teams and organizations</p>
+          </div>
+          <div class="pricing-body">
+            <div class="pricing-price">
+              $99<small>/month</small>
+            </div>
+            <ul class="pricing-features">
+              <li><i class="ti ti-check"></i> Everything in Pro</li>
+              <li><i class="ti ti-check"></i> Custom theme development</li>
+              <li><i class="ti ti-check"></i> Multiple user licenses</li>
+              <li><i class="ti ti-check"></i> Dedicated support</li>
+              <li><i class="ti ti-check"></i> Theme API access</li>
+              <li><i class="ti ti-check"></i> White labeling</li>
+            </ul>
+          </div>
+          <div class="pricing-action">
+            <button class="btn btn-outline-primary btn-lg w-100">Choose Plan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonial-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">What Our Users Say</h2>
+        <p class="lead">Read testimonials from users who love our themes</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Testimonial 1 -->
+      <div class="col-md-4" data-aos="fade-up">
+        <div class="testimonial-card">
+          <div class="testimonial-avatar">
+            <img src="{% static 'img/avatars/1.png' %}" alt="User Avatar">
+          </div>
+          <div class="testimonial-content">
+            <div class="testimonial-rating">
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+            </div>
+            <p>"The Dark Pro theme completely transformed our learning platform. The sleek interface makes it much easier for students to focus on content."</p>
+            <h5 class="mb-1">Sarah Johnson</h5>
+            <p class="text-muted small mb-0">Online Course Creator</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Testimonial 2 -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="testimonial-card">
+          <div class="testimonial-avatar">
+            <img src="{% static 'img/avatars/2.png' %}" alt="User Avatar">
+          </div>
+          <div class="testimonial-content">
+            <div class="testimonial-rating">
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+            </div>
+            <p>"Educational Pro theme has features specifically designed for learning that make a huge difference. The note-taking integration is a game-changer!"</p>
+            <h5 class="mb-1">Michael Chen</h5>
+            <p class="text-muted small mb-0">University Professor</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Testimonial 3 -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="testimonial-card">
+          <div class="testimonial-avatar">
+            <img src="{% static 'img/avatars/3.png' %}" alt="User Avatar">
+          </div>
+          <div class="testimonial-content">
+            <div class="testimonial-rating">
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star-filled"></i>
+              <i class="ti ti-star"></i>
+            </div>
+            <p>"The Gradient Fusion theme looks absolutely stunning. Our students love the modern look and the smooth transitions between pages."</p>
+            <h5 class="mb-1">Emma Rodriguez</h5>
+            <p class="text-muted small mb-0">E-Learning Specialist</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call-to-Action -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content" data-aos="fade-up">
+      <h2 class="display-6 fw-bold mb-4">Ready to Transform Your Learning Experience?</h2>
+      <p class="lead mb-5">Choose from our collection of beautiful themes and take your learning platform to the next level.</p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="#" class="btn btn-light btn-lg">Browse Free Themes</a>
+        <a href="#" class="btn btn-primary btn-lg">Explore Premium Themes</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animation
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 50
+    });
+  });
+</script>
+{% endblock %}

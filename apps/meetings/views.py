@@ -141,10 +141,15 @@ class CreateMeetingView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
                 self.object.students.add(student)
             except User.DoesNotExist:
                 pass
-        
+            
         # If no meeting link was provided, generate one
         if not form.instance.meeting_link:
-            form.instance.meeting_link = f"https://meet.google.com/{self.request.user.username}-{timezone.now().strftime('%Y%m%d%H%M')}"
+            # Generate a proper Google Meet link with the format xxx-xxxx-xxx
+            import uuid
+            uuid_str = str(uuid.uuid4()).replace('-', '')
+            meeting_code = f"{uuid_str[:3]}-{uuid_str[3:7]}-{uuid_str[7:10]}"
+            form.instance.meeting_link = f"https://meet.google.com/{meeting_code}"
+            form.instance.meeting_code = meeting_code  # Store the meeting code
             form.instance.save()
         
         messages.success(self.request, "Meeting created successfully!")

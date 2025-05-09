@@ -13,11 +13,9 @@ logger = logging.getLogger(__name__)
 
 class Meeting(models.Model):
     """Model for virtual meetings and sessions"""
-    # Remove UUID primary key and let Django use its default auto-incrementing primary key
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Add a UUID field that's not a primary key for public identification
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    # Make all fields that might be missing optional
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, 
+                           null=True, blank=True)
     
     title = models.CharField(max_length=255)
     teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='teacher_meetings')
@@ -26,14 +24,16 @@ class Meeting(models.Model):
     duration = models.IntegerField(help_text="Duration in minutes")
     meeting_link = models.CharField(max_length=255, blank=True, null=True)
     meeting_code = models.CharField(max_length=30, blank=True, null=True, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Fields that may be missing - make them all optional
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
     status = models.CharField(max_length=20, choices=[
         ('scheduled', 'Scheduled'),
         ('in_progress', 'In Progress'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
-    ], default='scheduled')
+    ], default='scheduled', null=True, blank=True)
     notes = models.TextField(blank=True, null=True, help_text="Meeting notes or agenda")
     recording_url = models.URLField(blank=True, null=True, help_text="URL to recorded session if available")
     
@@ -42,14 +42,26 @@ class Meeting(models.Model):
     
     def save(self, *args, **kwargs):
         """Override save to generate meeting code and link if not provided"""
+        # Create UUID if it doesn't exist (for backward compatibility)
+        if not self.uuid:
+            self.uuid = uuid.uuid4()
+            
         if not self.meeting_code:
             # Generate a short unique code from the UUID
-            self.meeting_code = str(self.uuid).replace('-', '')[:12]
-            
+            uuid_str = str(self.uuid).replace('-', '')
+            self.meeting_code = f"{uuid_str[:3]}-{uuid_str[3:7]}-{uuid_str[7:10]}"
+        
         if not self.meeting_link:
             # Generate a Google Meet link with the unique code
-            self.generate_meeting_link()
-            
+            self.meeting_link = f"https://meet.google.com/{self.meeting_code}"
+        
+        # Set a default status if missing
+        if not self.status:
+            self.status = 'scheduled'
+        
+        # Clean and validate the meeting link
+        self.clean_meeting_link()
+        
         super().save(*args, **kwargs)
     
     @property
@@ -61,13 +73,17 @@ class Meeting(models.Model):
     def is_active(self):
         """Check if meeting is currently active"""
         now = timezone.now()
-        return self.start_time <= now <= self.end_time and self.status != 'cancelled'
+        # Handle missing status
+        current_status = self.status or 'scheduled'
+        return self.start_time <= now <= self.end_time and current_status != 'cancelled'
     
     @property
     def is_upcoming(self):
         """Check if meeting is upcoming"""
         now = timezone.now()
-        return self.start_time > now and self.status != 'cancelled'
+        # Handle missing status
+        current_status = self.status or 'scheduled'
+        return self.start_time > now and current_status != 'cancelled'
     
     @property
     def google_calendar_link(self):
@@ -100,18 +116,21 @@ class Meeting(models.Model):
         """Generate a properly formatted Google Meet link for this meeting"""
         # Format the meeting code from the UUID if not already set
         if not self.meeting_code:
+            # If UUID doesn't exist, create one (for backward compatibility)
+            if not self.uuid:
+                self.uuid = uuid.uuid4()
+                
             # Generate a meeting code that follows Google Meet's format
             # Google Meet codes are typically 10 characters with two hyphens
             # Format: xxx-xxxx-xxx
             uuid_str = str(self.uuid).replace('-', '')
             self.meeting_code = f"{uuid_str[:3]}-{uuid_str[3:7]}-{uuid_str[7:10]}"
-        
+
         # Create a properly formatted Google Meet link
         self.meeting_link = f"https://meet.google.com/{self.meeting_code}"
-        
+
         return self.meeting_link
     
-    # Other methods remain the same
     def send_reminders(self):
         """Send email reminders to all participants"""
         
@@ -167,7 +186,7 @@ class Meeting(models.Model):
     
     def mark_as_completed(self):
         """Mark meeting as completed if it's in the past"""
-        if timezone.now() > self.end_time and self.status == 'scheduled':
+        if timezone.now() > self.end_time and (self.status == 'scheduled' or self.status is None):
             self.status = 'completed'
             self.save(update_fields=['status'])
             return True
@@ -232,6 +251,35 @@ class Meeting(models.Model):
             except Exception as e:
                 logger.error(f"Failed to send cancellation notice to {email}: {str(e)}")
     
+    def clean_meeting_link(self):
+        """Validate and fix meeting link format if needed"""
+        if self.meeting_link:
+            # Check if it's already a valid Google Meet link
+            import re
+            meet_pattern = r'https://meet\.google\.com/([a-z0-9]{3}-[a-z0-9]{4}-[a-z0-9]{3})'
+            match = re.match(meet_pattern, self.meeting_link)
+
+            if match:
+                # Already valid, extract the code
+                self.meeting_code = match.group(1)
+            else:
+                # Try to fix common issues
+                # If it's a bare code without the URL prefix
+                code_pattern = r'([a-z0-9]{3}-[a-z0-9]{4}-[a-z0-9]{3})'
+                code_match = re.match(code_pattern, self.meeting_link)
+
+                if code_match:
+                    self.meeting_code = code_match.group(1)
+                    self.meeting_link = f"https://meet.google.com/{self.meeting_code}"
+                else:
+                    # Generate a new code if we can't fix the current one
+                    self.generate_meeting_link()
+        else:
+            # No link provided, generate one
+            self.generate_meeting_link()
+
+        return self.meeting_link
+
     class Meta:
         app_label = 'meetings'
         ordering = ['-start_time']

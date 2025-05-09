@@ -63,4 +63,10 @@ urlpatterns = [
     path('settings/security/', views.SecuritySettingsView.as_view(), name='security_settings'),
     path('settings/preferences/', views.PreferencesView.as_view(), name='preferences'),
     path('settings/', views.AccountSettingsView.as_view(), name='account_settings'),
+
+    # Footer URLs
+  path('license/', views.LicenseView.as_view(), name='license'),
+  path('more-themes/', views.MoreThemesView.as_view(), name='more_themes'),
+  path('documentation/', views.DocumentationView.as_view(), name='documentation'),
+  path('support/', views.SupportView.as_view(), name='support'),
 ]

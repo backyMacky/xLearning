@@ -1,0 +1,869 @@
+
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Support - xLearning{% endblock %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/aos/aos.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/aos/aos.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+<style>
+  .support-hero {
+    background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%);
+    padding: 80px 0 60px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .support-hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{% static "img/front-pages/backgrounds/dots-pattern.png" %}');
+    opacity: 0.1;
+    z-index: 0;
+  }
+  
+  .support-hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .support-search {
+    max-width: 600px;
+    margin: 30px auto 0;
+  }
+  
+  .support-search .input-group {
+    background-color: white;
+    border-radius: 50px;
+    padding: 5px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .support-search .form-control {
+    border: none;
+    box-shadow: none;
+    padding: 15px 20px;
+    height: auto;
+    background: transparent;
+    font-size: 1.1rem;
+  }
+  
+  .support-search .btn {
+    border-radius: 50px;
+    padding: 10px 25px;
+    margin-right: 5px;
+  }
+  
+  .support-content {
+    padding: 80px 0;
+  }
+  
+  .support-card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  
+  .support-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+  
+  .support-card-header {
+    background-color: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px 15px 0 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .support-card-icon {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(115, 103, 240, 0.1);
+    color: #7367f0;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+  }
+  
+  .support-card-body {
+    padding: 25px;
+    flex-grow: 1;
+  }
+  
+  .accordion-button:not(.collapsed) {
+    color: #7367f0;
+    background-color: rgba(115, 103, 240, 0.1);
+  }
+  
+  .accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(115, 103, 240, 0.25);
+  }
+  
+  .contact-form {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+  }
+  
+  .status-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .status-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .status-card-body {
+    padding: 25px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .status-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    flex-shrink: 0;
+  }
+  
+  .status-icon.operational {
+    background-color: rgba(40, 199, 111, 0.1);
+    color: #28c76f;
+  }
+  
+  .status-icon.issues {
+    background-color: rgba(255, 159, 67, 0.1);
+    color: #ff9f43;
+  }
+  
+  .status-icon.outage {
+    background-color: rgba(234, 84, 85, 0.1);
+    color: #ea5455;
+  }
+  
+  .timeline {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+  }
+  
+  .timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+    left: 24px;
+    margin-left: -1px;
+  }
+  
+  .timeline-item {
+    position: relative;
+    padding-left: 60px;
+    margin-bottom: 30px;
+  }
+  
+  .timeline-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .timeline-dot {
+    position: absolute;
+    top: 0;
+    left: 24px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #7367f0;
+    transform: translateX(-50%);
+  }
+  
+  .timeline-dot.success {
+    background: #28c76f;
+  }
+  
+  .timeline-dot.warning {
+    background: #ff9f43;
+  }
+  
+  .timeline-dot.danger {
+    background: #ea5455;
+  }
+  
+  .timeline-date {
+    display: block;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+  }
+  
+  .timeline-content {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .support-team {
+    padding: 80px 0;
+    background-color: #f8f9fa;
+  }
+  
+  .team-card {
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+  }
+  
+  .team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+  
+  .team-header {
+    height: 120px;
+    background: linear-gradient(135deg, #7367f0 0%, #ab89b6 100%);
+    position: relative;
+  }
+  
+  .team-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 5px solid white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    overflow: hidden;
+    background-color: white;
+  }
+  
+  .team-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .team-body {
+    padding: 60px 20px 20px;
+    text-align: center;
+  }
+  
+  .team-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  
+  .team-role {
+    color: #6c757d;
+    margin-bottom: 15px;
+  }
+  
+  .team-social {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .team-social a {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    transition: all 0.3s ease;
+  }
+  
+  .team-social a:hover {
+    background-color: #7367f0;
+    color: white;
+  }
+</style>
+{% endblock page_css %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="support-hero">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center support-hero-content" data-aos="fade-up">
+        <h1 class="display-5 fw-bold mb-3">How Can We Help You?</h1>
+        <p class="lead mb-4">Find answers to your questions and get support from our team</p>
+        
+        <div class="support-search">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for help..." aria-label="Search for help">
+            <button class="btn btn-primary" type="button">Search</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Support Options -->
+<section class="support-content">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Support Options</h2>
+        <p class="lead">Choose the support channel that works best for you</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Help Center -->
+      <div class="col-md-4" data-aos="fade-up">
+        <div class="support-card">
+          <div class="support-card-header">
+            <div class="support-card-icon">
+              <i class="ti ti-book"></i>
+            </div>
+            <h3 class="h5">Help Center</h3>
+          </div>
+          <div class="support-card-body">
+            <p class="text-muted">Browse our comprehensive knowledge base with guides, tutorials, and FAQs.</p>
+            <ul class="list-unstyled mb-4">
+              <li><i class="ti ti-check text-success me-2"></i> Step-by-step tutorials</li>
+              <li><i class="ti ti-check text-success me-2"></i> Frequently asked questions</li>
+              <li><i class="ti ti-check text-success me-2"></i> Troubleshooting guides</li>
+            </ul>
+            <div class="d-grid">
+              <a href="{% url 'account:documentation' %}" class="btn btn-outline-primary">Visit Help Center</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Email Support -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="support-card">
+          <div class="support-card-header">
+            <div class="support-card-icon">
+              <i class="ti ti-mail"></i>
+            </div>
+            <h3 class="h5">Email Support</h3>
+          </div>
+          <div class="support-card-body">
+            <p class="text-muted">Reach out to our support team directly via email for personalized assistance.</p>
+            <ul class="list-unstyled mb-4">
+              <li><i class="ti ti-check text-success me-2"></i> 24-48 hour response time</li>
+              <li><i class="ti ti-check text-success me-2"></i> Detailed solutions</li>
+              <li><i class="ti ti-check text-success me-2"></i> Issue tracking</li>
+            </ul>
+            <div class="d-grid">
+              <a href="#contact-form" class="btn btn-primary">Send Email</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Community Support -->
+      <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="support-card">
+          <div class="support-card-header">
+            <div class="support-card-icon">
+              <i class="ti ti-users"></i>
+            </div>
+            <h3 class="h5">Community Forum</h3>
+          </div>
+          <div class="support-card-body">
+            <p class="text-muted">Connect with other users, share experiences, and get community-driven help.</p>
+            <ul class="list-unstyled mb-4">
+              <li><i class="ti ti-check text-success me-2"></i> User discussions</li>
+              <li><i class="ti ti-check text-success me-2"></i> Shared solutions</li>
+              <li><i class="ti ti-check text-success me-2"></i> Tips and tricks</li>
+            </ul>
+            <div class="d-grid">
+              <a href="#" class="btn btn-outline-primary">Join Community</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Common Support Topics -->
+<section class="bg-light py-5">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Common Support Topics</h2>
+        <p class="lead">Quick answers to our most frequently asked questions</p>
+      </div>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-10" data-aos="fade-up">
+        <div class="accordion" id="supportFAQ">
+          <!-- Account Questions -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="accountHeading">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accountCollapse" aria-expanded="true" aria-controls="accountCollapse">
+                Account Management
+              </button>
+            </h2>
+            <div id="accountCollapse" class="accordion-collapse collapse show" aria-labelledby="accountHeading" data-bs-parent="#supportFAQ">
+              <div class="accordion-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>How do I reset my password?</h5>
+                    <p>To reset your password, click on the "Forgot Password" link on the login page. Enter your email address and follow the instructions sent to your email.</p>
+                    
+                    <h5>How do I verify my email address?</h5>
+                    <p>After registration, a verification link is sent to your email. Click the link to verify your account. If you didn't receive it, you can request a new verification link from the "Verify Email" page.</p>
+                  </div>
+                  <div class="col-md-6">
+                    <h5>How do I update my profile information?</h5>
+                    <p>Log in to your account, click on your profile picture in the top-right corner, and select "My Profile." Then click "Edit Profile" to update your information.</p>
+                    
+                    <h5>Can I change my username?</h5>
+                    <p>Yes, you can change your username from your profile settings. Log in, go to "Edit Profile," and update your username field.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Teacher Application Questions -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="teacherHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#teacherCollapse" aria-expanded="false" aria-controls="teacherCollapse">
+                Teacher Applications
+              </button>
+            </h2>
+            <div id="teacherCollapse" class="accordion-collapse collapse" aria-labelledby="teacherHeading" data-bs-parent="#supportFAQ">
+              <div class="accordion-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>How do I apply to become a teacher?</h5>
+                    <p>Go to your profile and select "Request Teacher Status." Fill out the application form with your qualifications and teaching experience.</p>
+                    
+                    <h5>What are the requirements to become a teacher?</h5>
+                    <p>You should have fluency in the language you want to teach, some teaching experience, and a verified xLearning account.</p>
+                  </div>
+                  <div class="col-md-6">
+                    <h5>How long does the approval process take?</h5>
+                    <p>The teacher approval process typically takes 2-3 business days. You'll receive a notification when your application is reviewed.</p>
+                    
+                    <h5>What happens if my application is rejected?</h5>
+                    <p>If your application is rejected, you'll receive feedback on why. You can improve your application based on the feedback and reapply after 30 days.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Security Questions -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="securityHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#securityCollapse" aria-expanded="false" aria-controls="securityCollapse">
+                Security & Privacy
+              </button>
+            </h2>
+            <div id="securityCollapse" class="accordion-collapse collapse" aria-labelledby="securityHeading" data-bs-parent="#supportFAQ">
+              <div class="accordion-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>How secure is my personal information?</h5>
+                    <p>We use industry-standard encryption and security measures to protect your data. Your personal information is only used for the purposes outlined in our privacy policy.</p>
+                    
+                    <h5>Can I enable two-factor authentication?</h5>
+                    <p>This feature is coming soon. In the meantime, we recommend using a strong, unique password for your account.</p>
+                  </div>
+                  <div class="col-md-6">
+                    <h5>Who can see my profile information?</h5>
+                    <p>Your public profile is visible to other users on the platform. You can control what information is displayed in your privacy settings.</p>
+                    
+                    <h5>How do I report a security concern?</h5>
+                    <p>If you have any security concerns or notice suspicious activity, please contact our support team immediately using the contact form below.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Payment Questions -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="paymentHeading">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#paymentCollapse" aria-expanded="false" aria-controls="paymentCollapse">
+                Payments & Credits
+              </button>
+            </h2>
+            <div id="paymentCollapse" class="accordion-collapse collapse" aria-labelledby="paymentHeading" data-bs-parent="#supportFAQ">
+              <div class="accordion-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>How does the credit system work?</h5>
+                    <p>Credits are the currency used on xLearning to book sessions with teachers. You can purchase credits and use them to book lessons.</p>
+                    
+                    <h5>How do I purchase credits?</h5>
+                    <p>Go to the Credits page from your dashboard, select a credit package, and complete the checkout process using your preferred payment method.</p>
+                  </div>
+                  <div class="col-md-6">
+                    <h5>What payment methods are accepted?</h5>
+                    <p>We accept major credit cards, PayPal, and bank transfers depending on your region.</p>
+                    
+                    <h5>Can I get a refund for unused credits?</h5>
+                    <p>Yes, you can request a refund for unused credits within 30 days of purchase. Contact our support team to process your refund.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-5" data-aos="fade-up">
+      <a href="{% url 'account:documentation' %}" class="btn btn-primary">View All FAQs</a>
+    </div>
+  </div>
+</section>
+
+<!-- System Status -->
+<section class="support-content">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">System Status</h2>
+        <p class="lead">Check the operational status of xLearning services</p>
+      </div>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8" data-aos="fade-up">
+        <!-- Main Platform Status -->
+        <div class="status-card">
+          <div class="status-card-body">
+            <div class="status-icon operational">
+              <i class="ti ti-check"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">xLearning Platform</h5>
+              <p class="text-muted mb-0">All systems operational</p>
+            </div>
+            <div class="ms-auto">
+              <span class="badge bg-success">Operational</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Authentication Status -->
+        <div class="status-card">
+          <div class="status-card-body">
+            <div class="status-icon operational">
+              <i class="ti ti-check"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">Authentication System</h5>
+              <p class="text-muted mb-0">Login and registration services are functioning normally</p>
+            </div>
+            <div class="ms-auto">
+              <span class="badge bg-success">Operational</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Payment Status -->
+        <div class="status-card">
+          <div class="status-card-body">
+            <div class="status-icon operational">
+              <i class="ti ti-check"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">Payment Processing</h5>
+              <p class="text-muted mb-0">All payment methods are working correctly</p>
+            </div>
+            <div class="ms-auto">
+              <span class="badge bg-success">Operational</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Video System Status -->
+        <div class="status-card">
+          <div class="status-card-body">
+            <div class="status-icon issues">
+              <i class="ti ti-alert-triangle"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">Video Conferencing</h5>
+              <p class="text-muted mb-0">Minor issues affecting some users, but most connections are stable</p>
+            </div>
+            <div class="ms-auto">
+              <span class="badge bg-warning">Minor Issues</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Recent Incidents -->
+        <div class="card mt-4">
+          <div class="card-header bg-transparent">
+            <h5 class="mb-0">Recent Incidents</h5>
+          </div>
+          <div class="card-body">
+            <ul class="timeline">
+              <li class="timeline-item">
+                <div class="timeline-dot success"></div>
+                <span class="timeline-date">May 7, 2025 - 14:30</span>
+                <div class="timeline-content">
+                  <h6 class="mb-1">Video Conferencing Issues Resolved</h6>
+                  <p class="mb-0">Our team has resolved the intermittent connection issues with the video conferencing system. All services are now operating normally.</p>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <div class="timeline-dot warning"></div>
+                <span class="timeline-date">May 7, 2025 - 10:15</span>
+                <div class="timeline-content">
+                  <h6 class="mb-1">Video Conferencing Issues Detected</h6>
+                  <p class="mb-0">We're investigating reports of intermittent connection issues with the video conferencing system. Some users may experience difficulties joining sessions.</p>
+                </div>
+              </li>
+              <li class="timeline-item">
+                <div class="timeline-dot success"></div>
+                <span class="timeline-date">May 5, 2025 - 09:45</span>
+                <div class="timeline-content">
+                  <h6 class="mb-1">Scheduled Maintenance Completed</h6>
+                  <p class="mb-0">The scheduled database maintenance has been completed successfully. All services are operating normally with improved performance.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Form -->
+<section class="bg-light py-5" id="contact-form">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Contact Support</h2>
+        <p class="lead">Can't find what you're looking for? Reach out to our support team directly.</p>
+      </div>
+    </div>
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-8" data-aos="fade-up">
+        <div class="contact-form">
+          <form>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Your name">
+              </div>
+              <div class="col-md-6">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" placeholder="Your email">
+              </div>
+              <div class="col-12">
+                <label for="subject" class="form-label">Subject</label>
+                <select class="form-select" id="subject">
+                  <option selected disabled>Select a topic</option>
+                  <option value="account">Account Issues</option>
+                  <option value="teacher">Teacher Application</option>
+                  <option value="payment">Payment & Billing</option>
+                  <option value="technical">Technical Support</option>
+                  <option value="other">Other Inquiries</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label for="message" class="form-label">Message</label>
+                <textarea class="form-control" id="message" rows="5" placeholder="Describe your issue or question in detail"></textarea>
+              </div>
+              <div class="col-12">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="terms" required>
+                  <label class="form-check-label" for="terms">
+                    I agree to the <a href="{% url 'account:license' %}">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                  </label>
+                </div>
+              </div>
+              <div class="col-12 mt-4 text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Support Request</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        
+        <div class="row mt-5">
+          <div class="col-md-4 text-center" data-aos="fade-up">
+            <div class="support-card-icon mx-auto">
+              <i class="ti ti-mail"></i>
+            </div>
+            <h5 class="mt-3">Email</h5>
+            <p class="text-muted">support@xlearning.com</p>
+          </div>
+          <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="100">
+            <div class="support-card-icon mx-auto">
+              <i class="ti ti-phone"></i>
+            </div>
+            <h5 class="mt-3">Phone</h5>
+            <p class="text-muted">+1 (800) 123-4567</p>
+          </div>
+          <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="200">
+            <div class="support-card-icon mx-auto">
+              <i class="ti ti-clock"></i>
+            </div>
+            <h5 class="mt-3">Hours</h5>
+            <p class="text-muted">Mon-Fri: 9AM-6PM EST</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Support Team -->
+<section class="support-team">
+  <div class="container">
+    <div class="row justify-content-center mb-5" data-aos="fade-up">
+      <div class="col-lg-8 text-center">
+        <h2 class="h2 mb-3">Meet Our Support Team</h2>
+        <p class="lead">Dedicated professionals ready to help you succeed</p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <!-- Team Member 1 -->
+      <div class="col-md-6 col-lg-3" data-aos="fade-up">
+        <div class="team-card">
+          <div class="team-header">
+            <div class="team-avatar">
+              <img src="{% static 'img/avatars/1.png' %}" alt="Team Member">
+            </div>
+          </div>
+          <div class="team-body">
+            <h5 class="team-name">Sarah Johnson</h5>
+            <p class="team-role">Support Lead</p>
+            <p class="text-muted small">Sarah oversees our support operations and ensures every query receives prompt attention.</p>
+            <div class="team-social">
+              <a href="#"><i class="ti ti-brand-linkedin"></i></a>
+              <a href="#"><i class="ti ti-mail"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Team Member 2 -->
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="team-card">
+          <div class="team-header">
+            <div class="team-avatar">
+              <img src="{% static 'img/avatars/2.png' %}" alt="Team Member">
+            </div>
+          </div>
+          <div class="team-body">
+            <h5 class="team-name">Michael Chen</h5>
+            <p class="team-role">Technical Support</p>
+            <p class="text-muted small">Michael handles technical issues and ensures the platform runs smoothly for all users.</p>
+            <div class="team-social">
+              <a href="#"><i class="ti ti-brand-linkedin"></i></a>
+              <a href="#"><i class="ti ti-mail"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Team Member 3 -->
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="team-card">
+          <div class="team-header">
+            <div class="team-avatar">
+              <img src="{% static 'img/avatars/3.png' %}" alt="Team Member">
+            </div>
+          </div>
+          <div class="team-body">
+            <h5 class="team-name">Emma Rodriguez</h5>
+            <p class="team-role">Billing Support</p>
+            <p class="text-muted small">Emma specializes in payment issues, refunds, and credit management on the platform.</p>
+            <div class="team-social">
+              <a href="#"><i class="ti ti-brand-linkedin"></i></a>
+              <a href="#"><i class="ti ti-mail"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Team Member 4 -->
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="team-card">
+          <div class="team-header">
+            <div class="team-avatar">
+              <img src="{% static 'img/avatars/4.png' %}" alt="Team Member">
+            </div>
+          </div>
+          <div class="team-body">
+            <h5 class="team-name">David Wilson</h5>
+            <p class="team-role">Account Specialist</p>
+            <p class="text-muted small">David helps with account issues, profile management, and teacher applications.</p>
+            <div class="team-social">
+              <a href="#"><i class="ti ti-brand-linkedin"></i></a>
+              <a href="#"><i class="ti ti-mail"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animation
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 50
+    });
+  });
+</script>
+{% endblock %}
