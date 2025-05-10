@@ -39,35 +39,416 @@
 </div>
 {% endif %}
 
-<!-- Hero stats section with gradient background -->
+<!-- Hero Section with Rich Gradient -->
 <div class="row">
   <div class="col-12 mb-4">
-    <div class="card bg-primary text-white border-0">
-      <div class="card-body">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden teacher-hero">
+      <div class="position-absolute top-0 end-0 d-lg-block d-none">
+        <svg width="300" height="250" viewBox="0 0 300 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path opacity="0.2" d="M41.5 250C18.6 250 0 231.4 0 208.5V85.8L42.2 0H300V208.5C300 231.4 281.4 250 258.5 250H41.5Z" fill="white"/>
+          <path opacity="0.2" d="M300 42.8V0H93.8L59.5 66L125.5 0H300V42.8Z" fill="white"/>
+        </svg>
+      </div>
+      <div class="card-body py-4 py-lg-5">
         <div class="row align-items-center">
-          <div class="col-lg-8 col-md-12">
-            <h2 class="fw-bold mb-3">Teacher Dashboard</h2>
-            <div class="row g-3">
+          <div class="col-lg-7 col-md-12">
+            <h2 class="fw-bold mb-3 display-4 text-info">Welcome, Teacher!</h2>
+            <p class="text-primary fs-5 mb-4" style="text-shadow: 0 1px 2px rgba(0,0,0,0.2);">Track your teaching progress and manage your courses from this dashboard.</p>
+            
+            <div class="row g-3 mb-4">
               <div class="col-sm-6 col-lg-3">
-                <div class="card shadow-none bg-white bg-opacity-20 border-0 text-white">
+                <div class="card shadow-md h-100 border-0 bg-purple-gradient text-white">
                   <div class="card-body p-3">
                     <div class="d-flex align-items-center mb-2">
                       <div class="avatar me-2">
-                        <div class="avatar-initial rounded bg-white bg-opacity-20">
-                          <i class="ti ti-users ti-md"></i>
+                        <div class="avatar-initial rounded bg-white bg-opacity-30">
+                          <i class="ti ti-users ti-md text-info"></i>
                         </div>
+                      </div>
+                      <span class="text-success fw-bold">Students</span>
+                    </div>
+                    <h3 class="mb-0 fw-semibold text-white">{{ student_count }}</h3>
+                    <div class="text-primary mt-1">Enrolled Students</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-md h-100 border-0 bg-teal-gradient text-info">
+                  <div class="card-body p-3">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar me-2">
+                        <div class="avatar-initial rounded bg-white bg-opacity-30">
+                          <i class="ti ti-book ti-md text-secondary"></i>
+                        </div>
+                      </div>
+                      <span class="text-primary fw-bold">Courses</span>
+                    </div>
+                    <h3 class="mb-0 fw-semibold text-info">{{ course_count }}</h3>
+                    <div class="text-secondary mt-1">Active Courses</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-md h-100 border-0 bg-orange-gradient text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar me-2">
+                        <div class="avatar-initial rounded bg-white bg-opacity-30">
+                          <i class="ti ti-calendar-event ti-md text-white"></i>
+                        </div>
+                      </div>
+                      <span class="text-success fw-bold">Sessions</span>
+                    </div>
+                    <h3 class="mb-0 fw-semibold text-secondary">{{ upcoming_sessions }}</h3>
+                    <div class="text-primary mt-1">Upcoming</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="card shadow-md h-100 border-0 bg-blue-gradient text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="avatar me-2">
+                        <div class="avatar-initial rounded bg-white bg-opacity-30">
+                          <i class="ti ti-clock ti-md text-info"></i>
+                        </div>
+                      </div>
+                      <span class="text-info fw-bold">Hours</span>
+                    </div>
+                    <h3 class="mb-0 fw-semibold text-info">{{ teaching_hours }}h</h3>
+                    <div class="text-info mt-1">This Month</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-4 d-flex flex-wrap gap-2">
+              <a href="{% url 'content:create_course' %}" class="btn btn-light btn-lg fw-semibold">
+                <i class="ti ti-plus me-1"></i> New Course
+              </a>
+              <a href="{% url 'meetings:create_meeting' %}" class="btn btn-glow btn-lg fw-semibold">
+                <i class="ti ti-calendar-plus me-1"></i> Schedule Session
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-5 d-none d-lg-block text-center">
+            <img src="{% static 'img/illustrations/teacher.png' %}" height="280" alt="Teacher Illustration" class="img-fluid hero-image">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="row mb-4">
+  <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+    <a href="{% url 'content:create_course' %}" class="card shadow-sm h-100 text-decoration-none hover-elevate-up transition-all">
+      <div class="card-body d-flex flex-column gap-2 align-items-center justify-content-center text-center p-4 bg-primary-subtle">
+        <div class="avatar avatar-lg mb-2">
+          <div class="avatar-initial rounded-circle bg-primary">
+            <i class="ti ti-book-plus ti-lg text-white"></i>
+          </div>
+        </div>
+        <h5 class="mb-0 text-primary">Create Course</h5>
+        <small class="text-muted">Add a new course</small>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+    <a href="" class="card shadow-sm h-100 text-decoration-none hover-elevate-up transition-all">
+      <div class="card-body d-flex flex-column gap-2 align-items-center justify-content-center text-center p-4 bg-info-subtle">
+        <div class="avatar avatar-lg mb-2">
+          <div class="avatar-initial rounded-circle bg-info">
+            <i class="ti ti-upload ti-lg text-white"></i>
+          </div>
+        </div>
+        <h5 class="mb-0 text-info">Upload Resource</h5>
+        <small class="text-muted">Share materials</small>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+    <a href="" class="card shadow-sm h-100 text-decoration-none hover-elevate-up transition-all">
+      <div class="card-body d-flex flex-column gap-2 align-items-center justify-content-center text-center p-4 bg-success-subtle">
+        <div class="avatar avatar-lg mb-2">
+          <div class="avatar-initial rounded-circle bg-success">
+            <i class="ti ti-calendar-plus ti-lg text-white"></i>
+          </div>
+        </div>
+        <h5 class="mb-0 text-success">Create Slot</h5>
+        <small class="text-muted">Schedule availability</small>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+    <a href="{% url 'assessment:create_quiz' %}" class="card shadow-sm h-100 text-decoration-none hover-elevate-up transition-all">
+      <div class="card-body d-flex flex-column gap-2 align-items-center justify-content-center text-center p-4 bg-warning-subtle">
+        <div class="avatar avatar-lg mb-2">
+          <div class="avatar-initial rounded-circle bg-warning">
+            <i class="ti ti-file-text ti-lg text-white"></i>
+          </div>
+        </div>
+        <h5 class="mb-0 text-warning">Create Quiz</h5>
+        <small class="text-muted">Test knowledge</small>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Course Analytics & Calendar -->
+<div class="row">
+  <!-- Course Analytics -->
+  <div class="col-xl-8 mb-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center bg-primary bg-opacity-10">
+        <h5 class="card-title mb-0 text-primary">Course Analytics</h5>
+        <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">View All</a>
+      </div>
+      <div class="card-body">
+        {% if course_analytics %}
+        <div class="swiper" id="course-analytics-swiper">
+          <div class="swiper-wrapper">
+            {% for course in course_analytics %}
+            <div class="swiper-slide">
+              <div class="card border h-100 hover-shadow transition-all course-card">
+                <div class="position-relative">
+                  <div class="progress rounded-0" style="height: 6px;">
+                    <div class="progress-bar bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}" role="progressbar" style="width: {{ course.completion_rate }}%"></div>
+                  </div>
+                </div>
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-3">
+                    {% if course.image %}
+                    <img src="{{ course.image }}" alt="{{ course.title }}" class="rounded-3 me-3" width="60" height="60">
+                    {% else %}
+                    <div class="avatar avatar-lg me-3">
+                      <div class="avatar-initial rounded-3 bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}">
+                        <i class="ti ti-book ti-lg text-white"></i>
+                      </div>
+                    </div>
+                    {% endif %}
+                    <div>
+                      <h5 class="mb-0 fw-semibold">{{ course.title }}</h5>
+                      <span class="badge bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }} mt-1">{{ course.student_count }} students</span>
+                    </div>
+                  </div>
+                  
+                  <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="mb-0">Course Completion</h6>
+                    <span class="fw-semibold">{{ course.completion_rate }}%</span>
+                  </div>
+                  
+                  <div class="progress mb-4" style="height: 10px;">
+                    <div class="progress-bar bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}" role="progressbar" style="width: {{ course.completion_rate }}%"></div>
+                  </div>
+                  
+                  <div class="row g-3 mb-4">
+                    <div class="col-6">
+                      <div class="d-flex align-items-center p-2 rounded-3 bg-primary bg-opacity-10">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded bg-primary">
+                            <i class="ti ti-users ti-xs text-white"></i>
+                          </span>
+                        </div>
+                        <div>
+                          <h6 class="mb-0 fw-semibold">{{ course.student_count }}</h6>
+                          <small class="text-muted">Students</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="d-flex align-items-center p-2 rounded-3 bg-info bg-opacity-10">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded bg-info">
+                            <i class="ti ti-list-check ti-xs text-white"></i>
+                          </span>
+                        </div>
+                        <div>
+                          <h6 class="mb-0 fw-semibold">{{ course.lesson_count }}</h6>
+                          <small class="text-muted">Lessons</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="d-flex align-items-center p-2 rounded-3 bg-success bg-opacity-10">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded bg-success">
+                            <i class="ti ti-chart-pie ti-xs text-white"></i>
+                          </span>
+                        </div>
+                        <div>
+                          <h6 class="mb-0 fw-semibold">{{ course.quiz_avg_score }}%</h6>
+                          <small class="text-muted">Avg. Score</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="d-flex align-items-center p-2 rounded-3 bg-warning bg-opacity-10">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded bg-warning">
+                            <i class="ti ti-file-text ti-xs text-white"></i>
+                          </span>
+                        </div>
+                        <div>
+                          <h6 class="mb-0 fw-semibold">{{ course.quiz_count }}</h6>
+                          <small class="text-muted">Quizzes</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <a href="{% url 'content:course_detail' course_id=course.id %}" class="btn btn-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }} w-100">
+                    <i class="ti ti-eye me-1"></i> View Course
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <div class="avatar avatar-md mb-3">
+            <div class="avatar-initial rounded-circle bg-primary">
+              <i class="ti ti-books ti-md text-white"></i>
+            </div>
+          </div>
+          <h6 class="mb-1">No courses yet</h6>
+          <p class="mb-3">Start creating courses to see analytics</p>
+          <a href="{% url 'content:create_course' %}" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i> Create Course
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <!-- Calendar -->
+  <div class="col-xl-4 mb-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header bg-info bg-opacity-10">
+        <h5 class="card-title mb-0 text-info">Your Schedule</h5>
+      </div>
+      <div class="card-body p-0">
+        <div id="teacherCalendar" style="height: 450px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sessions Management & Weekly Stats -->
+<div class="row">
+  <!-- Sessions Management -->
+  <div class="col-xl-8 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center bg-success bg-opacity-10">
+        <h5 class="card-title mb-0 text-success">Sessions Management</h5>
+        <div>
+          <a href="" class="btn btn-sm btn-success me-2">
+            <i class="ti ti-plus me-1"></i> Create Slot
+          </a>
+          <a href="{% url 'meetings:create_meeting' %}" class="btn btn-sm btn-primary">
+            <i class="ti ti-calendar-plus me-1"></i> Schedule Meeting
+          </a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <ul class="nav nav-tabs nav-fill" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#tab-available" aria-selected="true" role="tab">
+              <i class="ti ti-calendar-time me-1"></i> Available Slots
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#tab-booked" aria-selected="false" role="tab">
+              <i class="ti ti-calendar-check me-1"></i> Booked Sessions
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#tab-group" aria-selected="false" role="tab">
+              <i class="ti ti-users me-1"></i> Group Sessions
+            </button>
+          </li>
+        </ul>
+        
+        <div class="tab-content">
+          <!-- Available Slots Tab -->
+          <div class="tab-pane fade show active p-3" id="tab-available" role="tabpanel">
+            {% if available_slots %}
+            <div class="table-responsive">
+              <table class="table table-hover table-striped">
+                <thead class="table-light">
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>Duration</th>
+                    <th>Language</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for slot in available_slots %}
+                  <tr>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span class="fw-semibold">{{ slot.start_time|date:"M d, Y" }}</span>
+                        <small class="text-muted">{{ slot.start_time|date:"h:i A" }}</small>
+                      </div>
+                    </td>
+                    <td>{{ slot.duration_minutes }} min</td>
+                    <td>
+                      {% if slot.language %}
+                      <span class="badge bg-info">{{ slot.get_language_display }}</span>
+                      {% else %}
+                      <span class="text-muted">-</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-center">
+                      <div class="d-flex gap-2 justify-content-center">
+                        <a href="{% url 'booking:edit_slot' slot_id=slot.id %}" class="btn btn-sm btn-icon btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                          <i class="ti ti-edit"></i>
+                        </a>
+                        <a href="{% url 'booking:delete_slot' slot_id=slot.id %}" class="btn btn-sm btn-icon btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                          <i class="ti ti-trash"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-primary">
+                  <i class="ti ti-calendar-off ti-md text-white"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No available slots</h6>
+              <p class="mb-3">You haven't created any available time slots yet</p>
+              <a href="" class="btn btn-primary">
+                <i class="ti ti-plus me-1"></i> Create Slot
+              </a>
+            </div>
+            {% endif %}
+          </div>
           
           <!-- Booked Sessions Tab -->
-          <div class="tab-pane fade" id="tab-booked" role="tabpanel">
+          <div class="tab-pane fade p-3" id="tab-booked" role="tabpanel">
             {% if booked_slots %}
             <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
+              <table class="table table-hover table-striped">
+                <thead class="table-light">
                   <tr>
                     <th>Date & Time</th>
                     <th>Student</th>
                     <th>Duration</th>
-                    <th>Actions</th>
+                    <th class="text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -75,29 +456,29 @@
                   <tr>
                     <td>
                       <div class="d-flex flex-column">
-                        <span>{{ slot.start_time|date:"M d, Y" }}</span>
+                        <span class="fw-semibold">{{ slot.start_time|date:"M d, Y" }}</span>
                         <small class="text-muted">{{ slot.start_time|date:"h:i A" }}</small>
                       </div>
                     </td>
                     <td>
                       <div class="d-flex align-items-center">
                         <div class="avatar avatar-xs me-2">
-                          <div class="avatar-initial rounded-circle bg-label-primary">
-                            <span>{{ slot.student.username|slice:":1" }}</span>
+                          <div class="avatar-initial rounded-circle bg-primary">
+                            <span class="text-white">{{ slot.student.username|slice:":1" }}</span>
                           </div>
                         </div>
-                        <span>{{ slot.student.username }}</span>
+                        <span class="fw-semibold">{{ slot.student.username }}</span>
                       </div>
                     </td>
                     <td>{{ slot.duration_minutes }} min</td>
-                    <td>
-                      <div class="d-flex gap-2">
+                    <td class="text-center">
+                      <div class="d-flex gap-2 justify-content-center">
                         {% if slot.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" and slot.end_time|date:"U"|add:"0" > now|date:"U"|add:"0" %}
-                        <a href="{% url 'meetings:join_meeting' meeting_id=slot.meeting.id %}" class="btn btn-sm btn-primary">
+                        <a href="{% url 'meetings:join_meeting' meeting_id=slot.meeting.id %}" class="btn btn-sm btn-success">
                           <i class="ti ti-video me-1"></i> Join
                         </a>
                         {% endif %}
-                        <a href="{% url 'booking:cancel_booking' slot_id=slot.id %}" class="btn btn-sm btn-outline-danger">
+                        <a href="{% url 'booking:cancel_booking' slot_id=slot.id %}" class="btn btn-sm btn-danger">
                           <i class="ti ti-x me-1"></i> Cancel
                         </a>
                       </div>
@@ -110,8 +491,8 @@
             {% else %}
             <div class="text-center py-5">
               <div class="avatar avatar-md mb-3">
-                <div class="avatar-initial rounded-circle bg-label-primary">
-                  <i class="ti ti-calendar-off ti-md"></i>
+                <div class="avatar-initial rounded-circle bg-primary">
+                  <i class="ti ti-calendar-off ti-md text-white"></i>
                 </div>
               </div>
               <h6 class="mb-1">No booked slots</h6>
@@ -119,97 +500,80 @@
             </div>
             {% endif %}
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Weekly Schedule and Teaching Resources -->
-<div class="row">
-  <!-- Weekly Schedule -->
-  <div class="col-xl-8 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Weekly Schedule</h5>
-      </div>
-      <div class="card-body px-0">
-        <div class="nav-align-top mb-0">
-          <ul class="nav nav-tabs nav-fill" role="tablist">
-            {% for day in weekly_schedule %}
-            <li class="nav-item" role="presentation">
-              <button type="button" class="nav-link {% if day.is_today %}active{% endif %}" 
-                      role="tab" data-bs-toggle="tab" data-bs-target="#tab-{{ day.day_name|lower }}" 
-                      aria-controls="tab-{{ day.day_name|lower }}" aria-selected="{{ day.is_today|yesno:"true,false" }}">
-                <div class="text-nowrap overflow-hidden">
-                  <span class="d-block">{{ day.day_name|slice:":3" }}</span>
-                  <span class="d-block small">{{ day.date }}</span>
-                </div>
-              </button>
-            </li>
-            {% endfor %}
-          </ul>
           
-          <div class="tab-content p-0">
-            {% for day in weekly_schedule %}
-            <div class="tab-pane fade {% if day.is_today %}show active{% endif %}" id="tab-{{ day.day_name|lower }}" role="tabpanel">
-              {% if day.meetings %}
-              <div class="list-group list-group-flush">
-                {% for meeting in day.meetings %}
-                <div class="list-group-item p-3">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                      <div class="avatar me-3">
-                        <span class="avatar-initial rounded bg-label-{% if meeting.type == 'meeting' %}primary{% elif meeting.type == 'private' %}danger{% elif meeting.type == 'group' %}success{% else %}info{% endif %}">
-                          <i class="ti ti-{% if meeting.type == 'meeting' %}video{% elif meeting.type == 'private' %}user{% elif meeting.type == 'group' %}users{% else %}calendar{% endif %}"></i>
-                        </span>
-                      </div>
-                      <div>
-                        <h6 class="mb-0">{{ meeting.title }}</h6>
-                        <div class="d-flex text-muted small align-items-center">
-                          <i class="ti ti-clock ti-xs me-1"></i> {{ meeting.start_time }}
-                          {% if meeting.student_count %}
-                          <i class="ti ti-users ti-xs ms-2 me-1"></i> {{ meeting.student_count }} student{{ meeting.student_count|pluralize }}
-                          {% endif %}
+          <!-- Group Sessions Tab -->
+          <div class="tab-pane fade p-3" id="tab-group" role="tabpanel">
+            {% if upcoming_group_sessions %}
+            <div class="table-responsive">
+              <table class="table table-hover table-striped">
+                <thead class="table-light">
+                  <tr>
+                    <th>Session</th>
+                    <th>Date & Time</th>
+                    <th>Enrollment</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for session in upcoming_group_sessions %}
+                  <tr>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span class="fw-semibold">{{ session.title }}</span>
+                        <div class="d-flex gap-1 mt-1">
+                          <span class="badge bg-primary">{{ session.get_language_display }}</span>
+                          <span class="badge bg-info">{{ session.get_level_display }}</span>
                         </div>
                       </div>
-                    </div>
-                    <div>
-                      {% if meeting.status == 'available' %}
-                      <span class="badge bg-label-info">Available</span>
-                      {% elif meeting.status == 'confirmed' or meeting.status == 'booked' %}
-                      <span class="badge bg-label-success">Booked</span>
-                      {% endif %}
-                      {% if meeting.type == 'meeting' %}
-                      <a href="{% url 'meetings:meeting_detail' meeting_id=meeting.id %}" class="btn btn-sm btn-outline-primary ms-2">
-                        <i class="ti ti-eye me-1"></i> View
-                      </a>
-                      {% elif meeting.type == 'private' and meeting.status == 'booked' %}
-                      <a href="{% url 'booking:booking_detail' booking_id=meeting.id %}" class="btn btn-sm btn-outline-primary ms-2">
-                        <i class="ti ti-eye me-1"></i> View
-                      </a>
-                      {% elif meeting.type == 'group' %}
-                      <a href="{% url 'booking:group_session_detail' session_id=meeting.id %}" class="btn btn-sm btn-outline-primary ms-2">
-                        <i class="ti ti-eye me-1"></i> View
-                      </a>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
-              {% else %}
-              <div class="text-center py-5">
-                <div class="avatar avatar-sm mb-3">
-                  <span class="avatar-initial rounded-circle bg-label-primary">
-                    <i class="ti ti-calendar-off"></i>
-                  </span>
-                </div>
-                <p class="mb-0">No sessions scheduled for {{ day.day_name }}</p>
-              </div>
-              {% endif %}
+                    </td>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span class="fw-semibold">{{ session.start_time|date:"M d, Y" }}</span>
+                        <small class="text-muted">{{ session.start_time|date:"h:i A" }}</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="progress flex-grow-1 me-2" style="height: 8px; width: 80px;">
+                          <div class="progress-bar bg-success" style="width: {{ session.enrollment_percentage }}%"></div>
+                        </div>
+                        <span>{{ session.students.count }}/{{ session.max_students }}</span>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <div class="d-flex gap-2 justify-content-center">
+                        {% if session.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" and session.end_time|date:"U"|add:"0" > now|date:"U"|add:"0" %}
+                        <a href="{{ session.meeting_link }}" target="_blank" class="btn btn-sm btn-success">
+                          <i class="ti ti-video me-1"></i> Join
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'booking:edit_group_session' session_id=session.id %}" class="btn btn-sm btn-icon btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                          <i class="ti ti-edit"></i>
+                        </a>
+                        <a href="{% url 'booking:cancel_group_session' session_id=session.id %}" class="btn btn-sm btn-icon btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                          <i class="ti ti-trash"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
-            {% endfor %}
+            {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-primary">
+                  <i class="ti ti-users-off ti-md text-white"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No group sessions</h6>
+              <p class="mb-3">You haven't created any group sessions yet</p>
+              <a href="" class="btn btn-primary">
+                <i class="ti ti-plus me-1"></i> Create Group Session
+              </a>
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -218,37 +582,61 @@
   
   <!-- Weekly Availability Stats -->
   <div class="col-xl-4 mb-4">
-    <div class="card h-100">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Weekly Availability Stats</h5>
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-warning bg-opacity-10">
+        <h5 class="card-title mb-0 text-warning">Weekly Availability Stats</h5>
       </div>
       <div class="card-body">
-        <div id="weeklyStatsChart" style="min-height: 265px;"></div>
+        <div id="weeklyStatsChart" class="mb-4" style="min-height: 265px;"></div>
         
-        <div class="row mt-4">
+        <div class="row g-3">
           <div class="col-6">
-            <div class="d-flex align-items-center">
-              <div class="avatar avatar-sm me-2">
-                <span class="avatar-initial rounded bg-label-primary">
-                  <i class="ti ti-calendar-time ti-sm"></i>
+            <div class="d-flex align-items-center gap-2 p-3 rounded-3 bg-primary bg-opacity-10 hover-shadow transition-all">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <span class="avatar-initial rounded bg-primary">
+                  <i class="ti ti-calendar-time ti-sm text-white"></i>
                 </span>
               </div>
               <div>
-                <h6 class="mb-0">{{ available_slots|length }}</h6>
+                <h6 class="mb-0 fw-semibold">{{ available_slots|length }}</h6>
                 <small>Available Slots</small>
               </div>
             </div>
           </div>
           <div class="col-6">
-            <div class="d-flex align-items-center">
-              <div class="avatar avatar-sm me-2">
-                <span class="avatar-initial rounded bg-label-success">
-                  <i class="ti ti-calendar-check ti-sm"></i>
+            <div class="d-flex align-items-center gap-2 p-3 rounded-3 bg-success bg-opacity-10 hover-shadow transition-all">
+              <div class="avatar avatar-sm flex-shrink-0">
+                <span class="avatar-initial rounded bg-success">
+                  <i class="ti ti-calendar-check ti-sm text-white"></i>
                 </span>
               </div>
               <div>
-                <h6 class="mb-0">{{ booked_slots|length }}</h6>
+                <h6 class="mb-0 fw-semibold">{{ booked_slots|length }}</h6>
                 <small>Booked Sessions</small>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-12 mt-2">
+            <div class="bg-warning bg-opacity-10 rounded-3 p-3 mt-2">
+              <h6 class="fw-semibold mb-3 text-warning">Booking Conversion Rate</h6>
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-warning" role="progressbar" 
+                  style="width: {% if available_slots|length > 0 %}{{ booked_slots|length|floatformat:0 }}{% else %}0{% endif %}%" 
+                  aria-valuenow="{% if available_slots|length > 0 %}{{ booked_slots|length|floatformat:0 }}{% else %}0{% endif %}" 
+                  aria-valuemin="0" 
+                  aria-valuemax="100">
+                </div>
+              </div>
+              <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted">Total: {{ available_slots|length|add:booked_slots|length }} slots</small>
+                <small class="fw-semibold text-warning">
+                  {% if available_slots|length > 0 %}
+                    {{ booked_slots|length|floatformat:0 }}%
+                  {% else %}
+                    0%
+                  {% endif %}
+                </small>
               </div>
             </div>
           </div>
@@ -258,53 +646,109 @@
   </div>
 </div>
 
-<!-- Teaching Resources -->
+<!-- Student Activity & Teaching Resources -->
 <div class="row">
-  <div class="col-12 mb-4">
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Teaching Resources</h5>
-        <a href=" " class="btn btn-sm btn-primary">
+  <!-- Student Activity -->
+  <div class="col-xl-6 mb-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center bg-danger bg-opacity-10">
+        <h5 class="card-title mb-0 text-danger">Recent Student Activity</h5>
+        <div class="input-group input-group-merge" style="width: 200px;">
+          <span class="input-group-text"><i class="ti ti-search"></i></span>
+          <input type="text" class="form-control" id="studentActivitySearch" placeholder="Search activities...">
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="timeline-compact ps-3 pe-3 pt-2">
+          {% if student_activities %}
+            {% for activity in student_activities %}
+              <div class="timeline-item mb-4">
+                <div class="timeline-header position-relative mb-3">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm me-2">
+                      <div class="avatar-initial rounded-circle bg-{{ activity.color }}">
+                        <span class="text-white">{{ activity.student_name|slice:":1" }}</span>
+                      </div>
+                    </div>
+                    <h6 class="mb-0 fw-semibold">{{ activity.student_name }}</h6>
+                    <small class="text-muted ms-auto">{{ activity.time_ago }}</small>
+                  </div>
+                </div>
+                <div class="timeline-body p-3 rounded-3 bg-{{ activity.color }} bg-opacity-10 mb-3">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="avatar avatar-xs me-2">
+                      <span class="avatar-initial rounded bg-{{ activity.color }}">
+                        <i class="ti ti-{{ activity.type|yesno:"quiz=file-text,session=video,booking=calendar-event" }} text-white"></i>
+                      </span>
+                    </div>
+                    <p class="mb-0 fw-medium">{{ activity.title }}</p>
+                  </div>
+                  <span class="badge bg-{{ activity.color }}">{{ activity.result }}</span>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-5">
+              <div class="avatar avatar-md mb-3">
+                <div class="avatar-initial rounded-circle bg-danger">
+                  <i class="ti ti-users ti-md text-white"></i>
+                </div>
+              </div>
+              <h6 class="mb-1">No recent activity</h6>
+              <p class="mb-4">Student activities will appear here</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Teaching Resources -->
+  <div class="col-xl-6 mb-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center bg-purple bg-opacity-10">
+        <h5 class="card-title mb-0 text-purple">Teaching Resources</h5>
+        <a href="" class="btn btn-sm btn-purple">
           <i class="ti ti-upload me-1"></i> Upload Resource
         </a>
       </div>
       <div class="card-body">
         {% if resources %}
-        <div class="row g-4">
+        <div class="row g-3">
           {% for resource in resources %}
-          <div class="col-md-4 col-xl-3">
-            <div class="card shadow-sm h-100">
-              <div class="card-body">
+          <div class="col-md-6">
+            <div class="card resource-card border hover-shadow transition-all h-100">
+              <div class="card-body p-3">
                 <div class="d-flex align-items-center mb-3">
-                  <div class="avatar me-3">
-                    <div class="avatar-initial rounded bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
-                      <i class="ti ti-{{ resource.icon|default:"file" }} ti-md"></i>
+                  <div class="avatar avatar-lg me-3 flex-shrink-0">
+                    <div class="avatar-initial rounded bg-{{ resource.file_type|lower|cut:" "|yesno:"pdf=danger,document=primary,spreadsheet=success,presentation=warning,image=info,video=purple,audio=info,file=secondary" }}">
+                      <i class="ti ti-{{ resource.icon|default:"file" }} ti-md text-white"></i>
                     </div>
                   </div>
                   <div>
-                    <h6 class="mb-0 text-truncate" style="max-width: 140px;">{{ resource.title }}</h6>
-                    <span class="badge bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
+                    <h6 class="mb-0 fw-semibold text-truncate" style="max-width: 150px;">{{ resource.title }}</h6>
+                    <span class="badge bg-{{ resource.file_type|lower|cut:" "|yesno:"pdf=danger,document=primary,spreadsheet=success,presentation=warning,image=info,video=purple,audio=info,file=secondary" }} mt-1">
                       {{ resource.file_type }}
                     </span>
                   </div>
                 </div>
                 
-                <div class="d-flex align-items-center">
-                  <div class="d-flex align-items-center me-3">
+                <div class="d-flex justify-content-between align-items-center text-muted mb-3">
+                  <div class="d-flex align-items-center">
                     <i class="ti ti-eye ti-sm me-1"></i>
                     <span>{{ resource.views }}</span>
                   </div>
-                  <div class="d-flex align-items-center text-muted">
+                  <div class="d-flex align-items-center">
                     <i class="ti ti-calendar ti-sm me-1"></i>
-                    <span>{{ resource.upload_date|date:"M d" }}</span>
+                    <span>{{ resource.upload_date|date:"M d, Y" }}</span>
                   </div>
                 </div>
                 
-                <div class="d-flex gap-2 mt-3">
-                  <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-primary flex-grow-1">
+                <div class="d-flex gap-2">
+                  <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-{{ resource.file_type|lower|cut:" "|yesno:"pdf=danger,document=primary,spreadsheet=success,presentation=warning,image=info,video=purple,audio=info,file=secondary" }} flex-grow-1">
                     <i class="ti ti-download me-1"></i> Download
                   </a>
-                  <a href="{% url 'repository:edit_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon btn-outline-primary">
+                  <a href="{% url 'repository:edit_resource' resource_id=resource.id %}" class="btn btn-sm btn-icon btn-outline-{{ resource.file_type|lower|cut:" "|yesno:"pdf=danger,document=primary,spreadsheet=success,presentation=warning,image=info,video=purple,audio=info,file=secondary" }}">
                     <i class="ti ti-edit"></i>
                   </a>
                 </div>
@@ -316,13 +760,13 @@
         {% else %}
         <div class="text-center py-5">
           <div class="avatar avatar-md mb-3">
-            <div class="avatar-initial rounded-circle bg-label-primary">
-              <i class="ti ti-file ti-md"></i>
+            <div class="avatar-initial rounded-circle bg-purple">
+              <i class="ti ti-file ti-md text-white"></i>
             </div>
           </div>
           <h6 class="mb-1">No resources yet</h6>
           <p class="mb-3">Upload resources for your students</p>
-          <a href="" class="btn btn-primary">
+          <a href="" class="btn btn-purple">
             <i class="ti ti-upload me-1"></i> Upload Resource
           </a>
         </div>
@@ -335,34 +779,41 @@
 <!-- Most Active Students -->
 <div class="row">
   <div class="col-12 mb-4">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Most Active Students</h5>
+    <div class="card shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center bg-teal bg-opacity-10">
+        <h5 class="card-title mb-0 text-teal">Most Active Students</h5>
+        <a href="" class="btn btn-sm btn-teal">View All</a>
       </div>
       <div class="card-body">
         {% if active_students %}
         <div class="row g-4">
           {% for student in active_students %}
-          <div class="col-md-4 col-xl-3">
-            <div class="card border shadow-none h-100">
-              <div class="card-body text-center">
-                <div class="avatar avatar-md mx-auto mb-3">
-                  <div class="avatar-initial rounded-circle bg-label-primary">
-                    <span>{{ student.name|slice:":1" }}</span>
+          <div class="col-md-3 col-sm-6">
+            <div class="card border shadow-none h-100 hover-shadow transition-all student-card">
+              <div class="card-body text-center p-3">
+                <div class="avatar avatar-lg mx-auto mb-3">
+                  <div class="avatar-initial rounded-circle bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}">
+                    <span class="text-white">{{ student.name|slice:":1" }}</span>
                   </div>
                 </div>
-                <h6 class="mb-1">{{ student.name }}</h6>
-                <div class="d-flex justify-content-center gap-2 mb-3">
+                <h6 class="mb-1 fw-semibold">{{ student.name }}</h6>
+                <div class="d-flex justify-content-center gap-3 mb-3">
                   <div class="d-flex align-items-center">
-                    <i class="ti ti-calendar-event ti-sm text-muted me-1"></i>
+                    <i class="ti ti-calendar-event ti-sm text-primary me-1"></i>
                     <span>{{ student.session_count }}</span>
                   </div>
                   <div class="d-flex align-items-center">
-                    <i class="ti ti-file-text ti-sm text-muted me-1"></i>
+                    <i class="ti ti-file-text ti-sm text-info me-1"></i>
                     <span>{{ student.quiz_count }}</span>
                   </div>
                 </div>
-                <a href="{% url 'account:student_profile' student_id=student.id %}" class="btn btn-sm btn-primary w-100">
+                <div class="d-flex justify-content-center mb-3">
+                  <!-- Student activity gauge -->
+                  <div class="progress w-75" style="height: 6px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Activity level">
+                    <div class="progress-bar bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}" style="width: {{ student.total_activity|divisibleby:2|yesno:"100,75,50,25" }}%"></div>
+                  </div>
+                </div>
+                <a href="{% url 'account:student_profile' student_id=student.id %}" class="btn btn-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }} w-100">
                   <i class="ti ti-user me-1"></i> View Profile
                 </a>
               </div>
@@ -373,12 +824,12 @@
         {% else %}
         <div class="text-center py-5">
           <div class="avatar avatar-md mb-3">
-            <div class="avatar-initial rounded-circle bg-label-primary">
-              <i class="ti ti-users ti-md"></i>
+            <div class="avatar-initial rounded-circle bg-teal">
+              <i class="ti ti-users ti-md text-white"></i>
             </div>
           </div>
           <h6 class="mb-1">No active students yet</h6>
-          <p class="mb-0">Student activity data will appear here</p>
+          <p class="mb-4">Student activity data will appear here</p>
         </div>
         {% endif %}
       </div>
@@ -399,7 +850,7 @@
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         events: {{ calendar_events|default:"[]"|safe }},
         slotMinTime: '08:00:00',
@@ -409,11 +860,39 @@
           startTime: '09:00',
           endTime: '18:00',
         },
+        height: '100%',
         eventClick: function(info) {
-          // Handle event click if needed
+          // Handle event click
+        },
+        eventClassNames: function(arg) {
+          return ['fc-event-' + arg.event.extendedProps.type];
         }
       });
       calendar.render();
+    }
+    
+    // Initialize Course Analytics Swiper
+    if (document.querySelector('#course-analytics-swiper')) {
+      new Swiper('#course-analytics-swiper', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+        breakpoints: {
+          768: {
+            slidesPerView: 1,
+          },
+          1200: {
+            slidesPerView: 2,
+          }
+        }
+      });
     }
     
     // Student activity search functionality
@@ -424,8 +903,8 @@
         const activityItems = document.querySelectorAll('.timeline-item');
         
         activityItems.forEach(item => {
-          const studentName = item.querySelector('.timeline-header h6').innerText.toLowerCase();
-          const activityTitle = item.querySelector('.timeline-event p').innerText.toLowerCase();
+          const studentName = item.querySelector('.fw-semibold').innerText.toLowerCase();
+          const activityTitle = item.querySelector('.fw-medium').innerText.toLowerCase();
           
           if (studentName.includes(searchValue) || activityTitle.includes(searchValue)) {
             item.style.display = '';
@@ -436,25 +915,35 @@
       });
     }
     
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
     // Weekly Stats Chart
     if (document.querySelector("#weeklyStatsChart")) {
       const weeklyStats = {
         chart: {
-          height: 255,
+          height: 260,
           type: 'bar',
           stacked: true,
           toolbar: {
             show: false
-          }
+          },
+          fontFamily: 'inherit'
         },
         plotOptions: {
           bar: {
             horizontal: false,
             columnWidth: '55%',
             borderRadius: 4,
+            dataLabels: {
+              position: 'top'
+            }
           },
         },
-        colors: ['#696cff', '#03c3ec'],
+        colors: ['#ff8f00', '#03c3ec'],
         dataLabels: {
           enabled: false
         },
@@ -471,13 +960,26 @@
         }],
         xaxis: {
           categories: {{ weekly_stats.categories|default:"['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"|safe }},
+          axisBorder: {
+            show: false
+          },
+          axisTicks: {
+            show: false
+          }
         },
         legend: {
           position: 'top',
-          horizontalAlign: 'left'
+          horizontalAlign: 'left',
+          fontFamily: 'inherit',
+          markers: {
+            radius: 12
+          }
         },
         fill: {
           opacity: 1
+        },
+        tooltip: {
+          theme: 'dark'
         }
       };
       
@@ -487,6 +989,188 @@
       );
       weeklyStatsChart.render();
     }
+    
+    // Add custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+      /* Custom CSS for improved visuals */
+      .teacher-hero {
+        background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+        color: white;
+      }
+      
+      .bg-purple-gradient {
+        background: linear-gradient(45deg, #a64eee 0%, #c887f7 100%);
+      }
+      
+      .bg-teal-gradient {
+        background: linear-gradient(45deg, #0acffe 0%, #495aff 100%);
+      }
+      
+      .bg-orange-gradient {
+        background: linear-gradient(45deg, #ff8f00 0%, #ff5252 100%);
+      }
+      
+      .bg-blue-gradient {
+        background: linear-gradient(45deg, #45cafc 0%, #303f9f 100%);
+      }
+      
+      .btn-glow {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+      }
+      
+      .btn-glow:hover {
+        background: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+      }
+      
+      .hover-shadow {
+        transition: box-shadow 0.2s ease-in-out;
+      }
+      
+      .hover-shadow:hover {
+        box-shadow: 0 0.25rem 1rem rgba(165, 163, 174, 0.2) !important;
+      }
+      
+      .transition-all {
+        transition: all 0.2s ease-in-out;
+      }
+      
+      .hover-elevate-up {
+        transition: transform 0.2s ease-in-out;
+      }
+      
+      .hover-elevate-up:hover {
+        transform: translateY(-5px);
+      }
+      
+      .course-card {
+        transition: all 0.3s ease;
+      }
+      
+      .course-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .resource-card {
+        transition: all 0.3s ease;
+      }
+      
+      .resource-card:hover {
+        transform: translateY(-3px);
+      }
+      
+      .student-card {
+        transition: all 0.3s ease;
+      }
+      
+      .student-card:hover {
+        transform: translateY(-3px);
+      }
+      
+      .shadow-md {
+        box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;
+      }
+      
+      .rounded-4 {
+        border-radius: 0.75rem !important;
+      }
+      
+      .fc-event-meeting {
+        background-color: #696cff !important;
+        border-color: #696cff !important;
+      }
+      
+      .fc-event-private {
+        background-color: #ff6b72 !important;
+        border-color: #ff6b72 !important;
+      }
+      
+      .fc-event-group {
+        background-color: #03c3ec !important;
+        border-color: #03c3ec !important;
+      }
+      
+      .fc-event-available {
+        background-color: #28c76f !important;
+        border-color: #28c76f !important;
+      }
+      
+      .hero-image {
+        filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.15));
+      }
+      
+      .timeline-compact .timeline-item {
+        position: relative;
+        padding-left: 1.5rem;
+        border-left: 1px solid #d9dee3;
+      }
+      
+      .timeline-compact .timeline-header {
+        position: relative;
+      }
+      
+      .timeline-compact .timeline-header:before {
+        content: '';
+        position: absolute;
+        left: -1.625rem;
+        top: 0.75rem;
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        background-color: #d9dee3;
+      }
+      
+      /* Custom theme colors */
+      .bg-purple {
+        background-color: #a64eee !important;
+      }
+      .text-purple {
+        color: #a64eee !important;
+      }
+      .btn-purple {
+        background-color: #a64eee !important;
+        border-color: #a64eee !important;
+        color: #fff !important;
+      }
+      .btn-outline-purple {
+        color: #a64eee !important;
+        border-color: #a64eee !important;
+      }
+      .btn-outline-purple:hover {
+        background-color: #a64eee !important;
+        color: #fff !important;
+      }
+      
+      .bg-teal {
+        background-color: #0acffe !important;
+      }
+      .text-teal {
+        color: #0acffe !important;
+      }
+      .btn-teal {
+        background-color: #0acffe !important;
+        border-color: #0acffe !important;
+        color: #fff !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Add hover effects for cards
+    const hoverCards = document.querySelectorAll('.hover-elevate-up');
+    hoverCards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
   });
 </script>
 {% endblock %}

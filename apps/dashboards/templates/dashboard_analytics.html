@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/swiper/swiper.css' %}" />
 <link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/fullcalendar/fullcalendar.css' %}" />
 {% endblock vendor_css %}
 
 {% block vendor_js %}
@@ -17,6 +18,7 @@
 <script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
 <script src="{% static 'vendor/libs/swiper/swiper.js' %}"></script>
 <script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/fullcalendar/fullcalendar.js' %}"></script>
 {% endblock vendor_js %}
 
 {% block page_js %}
@@ -26,91 +28,169 @@
 
 {% block content %}
 
-<!-- Welcome Banner Section with Glass Morphism design -->
+<!-- Welcome Banner Section with Enhanced Design -->
 <div class="row">
   <div class="col-12 mb-4">
-    <div class="card bg-primary text-white shadow-lg border-0">
-      <div class="d-flex align-items-center row">
-        <div class="col-lg-7">
-          <div class="card-body p-4">
-            <h2 class="fw-bold mb-2">Welcome back, {{request.user.username}}!</h2>
-            <p class="mb-4 opacity-75">Here's your learning overview for today - {{ now|date:"l, F j" }}</p>
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden dashboard-hero">
+      <div class="position-absolute top-0 end-0 d-lg-block d-none">
+        <svg width="300" height="250" viewBox="0 0 300 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path opacity="0.2" d="M41.5 250C18.6 250 0 231.4 0 208.5V85.8L42.2 0H300V208.5C300 231.4 281.4 250 258.5 250H41.5Z" fill="white"/>
+          <path opacity="0.2" d="M300 42.8V0H93.8L59.5 66L125.5 0H300V42.8Z" fill="white"/>
+        </svg>
+      </div>
+      <div class="card-body py-4 py-lg-5">
+        <div class="row align-items-center">
+          <div class="col-lg-8 col-md-12">
+            <h2 class="fw-bold mb-3 display-5 text-info">Welcome back, {{request.user.username}}!</h2>
+            <p class="text-success fs-5 mb-4" style="text-success: 0 1px 2px rgba(0,0,0,0.2);">Here's your learning overview for today - {{ now|date:"l, F j" }}</p>
             
-            <div class="d-flex flex-wrap gap-4 pt-2">
+            <div class="row g-3 mb-4">
               {% if request.user.is_teacher %}
-              <!-- Teacher stats -->
-              <div class="d-flex align-items-center gap-2">
-                <div class="badge bg-white bg-opacity-25 p-2 rounded-3">
-                  <i class="ti ti-users ti-md"></i>
-                </div>
-                <div>
-                  <h3 class="mb-0 fs-5">{{student_count|default:"0"}}</h3>
-                  <span class="fs-sm">Students</span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="badge bg-white bg-opacity-25 p-2 rounded-3">
-                  <i class="ti ti-book ti-md"></i>
-                </div>
-                <div>
-                  <h3 class="mb-0 fs-5">{{course_count|default:"0"}}</h3>
-                  <span class="fs-sm">Courses</span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="badge bg-white bg-opacity-25 p-2 rounded-3">
-                  <i class="ti ti-calendar-event ti-md"></i>
-                </div>
-                <div>
-                  <h3 class="mb-0 fs-5">{{upcoming_sessions|default:"0"}}</h3>
-                  <span class="fs-sm">Sessions</span>
+              <!-- Teacher stats with enhanced design - matching the colorful layout below -->
+              <div class="col-md-3 col-sm-6">
+                <div class="card shadow-md h-100 border-0 bg-purple text-info">
+                  <div class="card-body p-3">
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-items-center mb-1">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded-circle bg-white text-purple">
+                            <i class="ti ti-users"></i>
+                          </span>
+                        </div>
+                        <span class="text-white fw-semibold fs-6">Students</span>
+                      </div>
+                      <h2 class="display-6 fw-bold text-white mb-0">{{student_count|default:"0"}}</h2>
+                      <span class="text-white text-opacity-75 small">All time</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="badge bg-white bg-opacity-25 p-2 rounded-3">
-                  <i class="ti ti-clock ti-md"></i>
+              <div class="col-md-3 col-sm-6">
+                <div class="card shadow-md h-100 border-0 bg-teal text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-items-center mb-1">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded-circle bg-white text-teal">
+                            <i class="ti ti-book"></i>
+                          </span>
+                        </div>
+                        <span class="text-white fw-semibold fs-6">Courses</span>
+                      </div>
+                      <h2 class="display-6 fw-bold text-white mb-0">{{course_count|default:"0"}}</h2>
+                      <span class="text-white text-opacity-75 small">All time</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="mb-0 fs-5">{{teaching_hours|default:"0"}}h</h3>
-                  <span class="fs-sm">This Month</span>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="card shadow-md h-100 border-0 bg-success text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-items-center mb-1">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded-circle bg-white text-success">
+                            <i class="ti ti-calendar-event"></i>
+                          </span>
+                        </div>
+                        <span class="text-white fw-semibold fs-6">Sessions</span>
+                      </div>
+                      <h2 class="display-6 fw-bold text-white mb-0">{{upcoming_sessions|default:"0"}}</h2>
+                      <span class="text-white text-opacity-75 small">Upcoming</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="card shadow-md h-100 border-0 bg-warning text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-items-center mb-1">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded-circle bg-white text-warning">
+                            <i class="ti ti-clock"></i>
+                          </span>
+                        </div>
+                        <span class="text-white fw-semibold fs-6">Hours</span>
+                      </div>
+                      <h2 class="display-6 fw-bold text-white mb-0">{{teaching_hours|default:"0"}}h</h2>
+                      <span class="text-white text-opacity-75 small">This month</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               {% else %}
-              <!-- Student stats -->
-              <div class="d-flex align-items-center gap-2">
-                <div class="badge bg-white bg-opacity-25 p-2 rounded-3">
-                  <i class="ti ti-books ti-md"></i>
-                </div>
-                <div>
-                  <h3 class="mb-0 fs-5">{{enrolled_courses|default:"0"}}</h3>
-                  <span class="fs-sm">Courses</span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="badge bg-white bg-opacity-25 p-2 rounded-3">
-                  <i class="ti ti-checkbox ti-md"></i>
-                </div>
-                <div>
-                  <h3 class="mb-0 fs-5">{{completed_lessons|default:"0"}}</h3>
-                  <span class="fs-sm">Lessons</span>
-                </div>
-              </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="badge bg-white bg-opacity-25 p-2 rounded-3">
-                  <i class="ti ti-credit-card ti-md"></i>
-                </div>
-                <div>
-                  <h3 class="mb-0 fs-5">{{credit_balance|default:"0"}}</h3>
-                  <span class="fs-sm">Credits</span>
+              <!-- Student stats with enhanced design - matching the colorful layout below -->
+              <div class="col-md-3 col-sm-6">
+                <div class="card shadow-md h-100 border-0 bg-purple text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-items-center mb-1">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded-circle bg-white text-purple">
+                            <i class="ti ti-books"></i>
+                          </span>
+                        </div>
+                        <span class="text-white fw-semibold fs-6">Courses</span>
+                      </div>
+                      <h2 class="display-6 fw-bold text-white mb-0">{{enrolled_courses|default:"0"}}</h2>
+                      <span class="text-white text-opacity-75 small">Enrolled</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="d-flex align-items-center gap-2">
-                <div class="badge bg-white bg-opacity-25 p-2 rounded-3">
-                  <i class="ti ti-chart-pie ti-md"></i>
+              <div class="col-md-3 col-sm-6">
+                <div class="card shadow-md h-100 border-0 bg-teal text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-items-center mb-1">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded-circle bg-white text-teal">
+                            <i class="ti ti-checkbox"></i>
+                          </span>
+                        </div>
+                        <span class="text-white fw-semibold fs-6">Lessons</span>
+                      </div>
+                      <h2 class="display-6 fw-bold text-white mb-0">{{completed_lessons|default:"0"}}</h2>
+                      <span class="text-white text-opacity-75 small">Completed</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="mb-0 fs-5">{{avg_score|default:"0"}}%</h3>
-                  <span class="fs-sm">Avg Score</span>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="card shadow-md h-100 border-0 bg-success text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-items-center mb-1">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded-circle bg-white text-success">
+                            <i class="ti ti-credit-card"></i>
+                          </span>
+                        </div>
+                        <span class="text-white fw-semibold fs-6">Credits</span>
+                      </div>
+                      <h2 class="display-6 fw-bold text-white mb-0">{{credit_balance|default:"0"}}</h2>
+                      <span class="text-white text-opacity-75 small">Available</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <div class="card shadow-md h-100 border-0 bg-warning text-white">
+                  <div class="card-body p-3">
+                    <div class="d-flex flex-column">
+                      <div class="d-flex align-items-center mb-1">
+                        <div class="avatar avatar-sm me-2">
+                          <span class="avatar-initial rounded-circle bg-white text-warning">
+                            <i class="ti ti-chart-pie"></i>
+                          </span>
+                        </div>
+                        <span class="text-white fw-semibold fs-6">Scores</span>
+                      </div>
+                      <h2 class="display-6 fw-bold text-white mb-0">{{avg_score|default:"0"}}%</h2>
+                      <span class="text-white text-opacity-75 small">Avg. Score</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               {% endif %}
@@ -118,43 +198,47 @@
             
             <div class="mt-4 d-flex flex-wrap gap-2">
               {% if request.user.is_teacher %}
-              <a href="{% url 'content:create_course' %}" class="btn btn-light">
+              <a href="{% url 'content:create_course' %}" class="btn btn-light btn-lg fw-semibold">
                 <i class="ti ti-plus me-1"></i> New Course
               </a>
-              <a href="{% url 'meetings:create_meeting' %}" class="btn btn-outline-light">
+              <a href="{% url 'meetings:create_meeting' %}" class="btn btn-glow btn-lg fw-semibold">
                 <i class="ti ti-calendar-plus me-1"></i> Schedule Session
               </a>
               {% else %}
-              <a href="{% url 'content:course_list' %}" class="btn btn-light">
+              <a href="{% url 'content:course_list' %}" class="btn btn-light btn-lg fw-semibold">
                 <i class="ti ti-book me-1"></i> Browse Courses
               </a>
-              <a href="{% url 'booking:dashboard' %}" class="btn btn-outline-light">
+              <a href="{% url 'booking:dashboard' %}" class="btn btn-glow btn-lg fw-semibold">
                 <i class="ti ti-calendar-event me-1"></i> Book Session
               </a>
               {% endif %}
             </div>
           </div>
-        </div>
-        <div class="col-lg-5 text-center ps-0 d-none d-lg-block">
-          <img src="{% static 'img/illustrations/student-learning.png' %}" height="300" alt="Student Learning" class="img-fluid mt-n5">
+          <div class="col-lg-4 d-none d-lg-block text-center">
+            {% if request.user.is_teacher %}
+            <img src="{% static 'img/illustrations/teacher.png' %}" height="240" alt="Teacher Illustration" class="hero-image img-fluid">
+            {% else %}
+            <img src="{% static 'img/illustrations/student-learning.png' %}" height="240" alt="Student Learning" class="hero-image img-fluid">
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Quick Actions Section -->
+<!-- Quick Actions Section with Improved Cards -->
 <div class="row mb-4">
   {% for link in quick_links %}
-  <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
-    <a href="{{ link.url }}" class="card shadow-sm h-100 text-decoration-none">
-      <div class="card-body d-flex flex-column gap-2 align-items-center justify-content-center text-center p-4">
+  <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
+    <a href="{{ link.url }}" class="card shadow-sm h-100 text-decoration-none hover-elevate-up transition-all quick-action-card">
+      <div class="card-body d-flex flex-column gap-2 align-items-center justify-content-center text-center p-4" style="background-color: {% if link.color == 'primary' %}#f1efff{% elif link.color == 'success' %}#e6fff6{% elif link.color == 'info' %}#e6f7ff{% elif link.color == 'warning' %}#fff4e9{% endif %};">
         <div class="avatar avatar-lg mb-2">
-          <div class="avatar-initial rounded-circle bg-label-{{ link.color }}">
-            <i class="ti ti-{{ link.icon }} ti-lg"></i>
+          <div class="avatar-initial rounded-circle" style="background-color: {% if link.color == 'primary' %}#6342ff{% elif link.color == 'success' %}#28c76f{% elif link.color == 'info' %}#03c3ec{% elif link.color == 'warning' %}#ff8c42{% endif %};">
+            <i class="ti ti-{{ link.icon }} ti-lg text-white"></i>
           </div>
         </div>
-        <h5 class="mb-0">{{ link.name }}</h5>
+        <h5 class="mb-0" style="color: {% if link.color == 'primary' %}#6342ff{% elif link.color == 'success' %}#28c76f{% elif link.color == 'info' %}#03c3ec{% elif link.color == 'warning' %}#ff8c42{% endif %};">{{ link.name }}</h5>
         <small class="text-muted">Start now</small>
       </div>
     </a>
@@ -166,15 +250,15 @@
 <div class="row">
   <!-- Available Sessions Panel -->
   <div class="col-lg-8 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title m-0">{% if request.user.is_teacher %}Available Teaching Slots{% else %}Available Sessions{% endif %}</h5>
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header d-flex justify-content-between align-items-center bg-primary bg-opacity-10">
+        <h5 class="card-title m-0 text-primary">{% if request.user.is_teacher %}Available Teaching Slots{% else %}Available Sessions{% endif %}</h5>
         <a href="{% url 'booking:dashboard' %}" class="btn btn-sm btn-primary">
           <i class="ti ti-calendar me-1"></i> View All
         </a>
       </div>
       <div class="card-body">
-        <ul class="nav nav-tabs mb-3" role="tablist">
+        <ul class="nav nav-tabs nav-fill custom-tabs mb-3" role="tablist">
           <li class="nav-item" role="presentation">
             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#private-sessions" role="tab" aria-selected="true">
               <i class="ti ti-user me-1"></i> Private
@@ -189,8 +273,8 @@
         <div class="tab-content">
           <div class="tab-pane fade show active" id="private-sessions" role="tabpanel">
             {% if available_slots %}
-              <div class="table-responsive">
-                <table class="table table-hover">
+              <div class="table-responsive custom-table">
+                <table class="table align-middle">
                   <thead>
                     <tr>
                       <th>{% if request.user.is_teacher %}Status{% else %}Instructor{% endif %}</th>
@@ -201,15 +285,15 @@
                   </thead>
                   <tbody>
                     {% for slot in available_slots %}
-                      <tr>
+                      <tr class="table-row-hover">
                         <td>
                           {% if request.user.is_teacher %}
-                            <span class="badge bg-label-success">Available</span>
+                            <span class="badge bg-success text-white">Available</span>
                           {% else %}
                             <div class="d-flex align-items-center">
                               <div class="avatar avatar-xs me-2">
-                                <div class="avatar-initial rounded-circle bg-label-primary">
-                                  <span>{{ slot.instructor.user.username|slice:":1" }}</span>
+                                <div class="avatar-initial rounded-circle bg-primary">
+                                  <span class="text-white">{{ slot.instructor.user.username|slice:":1" }}</span>
                                 </div>
                               </div>
                               <span>{{ slot.instructor.user.username }}</span>
@@ -218,14 +302,14 @@
                         </td>
                         <td>
                           <div class="d-flex flex-column">
-                            <span>{{ slot.start_time|date:"M d, Y" }}</span>
+                            <span class="fw-semibold">{{ slot.start_time|date:"M d, Y" }}</span>
                             <small class="text-muted">{{ slot.start_time|date:"h:i A" }}</small>
                           </div>
                         </td>
                         <td>{{ slot.duration_minutes }} min</td>
                         <td>
                           {% if request.user.is_teacher %}
-                            <a href="{% url 'booking:cancel_booking' slot_id=slot.id %}" class="btn btn-sm btn-outline-danger">
+                            <a href="{% url 'booking:cancel_booking' slot_id=slot.id %}" class="btn btn-sm btn-danger">
                               <i class="ti ti-trash me-1"></i> Delete
                             </a>
                           {% else %}
@@ -240,10 +324,10 @@
                 </table>
               </div>
             {% else %}
-              <div class="text-center py-5">
+              <div class="text-center py-5 empty-state">
                 <div class="avatar avatar-md mb-3">
-                  <div class="avatar-initial rounded-circle bg-label-primary">
-                    <i class="ti ti-calendar-off ti-md"></i>
+                  <div class="avatar-initial rounded-circle bg-primary">
+                    <i class="ti ti-calendar-off ti-md text-white"></i>
                   </div>
                 </div>
                 <h6 class="mb-1">No available sessions</h6>
@@ -268,8 +352,8 @@
           </div>
           <div class="tab-pane fade" id="group-sessions" role="tabpanel">
             {% if available_group_sessions %}
-              <div class="table-responsive">
-                <table class="table table-hover">
+              <div class="table-responsive custom-table">
+                <table class="table align-middle">
                   <thead>
                     <tr>
                       <th>Session</th>
@@ -280,33 +364,33 @@
                   </thead>
                   <tbody>
                     {% for session in available_group_sessions %}
-                      <tr>
+                      <tr class="table-row-hover">
                         <td>
                           <div class="d-flex flex-column">
-                            <span class="fw-medium">{{ session.title }}</span>
+                            <span class="fw-semibold">{{ session.title }}</span>
                             <div class="d-flex gap-1 mt-1">
-                              <span class="badge bg-label-primary">{{ session.get_language_display }}</span>
-                              <span class="badge bg-label-info">{{ session.get_level_display }}</span>
+                              <span class="badge bg-primary">{{ session.get_language_display }}</span>
+                              <span class="badge bg-info">{{ session.get_level_display }}</span>
                             </div>
                           </div>
                         </td>
                         <td>
                           <div class="d-flex flex-column">
-                            <span>{{ session.start_time|date:"M d, Y" }}</span>
+                            <span class="fw-semibold">{{ session.start_time|date:"M d, Y" }}</span>
                             <small class="text-muted">{{ session.start_time|date:"h:i A" }}</small>
                           </div>
                         </td>
                         <td>
                           <div class="d-flex align-items-center">
-                            <div class="progress flex-grow-1 me-2" style="height: 6px; width: 80px;">
-                              <div class="progress-bar bg-primary" style="width: {{ session.enrollment_percentage }}%"></div>
+                            <div class="progress flex-grow-1 me-2" style="height: 8px; width: 80px;">
+                              <div class="progress-bar bg-success" style="width: {{ session.enrollment_percentage }}%"></div>
                             </div>
                             <span>{{ session.students.count }}/{{ session.max_students }}</span>
                           </div>
                         </td>
                         <td>
                           {% if session.is_full %}
-                            <button disabled class="btn btn-sm btn-outline-secondary">
+                            <button disabled class="btn btn-sm btn-secondary">
                               <i class="ti ti-users-off me-1"></i> Full
                             </button>
                           {% else %}
@@ -321,10 +405,10 @@
                 </table>
               </div>
             {% else %}
-              <div class="text-center py-5">
+              <div class="text-center py-5 empty-state">
                 <div class="avatar avatar-md mb-3">
-                  <div class="avatar-initial rounded-circle bg-label-primary">
-                    <i class="ti ti-users-off ti-md"></i>
+                  <div class="avatar-initial rounded-circle bg-primary">
+                    <i class="ti ti-users-off ti-md text-white"></i>
                   </div>
                 </div>
                 <h6 class="mb-1">No group sessions</h6>
@@ -340,22 +424,22 @@
     </div>
   </div>
 
-  <!-- Recent Activity -->
+  <!-- Recent Activity with Timeline Redesign -->
   <div class="col-lg-4 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title m-0">Recent Activity</h5>
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header d-flex justify-content-between align-items-center bg-danger bg-opacity-10">
+        <h5 class="card-title m-0 text-danger">Recent Activity</h5>
       </div>
       <div class="card-body p-0">
-        <div class="timeline-compact timeline-advance ps-3 pe-3 pt-2">
+        <div class="timeline-modern ps-3 pe-3 pt-2">
           {% if recent_activities %}
             {% for activity in recent_activities %}
-              <div class="timeline-item">
+              <div class="timeline-item mb-4">
                 <span class="timeline-indicator timeline-indicator-{{ activity.color }}">
-                  <i class="ti ti-{{ activity.icon }}"></i>
+                  <i class="ti ti-{{ activity.icon }} text-white"></i>
                 </span>
                 <div class="timeline-event">
-                  <div class="timeline-header mb-1">
+                  <div class="timeline-header mb-1 d-flex justify-content-between">
                     <h6 class="mb-0 fw-semibold">{{ activity.title }}</h6>
                     <small class="text-muted">{{ activity.time_ago }}</small>
                   </div>
@@ -364,10 +448,10 @@
               </div>
             {% endfor %}
           {% else %}
-            <div class="text-center py-4">
+            <div class="text-center py-4 empty-state">
               <div class="avatar avatar-md mb-3">
-                <div class="avatar-initial rounded-circle bg-label-primary">
-                  <i class="ti ti-activity ti-md"></i>
+                <div class="avatar-initial rounded-circle bg-danger">
+                  <i class="ti ti-activity ti-md text-white"></i>
                 </div>
               </div>
               <h6 class="mb-1">No recent activity</h6>
@@ -384,69 +468,74 @@
 <div class="row">
   <!-- Course Progress -->
   <div class="col-xl-8 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title m-0">{% if request.user.is_teacher %}Course Engagement{% else %}My Course Progress{% endif %}</h5>
-        <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-primary">View All</a>
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header d-flex justify-content-between align-items-center bg-success bg-opacity-10">
+        <h5 class="card-title m-0 me-2 text-success">{% if request.user.is_teacher %}Course Engagement{% else %}My Course Progress{% endif %}</h5>
+        <a href="{% url 'content:course_list' %}" class="btn btn-sm btn-success">View All</a>
       </div>
       <div class="card-body">
         {% if courses %}
-          <div class="row">
-            {% for course in courses %}
-              <div class="col-md-6 mb-3">
-                <div class="card shadow-none border">
-                  <div class="card-body p-3">
-                    <div class="d-flex align-items-center mb-3">
-                      {% if course.image %}
-                        <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded me-3" width="48" height="48">
-                      {% else %}
-                        <div class="avatar me-3">
-                          <div class="avatar-initial rounded bg-label-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}">
-                            <i class="ti ti-book ti-md"></i>
+          <div class="swiper" id="course-progress-swiper">
+            <div class="swiper-wrapper">
+              {% for course in courses %}
+                <div class="swiper-slide">
+                  <div class="card border h-100 hover-shadow transition-all course-card">
+                    <div class="position-relative">
+                      <div class="progress rounded-0" style="height: 6px;">
+                        <div class="progress-bar bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}" role="progressbar" style="width: {{ course.progress }}%"></div>
+                      </div>
+                    </div>
+                    <div class="card-body p-4">
+                      <div class="d-flex align-items-center mb-3">
+                        {% if course.image %}
+                          <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded-3 me-3" width="60" height="60">
+                        {% else %}
+                          <div class="avatar avatar-lg me-3">
+                            <div class="avatar-initial rounded-3 bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}">
+                              <i class="ti ti-book ti-lg text-white"></i>
+                            </div>
                           </div>
-                        </div>
-                      {% endif %}
-                      <div>
-                        <h6 class="mb-0">{{ course.title }}</h6>
-                        <small class="text-muted">
+                        {% endif %}
+                        <div>
+                          <h5 class="mb-0 fw-semibold">{{ course.title }}</h5>
                           {% if request.user.is_teacher %}
-                            {{ course.students_count }} student{{ course.students_count|pluralize }}
+                            <span class="badge bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }} mt-1">{{ course.students_count }} students</span>
                           {% else %}
-                            {{ course.lessons_count }} lesson{{ course.lessons_count|pluralize }}
+                            <small class="text-muted">{{ course.lessons_count }} lessons</small>
                           {% endif %}
-                        </small>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div class="d-flex align-items-center mb-2">
-                      <div class="progress w-100 me-3" style="height: 8px;">
-                        <div class="progress-bar bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}" 
-                             style="width: {{ course.progress }}%" 
-                             aria-valuenow="{{ course.progress }}" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100"></div>
+                      
+                      <div class="d-flex align-items-center mb-2">
+                        <div class="progress w-100 me-3" style="height: 8px;">
+                          <div class="progress-bar bg-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }}" role="progressbar" style="width: {{ course.progress }}%"></div>
+                        </div>
+                        <span class="text-body fw-semibold">{{ course.progress }}%</span>
                       </div>
-                      <span class="text-body fw-semibold">{{ course.progress }}%</span>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center">
-                      {% if not request.user.is_teacher %}
-                        <small class="text-muted">{{ course.completed_lessons }}/{{ course.lessons_count }} completed</small>
-                      {% endif %}
-                      <a href="{% url 'content:course_detail' course_id=course.id %}" class="btn btn-sm btn-primary">
-                        <i class="ti ti-eye me-1"></i> View
+                      
+                      <div class="d-flex justify-content-between mb-3">
+                        {% if not request.user.is_teacher %}
+                          <small class="text-muted">{{ course.completed_lessons }}/{{ course.lessons_count }} completed</small>
+                        {% endif %}
+                      </div>
+                      
+                      <a href="{% url 'content:course_detail' course_id=course.id %}" class="btn btn-{{ forloop.counter|divisibleby:4|yesno:"success,primary,info,warning" }} w-100">
+                        <i class="ti ti-eye me-1"></i> View Course
                       </a>
                     </div>
                   </div>
                 </div>
-              </div>
-            {% endfor %}
+              {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
           </div>
         {% else %}
-          <div class="text-center py-5">
+          <div class="text-center py-5 empty-state">
             <div class="avatar avatar-md mb-3">
-              <div class="avatar-initial rounded-circle bg-label-primary">
-                <i class="ti ti-books ti-md"></i>
+              <div class="avatar-initial rounded-circle bg-success">
+                <i class="ti ti-books ti-md text-white"></i>
               </div>
             </div>
             <h6 class="mb-1">No courses yet</h6>
@@ -457,7 +546,7 @@
                 Enroll in courses to track your learning progress
               {% endif %}
             </p>
-            <a href="{% if request.user.is_teacher %}{% url 'content:create_course' %}{% else %}{% url 'content:course_list' %}{% endif %}" class="btn btn-primary">
+            <a href="{% if request.user.is_teacher %}{% url 'content:create_course' %}{% else %}{% url 'content:course_list' %}{% endif %}" class="btn btn-success">
               {% if request.user.is_teacher %}Create Course{% else %}Browse Courses{% endif %}
             </a>
           </div>
@@ -468,62 +557,62 @@
 
   <!-- Learning Statistics -->
   <div class="col-xl-4 mb-4">
-    <div class="card h-100">
-      <div class="card-header">
-        <h5 class="card-title mb-0">{% if request.user.is_teacher %}Teaching{% else %}Learning{% endif %} Statistics</h5>
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header bg-warning bg-opacity-10">
+        <h5 class="card-title mb-0 text-warning">{% if request.user.is_teacher %}Teaching{% else %}Learning{% endif %} Statistics</h5>
       </div>
       <div class="card-body">
         <div id="weeklyActivityChart" class="mb-3" style="min-height: 250px;"></div>
         
         <div class="row g-3">
           <div class="col-6">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 p-3 rounded-3 bg-primary bg-opacity-10 hover-shadow transition-all">
               <div class="avatar avatar-sm flex-shrink-0">
-                <div class="avatar-initial rounded bg-label-primary">
-                  <i class="ti ti-clock ti-sm"></i>
+                <div class="avatar-initial rounded bg-primary">
+                  <i class="ti ti-clock ti-sm text-white"></i>
                 </div>
               </div>
               <div>
-                <h6 class="mb-0">{{ total_hours|default:"0" }}h</h6>
+                <h6 class="mb-0 fw-semibold">{{ total_hours|default:"0" }}h</h6>
                 <small>This Week</small>
               </div>
             </div>
           </div>
           <div class="col-6">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 p-3 rounded-3 bg-success bg-opacity-10 hover-shadow transition-all">
               <div class="avatar avatar-sm flex-shrink-0">
-                <div class="avatar-initial rounded bg-label-success">
-                  <i class="ti ti-checkbox ti-sm"></i>
+                <div class="avatar-initial rounded bg-success">
+                  <i class="ti ti-checkbox ti-sm text-white"></i>
                 </div>
               </div>
               <div>
-                <h6 class="mb-0">{{ total_completed|default:"0" }}</h6>
+                <h6 class="mb-0 fw-semibold">{{ total_completed|default:"0" }}</h6>
                 <small>{% if request.user.is_teacher %}Resources{% else %}Lessons{% endif %}</small>
               </div>
             </div>
           </div>
           <div class="col-6">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 p-3 rounded-3 bg-info bg-opacity-10 hover-shadow transition-all">
               <div class="avatar avatar-sm flex-shrink-0">
-                <div class="avatar-initial rounded bg-label-info">
-                  <i class="ti ti-file-text ti-sm"></i>
+                <div class="avatar-initial rounded bg-info">
+                  <i class="ti ti-file-text ti-sm text-white"></i>
                 </div>
               </div>
               <div>
-                <h6 class="mb-0">{{ assessments_taken|default:"0" }}</h6>
+                <h6 class="mb-0 fw-semibold">{{ assessments_taken|default:"0" }}</h6>
                 <small>{% if request.user.is_teacher %}Quizzes{% else %}Assessments{% endif %}</small>
               </div>
             </div>
           </div>
           <div class="col-6">
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 p-3 rounded-3 bg-warning bg-opacity-10 hover-shadow transition-all">
               <div class="avatar avatar-sm flex-shrink-0">
-                <div class="avatar-initial rounded bg-label-warning">
-                  <i class="ti ti-calendar-event ti-sm"></i>
+                <div class="avatar-initial rounded bg-warning">
+                  <i class="ti ti-calendar-event ti-sm text-white"></i>
                 </div>
               </div>
               <div>
-                <h6 class="mb-0">{{ total_sessions|default:"0" }}</h6>
+                <h6 class="mb-0 fw-semibold">{{ total_sessions|default:"0" }}</h6>
                 <small>Sessions</small>
               </div>
             </div>
@@ -538,55 +627,58 @@
 <div class="row">
   <!-- Upcoming Sessions -->
   <div class="col-lg-6 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title m-0">Upcoming Sessions</h5>
-        <a href="{% url 'meetings:meeting_list' %}" class="btn btn-sm btn-primary">View All</a>
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header d-flex justify-content-between align-items-center bg-info bg-opacity-10">
+        <h5 class="card-title m-0 text-info">Upcoming Sessions</h5>
+        <a href="{% url 'meetings:meeting_list' %}" class="btn btn-sm btn-info text-white">View All</a>
       </div>
       <div class="card-body p-0">
         {% if upcoming_meetings %}
           <div class="list-group list-group-flush">
             {% for meeting in upcoming_meetings %}
-              <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3">
-                <div class="d-flex align-items-center">
-                  <div class="avatar me-3">
-                    <span class="avatar-initial rounded bg-label-primary">
-                      <i class="ti ti-video"></i>
-                    </span>
-                  </div>
-                  <div>
-                    <h6 class="mb-0">{{ meeting.title }}</h6>
-                    <div class="d-flex align-items-center gap-1">
-                      <i class="ti ti-calendar-event ti-xs text-muted"></i>
-                      <small class="text-muted">{{ meeting.start_time|date:"M d, Y" }}</small>
-                      <i class="ti ti-clock ti-xs text-muted ms-2"></i>
-                      <small class="text-muted">{{ meeting.start_time|date:"h:i A" }}</small>
-                      <i class="ti ti-hourglass ti-xs text-muted ms-2"></i>
-                      <small class="text-muted">{{ meeting.duration }} min</small>
+              <div class="list-group-item d-flex align-items-center p-4 gap-3 meeting-item hover-shadow transition-all">
+                <div class="avatar flex-shrink-0">
+                  <span class="avatar-initial rounded bg-info">
+                    <i class="ti ti-video text-white"></i>
+                  </span>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1 fw-semibold">{{ meeting.title }}</h6>
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <div class="d-flex align-items-center text-muted">
+                      <i class="ti ti-calendar-event ti-xs me-1"></i>
+                      <small>{{ meeting.start_time|date:"M d, Y" }}</small>
+                    </div>
+                    <div class="d-flex align-items-center text-muted">
+                      <i class="ti ti-clock ti-xs me-1"></i>
+                      <small>{{ meeting.start_time|date:"h:i A" }}</small>
+                    </div>
+                    <div class="d-flex align-items-center text-muted">
+                      <i class="ti ti-hourglass ti-xs me-1"></i>
+                      <small>{{ meeting.duration }} min</small>
                     </div>
                   </div>
                 </div>
-                
                 {% if meeting.start_time|date:"U"|add:"0" < now|date:"U"|add:"600" %}
-                <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">
+                <a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-sm btn-info text-white">
                   <i class="ti ti-video me-1"></i> Join
                 </a>
                 {% else %}
-                <span class="badge bg-label-info">Upcoming</span>
+                <span class="badge bg-info text-white">Upcoming</span>
                 {% endif %}
               </div>
             {% endfor %}
           </div>
         {% else %}
-          <div class="text-center py-5">
+          <div class="text-center py-5 empty-state">
             <div class="avatar avatar-md mb-3">
-              <div class="avatar-initial rounded-circle bg-label-primary">
-                <i class="ti ti-calendar-off ti-md"></i>
+              <div class="avatar-initial rounded-circle bg-info">
+                <i class="ti ti-calendar-off ti-md text-white"></i>
               </div>
             </div>
             <h6 class="mb-1">No upcoming sessions</h6>
             <p class="mb-4">You don't have any scheduled sessions yet</p>
-            <a href="{% if request.user.is_teacher %}{% url 'meetings:create_meeting' %}{% else %}{% url 'booking:dashboard' %}{% endif %}" class="btn btn-primary">
+            <a href="{% if request.user.is_teacher %}{% url 'meetings:create_meeting' %}{% else %}{% url 'booking:dashboard' %}{% endif %}" class="btn btn-info text-white">
               {% if request.user.is_teacher %}Schedule Session{% else %}Book a Session{% endif %}
             </a>
           </div>
@@ -597,44 +689,45 @@
 
   <!-- Latest Resources -->
   <div class="col-lg-6 mb-4">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title m-0">Latest Resources</h5>
-        <a href="{% url 'repository:dashboard' %}" class="btn btn-sm btn-primary">View All</a>
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header d-flex justify-content-between align-items-center bg-purple bg-opacity-10">
+        <h5 class="card-title m-0 text-purple">Latest Resources</h5>
+        <a href="{% url 'repository:dashboard' %}" class="btn btn-sm btn-purple text-white">View All</a>
       </div>
       <div class="card-body">
         {% if resources %}
-          <div class="row">
-            {% for resource in resources %}
-              <div class="col-md-6 mb-3">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar">
-                      <div class="avatar-initial rounded bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
-                        <i class="ti ti-{{ resource.icon|default:"file" }} ti-md"></i>
+        <div class="row g-3">
+          {% for resource in resources %}
+            <div class="col-md-6 mb-3">
+              <div class="card resource-card border hover-shadow transition-all h-100">
+                <div class="card-body p-3">
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="avatar me-3 flex-shrink-0">
+                      <div class="avatar-initial rounded bg-{{ resource.file_type|lower|cut:" "|yesno:"pdf=danger,document=primary,spreadsheet=success,presentation=warning,image=info,video=purple,audio=info,file=secondary" }}">
+                        <i class="ti ti-{{ resource.icon|default:"file" }} ti-md text-white"></i>
                       </div>
                     </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <h6 class="mb-1 text-truncate" style="max-width: 180px;">{{ resource.title }}</h6>
-                    <div class="d-flex align-items-center gap-1">
-                      <span class="badge bg-label-{{ resource.file_type|lower|cut:" "|default:"primary" }}">
+                    <div>
+                      <h6 class="mb-0 fw-semibold text-truncate" style="max-width: 150px;">{{ resource.title }}</h6>
+                      <span class="badge bg-{{ resource.file_type|lower|cut:" "|yesno:"pdf=danger,document=primary,spreadsheet=success,presentation=warning,image=info,video=purple,audio=info,file=secondary" }} mt-1">
                         {{ resource.file_type }}
                       </span>
-                      <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="ms-auto btn btn-sm btn-icon btn-label-primary">
-                        <i class="ti ti-download ti-xs"></i>
-                      </a>
                     </div>
                   </div>
+                  
+                  <a href="{% url 'repository:download_resource' resource_id=resource.id %}" class="btn btn-sm btn-{{ resource.file_type|lower|cut:" "|yesno:"pdf=danger,document=primary,spreadsheet=success,presentation=warning,image=info,video=purple,audio=info,file=secondary" }} w-100">
+                    <i class="ti ti-download me-1"></i> Download
+                  </a>
                 </div>
               </div>
-            {% endfor %}
-          </div>
+            </div>
+          {% endfor %}
+        </div>
         {% else %}
-          <div class="text-center py-5">
+          <div class="text-center py-5 empty-state">
             <div class="avatar avatar-md mb-3">
-              <div class="avatar-initial rounded-circle bg-label-primary">
-                <i class="ti ti-file ti-md"></i>
+              <div class="avatar-initial rounded-circle bg-purple">
+                <i class="ti ti-file ti-md text-white"></i>
               </div>
             </div>
             <h6 class="mb-1">No resources yet</h6>
@@ -645,7 +738,7 @@
                 No learning resources are available yet
               {% endif %}
             </p>
-            <a href="{% if request.user.is_teacher %}{% url 'repository:upload_teacher_resource' %}{% else %}{% url 'repository:dashboard' %}{% endif %}" class="btn btn-primary">
+            <a href="{% if request.user.is_teacher %}{% url 'repository:upload_teacher_resource' %}{% else %}{% url 'repository:dashboard' %}{% endif %}" class="btn btn-purple text-white">
               {% if request.user.is_teacher %}Upload Resource{% else %}Browse Resources{% endif %}
             </a>
           </div>
@@ -659,27 +752,27 @@
 <!-- Featured Teachers -->
 <div class="row mb-4">
   <div class="col-12">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">Featured Teachers</h5>
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-teal bg-opacity-10">
+        <h5 class="card-title mb-0 text-teal">Featured Teachers</h5>
       </div>
       <div class="card-body">
         <div class="swiper" id="swiper-featured-teachers">
           <div class="swiper-wrapper">
             {% for teacher in featured_teachers %}
               <div class="swiper-slide">
-                <div class="card shadow-none bg-transparent border h-100">
+                <div class="card border shadow-none h-100 hover-shadow transition-all teacher-card">
                   <div class="card-body text-center p-4">
                     <div class="avatar avatar-xl mx-auto mb-3">
                       {% if teacher.profile_image %}
                         <img src="{{ teacher.profile_image.url }}" alt="{{ teacher.user.username }}" class="rounded-circle">
                       {% else %}
-                        <div class="avatar-initial rounded-circle bg-label-primary">
-                          <span>{{ teacher.user.username|slice:":1" }}</span>
+                        <div class="avatar-initial rounded-circle bg-teal">
+                          <span class="text-white">{{ teacher.user.username|slice:":1" }}</span>
                         </div>
                       {% endif %}
                     </div>
-                    <h5 class="mb-1">{{ teacher.user.username }}</h5>
+                    <h5 class="mb-1 fw-semibold">{{ teacher.user.username }}</h5>
                     
                     <div class="d-flex justify-content-center mb-3">
                       {% for i in "12345" %}
@@ -693,15 +786,15 @@
                     
                     <p class="text-muted mb-3">{{ teacher.bio|truncatechars:80 }}</p>
                     
-                    <div class="d-flex gap-1 justify-content-center mb-2">
+                    <div class="d-flex gap-1 justify-content-center mb-3">
                       {% if teacher.teaching_languages %}
                         {% for lang in teacher.teaching_languages.split %}
-                          <span class="badge bg-label-info">{{ lang }}</span>
+                          <span class="badge bg-info text-white">{{ lang }}</span>
                         {% endfor %}
                       {% endif %}
                     </div>
                     
-                    <a href="{% url 'content:instructor_detail' username=teacher.user.username %}" class="btn btn-primary w-100">
+                    <a href="{% url 'content:instructor_detail' username=teacher.user.username %}" class="btn btn-teal text-white w-100">
                       <i class="ti ti-user me-1"></i> View Profile
                     </a>
                   </div>
@@ -724,6 +817,30 @@
 {% block page_js_extra %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Swiper for course progress if exists
+    if (document.querySelector('#course-progress-swiper')) {
+      new Swiper('#course-progress-swiper', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+          el: '.swiper-pagination',
+          clickable: true,
+        },
+        breakpoints: {
+          768: {
+            slidesPerView: 1,
+          },
+          1200: {
+            slidesPerView: 2,
+          }
+        }
+      });
+    }
+  
     // Weekly Activity Chart
     const weeklyActivityOptions = {
       series: [{
@@ -738,7 +855,8 @@
         },
         sparkline: {
           enabled: false
-        }
+        },
+        fontFamily: 'inherit'
       },
       grid: {
         show: false,
@@ -757,7 +875,7 @@
       legend: {
         show: false
       },
-      colors: ['#696cff'],
+      colors: ['#ff8f00'],
       fill: {
         type: 'gradient',
         gradient: {
@@ -793,7 +911,8 @@
       tooltip: {
         x: {
           show: false
-        }
+        },
+        theme: 'dark'
       }
     };
     
@@ -831,6 +950,300 @@
         }
       });
     }
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Add hover effects for cards
+    const hoverCards = document.querySelectorAll('.hover-elevate-up');
+    hoverCards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+    
+    // Add custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+      /* Custom Color Gradients */
+      .dashboard-hero {
+        background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+        color: white;
+      }
+      
+      .bg-purple {
+        background-color: #6342ff !important;
+      }
+      
+      .bg-teal {
+        background-color: #03c3ec !important;
+      }
+      
+      .bg-success {
+        background-color: #28c76f !important;
+      }
+      
+      .bg-warning {
+        background-color: #ff8c42 !important;
+      }
+      
+      .text-purple {
+        color: #6342ff !important;
+      }
+      
+      .text-teal {
+        color: #03c3ec !important;
+      }
+      
+      .text-success {
+        color: #28c76f !important;
+      }
+      
+      .text-warning {
+        color: #ff8c42 !important;
+      }
+      
+      /* Hero Section */
+      .hero-image {
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+        transition: transform 0.5s ease;
+      }
+      
+      /* Button Styles */
+      .btn-glow {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+      }
+      
+      .btn-glow:hover {
+        background: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+      }
+      
+      .btn-purple {
+        background-color: #a64eee;
+        border-color: #a64eee;
+      }
+      
+      .btn-teal {
+        background-color: #0acffe;
+        border-color: #0acffe;
+      }
+      
+      /* Card and Item Transitions */
+      .hover-shadow {
+        transition: box-shadow 0.2s ease-in-out;
+      }
+      
+      .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+      }
+      
+      .transition-all {
+        transition: all 0.2s ease-in-out;
+      }
+      
+      .hover-elevate-up {
+        transition: transform 0.2s ease-in-out;
+      }
+      
+      .hover-elevate-up:hover {
+        transform: translateY(-5px);
+      }
+      
+      .meeting-item {
+        transition: all 0.2s ease;
+      }
+      
+      .meeting-item:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+      }
+      
+      .course-card {
+        transition: all 0.3s ease;
+      }
+      
+      .course-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .resource-card {
+        transition: all 0.3s ease;
+      }
+      
+      .resource-card:hover {
+        transform: translateY(-3px);
+      }
+      
+      .teacher-card {
+        transition: all 0.3s ease;
+      }
+      
+      .teacher-card:hover {
+        transform: translateY(-3px);
+      }
+      
+      .shadow-md {
+        box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1) !important;
+      }
+      
+      .rounded-4 {
+        border-radius: 0.75rem !important;
+      }
+      
+      /* Timeline Modern Design */
+      .timeline-modern {
+        position: relative;
+        padding-left: 1.75rem;
+      }
+      
+      .timeline-modern .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+      }
+      
+      .timeline-modern .timeline-item:not(:last-child):before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 22px;
+        bottom: -6px;
+        width: 2px;
+        background-color: rgba(105, 108, 255, 0.25);
+      }
+      
+      .timeline-modern .timeline-indicator {
+        position: absolute;
+        left: -31px;
+        top: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .timeline-modern .timeline-indicator i {
+        font-size: 12px;
+      }
+      
+      .timeline-indicator-primary {
+        background-color: #696cff;
+      }
+      
+      .timeline-indicator-success {
+        background-color: #28c76f;
+      }
+      
+      .timeline-indicator-info {
+        background-color: #03c3ec;
+      }
+      
+      .timeline-indicator-warning {
+        background-color: #ffab00;
+      }
+      
+      .timeline-indicator-danger {
+        background-color: #ff3e1d;
+      }
+      
+      .timeline-modern .timeline-event {
+        padding-bottom: 1rem;
+      }
+      
+      /* Custom color definitions */
+      .text-purple {
+        color: #a64eee !important;
+      }
+      
+      .bg-purple {
+        background-color: #a64eee !important;
+      }
+      
+      .bg-purple-subtle {
+        background-color: rgba(166, 78, 238, 0.1) !important;
+      }
+      
+      .text-teal {
+        color: #0acffe !important;
+      }
+      
+      .bg-teal {
+        background-color: #0acffe !important;
+      }
+      
+      .bg-teal-subtle {
+        background-color: rgba(10, 207, 254, 0.1) !important;
+      }
+      
+      /* Background opacity utilities */
+      .bg-opacity-10 {
+        --bs-bg-opacity: 0.1;
+      }
+      
+      /* Custom table styling */
+      .custom-table .table {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+      }
+      
+      .custom-table thead th {
+        border-bottom: none;
+        font-weight: 600;
+        color: #5d596c;
+      }
+      
+      .custom-table tbody tr {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+      
+      .table-row-hover:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+      }
+      
+      /* Custom Tabs */
+      .custom-tabs .nav-link {
+        color: #5d596c;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+      
+      .custom-tabs .nav-link:hover:not(.active) {
+        background-color: rgba(105, 108, 255, 0.04);
+      }
+      
+      .custom-tabs .nav-link.active {
+        background-color: #696cff;
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(105, 108, 255, 0.4);
+      }
+      
+      /* Empty state styling */
+      .empty-state {
+        opacity: 0.8;
+        transition: all 0.3s ease;
+      }
+      
+      .empty-state:hover {
+        opacity: 1;
+      }
+    `;
+    document.head.appendChild(style);
   });
 </script>
 {% endblock %}

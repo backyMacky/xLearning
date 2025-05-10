@@ -34,13 +34,5 @@ urlpatterns = [
         name="dashboard-student",  # This should match what's used in the StudentDashboardView
     ),
     
-    # Keep existing CRM dashboard for backward compatibility
-    # path(
-    #    "dashboard/crm/",
-    #    DashboardsView.as_view(template_name="dashboard_crm.html"),
-    #    name="dashboard-crm",
-    #),
-    
-    # Other URL patterns...
-    # ...
+   
 ]
